@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30406.217
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TGC.MonoGame.Samples", "TGC.MonoGame.Samples\TGC.MonoGame.Samples.csproj", "{D14FE901-8CA9-451B-8427-F448C2676E4A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D14FE901-8CA9-451B-8427-F448C2676E4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D14FE901-8CA9-451B-8427-F448C2676E4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D14FE901-8CA9-451B-8427-F448C2676E4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D14FE901-8CA9-451B-8427-F448C2676E4A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F1F679D4-8C29-4B92-9D77-F7AC047127DF}
+	EndGlobalSection
+EndGlobal

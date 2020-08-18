@@ -1,0 +1,67 @@
+### Linux ###
+*~
+
+### macOS ###
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+### Windows ###
+# Windows thumbnail cache files
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+
+# Folder config file
+[Dd]esktop.ini
+
+# Windows shortcuts
+*.lnk
+
+### DotnetCore ###
+# .NET Core build folders
+[Bb]in/
+[Oo]bj/
+
+# Common node modules locations
+/node_modules
+/wwwroot/node_modules
+
+### VisualStudioCode ###
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+### VisualStudioCode Patch ###
+# Ignore all local history of files
+.history
+
+### VisualStudio ###
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# User-specific files (MonoDevelop/Xamarin Studio)
+*.userprefs
+
+# Visual Studio 2015/2017 cache/options directory
+.vs/
+
+# Content
+*/Content/2D/*
+*/Content/3D/*
+*/Content/Data/*
+*/Content/Music/*
+*/Content/Sounds/*
+*/Content/SpriteFonts/*
+*/Content/Textures/*
