@@ -20,38 +20,28 @@ namespace TGC.MonoGame.Samples.Cameras
         public readonly Vector3 DefaultWorldUpVector = Vector3.Up;
 
         /// <summary>
-        /// Camera with simple movement to be able to move in the 3D world, which has the up vector in (0,1,0) and the forward vector in (0,0,-1).
-        /// </summary>
-        /// <param name="aspectRatio">Aspect ratio, defined as view space width divided by height.</param>
-        /// <param name="fieldOfViewDegrees">Field of view in the y direction, in radians.</param>
-        /// <param name="nearPlane">Distance to the near view plane.</param>
-        /// <param name="farPlane">Distance to the far view plane.</param>
-        /// <param name="position">The position of the camera.</param>
-        /// <param name="speed">The speed of movement.</param>
-        public SimpleCamera(float aspectRatio, float fieldOfViewDegrees, float nearPlane, float farPlane,
-            Vector3 position, float speed)
-        {
-            AspectRatio = aspectRatio;
-            FieldOfView = fieldOfViewDegrees;
-            NearPlane = nearPlane;
-            FarPlane = farPlane;
-            Position = position;
-            FrontDirection = DefaultWorldFrontVector;
-            Speed = speed;
-            LookAtDirection = Position + FrontDirection;
-            ViewMatrix = Matrix.CreateLookAt(Position, LookAtDirection, DefaultWorldUpVector);
-            ProjectionMatrix = Matrix.CreatePerspectiveFieldOfView(FieldOfView, AspectRatio, NearPlane, FarPlane);
-            WorldMatrix = Matrix.Identity;
-        }
-
-        /// <summary>
         /// Direction where the front of the camera is.
         /// </summary>
         public Vector3 FrontDirection { get; set; }
+
         /// <summary>
         /// Value with which the camera is going to move.
         /// </summary>
         public float Speed { get; set; }
+
+        /// <summary>
+        /// Camera with simple movement to be able to move in the 3D world, which has the up vector in (0,1,0) and the forward vector in (0,0,-1).
+        /// </summary>
+        /// <param name="position">The position of the camera.</param>
+        /// <param name="speed">The speed of movement.</param>
+        public SimpleCamera(Vector3 position, float speed)
+        {
+            Position = position;
+            FrontDirection = DefaultWorldFrontVector;
+            Speed = speed;
+            base.FrontDirection = Position + FrontDirection;
+            ViewMatrix = Matrix.CreateLookAt(Position, base.FrontDirection, DefaultWorldUpVector);
+        }
 
         /// <summary>
         /// Handles camera input.
@@ -102,9 +92,8 @@ namespace TGC.MonoGame.Samples.Cameras
             if (keyboardState.IsKeyDown(Keys.D))
                 Position -= RightDirection * time * Speed;
 
-            LookAtDirection = Position + FrontDirection;
-            ViewMatrix = Matrix.CreateLookAt(Position, LookAtDirection, DefaultWorldUpVector);
-            ProjectionMatrix = Matrix.CreatePerspectiveFieldOfView(FieldOfView, AspectRatio, NearPlane, FarPlane);
+            base.FrontDirection = Position + FrontDirection;
+            ViewMatrix = Matrix.CreateLookAt(Position, base.FrontDirection, DefaultWorldUpVector);
         }
     }
 }

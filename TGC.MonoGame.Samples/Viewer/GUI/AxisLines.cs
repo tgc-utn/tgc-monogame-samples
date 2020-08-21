@@ -13,13 +13,16 @@ namespace TGC.MonoGame.Samples.Viewer.GUI
         private const float AxisPosDistance = 25;
         private const int NumberOfVertices = 6;
 
+        private GraphicsDevice device;
+
         /// <summary>
         /// Default constructor.
         /// </summary>
         /// <param name="device">Used to initialize and control the presentation of the graphics device.</param>
         public AxisLines(GraphicsDevice device)
         {
-            CreateVertexBuffer(device);
+            this.device = device;
+            CreateVertexBuffer();
         }
 
         /// <summary>
@@ -40,18 +43,17 @@ namespace TGC.MonoGame.Samples.Viewer.GUI
         /// <summary>
         /// Create a vertex buffer for the figure with the given information.
         /// </summary>
-        /// <param name="device">The graphics device to associate with this vertex buffer.</param>
-        private void CreateVertexBuffer(GraphicsDevice device)
+        private void CreateVertexBuffer()
         {
             AxisLinesVertices = new VertexPositionColor[NumberOfVertices];
             // Red = +x Axis
             AxisLinesVertices[0] = new VertexPositionColor(Vector3.Zero, Color.Red);
-            AxisLinesVertices[1] = new VertexPositionColor(Vector3.UnitX * 120, Color.Red);
+            AxisLinesVertices[1] = new VertexPositionColor(Vector3.UnitX * 60, Color.Red);
             // Green = +y Axis
             AxisLinesVertices[2] = new VertexPositionColor(Vector3.Zero, Color.Green);
-            AxisLinesVertices[3] = new VertexPositionColor(Vector3.UnitY * 120, Color.Green);
+            AxisLinesVertices[3] = new VertexPositionColor(Vector3.UnitY * 60, Color.Green);
             // Blue = +z Axis
-            AxisLinesVertices[4] = new VertexPositionColor(Vector3.UnitZ * 120, Color.Blue);
+            AxisLinesVertices[4] = new VertexPositionColor(Vector3.UnitZ * 60, Color.Blue);
             AxisLinesVertices[5] = new VertexPositionColor(Vector3.Zero, Color.Blue);
 
             Effect = new BasicEffect(device);
@@ -64,9 +66,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI
         /// <summary>
         /// Draw de axes.
         /// </summary>
-        /// <param name="device">The device where to draw.</param>
-        /// <param name="camera">The camera contains the necessary matrices.</param>
-        public void Draw(GraphicsDevice device, Camera camera)
+        /// <param name="view">The view matrix, normally from the camera.</param>
+        /// <param name="projection">The projection matrix, normally from the application.</param>
+        public void Draw(Matrix view, Matrix projection)
         {
             //Obtener World coordinate de la esquina inferior de la pantalla
             var width = device.Viewport.Width;
@@ -76,12 +78,11 @@ namespace TGC.MonoGame.Samples.Viewer.GUI
             var v = new Vector3(sx, sy, 1.0f);
 
             //Transform the screen space into 3D space
-            var worldCoordPos =
-                device.Viewport.Unproject(v, camera.ProjectionMatrix, camera.ViewMatrix, camera.WorldMatrix);
+            var worldCoordPos = device.Viewport.Unproject(v, projection, view, Matrix.Identity);
 
             Effect.World = Matrix.CreateTranslation(worldCoordPos);
-            Effect.View = camera.ViewMatrix;
-            Effect.Projection = camera.ProjectionMatrix;
+            Effect.View = view;
+            Effect.Projection = projection;
             Effect.VertexColorEnabled = true;
 
             foreach (var pass in Effect.CurrentTechnique.Passes)
