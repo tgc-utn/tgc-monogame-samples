@@ -28,7 +28,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         ///<inheritdoc/>
         public override void Initialize()
         {
-            Camera = new StaticCamera(new Vector3(0, 0, 55), Vector3.Zero);
+            Camera = new StaticCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 0, 55), Vector3.Zero);
             Triangle = new TrianglePrimitive(GraphicsDevice, new Vector3(-20f, 0f, 0f), new Vector3(-10f, 10f, 0f),
                 new Vector3(0f, 0f, 0f), Color.Black, Color.Cyan, Color.Magenta);
             Triangle2 = new TrianglePrimitive(GraphicsDevice, new Vector3(0f, 0f, 0f), new Vector3(10f, 10f, 0f),
@@ -42,10 +42,10 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         {
             Game.Background = Color.CornflowerBlue;
 
-            AxisLines.Draw(Camera.ViewMatrix, Projection);
+            AxisLines.Draw(Camera.View, Camera.Projection);
 
-            Triangle.Draw(Matrix.Identity, Camera.ViewMatrix, Projection);
-            Triangle2.Draw(Matrix.Identity, Camera.ViewMatrix, Projection);
+            Triangle.Draw(Matrix.Identity, Camera.View, Camera.Projection);
+            Triangle2.Draw(Matrix.Identity, Camera.View, Camera.Projection);
 
             base.Draw(gameTime);
         }

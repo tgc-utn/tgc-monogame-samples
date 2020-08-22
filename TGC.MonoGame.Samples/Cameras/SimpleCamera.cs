@@ -20,11 +20,6 @@ namespace TGC.MonoGame.Samples.Cameras
         public readonly Vector3 DefaultWorldUpVector = Vector3.Up;
 
         /// <summary>
-        /// Direction where the front of the camera is.
-        /// </summary>
-        public Vector3 FrontDirection { get; set; }
-
-        /// <summary>
         /// Value with which the camera is going to move.
         /// </summary>
         public float Speed { get; set; }
@@ -32,23 +27,21 @@ namespace TGC.MonoGame.Samples.Cameras
         /// <summary>
         /// Camera with simple movement to be able to move in the 3D world, which has the up vector in (0,1,0) and the forward vector in (0,0,-1).
         /// </summary>
+        /// <param name="aspectRatio">Aspect ratio, defined as view space width divided by height.</param>
         /// <param name="position">The position of the camera.</param>
         /// <param name="speed">The speed of movement.</param>
-        public SimpleCamera(Vector3 position, float speed)
+        public SimpleCamera(float aspectRatio, Vector3 position, float speed) : base(aspectRatio)
         {
             Position = position;
             FrontDirection = DefaultWorldFrontVector;
             Speed = speed;
-            ViewMatrix = Matrix.CreateLookAt(Position, Position + FrontDirection, DefaultWorldUpVector);
+            View = Matrix.CreateLookAt(Position, Position + FrontDirection, DefaultWorldUpVector);
         }
 
-        /// <summary>
-        /// Handles camera input.
-        /// </summary>
-        /// <param name="gameTime">Holds the time state of a <see cref="Game" />.</param>
-        /// <param name="keyboardState">Allows retrieval of keystrokes from a keyboard input device.</param>
-        public void Update(GameTime gameTime, KeyboardState keyboardState)
+        ///<inheritdoc/>
+        public override void Update(GameTime gameTime)
         {
+            var keyboardState = Keyboard.GetState();
             var time = Convert.ToSingle(gameTime.ElapsedGameTime.TotalMilliseconds);
 
             // Check for input to rotate the camera.
@@ -91,7 +84,7 @@ namespace TGC.MonoGame.Samples.Cameras
             if (keyboardState.IsKeyDown(Keys.D))
                 Position -= RightDirection * time * Speed;
 
-            ViewMatrix = Matrix.CreateLookAt(Position, Position + FrontDirection, DefaultWorldUpVector);
+            View = Matrix.CreateLookAt(Position, Position + FrontDirection, DefaultWorldUpVector);
         }
     }
 }

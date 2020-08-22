@@ -1,29 +1,29 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.Threading;
 
 namespace TGC.MonoGame.Samples.Cameras
 {
-    class FreeCamera : Camera
+    internal class FreeCamera : Camera
     {
-        // Angles
-        private float yaw = -90f;
-        private float pitch = 0f;
+        private bool changed;
+        private readonly bool lockMouse;
 
         private Vector2 pastMousePosition;
+        private float pitch;
 
-        public float MovementSpeed { get; set; } = 100f;
-        public float MouseSensitivity { get; set; } = 5f;
+        private readonly Point screenCenter;
 
-        private bool changed = false, lockMouse = false;
+        // Angles
+        private float yaw = -90f;
 
-        private Point screenCenter;
+        public FreeCamera(float aspectRatio, Vector3 position, Point screenCenter) : this(aspectRatio, position)
+        {
+            lockMouse = true;
+            this.screenCenter = screenCenter;
+        }
 
-        public FreeCamera(Vector3 position)
+        public FreeCamera(float aspectRatio, Vector3 position) : base(aspectRatio)
         {
             Position = position;
             pastMousePosition = Mouse.GetState().Position.ToVector2();
@@ -31,21 +31,18 @@ namespace TGC.MonoGame.Samples.Cameras
             CalculateView();
         }
 
-        public FreeCamera(Vector3 position, Point screenCenter) : this(position)
-        {
-            lockMouse = true;
-            this.screenCenter = screenCenter;
-        }
-
+        public float MovementSpeed { get; set; } = 100f;
+        public float MouseSensitivity { get; set; } = 5f;
 
         private void CalculateView()
         {
-            ViewMatrix = Matrix.CreateLookAt(Position, Position + FrontDirection, UpDirection);
+            View = Matrix.CreateLookAt(Position, Position + FrontDirection, UpDirection);
         }
 
-        public void Update(GameTime gameTime)
+        /// <inheritdoc />
+        public override void Update(GameTime gameTime)
         {
-            float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            var elapsedTime = (float) gameTime.ElapsedGameTime.TotalSeconds;
             changed = false;
             ProcessKeyboard(elapsedTime);
             ProcessMouseMovement(elapsedTime);
@@ -54,7 +51,7 @@ namespace TGC.MonoGame.Samples.Cameras
                 CalculateView();
         }
 
-        void ProcessKeyboard(float elapsedTime)
+        private void ProcessKeyboard(float elapsedTime)
         {
             var keyboardState = Keyboard.GetState();
             if (keyboardState.IsKeyDown(Keys.A) || keyboardState.IsKeyDown(Keys.Left))
@@ -80,16 +77,15 @@ namespace TGC.MonoGame.Samples.Cameras
                 Position += -FrontDirection * MovementSpeed * elapsedTime;
                 changed = true;
             }
-
         }
 
-        void ProcessMouseMovement(float elapsedTime)
+        private void ProcessMouseMovement(float elapsedTime)
         {
             var mouseState = Mouse.GetState();
 
-            if(mouseState.RightButton.Equals(ButtonState.Pressed))
+            if (mouseState.RightButton.Equals(ButtonState.Pressed))
             {
-                Vector2 mouseDelta = mouseState.Position.ToVector2() - pastMousePosition;
+                var mouseDelta = mouseState.Position.ToVector2() - pastMousePosition;
                 mouseDelta *= MouseSensitivity * elapsedTime;
 
                 yaw -= mouseDelta.X;
@@ -109,6 +105,7 @@ namespace TGC.MonoGame.Samples.Cameras
                     Mouse.SetCursor(MouseCursor.Crosshair);
                 }
             }
+
             pastMousePosition = Mouse.GetState().Position.ToVector2();
         }
 
@@ -124,11 +121,8 @@ namespace TGC.MonoGame.Samples.Cameras
 
             // Also re-calculate the Right and Up vector
             // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-            RightDirection = Vector3.Normalize(Vector3.Cross(FrontDirection, Vector3.Up));  
+            RightDirection = Vector3.Normalize(Vector3.Cross(FrontDirection, Vector3.Up));
             UpDirection = Vector3.Normalize(Vector3.Cross(RightDirection, FrontDirection));
         }
-    };
-
+    }
 }
-
-

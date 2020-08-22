@@ -22,7 +22,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             Description = "Shows the Creation of a 3D Box with one color per vertex and can be moved using the keyboard arrows.";
         }
 
-        private FreeCamera Camera { get; set; }
+        private Camera Camera { get; set; }
         private BoxPrimitive Box { get; set; }
 
         private Matrix BoxWorld { get; set; } = Matrix.Identity;
@@ -34,7 +34,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             Point size = GraphicsDevice.Viewport.Bounds.Size;
             size.X /= 2;
             size.Y /= 2;
-            Camera = new FreeCamera(new Vector3(0f, 20f, 60f), size);
+            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0f, 20f, 60f), size);
             Box = new BoxPrimitive(GraphicsDevice, new Vector3(25, 25, 25), Vector3.Zero, Color.Black, Color.Red, Color.Yellow,
                 Color.Green, Color.Blue, Color.Magenta, Color.White, Color.Cyan);
 
@@ -65,9 +65,9 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
 
             Game.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            AxisLines.Draw(Camera.ViewMatrix, Projection);
+            AxisLines.Draw(Camera.View, Camera.Projection);
 
-            Box.Draw(BoxWorld, Camera.ViewMatrix, Projection);
+            Box.Draw(BoxWorld, Camera.View, Camera.Projection);
 
             base.Draw(gameTime);
         }

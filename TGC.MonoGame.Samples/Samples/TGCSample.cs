@@ -32,27 +32,6 @@ namespace TGC.MonoGame.Samples.Samples
         /// </summary>
         public AxisLines AxisLines { get; set; }
 
-
-        /// <summary>
-        /// Default Projection Matrix
-        /// </summary>
-        public Matrix Projection { get; set; }
-
-        /// <summary>
-        /// Default Field of View for the Projection Matrix
-        /// </summary>
-        public float FieldOfView { get; set; } = MathHelper.PiOver4;
-
-        /// <summary>
-        /// Default Far Plane Distance for the Projection Matrix
-        /// </summary>
-        public float FarPlaneDistance { get; set; } = 3000f;
-
-        /// <summary>
-        /// Default Near Plane Distance for the Projection Matrix
-        /// </summary>
-        public float NearPlaneDistance { get; set; } = 0.1f;
-
         /// <summary>
         /// Category where the example belongs, this value is used to build the example tree.
         /// </summary>
@@ -80,7 +59,6 @@ namespace TGC.MonoGame.Samples.Samples
         {
             AxisLines = new AxisLines(GraphicsDevice);
             
-            Projection = Matrix.CreatePerspectiveFieldOfView(FieldOfView, GraphicsDevice.Viewport.AspectRatio, NearPlaneDistance, FarPlaneDistance);
             base.Initialize();
         }
 

@@ -20,7 +20,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             Description = "Applying Blinn-Phong to a scene";
         }
 
-        private SimpleCamera Camera { get; set; }
+        private Camera Camera { get; set; }
         private Model Model { get; set; }
         private Effect Effect { get; set; }
         private Matrix LightBoxWorld { get; set; } = Matrix.Identity;
@@ -29,8 +29,8 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         /// <inheritdoc />
         public override void Initialize()
         {
-            Camera = new SimpleCamera(new Vector3(0, 50, 400), 0.1f);
-            //GraphicsDevice.Viewport.AspectRatio, MathHelper.PiOver4, 1, 5000, 
+            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 50, 1000), 0.1f);
+
             base.Initialize();
         }
 
@@ -73,7 +73,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         public override void Update(GameTime gameTime)
         {
             // Update the state of the camera
-            Camera.Update(gameTime, Game.CurrentKeyboardState);
+            Camera.Update(gameTime);
 
             // Rotate our light position in a circle up in the sky
             var lightPosition = new Vector3((float) Math.Cos(Timer) * 700f, 800f, (float) Math.Sin(Timer) * 700f);
@@ -96,7 +96,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             Game.Background = Color.Black;
             Game.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            AxisLines.Draw(Camera.ViewMatrix, Projection);
+            AxisLines.Draw(Camera.View, Camera.Projection);
 
             // We get the base transform for each mesh
             var modelMeshesBaseTransforms = new Matrix[Model.Bones.Count];
@@ -110,13 +110,13 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
                 // InverseTransposeWorld is used to rotate normals
                 Effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(worldMatrix)));
                 // WorldViewProjection is used to transform from model space to clip space
-                Effect.Parameters["WorldViewProjection"].SetValue(worldMatrix * Camera.ViewMatrix * Projection);
+                Effect.Parameters["WorldViewProjection"].SetValue(worldMatrix * Camera.View * Camera.Projection);
 
                 // Once we set these matrices we draw
                 modelMesh.Draw();
             }
 
-            lightBox.Draw(LightBoxWorld, Camera.ViewMatrix, Projection);
+            lightBox.Draw(LightBoxWorld, Camera.View, Camera.Projection);
 
             base.Draw(gameTime);
         }
