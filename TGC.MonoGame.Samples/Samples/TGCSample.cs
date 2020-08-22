@@ -46,7 +46,7 @@ namespace TGC.MonoGame.Samples.Samples
         /// <summary>
         /// Default Far Plane Distance for the Projection Matrix
         /// </summary>
-        public float FarPlaneDistance { get; set; } = 1000f;
+        public float FarPlaneDistance { get; set; } = 3000f;
 
         /// <summary>
         /// Default Near Plane Distance for the Projection Matrix

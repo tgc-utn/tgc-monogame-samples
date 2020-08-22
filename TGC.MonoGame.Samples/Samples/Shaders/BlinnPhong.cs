@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using TGC.MonoGame.Samples.Cameras;
@@ -11,12 +12,13 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 {
     public class BlinnPhong : TGCSample
     {
-        private SimpleCamera Camera { get; set; }
+        private FreeCamera Camera { get; set; }
         private Model Model { get; set; }
 
         private Effect Effect { get; set; }
 
         private BoxPrimitive lightBox;
+        private Matrix lightBoxWorld;
 
         private float timer = 0f;
 
@@ -32,8 +34,8 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         /// <inheritdoc />
         public override void Initialize()
         {
-            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, MathHelper.PiOver4, 1, 5000,
-                new Vector3(0, 50, 400), 0.1f);
+            Point screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
+            Camera = new FreeCamera(new Vector3(0, 50, 400), screenSize);
 
 
             base.Initialize();
@@ -55,7 +57,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             foreach (var modelMesh in Model.Meshes)
                 foreach (var meshPart in modelMesh.MeshParts)
                     meshPart.Effect = Effect;
-
+            
             // Set the texture. This won't change on this effect so we can assign it here
             Effect.Parameters["baseTexture"].SetValue(texture);
 
@@ -78,11 +80,11 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         public override void Update(GameTime gameTime)
         {
             // Update the state of the camera
-            Camera.Update(gameTime, Game.CurrentKeyboardState);
+            Camera.Update(gameTime);
 
             // Rotate our light position in a circle up in the sky
             var lightPosition = new Vector3((float)Math.Cos(timer) * 700f, 800f, (float)Math.Sin(timer) * 700f);
-            Camera.WorldMatrix = Matrix.CreateTranslation(lightPosition);
+            lightBoxWorld = Matrix.CreateTranslation(lightPosition);
 
             // Set the light position and camera position
             // These change every update so we need to set them on every update call
@@ -101,7 +103,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             Game.Background = Color.Black;
             Game.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            AxisLines.Draw(GraphicsDevice, Camera);
+            AxisLines.Draw(Camera.ViewMatrix, Projection);
 
             // We get the base transform for each mesh
             var modelMeshesBaseTransforms = new Matrix[Model.Bones.Count];
@@ -110,18 +112,19 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             {
                 // We set the main matrices for each mesh to draw
                 var worldMatrix = modelMeshesBaseTransforms[modelMesh.ParentBone.Index];
+
                 // World is used to transform from model space to world space
                 Effect.Parameters["World"].SetValue(worldMatrix);
                 // InverseTransposeWorld is used to rotate normals
                 Effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(worldMatrix)));
                 // WorldViewProjection is used to transform from model space to clip space
-                Effect.Parameters["WorldViewProjection"].SetValue(worldMatrix * Camera.ViewMatrix * Camera.ProjectionMatrix);
+                Effect.Parameters["WorldViewProjection"].SetValue(worldMatrix * Camera.ViewMatrix * Projection);
 
                 // Once we set these matrices we draw
                 modelMesh.Draw();
             }
 
-            lightBox.Draw(GraphicsDevice, Camera);
+            lightBox.Draw(lightBoxWorld, Camera.ViewMatrix, Projection);
             
 
             base.Draw(gameTime);
