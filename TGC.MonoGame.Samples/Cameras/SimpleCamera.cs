@@ -39,8 +39,7 @@ namespace TGC.MonoGame.Samples.Cameras
             Position = position;
             FrontDirection = DefaultWorldFrontVector;
             Speed = speed;
-            base.FrontDirection = Position + FrontDirection;
-            ViewMatrix = Matrix.CreateLookAt(Position, base.FrontDirection, DefaultWorldUpVector);
+            ViewMatrix = Matrix.CreateLookAt(Position, Position + FrontDirection, DefaultWorldUpVector);
         }
 
         /// <summary>
@@ -92,8 +91,7 @@ namespace TGC.MonoGame.Samples.Cameras
             if (keyboardState.IsKeyDown(Keys.D))
                 Position -= RightDirection * time * Speed;
 
-            base.FrontDirection = Position + FrontDirection;
-            ViewMatrix = Matrix.CreateLookAt(Position, base.FrontDirection, DefaultWorldUpVector);
+            ViewMatrix = Matrix.CreateLookAt(Position, Position + FrontDirection, DefaultWorldUpVector);
         }
     }
 }
