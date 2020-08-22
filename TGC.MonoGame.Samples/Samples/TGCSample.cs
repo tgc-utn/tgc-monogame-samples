@@ -58,6 +58,7 @@ namespace TGC.MonoGame.Samples.Samples
         public override void Initialize()
         {
             AxisLines = new AxisLines(GraphicsDevice);
+            
             base.Initialize();
         }
 

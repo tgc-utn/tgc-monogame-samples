@@ -27,8 +27,7 @@ namespace TGC.MonoGame.Samples.Samples
         ///<inheritdoc/>
         public override void Initialize()
         {
-            Camera = new StaticCamera(GraphicsDevice.Viewport.AspectRatio, MathHelper.PiOver4, 1, 200,
-                Vector3.UnitZ * 150, Vector3.Zero);
+            Camera = new StaticCamera(GraphicsDevice.Viewport.AspectRatio, Vector3.UnitZ * 150, Vector3.Zero);
             base.Initialize();
         }
 
@@ -59,10 +58,10 @@ namespace TGC.MonoGame.Samples.Samples
                 foreach (var effect in mesh.Effects)
                 {
                     var castEffect = (BasicEffect)effect;
-                    castEffect.World = Camera.WorldMatrix * Matrix.CreateRotationY(Rotation) *
+                    castEffect.World = Matrix.CreateRotationY(Rotation) *
                                        Matrix.CreateTranslation(new Vector3(0, -40, 0));
-                    castEffect.View = Camera.ViewMatrix;
-                    castEffect.Projection = Camera.ProjectionMatrix;
+                    castEffect.View = Camera.View;
+                    castEffect.Projection = Camera.Projection;
                     castEffect.EnableDefaultLighting();
                 }
 

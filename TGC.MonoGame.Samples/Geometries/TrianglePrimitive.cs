@@ -11,6 +11,8 @@ namespace TGC.MonoGame.Samples.Geometries
     {
         private const int NumberOfVertices = 3;
 
+        private GraphicsDevice device;
+        
         /// <summary>
         /// Create a triangle based on the vertices and colored white.
         /// </summary>
@@ -49,8 +51,9 @@ namespace TGC.MonoGame.Samples.Geometries
         public TrianglePrimitive(GraphicsDevice device, Vector3 vertex1, Vector3 vertex2, Vector3 vertex3, Color vertexColor1,
             Color vertexColor2, Color vertexColor3)
         {
+            this.device = device;
             Effect = new BasicEffect(device);
-            CreateVertexBuffer(device, vertex1, vertex2, vertex3, vertexColor1, vertexColor2, vertexColor3);
+            CreateVertexBuffer(vertex1, vertex2, vertex3, vertexColor1, vertexColor2, vertexColor3);
         }
 
         /// <summary>
@@ -78,7 +81,7 @@ namespace TGC.MonoGame.Samples.Geometries
         /// <param name="vertexColor1">The color of the vertex.</param>
         /// <param name="vertexColor2">The color of the vertex.</param>
         /// <param name="vertexColor3">The color of the vertex.</param>
-        private void CreateVertexBuffer(GraphicsDevice device, Vector3 vertex1, Vector3 vertex2, Vector3 vertex3,
+        private void CreateVertexBuffer(Vector3 vertex1, Vector3 vertex2, Vector3 vertex3,
             Color vertexColor1, Color vertexColor2, Color vertexColor3)
         {
             TriangleVertices = new VertexPositionColor[NumberOfVertices];
@@ -99,20 +102,21 @@ namespace TGC.MonoGame.Samples.Geometries
         /// <summary>
         /// Draw the triangle.
         /// </summary>
-        /// <param name="graphicsDevice">The device where to draw.</param>
-        /// <param name="camera">The camera contains the necessary matrices.</param>
-        public void Draw(GraphicsDevice graphicsDevice, Camera camera)
+        /// <param name="world">The world matrix for this triangle.</param>
+        /// <param name="view">The view matrix, normally from the camera.</param>
+        /// <param name="projection">The projection matrix, normally from the application.</param>
+        public void Draw(Matrix world, Matrix view, Matrix projection)
         {
-            Effect.World = camera.WorldMatrix;
-            Effect.View = camera.ViewMatrix;
-            Effect.Projection = camera.ProjectionMatrix;
+            Effect.World = world;
+            Effect.View = view;
+            Effect.Projection = projection;
             Effect.VertexColorEnabled = true;
 
             foreach (var pass in Effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
 
-                graphicsDevice.DrawUserPrimitives(
+                device.DrawUserPrimitives(
                     // We’ll be rendering one triangles
                     PrimitiveType.TriangleList,
                     // The array of verts that we want to render
