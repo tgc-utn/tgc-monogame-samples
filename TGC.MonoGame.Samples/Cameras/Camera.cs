@@ -17,6 +17,11 @@ namespace TGC.MonoGame.Samples.Cameras
 
         public Camera(float aspectRatio, float fieldOfViewDegrees, float nearPlaneDistance, float farPlaneDistance)
         {
+            BuildProjection(aspectRatio, fieldOfViewDegrees, nearPlaneDistance, farPlaneDistance);
+        }
+
+        public void BuildProjection(float aspectRatio, float fieldOfViewDegrees, float nearPlaneDistance, float farPlaneDistance)
+        {
             Projection = Matrix.CreatePerspectiveFieldOfView(fieldOfViewDegrees, aspectRatio, nearPlaneDistance, farPlaneDistance);
         }
 
