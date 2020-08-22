@@ -20,7 +20,7 @@ namespace TGC.MonoGame.Samples.Samples.Audio
         public SoundStatic(TGCViewer game) : base(game)
         {
             Category = TGCSampleCategory.Audio;
-            Name = "StaticSound effect";
+            Name = "Sound effect";
             Description = "Shows how to play a sound file. Audio from https://www.fesliyanstudios.com";
         }
 
@@ -73,6 +73,8 @@ namespace TGC.MonoGame.Samples.Samples.Audio
         ///<inheritdoc/>
         public override void Draw(GameTime gameTime)
         {
+            Game.Background = Color.CornflowerBlue;
+
             Game.SpriteBatch.Begin();
 
             var soundNamePosition = new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2f, 20) -
