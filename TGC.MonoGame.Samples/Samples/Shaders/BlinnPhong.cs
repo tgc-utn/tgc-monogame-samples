@@ -1,9 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System;
 using System.Linq;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
@@ -12,16 +10,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 {
     public class BlinnPhong : TGCSample
     {
-        private FreeCamera Camera { get; set; }
-        private Model Model { get; set; }
-
-        private Effect Effect { get; set; }
-
         private BoxPrimitive lightBox;
-        private Matrix lightBoxWorld;
-
-        private float timer = 0f;
-
 
         /// <inheritdoc />
         public BlinnPhong(TGCViewer game) : base(game)
@@ -31,13 +20,17 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             Description = "Applying Blinn-Phong to a scene";
         }
 
+        private SimpleCamera Camera { get; set; }
+        private Model Model { get; set; }
+        private Effect Effect { get; set; }
+        private Matrix LightBoxWorld { get; set; } = Matrix.Identity;
+        private float Timer { get; set; }
+
         /// <inheritdoc />
         public override void Initialize()
         {
-            Point screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
-            Camera = new FreeCamera(new Vector3(0, 50, 400), screenSize);
-
-
+            Camera = new SimpleCamera(new Vector3(0, 50, 400), 0.1f);
+            //GraphicsDevice.Viewport.AspectRatio, MathHelper.PiOver4, 1, 5000, 
             base.Initialize();
         }
 
@@ -48,16 +41,16 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             Model = Game.Content.Load<Model>(ContentFolder3D + "scene/city");
 
             // We get the mesh texture. All mesh parts use the same texture so we are fine
-            var texture = ((BasicEffect)Model.Meshes.FirstOrDefault()?.MeshParts.FirstOrDefault()?.Effect)?.Texture;
+            var texture = ((BasicEffect) Model.Meshes.FirstOrDefault()?.MeshParts.FirstOrDefault()?.Effect)?.Texture;
 
             // We load the effect in the .fx file
             Effect = Game.Content.Load<Effect>(ContentFolderEffect + "BlinnPhong");
 
             // We assign the effect to each one of the models
             foreach (var modelMesh in Model.Meshes)
-                foreach (var meshPart in modelMesh.MeshParts)
-                    meshPart.Effect = Effect;
-            
+            foreach (var meshPart in modelMesh.MeshParts)
+                meshPart.Effect = Effect;
+
             // Set the texture. This won't change on this effect so we can assign it here
             Effect.Parameters["baseTexture"].SetValue(texture);
 
@@ -80,18 +73,18 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         public override void Update(GameTime gameTime)
         {
             // Update the state of the camera
-            Camera.Update(gameTime);
+            Camera.Update(gameTime, Game.CurrentKeyboardState);
 
             // Rotate our light position in a circle up in the sky
-            var lightPosition = new Vector3((float)Math.Cos(timer) * 700f, 800f, (float)Math.Sin(timer) * 700f);
-            lightBoxWorld = Matrix.CreateTranslation(lightPosition);
+            var lightPosition = new Vector3((float) Math.Cos(Timer) * 700f, 800f, (float) Math.Sin(Timer) * 700f);
+            LightBoxWorld = Matrix.CreateTranslation(lightPosition);
 
             // Set the light position and camera position
             // These change every update so we need to set them on every update call
             Effect.Parameters["lightPosition"].SetValue(lightPosition);
             Effect.Parameters["eyePosition"].SetValue(Camera.Position);
 
-            timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            Timer += (float) gameTime.ElapsedGameTime.TotalSeconds;
 
             base.Update(gameTime);
         }
@@ -112,7 +105,6 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             {
                 // We set the main matrices for each mesh to draw
                 var worldMatrix = modelMeshesBaseTransforms[modelMesh.ParentBone.Index];
-
                 // World is used to transform from model space to world space
                 Effect.Parameters["World"].SetValue(worldMatrix);
                 // InverseTransposeWorld is used to rotate normals
@@ -124,11 +116,9 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
                 modelMesh.Draw();
             }
 
-            lightBox.Draw(lightBoxWorld, Camera.ViewMatrix, Projection);
-            
+            lightBox.Draw(LightBoxWorld, Camera.ViewMatrix, Projection);
 
             base.Draw(gameTime);
         }
     }
-
 }
