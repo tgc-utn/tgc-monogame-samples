@@ -1,12 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
 using TGC.MonoGame.Samples.Viewer;
 using TGC.MonoGame.Samples.Viewer.GUI;
 
 namespace TGC.MonoGame.Samples.Samples
 {
     /// <summary>
-    /// Component drawable with some helpers, those who inherit from this class will be loaded automatically in the sample tree.
+    ///     Component drawable with some helpers, those who inherit from this class will be loaded automatically in the sample
+    ///     tree.
     /// </summary>
     public abstract class TGCSample : DrawableGameComponent
     {
@@ -19,7 +19,7 @@ namespace TGC.MonoGame.Samples.Samples
         public const string ContentFolderTextures = "Textures/";
 
         /// <summary>
-        /// Default constructor.
+        ///     Default constructor.
         /// </summary>
         /// <param name="game">The game.</param>
         public TGCSample(TGCViewer game) : base(game)
@@ -28,48 +28,50 @@ namespace TGC.MonoGame.Samples.Samples
         }
 
         /// <summary>
-        /// Helper to visualize the Cartesian axes.
+        ///     Helper to visualize the Cartesian axes.
         /// </summary>
         public AxisLines AxisLines { get; set; }
 
         /// <summary>
-        /// Category where the example belongs, this value is used to build the example tree.
+        ///     Category where the example belongs, this value is used to build the example tree.
         /// </summary>
         public string Category { get; set; }
 
         /// <summary>
-        /// The viewer where the example is shown.
+        ///     The viewer where the example is shown.
         /// </summary>
         protected new TGCViewer Game { get; }
 
         /// <summary>
-        /// The name of the example.
+        ///     The name of the example.
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// Description of the topics applied in the example.
+        ///     Description of the topics applied in the example.
         /// </summary>
         public string Description { get; set; }
 
         /// <summary>
-        /// Initialize the game settings here.
+        ///     Initialize the game settings here.
         /// </summary>
         public override void Initialize()
         {
             AxisLines = new AxisLines(GraphicsDevice);
-            
+
             base.Initialize();
         }
 
-
+        /// <summary>
+        ///     Reload the sample content.
+        /// </summary>
         public void ReloadContent()
         {
             LoadContent();
         }
 
         /// <summary>
-        /// Load all content here.
+        ///     Load all content here.
         /// </summary>
         protected override void LoadContent()
         {
@@ -77,7 +79,7 @@ namespace TGC.MonoGame.Samples.Samples
         }
 
         /// <summary>
-        /// Updates the game.
+        ///     Updates the game.
         /// </summary>
         /// <param name="gameTime">Holds the time state of a <see cref="Game" />.</param>
         public override void Update(GameTime gameTime)
@@ -86,7 +88,7 @@ namespace TGC.MonoGame.Samples.Samples
         }
 
         /// <summary>
-        /// Draws the game.
+        ///     Draws the game.
         /// </summary>
         /// <param name="gameTime">Holds the time state of a <see cref="Game" />.</param>
         public override void Draw(GameTime gameTime)
@@ -95,13 +97,12 @@ namespace TGC.MonoGame.Samples.Samples
         }
 
         /// <summary>
-        /// Unload any content here.
+        ///     Unload any content here.
         /// </summary>
         protected override void UnloadContent()
         {
             base.UnloadContent();
             Game.Content.Unload();
         }
-
     }
 }

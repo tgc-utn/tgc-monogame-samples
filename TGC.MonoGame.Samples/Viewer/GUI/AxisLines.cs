@@ -1,11 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using TGC.MonoGame.Samples.Cameras;
 
 namespace TGC.MonoGame.Samples.Viewer.GUI
 {
     /// <summary>
-    /// Tool to draw the Cartesian axes.
+    ///     Tool to draw the Cartesian axes.
     /// </summary>
     public class AxisLines
     {
@@ -13,10 +12,10 @@ namespace TGC.MonoGame.Samples.Viewer.GUI
         private const float AxisPosDistance = 25;
         private const int NumberOfVertices = 6;
 
-        private GraphicsDevice device;
+        private readonly GraphicsDevice device;
 
         /// <summary>
-        /// Default constructor.
+        ///     Default constructor.
         /// </summary>
         /// <param name="device">Used to initialize and control the presentation of the graphics device.</param>
         public AxisLines(GraphicsDevice device)
@@ -26,22 +25,22 @@ namespace TGC.MonoGame.Samples.Viewer.GUI
         }
 
         /// <summary>
-        /// Array of vertex positions and colors.
+        ///     Array of vertex positions and colors.
         /// </summary>
         private VertexPositionColor[] AxisLinesVertices { get; set; }
 
         /// <summary>
-        /// Represents a list of 3D vertices to be streamed to the graphics device.
+        ///     Represents a list of 3D vertices to be streamed to the graphics device.
         /// </summary>
         private VertexBuffer Vertices { get; set; }
 
         /// <summary>
-        /// Built-in effect that supports optional texturing, vertex coloring, fog, and lighting.
+        ///     Built-in effect that supports optional texturing, vertex coloring, fog, and lighting.
         /// </summary>
         private BasicEffect Effect { get; set; }
 
         /// <summary>
-        /// Create a vertex buffer for the figure with the given information.
+        ///     Create a vertex buffer for the figure with the given information.
         /// </summary>
         private void CreateVertexBuffer()
         {
@@ -64,7 +63,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI
         }
 
         /// <summary>
-        /// Draw de axes.
+        ///     Draw de axes.
         /// </summary>
         /// <param name="view">The view matrix, normally from the camera.</param>
         /// <param name="projection">The projection matrix, normally from the application.</param>

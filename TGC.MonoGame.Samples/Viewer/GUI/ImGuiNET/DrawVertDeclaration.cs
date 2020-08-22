@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
 {
     /// <summary>
-    /// ImGui class to use with XNA-likes (FNA & MonoGame).
+    ///     ImGui class to use with XNA-likes (FNA & MonoGame).
     /// </summary>
     public static class DrawVertDeclaration
     {
@@ -14,7 +14,10 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
 
         static DrawVertDeclaration()
         {
-            unsafe { Size = sizeof(ImDrawVert); }
+            unsafe
+            {
+                Size = sizeof(ImDrawVert);
+            }
 
             Declaration = new VertexDeclaration(
                 Size,
