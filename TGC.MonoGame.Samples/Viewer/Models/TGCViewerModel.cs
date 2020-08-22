@@ -21,6 +21,10 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         {
             Game = game;
             ActiveSampleTreeNode = -1;
+        }
+
+        public void LoadImgGUI()
+        {
             ImGuiRenderer = new ImGuiRenderer(Game);
             ImGuiRenderer.RebuildFontAtlas();
         }
@@ -43,7 +47,15 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         /// <summary>
         /// The position where each component is in Game.Components.
         /// </summary>
-        public Dictionary<string, int> SamplesInComponents { get; set; }
+        public Dictionary<string, TGCSample> SamplesByName { get; set; }
+
+
+        /// <summary>
+        /// The position where each component is in Game.Components.
+        /// </summary>
+        public Dictionary<string, TGCSample> AlreadyLoadedSamples { get; set; }
+
+
 
         /// <summary>
         /// The active sample.
@@ -55,10 +67,6 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         /// </summary>
         private int ActiveSampleCategoryIndex { get; set; }
 
-        /// <summary>
-        /// The active sample in Game.Components.
-        /// </summary>
-        private int ActiveSampleIndex { get; set; }
 
         /// <summary>
         /// The active sample in the tree.
@@ -71,7 +79,8 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         public void LoadTreeSamples()
         {
             SamplesByCategory = new SortedList<string, List<TGCSample>>();
-            SamplesInComponents = new Dictionary<string, int>();
+            SamplesByName = new Dictionary<string, TGCSample>();
+            AlreadyLoadedSamples = new Dictionary<string, TGCSample>();
 
             var baseType = typeof(TGCSample);
 
@@ -91,9 +100,8 @@ namespace TGC.MonoGame.Samples.Viewer.Models
                         else
                             SamplesByCategory.Add(sample.Category, new List<TGCSample> { sample });
                     }
-
-                    Game.Components.Add(sample);
-                    SamplesInComponents.Add(sample.Name, Game.Components.Count - 1);
+                                        
+                    SamplesByName.Add(sample.Name, sample);
                 }
                 catch
                 {
@@ -118,16 +126,24 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         {
             // The first time ActiveSampleIndex is 0, in reality that example is not selected, but it does not generate a problem in the logic.
             // But just in case it is clarified :).
-            var actualSample = (TGCSample)Game.Components[ActiveSampleIndex];
-            actualSample.Visible = false;
-            actualSample.Enabled = false;
+            if (ActiveSample != null)
+            {
+                ActiveSample.Dispose();
+                ActiveSample.Enabled = false;
+                ActiveSample.Visible = false;
+            }
 
-            var sampleIndex = SamplesInComponents[sampleName];
-            var newSample = (TGCSample)Game.Components[sampleIndex];
+            var newSample = SamplesByName[sampleName];
             newSample.Visible = true;
             newSample.Enabled = true;
             ActiveSample = newSample;
-            ActiveSampleIndex = sampleIndex;
+            if (!Game.Components.Contains(newSample))
+                Game.Components.Add(newSample);
+            else
+            {
+                newSample.Initialize();
+                newSample.ReloadContent();
+            }
         }
 
         /// <summary>

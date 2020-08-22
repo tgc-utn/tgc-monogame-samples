@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 using TGC.MonoGame.Samples.Viewer;
 using TGC.MonoGame.Samples.Viewer.GUI;
 
@@ -60,6 +61,12 @@ namespace TGC.MonoGame.Samples.Samples
             base.Initialize();
         }
 
+
+        public void ReloadContent()
+        {
+            LoadContent();
+        }
+
         /// <summary>
         /// Load all content here.
         /// </summary>
@@ -92,6 +99,8 @@ namespace TGC.MonoGame.Samples.Samples
         protected override void UnloadContent()
         {
             base.UnloadContent();
+            Game.Content.Unload();
         }
+
     }
 }
