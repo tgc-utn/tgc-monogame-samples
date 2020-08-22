@@ -5,6 +5,7 @@ using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using NumericVector2 = System.Numerics.Vector2;
 
 namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
 {
@@ -12,7 +13,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
     /// ImGui renderer for use with XNA-likes (FNA & MonoGame).
     /// TODO try to remove unsafe code.
     /// </summary>
-    public class ImGuiRenderer
+    public sealed class ImGuiRenderer
     {
         private Game _game;
 
@@ -69,7 +70,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
         /// <summary>
         /// Creates a texture and loads the font data from ImGui. Should be called when the <see cref="GraphicsDevice" /> is initialized but before any rendering is done
         /// </summary>
-        public virtual unsafe void RebuildFontAtlas()
+        public unsafe void RebuildFontAtlas()
         {
             // Get font texture from ImGui
             var io = ImGui.GetIO();
@@ -77,7 +78,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
 
             // Copy the data to a managed array
             var pixels = new byte[width * height * bytesPerPixel];
-            unsafe { Marshal.Copy(new IntPtr(pixelData), pixels, 0, pixels.Length); }
+            Marshal.Copy(new IntPtr(pixelData), pixels, 0, pixels.Length);
 
             // Create and register the texture as an XNA texture
             var tex2d = new Texture2D(_graphicsDevice, width, height, false, SurfaceFormat.Color);
@@ -97,7 +98,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
         /// <summary>
         /// Creates a pointer to a texture, which can be passed through ImGui calls such as <see cref="ImGui.Image" />. That pointer is then used by ImGui to let us know what texture to draw
         /// </summary>
-        public virtual IntPtr BindTexture(Texture2D texture)
+        public IntPtr BindTexture(Texture2D texture)
         {
             var id = new IntPtr(_textureId++);
 
@@ -109,7 +110,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
         /// <summary>
         /// Removes a previously created texture pointer, releasing its reference and allowing it to be deallocated
         /// </summary>
-        public virtual void UnbindTexture(IntPtr textureId)
+        public void UnbindTexture(IntPtr textureId)
         {
             _loadedTextures.Remove(textureId);
         }
@@ -118,7 +119,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
         /// Sets up ImGui for a new frame, should be called at frame start
         /// </summary>
         /// <param name="gameTime">Holds the time state of a <see cref="Game" />.</param>
-        public virtual void BeforeLayout(GameTime gameTime)
+        public void BeforeLayout(GameTime gameTime)
         {
             ImGui.GetIO().DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -130,11 +131,11 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
         /// <summary>
         /// Asks ImGui for the generated geometry data and sends it to the graphics pipeline, should be called after the UI is drawn using ImGui.** calls
         /// </summary>
-        public virtual void AfterLayout()
+        public void AfterLayout()
         {
             ImGui.Render();
 
-            unsafe { RenderDrawData(ImGui.GetDrawData()); }
+            RenderDrawData(ImGui.GetDrawData());
         }
 
         #endregion ImGuiRenderer
@@ -144,7 +145,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
         /// <summary>
         /// Maps ImGui keys to XNA keys. We use this later on to tell ImGui what keys were pressed
         /// </summary>
-        protected virtual void SetupInput()
+        private void SetupInput()
         {
             var io = ImGui.GetIO();
 
@@ -194,7 +195,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
         /// <summary>
         /// Updates the <see cref="Effect" /> to the current matrices and texture
         /// </summary>
-        protected virtual Effect UpdateEffect(Texture2D texture)
+        private Effect UpdateEffect(Texture2D texture)
         {
             _effect = _effect ?? new BasicEffect(_graphicsDevice);
 
@@ -223,7 +224,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
         /// <summary>
         /// Sends XNA input state to ImGui
         /// </summary>
-        protected virtual void UpdateInput()
+        private void UpdateInput()
         {
             var io = ImGui.GetIO();
 
@@ -240,10 +241,10 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
             io.KeyAlt = keyboard.IsKeyDown(Keys.LeftAlt) || keyboard.IsKeyDown(Keys.RightAlt);
             io.KeySuper = keyboard.IsKeyDown(Keys.LeftWindows) || keyboard.IsKeyDown(Keys.RightWindows);
 
-            io.DisplaySize = new System.Numerics.Vector2(_graphicsDevice.PresentationParameters.BackBufferWidth, _graphicsDevice.PresentationParameters.BackBufferHeight);
-            io.DisplayFramebufferScale = new System.Numerics.Vector2(1f, 1f);
+            io.DisplaySize = new NumericVector2(_graphicsDevice.PresentationParameters.BackBufferWidth, _graphicsDevice.PresentationParameters.BackBufferHeight);
+            io.DisplayFramebufferScale = new NumericVector2(1f, 1f);
 
-            io.MousePos = new System.Numerics.Vector2(mouse.X, mouse.Y);
+            io.MousePos = new NumericVector2(mouse.X, mouse.Y);
 
             io.MouseDown[0] = mouse.LeftButton == ButtonState.Pressed;
             io.MouseDown[1] = mouse.RightButton == ButtonState.Pressed;
@@ -337,7 +338,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
             _indexBuffer.SetData(_indexData, 0, drawData.TotalIdxCount * sizeof(ushort));
         }
 
-        private unsafe void RenderCommandLists(ImDrawDataPtr drawData)
+        private void RenderCommandLists(ImDrawDataPtr drawData)
         {
             _graphicsDevice.SetVertexBuffer(_vertexBuffer);
             _graphicsDevice.Indices = _indexBuffer;
