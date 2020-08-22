@@ -12,12 +12,15 @@ namespace TGC.MonoGame.Samples.Geometries
         private const int NumberOfVertices = 8;
         private const int NumberOfIndices = 36;
 
+        private GraphicsDevice device;
+
         /// <summary>
         /// Create a box with center in (0,0,0), size 1 and white color
         /// </summary>
         /// <param name="device">Used to initialize and control the presentation of the graphics device.</param>
         public BoxPrimitive(GraphicsDevice device) : this(device, Vector3.One)
         {
+            
         }
 
         /// <summary>
@@ -27,6 +30,7 @@ namespace TGC.MonoGame.Samples.Geometries
         /// <param name="size">Size of the box.</param>
         public BoxPrimitive(GraphicsDevice device, Vector3 size) : this(device, size, Vector3.Zero)
         {
+            this.device = device;
         }
 
         /// <summary>
@@ -68,8 +72,9 @@ namespace TGC.MonoGame.Samples.Geometries
         public BoxPrimitive(GraphicsDevice device, Vector3 size, Vector3 center, Color color1, Color color2, Color color3,
             Color color4, Color color5, Color color6, Color color7, Color color8)
         {
+            this.device = device;
             Effect = new BasicEffect(device);
-            CreateVertexBuffer(device, size, center, color1, color2, color3, color4, color5, color6, color7,
+            CreateVertexBuffer(size, center, color1, color2, color3, color4, color5, color6, color7,
                 color8);
             CreateIndexBuffer(device);
         }
@@ -103,7 +108,7 @@ namespace TGC.MonoGame.Samples.Geometries
         /// <param name="color6">Color of a vertex.</param>
         /// <param name="color7">Color of a vertex.</param>
         /// <param name="color8">Color of a vertex.</param>
-        private void CreateVertexBuffer(GraphicsDevice device, Vector3 size, Vector3 center, Color color1,
+        private void CreateVertexBuffer(Vector3 size, Vector3 center, Color color1,
             Color color2, Color color3, Color color4, Color color5, Color color6, Color color7, Color color8)
         {
             var x = size.X / 2;
@@ -196,24 +201,24 @@ namespace TGC.MonoGame.Samples.Geometries
         /// <summary>
         /// Draw the box.
         /// </summary>
-        /// <param name="graphicsDevice">The device where to draw.</param>
-        /// <param name="camera">The camera contains the necessary matrices.</param>
-        public void Draw(GraphicsDevice graphicsDevice, Camera camera)
+        /// <param name="world">The world matrix for this box.</param>
+        /// <param name="view">The view matrix, normally from the camera.</param>
+        /// <param name="projection">The projection matrix, normally from the application.</param>
+        public void Draw(Matrix world, Matrix view, Matrix projection)
         {
-            graphicsDevice.SetVertexBuffer(Vertices);
-            graphicsDevice.Indices = Indices;
+            device.SetVertexBuffer(Vertices);
+            device.Indices = Indices;
 
-            Effect.World = camera.WorldMatrix;
-            Effect.View = camera.ViewMatrix;
-            Effect.Projection = camera.ProjectionMatrix;
+            Effect.World = world;
+            Effect.View = view;
+            Effect.Projection = projection;
 
             Effect.VertexColorEnabled = true;
 
             foreach (var pass in Effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-
-                graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, NumberOfIndices / 3);
+                device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, NumberOfIndices / 3);
             }
         }
     }

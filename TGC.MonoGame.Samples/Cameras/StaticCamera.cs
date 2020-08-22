@@ -16,25 +16,21 @@ namespace TGC.MonoGame.Samples.Cameras
         /// Static camera looking at a particular direction, which has the up vector (0,1,0).
         /// </summary>
         /// <param name="aspectRatio">Aspect ratio, defined as view space width divided by height.</param>
-        /// <param name="fieldOfViewDegrees">Field of view in the y direction, in radians.</param>
-        /// <param name="nearPlane">Distance to the near view plane.</param>
-        /// <param name="farPlane">Distance to the far view plane.</param>
         /// <param name="position">The position of the camera.</param>
         /// <param name="lookAt">The target towards which the camera is pointing.</param>
-        public StaticCamera(float aspectRatio, float fieldOfViewDegrees, float nearPlane, float farPlane,
-            Vector3 position, Vector3 lookAt)
+        public StaticCamera(float aspectRatio, Vector3 position, Vector3 lookAt) : base(aspectRatio)
         {
-            AspectRatio = aspectRatio;
-            FieldOfView = fieldOfViewDegrees;
-            NearPlane = nearPlane;
-            FarPlane = farPlane;
             Position = position;
-            LookAtDirection = Vector3.Normalize(position - lookAt);
-            RightDirection = Vector3.Normalize(Vector3.Cross(DefaultWorldUpVector, LookAtDirection));
-            UpDirection = Vector3.Cross(LookAtDirection, RightDirection);
-            ViewMatrix = Matrix.CreateLookAt(Position, LookAtDirection, UpDirection);
-            ProjectionMatrix = Matrix.CreatePerspectiveFieldOfView(FieldOfView, AspectRatio, NearPlane, FarPlane);
-            WorldMatrix = Matrix.Identity;
+            FrontDirection = Vector3.Normalize(position - lookAt);
+            RightDirection = Vector3.Normalize(Vector3.Cross(DefaultWorldUpVector, FrontDirection));
+            UpDirection = Vector3.Cross(FrontDirection, RightDirection);
+            View = Matrix.CreateLookAt(Position, FrontDirection, UpDirection);
+        }
+
+        ///<inheritdoc/>
+        public override void Update(GameTime gameTime)
+        {
+            // This camera has no movement, once initialized with position and lookAt it is no longer updated.
         }
     }
 }

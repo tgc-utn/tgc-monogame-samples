@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 using TGC.MonoGame.Samples.Viewer;
 using TGC.MonoGame.Samples.Viewer.GUI;
 
@@ -57,6 +58,7 @@ namespace TGC.MonoGame.Samples.Samples
         public override void Initialize()
         {
             AxisLines = new AxisLines(GraphicsDevice);
+            
             base.Initialize();
         }
 

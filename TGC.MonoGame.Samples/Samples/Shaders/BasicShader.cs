@@ -26,7 +26,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             Description = "Basic Shader Sample. Animation by vertex shader and coloring by pixel shader.";
         }
 
-        private SimpleCamera Camera { get; set; }
+        private Camera Camera { get; set; }
         private Effect Effect { get; set; }
         private Model Model { get; set; }
         private Texture2D Texture { get; set; }
@@ -34,8 +34,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         /// <inheritdoc />
         public override void Initialize()
         {
-            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, MathHelper.PiOver4, 1, 5000,
-                new Vector3(0, 50, 400), 0.1f);
+            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0f, 50f, 400f));
             time = 0;
             base.Initialize();
         }
@@ -62,7 +61,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
-            Camera.Update(gameTime, Game.CurrentKeyboardState);
+            Camera.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -74,7 +73,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 
             Game.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            AxisLines.Draw(GraphicsDevice, Camera);
+            AxisLines.Draw(Camera.View, Camera.Projection);
 
             time += gameTime.ElapsedGameTime.Milliseconds;
 
@@ -85,10 +84,10 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
                 foreach (var part in mesh.MeshParts)
                 {
                     part.Effect = Effect;
-                    Effect.Parameters["World"].SetValue(Camera.WorldMatrix * mesh.ParentBone.Transform);
-                    Effect.Parameters["View"].SetValue(Camera.ViewMatrix);
-                    Effect.Parameters["Projection"].SetValue(Camera.ProjectionMatrix);
-                    //Effect.Parameters["WorldViewProjection"].SetValue(Camera.WorldMatrix * Camera.ViewMatrix * Camera.ProjectionMatrix);
+                    Effect.Parameters["World"].SetValue(mesh.ParentBone.Transform);
+                    Effect.Parameters["View"].SetValue(Camera.View);
+                    Effect.Parameters["Projection"].SetValue(Camera.Projection);
+                    //Effect.Parameters["WorldViewProjection"].SetValue(Camera.WorldMatrix * Camera.View * Camera.Projection);
                     Effect.Parameters["ModelTexture"].SetValue(Texture);
                     Effect.Parameters["Time"].SetValue(time);
                 }
