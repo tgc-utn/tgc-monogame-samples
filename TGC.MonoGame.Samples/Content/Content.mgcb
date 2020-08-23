@@ -120,6 +120,12 @@
 /processorParam:DebugMode=Debug
 /build:Effect/BlinnPhong.fx
 
+#begin Effect/GaussianBlur.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effect/GaussianBlur.fx
+
 #begin Music/RetroPlatforming.mp3
 /importer:Mp3Importer
 /processor:SongProcessor
