@@ -120,6 +120,12 @@
 /processorParam:DebugMode=Debug
 /build:Effect/BlinnPhong.fx
 
+#begin Effect/ComboRata.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effect/ComboRata.fx
+
 #begin Music/RetroPlatforming.mp3
 /importer:Mp3Importer
 /processor:SongProcessor
@@ -144,6 +150,30 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:SpriteFonts/Arial.spritefont
+
+#begin Textures/Tunel/level2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Tunel/level2.png
+
+#begin Textures/Tunel/metal.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Tunel/metal.png
 
 #begin Textures/Wood/cajaMadera1.jpg
 /importer:TextureImporter
