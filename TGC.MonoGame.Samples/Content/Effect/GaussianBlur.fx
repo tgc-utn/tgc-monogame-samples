@@ -35,7 +35,6 @@ struct VertexShaderInput
 struct VertexShaderOutput
 {
     float4 Position : SV_POSITION;
-    float4 Color : COLOR0;
     float2 TextureCoordinates : TEXCOORD0;
 };
 
@@ -44,41 +43,40 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 {
     VertexShaderOutput output;
     output.Position = input.Position;
-    output.Color = float4(0, 0, 0, 0);
     output.TextureCoordinates = input.TextureCoordinates;
     return output;
 }
 
-float4 BlurPS(in VertexShaderOutput output) : COLOR
+float4 BlurPS(in VertexShaderOutput input) : COLOR
 {
     float4 finalColor = float4(0, 0, 0, 1);
     for (int x = 0; x < kernel_size; x++)
         for (int y = 0; y < kernel_size; y++)
         {
-            float2 scaledTextureCoordinates = output.TextureCoordinates + float2((float) (x - kernel_r) / screenSize.x, (float) (y - kernel_r) / screenSize.y);
+            float2 scaledTextureCoordinates = input.TextureCoordinates + float2((float) (x - kernel_r) / screenSize.x, (float) (y - kernel_r) / screenSize.y);
             finalColor += tex2D(textureSampler, scaledTextureCoordinates) * Kernel[x] * Kernel[y];
         }
     return finalColor;
 }
 
 
-float4 BlurHorizontal(in VertexShaderOutput output) : COLOR
+float4 BlurHorizontal(in VertexShaderOutput input) : COLOR
 {
     float4 finalColor = float4(0, 0, 0, 1);
     for (int i = 0; i < kernel_size; i++)
     {
-        float2 scaledTextureCoordinates = output.TextureCoordinates + float2((float) (i - kernel_r) / screenSize.x, 0);
+        float2 scaledTextureCoordinates = input.TextureCoordinates + float2((float) (i - kernel_r) / screenSize.x, 0);
         finalColor += tex2D(textureSampler, scaledTextureCoordinates) * Kernel[i];
     }
     return finalColor;    
 }
 
-float4 BlurVertical(in VertexShaderOutput output) : COLOR
+float4 BlurVertical(in VertexShaderOutput input) : COLOR
 {
     float4 finalColor = float4(0, 0, 0, 1);
     for (int i = 0; i < kernel_size; i++)
     {
-        float2 scaledTextureCoordinates = output.TextureCoordinates + float2(0, (float) (i - kernel_r) / screenSize.y);
+        float2 scaledTextureCoordinates = input.TextureCoordinates + float2(0, (float) (i - kernel_r) / screenSize.y);
         finalColor += tex2D(textureSampler, scaledTextureCoordinates) * Kernel[i];
     }
     return finalColor;

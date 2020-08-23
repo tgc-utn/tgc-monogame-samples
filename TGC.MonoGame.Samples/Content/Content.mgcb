@@ -120,6 +120,18 @@
 /processorParam:DebugMode=Debug
 /build:Effect/BlinnPhong.fx
 
+#begin Effect/Bloom.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effect/Bloom.fx
+
+#begin Effect/DebugTexture.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effect/DebugTexture.fx
+
 #begin Effect/GaussianBlur.fx
 /importer:EffectImporter
 /processor:EffectProcessor

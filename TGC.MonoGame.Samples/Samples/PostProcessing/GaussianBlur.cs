@@ -25,8 +25,6 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
         private Effect Effect { get; set; }
 
-        private Matrix ModelWorld = Matrix.Identity;
-
         private RenderTarget2D mainRenderTarget, horizontalRenderTarget;
 
         private FullScreenQuad fullScreenQuad;
@@ -123,7 +121,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             Game.Background = Color.CornflowerBlue;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            Model.Draw(ModelWorld, Camera.View, Camera.Projection);
+            Model.Draw(Matrix.Identity, Camera.View, Camera.Projection);
         }
 
 
@@ -143,7 +141,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             GraphicsDevice.SetRenderTarget(mainRenderTarget);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1f, 0);
 
-            Model.Draw(ModelWorld, Camera.View, Camera.Projection);
+            Model.Draw(Matrix.Identity, Camera.View, Camera.Projection);
 
             #endregion
 
@@ -184,7 +182,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             GraphicsDevice.SetRenderTarget(mainRenderTarget);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1f, 0);
 
-            Model.Draw(ModelWorld, Camera.View, Camera.Projection);
+            Model.Draw(Matrix.Identity, Camera.View, Camera.Projection);
 
             #endregion
 
