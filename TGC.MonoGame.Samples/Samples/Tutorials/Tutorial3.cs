@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
@@ -63,10 +64,10 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
-            var time = gameTime.ElapsedGameTime.Milliseconds;
-            Yaw += time * 0.0004f;
-            Pitch += time * 0.0008f;
-            Roll += time * 0.0009f;
+            var time = Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
+            Yaw += time * 0.4f;
+            Pitch += time * 0.8f;
+            Roll += time * 0.9f;
 
             base.Update(gameTime);
         }
@@ -107,8 +108,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         {
             var effect = geometry.Effect;
 
-            effect.World = Matrix.Identity * Matrix.CreateFromYawPitchRoll(yaw, pitch, roll) *
-                           Matrix.CreateTranslation(position);
+            effect.World = Matrix.CreateFromYawPitchRoll(yaw, pitch, roll) * Matrix.CreateTranslation(position);
             effect.View = Camera.View;
             effect.Projection = Camera.Projection;
 

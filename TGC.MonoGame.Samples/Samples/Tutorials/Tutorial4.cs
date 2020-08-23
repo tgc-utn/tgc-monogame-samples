@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
@@ -25,7 +26,6 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
 
         private Camera Camera { get; set; }
         private QuadPrimitive Quad { get; set; }
-        private float Rotation { get; set; }
 
         /// <inheritdoc />
         public override void Initialize()
@@ -38,14 +38,6 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
                 2);
 
             base.Initialize();
-        }
-
-        /// <inheritdoc />
-        public override void Update(GameTime gameTime)
-        {
-            Rotation += gameTime.ElapsedGameTime.Milliseconds * 0.001f;
-
-            base.Update(gameTime);
         }
 
         /// <inheritdoc />

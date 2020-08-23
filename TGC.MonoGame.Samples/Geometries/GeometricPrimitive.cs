@@ -119,14 +119,9 @@ namespace TGC.MonoGame.Samples.Geometries
         {
             if (disposing)
             {
-                if (VertexBuffer != null)
-                    VertexBuffer.Dispose();
-
-                if (IndexBuffer != null)
-                    IndexBuffer.Dispose();
-
-                if (Effect != null)
-                    Effect.Dispose();
+                VertexBuffer?.Dispose();
+                IndexBuffer?.Dispose();
+                Effect?.Dispose();
             }
         }
 
@@ -173,30 +168,6 @@ namespace TGC.MonoGame.Samples.Geometries
 
             // Draw the model, using BasicEffect.
             Draw(Effect);
-        }
-
-        /// <summary>
-        ///     Draws the primitive model, using a BasicEffect shader with default lighting. Unlike the other Draw overload where
-        ///     you specify a custom effect, this method sets important render states to sensible values for 3D model rendering, so
-        ///     you do not need to set these states before you call it.
-        /// </summary>
-        public void Draw(Matrix world, Matrix view, Matrix projection, Color color)
-        {
-            Effect.DiffuseColor = color.ToVector3();
-            Effect.Alpha = color.A / 255.0f;
-
-            var device = Effect.GraphicsDevice;
-            device.DepthStencilState = DepthStencilState.Default;
-
-            if (color.A < 255)
-                // Set renderstates for alpha blended rendering.
-                device.BlendState = BlendState.AlphaBlend;
-            else
-                // Set renderstates for opaque rendering.
-                device.BlendState = BlendState.Opaque;
-
-            // Draw the model, using BasicEffect.
-            Draw(world, view, projection);
         }
 
         #endregion Draw

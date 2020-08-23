@@ -42,7 +42,7 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 	VertexShaderOutput output = (VertexShaderOutput)0;
 
 	// Animate position
-    float atenuacion = 0.004;
+    float atenuacion = 0.8;
     float y = input.Position.y;
     float z = input.Position.z;    
     input.Position.y = y * cos(Time * atenuacion) - z * sin(Time * atenuacion);

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
@@ -7,11 +8,11 @@ using TGC.MonoGame.Samples.Viewer;
 namespace TGC.MonoGame.Samples.Samples.Transformations
 {
     /// <summary>
-    /// Solar System:
-    /// Units Involved:
-    /// # Unit 3 - 3D Basics - Transformations
-    /// Shows how to concatenate transformations to generate movements of planets in the solar system.
-    /// Author: Matias Leone, Leandro Barbagallo.
+    ///     Solar System:
+    ///     Units Involved:
+    ///     # Unit 3 - 3D Basics - Transformations
+    ///     Shows how to concatenate transformations to generate movements of planets in the solar system.
+    ///     Author: Matias Leone, Leandro Barbagallo.
     /// </summary>
     public class SolarSystem : TGCSample
     {
@@ -28,17 +29,18 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
 
         //Escalas de cada uno de los astros
         private readonly Vector3 SUN_SCALE = new Vector3(12, 12, 12);
+        private float AxisRotation;
 
         /// <inheritdoc />
         public SolarSystem(TGCViewer game) : base(game)
         {
             Category = TGCSampleCategory.Transformations;
             Name = "Solar System";
-            Description = "Shows how to concatenate transformations to generate movements of planets in the solar system. You can move around the scene with a simple camera that handles asdw and arrows keys.";
+            Description =
+                "Shows how to concatenate transformations to generate movements of planets in the solar system. You can move around the scene with a simple camera that handles asdw and arrows keys.";
         }
 
         private Camera Camera { get; set; }
-        private float AxisRotation;
         private SpherePrimitive Sun { get; set; }
         private Matrix SunTranslation { get; set; }
         private SpherePrimitive Earth { get; set; }
@@ -53,11 +55,11 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         /// <inheritdoc />
         public override void Initialize()
         {
-            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 100, 1500), 0.01f);
-            
-            Sun = new SpherePrimitive(GraphicsDevice, 10, 16);
-            Earth = new SpherePrimitive(GraphicsDevice, 10, 16);
-            Moon = new SpherePrimitive(GraphicsDevice, 10, 16);
+            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 100, 1500), 5);
+
+            Sun = new SpherePrimitive(GraphicsDevice, 10, 16, Color.MonoGameOrange);
+            Earth = new SpherePrimitive(GraphicsDevice, 10, 16, Color.LightSkyBlue);
+            Moon = new SpherePrimitive(GraphicsDevice, 10, 16, Color.LightSlateGray);
 
             base.Initialize();
         }
@@ -65,7 +67,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         /// <inheritdoc />
         protected override void LoadContent()
         {
-            //TODO load tectures to set.
+            //TODO load textures to set in the spheres.
             base.LoadContent();
         }
 
@@ -80,7 +82,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
             //Actualizar transformacion la luna
             MoonTranslation = GetMoonTransform(EarthTranslation);
 
-            var elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            var elapsedTime = Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
             AxisRotation += AXIS_ROTATION_SPEED * elapsedTime;
             EarthAxisRotation += EARTH_AXIS_ROTATION_SPEED * elapsedTime;
             EarthOrbitRotation += EARTH_ORBIT_SPEED * elapsedTime;
@@ -146,7 +148,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         {
             var effect = geometry.Effect;
 
-            effect.World = Matrix.Identity * transform;
+            effect.World = transform;
             effect.View = Camera.View;
             effect.Projection = Camera.Projection;
 

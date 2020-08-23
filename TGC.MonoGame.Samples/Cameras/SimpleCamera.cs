@@ -42,23 +42,23 @@ namespace TGC.MonoGame.Samples.Cameras
         public override void Update(GameTime gameTime)
         {
             var keyboardState = Keyboard.GetState();
-            var time = Convert.ToSingle(gameTime.ElapsedGameTime.TotalMilliseconds);
+            var time = Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
 
             // Check for input to rotate the camera.
             var pitch = 0f;
             var turn = 0f;
 
             if (keyboardState.IsKeyDown(Keys.Up))
-                pitch += time * 0.001f;
+                pitch += time * 0.1f;
 
             if (keyboardState.IsKeyDown(Keys.Down))
-                pitch -= time * 0.001f;
+                pitch -= time * 0.1f;
 
             if (keyboardState.IsKeyDown(Keys.Left))
-                turn += time * 0.001f;
+                turn += time * 0.1f;
 
             if (keyboardState.IsKeyDown(Keys.Right))
-                turn -= time * 0.001f;
+                turn -= time * 0.1f;
 
             RightDirection = Vector3.Cross(DefaultWorldUpVector, FrontDirection);
             var flatFront = Vector3.Cross(RightDirection, DefaultWorldUpVector);

@@ -25,16 +25,42 @@ namespace TGC.MonoGame.Samples.Geometries
     public class SpherePrimitive : GeometricPrimitive
     {
         /// <summary>
-        ///     Constructs a new sphere primitive, using default settings.
+        ///     Constructs a new sphere primitive, with the specified size 1, tessellation level 16 and white color.
         /// </summary>
-        public SpherePrimitive(GraphicsDevice graphicsDevice) : this(graphicsDevice, 1, 16)
+        /// <param name="graphicsDevice">Used to initialize and control the presentation of the graphics device.</param>
+        /// <param name="diameter">Diameter of the sphere.</param>
+        public SpherePrimitive(GraphicsDevice graphicsDevice) : this(graphicsDevice, 1)
         {
         }
 
         /// <summary>
-        ///     Constructs a new sphere primitive, with the specified size and tessellation level.
+        ///     Constructs a new sphere primitive, with the specified size, tessellation level 16 and white color.
         /// </summary>
-        public SpherePrimitive(GraphicsDevice graphicsDevice, float diameter, int tessellation)
+        /// <param name="graphicsDevice">Used to initialize and control the presentation of the graphics device.</param>
+        /// <param name="diameter">Diameter of the sphere.</param>
+        public SpherePrimitive(GraphicsDevice graphicsDevice, float diameter) : this(graphicsDevice, diameter, 16)
+        {
+        }
+
+        /// <summary>
+        ///     Constructs a new sphere primitive, with the specified size, tessellation level and white color.
+        /// </summary>
+        /// <param name="graphicsDevice">Used to initialize and control the presentation of the graphics device.</param>
+        /// <param name="diameter">Diameter of the sphere.</param>
+        /// <param name="tessellation">The number of times the surface triangles are subdivided.</param>
+        public SpherePrimitive(GraphicsDevice graphicsDevice, float diameter, int tessellation) : this(graphicsDevice,
+            diameter, tessellation, Color.White)
+        {
+        }
+
+        /// <summary>
+        ///     Constructs a new sphere primitive, with the specified size, tessellation level and color.
+        /// </summary>
+        /// <param name="graphicsDevice">Used to initialize and control the presentation of the graphics device.</param>
+        /// <param name="diameter">Diameter of the sphere.</param>
+        /// <param name="tessellation">The number of times the surface triangles are subdivided.</param>
+        /// <param name="color">Color of the sphere.</param>
+        public SpherePrimitive(GraphicsDevice graphicsDevice, float diameter, int tessellation, Color color)
         {
             if (tessellation < 3)
                 throw new ArgumentOutOfRangeException("tessellation");
@@ -46,7 +72,7 @@ namespace TGC.MonoGame.Samples.Geometries
 
             // Start with a single vertex at the bottom of the sphere.
             //AddVertex(Vector3.Down * radius, Vector3.Down);
-            AddVertex(Vector3.Down * radius, Color.MonoGameOrange);
+            AddVertex(Vector3.Down * radius, color);
 
             // Create rings of vertices at progressively higher latitudes.
             for (var i = 0; i < verticalSegments - 1; i++)
@@ -68,13 +94,13 @@ namespace TGC.MonoGame.Samples.Geometries
                     var normal = new Vector3(dx, dy, dz);
 
                     //AddVertex(normal * radius, normal);
-                    AddVertex(normal * radius, Color.AntiqueWhite);
+                    AddVertex(normal * radius, color);
                 }
             }
 
             // Finish with a single vertex at the top of the sphere.
             //AddVertex(Vector3.Up * radius, Vector3.Up);
-            AddVertex(Vector3.Up * radius, Color.AliceBlue);
+            AddVertex(Vector3.Up * radius, color);
 
             // Create a fan connecting the bottom vertex to the bottom latitude ring.
             for (var i = 0; i < horizontalSegments; i++)

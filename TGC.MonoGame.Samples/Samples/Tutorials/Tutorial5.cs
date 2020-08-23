@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Linq;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Viewer;
@@ -29,10 +30,14 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         /// <inheritdoc />
         public override void Initialize()
         {
-            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 0, 55), 0.01f);
+            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 0, 55), 5);
 
             Model1 = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
+            ((BasicEffect) Model1.Meshes.FirstOrDefault()?.Effects.FirstOrDefault())?.EnableDefaultLighting();
+
             Model2 = Game.Content.Load<Model>(ContentFolder3D + "tank/tank");
+
+            foreach (var mesh in Model2.Meshes) ((BasicEffect) mesh.Effects.FirstOrDefault())?.EnableDefaultLighting();
 
             base.Initialize();
         }
@@ -54,39 +59,10 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
 
             AxisLines.Draw(Camera.View, Camera.Projection);
 
-            foreach (var mesh in Model1.Meshes)
-            {
-                foreach (var effect in mesh.Effects)
-                {
-                    var castEffect = (BasicEffect) effect;
-                    castEffect.World = Matrix.Identity * Matrix.CreateScale(0.1f) *
-                                       Matrix.CreateTranslation(Vector3.UnitX * -8);
-                    castEffect.View = Camera.View;
-                    castEffect.Projection = Camera.Projection;
-                    castEffect.EnableDefaultLighting();
-                }
-
-                mesh.Draw();
-            }
-
-            // Look up the bone transform matrices.
-            var transforms = new Matrix[Model2.Bones.Count];
-            Model2.CopyAbsoluteBoneTransformsTo(transforms);
-
-            foreach (var mesh in Model2.Meshes)
-            {
-                foreach (var effect in mesh.Effects)
-                {
-                    var castEffect = (BasicEffect) effect;
-                    castEffect.World = transforms[mesh.ParentBone.Index] * Matrix.Identity *
-                                       Matrix.CreateScale(2.8f) * Matrix.CreateTranslation(new Vector3(8, -5, 0));
-                    castEffect.View = Camera.View;
-                    castEffect.Projection = Camera.Projection;
-                    castEffect.EnableDefaultLighting();
-                }
-
-                mesh.Draw();
-            }
+            Model1.Draw(Matrix.CreateScale(0.1f) * Matrix.CreateTranslation(Vector3.UnitX * -8), Camera.View,
+                Camera.Projection);
+            Model2.Draw(Matrix.CreateScale(2.8f) * Matrix.CreateTranslation(new Vector3(8, -5, 0)), Camera.View,
+                Camera.Projection);
 
             base.Draw(gameTime);
         }

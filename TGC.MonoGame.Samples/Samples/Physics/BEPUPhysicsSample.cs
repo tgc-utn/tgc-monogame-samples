@@ -15,7 +15,14 @@ namespace TGC.MonoGame.Samples.Samples.Physics
 {
     public class BEPUPhysicsSample : TGCSample
     {
-        ///<inheritdoc/>
+        public List<BoxPrimitive> Boxes;
+
+        //We'll randomize the size of bullets.
+        private Random Random;
+
+        public List<SpherePrimitive> Spheres;
+
+        /// <inheritdoc />
         public BEPUPhysicsSample(TGCViewer game) : base(game)
         {
             Category = TGCSampleCategory.Physics;
@@ -23,46 +30,41 @@ namespace TGC.MonoGame.Samples.Samples.Physics
             Description = "bepu physics 2";
         }
 
-        public List<BoxPrimitive> Boxes;
-
-        public List<SpherePrimitive> Spheres;
-
         /// <summary>
-        /// Gets the buffer pool used by the demo's simulation.
-        /// Note that the buffer pool used by the simulation is not considered to be *owned* by the simulation.
-        /// The simulation merely uses the pool.
-        /// Disposing the simulation will not dispose or clear the buffer pool.
+        ///     Gets the buffer pool used by the demo's simulation.
+        ///     Note that the buffer pool used by the simulation is not considered to be *owned* by the simulation.
+        ///     The simulation merely uses the pool.
+        ///     Disposing the simulation will not dispose or clear the buffer pool.
         /// </summary>
         public BufferPool BufferPool { get; private set; }
-
-        //We'll randomize the size of bullets.
-        private Random Random;
 
         private Camera Camera { get; set; }
 
         /// <summary>
-        /// Gets the simulation created by the sample's Initialize call.
+        ///     Gets the simulation created by the sample's Initialize call.
         /// </summary>
         public Simulation Simulation { get; protected set; }
 
         /// <summary>
-        /// Gets the thread dispatcher available for use by the simulation.
+        ///     Gets the thread dispatcher available for use by the simulation.
         /// </summary>
         public SimpleThreadDispatcher ThreadDispatcher { get; private set; }
 
-        ///<inheritdoc/>
+        /// <inheritdoc />
         public override void Initialize()
         {
             Random = new Random(5);
             //The buffer pool is a source of raw memory blobs for the engine to use.
             BufferPool = new BufferPool();
 
-            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(20, 8, 125), 0.1f);
+            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(20, 8, 125), 6);
 
             //The PositionFirstTimestepper is the simplest timestepping mode, but since it integrates velocity into position at the start of the frame, directly modified velocities outside of the timestep
             //will be integrated before collision detection or the solver has a chance to intervene. That's fine in this demo. Other built-in options include the PositionLastTimestepper and the SubsteppingTimestepper.
             //Note that the timestepper also has callbacks that you can use for executing logic between processing stages, like BeforeCollisionDetection.
-            Simulation = Simulation.Create(BufferPool, new SimpleSelfContainedDemo.NarrowPhaseCallbacks(), new SimpleSelfContainedDemo.PoseIntegratorCallbacks(new System.Numerics.Vector3(0, -10, 0)), new PositionFirstTimestepper());
+            Simulation = Simulation.Create(BufferPool, new SimpleSelfContainedDemo.NarrowPhaseCallbacks(),
+                new SimpleSelfContainedDemo.PoseIntegratorCallbacks(new System.Numerics.Vector3(0, -10, 0)),
+                new PositionFirstTimestepper());
 
             Boxes = new List<BoxPrimitive>();
             Spheres = new List<SpherePrimitive>();
@@ -71,31 +73,35 @@ namespace TGC.MonoGame.Samples.Samples.Physics
             boxShape.ComputeInertia(1, out var boxInertia);
             var boxIndex = Simulation.Shapes.Add(boxShape);
             const int pyramidCount = 40;
-            for (int pyramidIndex = 0; pyramidIndex < pyramidCount; ++pyramidIndex)
+            for (var pyramidIndex = 0; pyramidIndex < pyramidCount; ++pyramidIndex)
             {
                 const int rowCount = 20;
-                for (int rowIndex = 0; rowIndex < rowCount; ++rowIndex)
+                for (var rowIndex = 0; rowIndex < rowCount; ++rowIndex)
                 {
-                    int columnCount = rowCount - rowIndex;
-                    for (int columnIndex = 0; columnIndex < columnCount; ++columnIndex)
+                    var columnCount = rowCount - rowIndex;
+                    for (var columnIndex = 0; columnIndex < columnCount; ++columnIndex)
                     {
-                        var position = new System.Numerics.Vector3((-columnCount * 0.5f + columnIndex) * boxShape.Width, (rowIndex + 0.5f) * boxShape.Height, (pyramidIndex - pyramidCount * 0.5f) * (boxShape.Length + 4));
+                        var position = new System.Numerics.Vector3((-columnCount * 0.5f + columnIndex) * boxShape.Width,
+                            (rowIndex + 0.5f) * boxShape.Height,
+                            (pyramidIndex - pyramidCount * 0.5f) * (boxShape.Length + 4));
                         Simulation.Bodies.Add(BodyDescription.CreateDynamic(position,
                             boxInertia,
                             new CollidableDescription(boxIndex, 0.1f),
                             new BodyActivityDescription(0.01f)));
-                        Boxes.Add(new Geometries.BoxPrimitive(this.GraphicsDevice, Vector3.One, new Vector3(position.X, position.Y, position.Z), Color.Black, Color.Red, Color.Yellow,
+                        Boxes.Add(new BoxPrimitive(GraphicsDevice, Vector3.One,
+                            new Vector3(position.X, position.Y, position.Z), Color.Black, Color.Red, Color.Yellow,
                             Color.Green, Color.Blue, Color.Magenta, Color.White, Color.Cyan));
                     }
                 }
             }
 
-            Simulation.Statics.Add(new StaticDescription(new System.Numerics.Vector3(0, -0.5f, 0), new CollidableDescription(Simulation.Shapes.Add(new Box(2500, 1, 2500)), 0.1f)));
+            Simulation.Statics.Add(new StaticDescription(new System.Numerics.Vector3(0, -0.5f, 0),
+                new CollidableDescription(Simulation.Shapes.Add(new Box(2500, 1, 2500)), 0.1f)));
 
             ThreadDispatcher = new SimpleThreadDispatcher(Environment.ProcessorCount);
         }
 
-        ///<inheritdoc/>
+        /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
             Camera.Update(gameTime);
@@ -103,7 +109,7 @@ namespace TGC.MonoGame.Samples.Samples.Physics
             if (Game.CurrentKeyboardState.IsKeyDown(Keys.Z))
             {
                 //Create the shape that we'll launch at the pyramids when the user presses a button.
-                var raduis = 0.5f + 5 * (float)Random.NextDouble();
+                var raduis = 0.5f + 5 * (float) Random.NextDouble();
                 var bulletShape = new Sphere(raduis);
                 //Note that the use of radius^3 for mass can produce some pretty serious mass ratios. 
                 //Observe what happens when a large ball sits on top of a few boxes with a fraction of the mass-
@@ -115,7 +121,9 @@ namespace TGC.MonoGame.Samples.Samples.Physics
                 //Unfortunately, at the moment, bepuphysics v2 does not contain any alternative solvers, so if you can't afford to brute force the the problem away,
                 //the best solution is to cheat as much as possible to avoid the corner cases.
                 var position = new System.Numerics.Vector3(0, 8, 130);
-                var bodyDescription = BodyDescription.CreateConvexDynamic(position, new BodyVelocity(new System.Numerics.Vector3(0, 0, 150)), bulletShape.Radius * bulletShape.Radius * bulletShape.Radius, Simulation.Shapes, bulletShape);
+                var bodyDescription = BodyDescription.CreateConvexDynamic(position,
+                    new BodyVelocity(new System.Numerics.Vector3(0, 0, 150)),
+                    bulletShape.Radius * bulletShape.Radius * bulletShape.Radius, Simulation.Shapes, bulletShape);
                 Spheres.Add(new SpherePrimitive(GraphicsDevice, raduis, 16));
                 Simulation.Bodies.Add(bodyDescription);
             }
@@ -131,7 +139,7 @@ namespace TGC.MonoGame.Samples.Samples.Physics
             base.Update(gameTime);
         }
 
-        ///<inheritdoc/>
+        /// <inheritdoc />
         public override void Draw(GameTime gameTime)
         {
             Game.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
@@ -156,7 +164,7 @@ namespace TGC.MonoGame.Samples.Samples.Physics
         }
 
         /// <summary>
-        /// Unload any content here.
+        ///     Unload any content here.
         /// </summary>
         protected override void UnloadContent()
         {
@@ -182,7 +190,7 @@ namespace TGC.MonoGame.Samples.Samples.Physics
         {
             var effect = geometry.Effect;
 
-            effect.World = Matrix.Identity * Matrix.CreateTranslation(position);
+            effect.World = Matrix.CreateTranslation(position);
             effect.View = Camera.View;
             effect.Projection = Camera.Projection;
 
