@@ -106,7 +106,7 @@ float4 ShadowedPS(in ShadowedVertexShaderOutput input) : COLOR
     shadowMapTextureCoordinates.y = 1.0f - shadowMapTextureCoordinates.y;
 	
 	
-    float3 normal = normalize(input.Normal);
+    float3 normal = normalize(input.Normal.rgb);
     float3 lightDirection = normalize(lightPosition - input.WorldSpacePosition.xyz);
     float inclinationBias = max(modulatedEpsilon * (1.0 - dot(normal, lightDirection)), maxEpsilon);
 	
@@ -127,7 +127,7 @@ float4 ShadowedPCFPS(in ShadowedVertexShaderOutput input) : COLOR
     float2 shadowMapTextureCoordinates = 0.5 * lightSpacePosition.xy + float2(0.5, 0.5);
     shadowMapTextureCoordinates.y = 1.0f - shadowMapTextureCoordinates.y;
 	
-    float3 normal = normalize(input.Normal);
+    float3 normal = normalize(input.Normal.rgb);
     float3 lightDirection = normalize(lightPosition - input.WorldSpacePosition.xyz);
     float inclinationBias = max(modulatedEpsilon * (1.0 - dot(normal, lightDirection)), maxEpsilon);
 	

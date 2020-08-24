@@ -144,6 +144,12 @@
 /processorParam:DebugMode=Auto
 /build:Effect/ShadowMap.fx
 
+#begin Effect/TextureMerge.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effect/TextureMerge.fx
+
 #begin Music/RetroPlatforming.mp3
 /importer:Mp3Importer
 /processor:SongProcessor
@@ -168,6 +174,18 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:SpriteFonts/Arial.spritefont
+
+#begin Textures/overlay.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/overlay.png
 
 #begin Textures/Wood/cajaMadera1.jpg
 /importer:TextureImporter
