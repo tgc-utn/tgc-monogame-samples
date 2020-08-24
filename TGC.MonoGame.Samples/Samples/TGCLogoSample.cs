@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Viewer;
@@ -42,7 +43,7 @@ namespace TGC.MonoGame.Samples.Samples
         ///<inheritdoc/>
         public override void Update(GameTime gameTime)
         {
-            Rotation += gameTime.ElapsedGameTime.Milliseconds * 0.001f;
+            Rotation += Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
             base.Update(gameTime);
         }
 
