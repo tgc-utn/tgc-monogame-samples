@@ -26,8 +26,8 @@ namespace TGC.MonoGame.Samples.Samples.Physics
         public BEPUPhysicsSample(TGCViewer game) : base(game)
         {
             Category = TGCSampleCategory.Physics;
-            Name = "bepu physics 2";
-            Description = "bepu physics 2";
+            Name = "BepuPhysics 2 - Pyramid demo";
+            Description = "A pyramid of boxes, because you can't have a physics engine without pyramids of boxes.";
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace TGC.MonoGame.Samples.Samples.Physics
             //The buffer pool is a source of raw memory blobs for the engine to use.
             BufferPool = new BufferPool();
 
-            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(20, 8, 125), 6);
+            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(20, 8, 125), 15);
 
             //The PositionFirstTimestepper is the simplest timestepping mode, but since it integrates velocity into position at the start of the frame, directly modified velocities outside of the timestep
             //will be integrated before collision detection or the solver has a chance to intervene. That's fine in this demo. Other built-in options include the PositionLastTimestepper and the SubsteppingTimestepper.
@@ -88,7 +88,7 @@ namespace TGC.MonoGame.Samples.Samples.Physics
                             boxInertia,
                             new CollidableDescription(boxIndex, 0.1f),
                             new BodyActivityDescription(0.01f)));
-                        Boxes.Add(new BoxPrimitive(GraphicsDevice, Vector3.One,
+                        Boxes.Add(new BoxPrimitive(GraphicsDevice, Vector3.One * 2,
                             new Vector3(position.X, position.Y, position.Z), Color.Black, Color.Red, Color.Yellow,
                             Color.Green, Color.Blue, Color.Magenta, Color.White, Color.Cyan));
                     }
@@ -109,7 +109,7 @@ namespace TGC.MonoGame.Samples.Samples.Physics
             if (Game.CurrentKeyboardState.IsKeyDown(Keys.Z))
             {
                 //Create the shape that we'll launch at the pyramids when the user presses a button.
-                var raduis = 0.5f + 5 * (float) Random.NextDouble();
+                var raduis = 0.5f + 5 * (float)Random.NextDouble();
                 var bulletShape = new Sphere(raduis);
                 //Note that the use of radius^3 for mass can produce some pretty serious mass ratios. 
                 //Observe what happens when a large ball sits on top of a few boxes with a fraction of the mass-
@@ -148,7 +148,8 @@ namespace TGC.MonoGame.Samples.Samples.Physics
 
             Boxes.ForEach(box =>
             {
-                var position = Simulation.Bodies.Sets[0].Poses[i].Position;
+                //var position = Simulation.Bodies.Sets[0].Poses[i].Position;
+                var position = Simulation.Bodies.ActiveSet.Poses[i].Position;
                 DrawGeometry(box, new Vector3(position.X, position.Y, position.Z));
                 i++;
             });
@@ -183,9 +184,6 @@ namespace TGC.MonoGame.Samples.Samples.Physics
         /// </summary>
         /// <param name="geometry">The geometry to draw.</param>
         /// <param name="position">The position of the geometry.</param>
-        /// <param name="yaw">Vertical axis (yaw).</param>
-        /// <param name="pitch">Transverse axis (pitch).</param>
-        /// <param name="roll">Longitudinal axis (roll).</param>
         private void DrawGeometry(GeometricPrimitive geometry, Vector3 position)
         {
             var effect = geometry.Effect;
