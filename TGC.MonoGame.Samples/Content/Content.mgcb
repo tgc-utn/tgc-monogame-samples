@@ -132,6 +132,12 @@
 /processorParam:DebugMode=Auto
 /build:Effect/DebugTexture.fx
 
+#begin Effect/EnvironmentMap.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effect/EnvironmentMap.fx
+
 #begin Effect/GaussianBlur.fx
 /importer:EffectImporter
 /processor:EffectProcessor
@@ -181,7 +187,7 @@
 /processorParam:ColorKeyColor=255,0,255,255
 /processorParam:ColorKeyEnabled=True
 /processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
+/processorParam:PremultiplyAlpha=False
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color

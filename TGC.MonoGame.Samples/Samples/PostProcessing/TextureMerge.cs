@@ -1,8 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
@@ -87,6 +84,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         /// <inheritdoc />
         public override void Draw(GameTime gameTime)
         {
+            #region Pass 1
+
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             // Set the render target as our shadow map, we are drawing the depth into this texture
             GraphicsDevice.SetRenderTarget(SceneRenderTarget);
@@ -94,7 +93,10 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             Model.Draw(Matrix.Identity, Camera.View, Camera.Projection);
 
+            #endregion
 
+
+            #region Pass 1
 
             // No depth needed
             GraphicsDevice.DepthStencilState = DepthStencilState.None;
@@ -103,7 +105,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             Effect.Parameters["baseTexture"].SetValue(SceneRenderTarget);
             FullScreenQuad.Draw(Effect);
-
+            
+            #endregion
 
             AxisLines.Draw(Camera.View, Camera.Projection);
             base.Draw(gameTime);
