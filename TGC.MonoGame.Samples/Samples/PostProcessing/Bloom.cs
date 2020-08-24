@@ -75,12 +75,13 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             // Create a full screen quad to post-process
             FullScreenQuad = new FullScreenQuad(GraphicsDevice);
-            
 
 
-            // Create render targets. One can be used for simple gaussian blur
-            // mainRenderTarget is also used as a render target in the separated filter
-            // horizontalRenderTarget is used as the horizontal render target in the separated filter
+
+            // Create render targets. 
+            // MainRenderTarget is used to store the scene color
+            // BloomRenderTarget is used to store the bloom color and switches with MultipassBloomRenderTarget
+            // depending on the pass count, to blur the bloom color
             MainSceneRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.DiscardContents);
             BloomRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.DiscardContents);
             MultipassBloomRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.DiscardContents);

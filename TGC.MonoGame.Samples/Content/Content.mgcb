@@ -138,6 +138,12 @@
 /processorParam:DebugMode=Auto
 /build:Effect/GaussianBlur.fx
 
+#begin Effect/ShadowMap.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effect/ShadowMap.fx
+
 #begin Music/RetroPlatforming.mp3
 /importer:Mp3Importer
 /processor:SongProcessor

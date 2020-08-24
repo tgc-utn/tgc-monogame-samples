@@ -12,6 +12,15 @@ namespace TGC.MonoGame.Samples.Cameras
         /// </summary>
         public readonly Vector3 DefaultWorldUpVector = Vector3.Up;
 
+        public Vector3 LookAtPosition { get; private set; }
+
+        public void SetPosition(Vector3 position)
+        {
+            Position = position;
+            Update();
+        }
+
+
         /// <summary>
         /// Static camera looking at a particular direction, which has the up vector (0,1,0).
         /// </summary>
@@ -20,11 +29,17 @@ namespace TGC.MonoGame.Samples.Cameras
         /// <param name="lookAt">The target towards which the camera is pointing.</param>
         public StaticCamera(float aspectRatio, Vector3 position, Vector3 lookAt) : base(aspectRatio)
         {
+            LookAtPosition = lookAt;
             Position = position;
-            FrontDirection = Vector3.Normalize(position - lookAt);
+            Update();
+        }
+
+        private void Update()
+        {
+            FrontDirection = Vector3.Normalize(LookAtPosition - Position);
             RightDirection = Vector3.Normalize(Vector3.Cross(DefaultWorldUpVector, FrontDirection));
             UpDirection = Vector3.Cross(FrontDirection, RightDirection);
-            View = Matrix.CreateLookAt(Position, FrontDirection, UpDirection);
+            View = Matrix.CreateLookAt(Position, Position + FrontDirection, UpDirection);
         }
 
         ///<inheritdoc/>
