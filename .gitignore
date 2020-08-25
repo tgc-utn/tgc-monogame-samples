@@ -56,13 +56,3 @@ ehthumbs_vista.db
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
-
-# Content
-*/Content/2D/*
-*/Content/3D/*
-*/Content/Data/*
-*/Content/Models/*
-*/Content/Music/*
-*/Content/Sounds/*
-*/Content/SpriteFonts/*
-*/Content/Textures/*

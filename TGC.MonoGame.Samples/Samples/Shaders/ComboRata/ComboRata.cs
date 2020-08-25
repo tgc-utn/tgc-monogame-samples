@@ -54,10 +54,10 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.ComboRata
         /// <inheritdoc />
         protected override void LoadContent()
         {
-            Texture = Game.Content.Load<Texture2D>(ContentFolderTextures + "Tunel/metal");
-            TextureAux = Game.Content.Load<Texture2D>(ContentFolderTextures + "Tunel/level2");
+            Texture = Game.Content.Load<Texture2D>(ContentFolderTextures + "tunel/metal");
+            TextureAux = Game.Content.Load<Texture2D>(ContentFolderTextures + "tunel/level2");
             // Load a shader using Content pipeline.
-            Effect = Game.Content.Load<Effect>(ContentFolderEffect + "ComboRata");
+            Effect = Game.Content.Load<Effect>(ContentFolderEffects + "ComboRata");
             Tunel = new TunelMesh();
             Effect.Parameters["World"].SetValue(Matrix.Identity);
             var projectionMatrix =

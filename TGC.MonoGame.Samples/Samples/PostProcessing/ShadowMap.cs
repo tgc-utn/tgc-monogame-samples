@@ -78,12 +78,12 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             Model = Game.Content.Load<Model>(ContentFolder3D + "scene/city");
 
             // Load the shadowmap effect
-            Effect = Game.Content.Load<Effect>(ContentFolderEffect + "ShadowMap");
+            Effect = Game.Content.Load<Effect>(ContentFolderEffects + "ShadowMap");
 
             BasicEffect = (BasicEffect)Model.Meshes.FirstOrDefault().Effects.FirstOrDefault();
 
             // Load the debug texture effect to visualize the shadow map
-            DebugTextureEffect = Game.Content.Load<Effect>(ContentFolderEffect + "DebugTexture");
+            DebugTextureEffect = Game.Content.Load<Effect>(ContentFolderEffects + "DebugTexture");
             // Assign the near and far plane distances of the light camera to debug depth
             DebugTextureEffect.Parameters["nearPlaneDistance"].SetValue(LightCameraNearPlaneDistance);
             DebugTextureEffect.Parameters["farPlaneDistance"].SetValue(LightCameraFarPlaneDistance);

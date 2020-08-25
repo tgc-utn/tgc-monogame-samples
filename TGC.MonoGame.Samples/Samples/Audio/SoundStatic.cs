@@ -45,7 +45,7 @@ namespace TGC.MonoGame.Samples.Samples.Audio
         {
             Font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "Arial");
             InstructionsSize = Font.MeasureString(Instructions);
-            SoundName = "A2-8bit";
+            SoundName = "a2-8bit";
             Sound = Game.Content.Load<SoundEffect>(ContentFolderSounds + SoundName);
 
             base.LoadContent();

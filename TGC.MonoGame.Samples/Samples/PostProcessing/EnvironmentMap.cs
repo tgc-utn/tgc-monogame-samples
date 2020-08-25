@@ -78,7 +78,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
 
             // Load the shadowmap effect
-            Effect = Game.Content.Load<Effect>(ContentFolderEffect + "EnvironmentMap");
+            Effect = Game.Content.Load<Effect>(ContentFolderEffects + "EnvironmentMap");
 
             BasicEffect = (BasicEffect)Robot.Meshes.FirstOrDefault().Effects[0];
 
@@ -87,7 +87,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
                 foreach (var part in modelMesh.MeshParts)
                     part.Effect = Effect;
 
-            DebugTextureEffect = Game.Content.Load<Effect>(ContentFolderEffect + "DebugTexture");
+            DebugTextureEffect = Game.Content.Load<Effect>(ContentFolderEffects + "DebugTexture");
             DebugTextureEffect.CurrentTechnique = DebugTextureEffect.Techniques["DebugCubeMap"];
 
             // Create a full screen quad to debug the environment map

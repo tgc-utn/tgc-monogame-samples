@@ -50,11 +50,11 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             // Load a shader in runtime, outside the Content pipeline.
             // First you must run "mgfxc <SourceFile> <OutputFile> [/Debug] [/Profile:<DirectX_11,OpenGL>]"
             // https://docs.monogame.net/articles/tools/mgfxc.html
-            //byte[] byteCode = File.ReadAllBytes(Game.Content.RootDirectory + "/" + ContentFolderEffect + "BasicShader.fx");
+            //byte[] byteCode = File.ReadAllBytes(Game.Content.RootDirectory + "/" + ContentFolderEffects + "BasicShader.fx");
             //Effect = new Effect(Game.GraphicsDevice, byteCode);
 
             // Load a shader using Content pipeline.
-            Effect = Game.Content.Load<Effect>(ContentFolderEffect + "BasicShader");
+            Effect = Game.Content.Load<Effect>(ContentFolderEffects + "BasicShader");
 
             base.LoadContent();
         }

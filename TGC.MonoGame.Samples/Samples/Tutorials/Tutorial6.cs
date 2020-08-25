@@ -33,6 +33,12 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         {
             Camera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(1000, 600, 0), new Vector3(0, 150, 0));
 
+            base.Initialize();
+        }
+
+        /// <inheritdoc />
+        protected override void LoadContent()
+        {
             // Load the tank model from the ContentManager.
             TankModel = new Tank();
             var model = Game.Content.Load<Model>(ContentFolder3D + "tank/tank");
@@ -41,7 +47,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             // TODO tgcito animation import from de tgcito model.
             TgcitoModel = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
 
-            base.Initialize();
+            base.LoadContent();
         }
 
         /// <inheritdoc />

@@ -47,7 +47,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             var texture = ((BasicEffect) Model.Meshes.FirstOrDefault()?.MeshParts.FirstOrDefault()?.Effect)?.Texture;
 
             // We load the effect in the .fx file
-            Effect = Game.Content.Load<Effect>(ContentFolderEffect + "BlinnPhong");
+            Effect = Game.Content.Load<Effect>(ContentFolderEffects + "BlinnPhong");
 
             // We assign the effect to each one of the models
             foreach (var modelMesh in Model.Meshes)

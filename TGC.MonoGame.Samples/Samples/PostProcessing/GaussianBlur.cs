@@ -59,7 +59,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             Model = Game.Content.Load<Model>(ContentFolder3D + "scene/city");
 
             // Load the post-processing effect
-            Effect = Game.Content.Load<Effect>(ContentFolderEffect + "GaussianBlur");
+            Effect = Game.Content.Load<Effect>(ContentFolderEffects + "GaussianBlur");
 
             // Create a full screen quad to post-process
             FullScreenQuad = new FullScreenQuad(GraphicsDevice);             
