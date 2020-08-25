@@ -185,12 +185,13 @@ namespace TGC.MonoGame.Samples.Physics
             var threadDispatcher = new SimpleThreadDispatcher(Environment.ProcessorCount);
 
             //Now take 100 time steps!
-            for (int i = 0; i < 100; ++i)
+            for (int i = 0; i < 100000; ++i)
             {
                 //Multithreading is pretty pointless for a simulation of one ball, but passing a IThreadDispatcher instance is all you have to do to enable multithreading.
                 //If you don't want to use multithreading, don't pass a IThreadDispatcher.
                 simulation.Timestep(0.01f, threadDispatcher);
             }
+
 
             //If you intend to reuse the BufferPool, disposing the simulation is a good idea- it returns all the buffers to the pool for reuse.
             //Here, we dispose it, but it's not really required; we immediately thereafter clear the BufferPool of all held memory.
