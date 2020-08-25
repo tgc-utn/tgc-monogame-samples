@@ -31,7 +31,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         /// <inheritdoc />
         public override void Initialize()
         {
-            Camera = new StaticCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(1000, 600, 0), new Vector3(0, 150, 0));
+            Camera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(1000, 600, 0), new Vector3(0, 150, 0));
 
             // Load the tank model from the ContentManager.
             TankModel = new Tank();
