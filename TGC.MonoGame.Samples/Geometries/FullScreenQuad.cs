@@ -69,5 +69,11 @@ namespace TGC.MonoGame.Samples.Geometries
             }
         }
 
+        public void Dispose()
+        {
+            vertexBuffer.Dispose();
+            indexBuffer.Dispose();
+        }
+
     }
 }

@@ -243,5 +243,16 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
 
         }
+
+
+
+        /// <inheritdoc />
+        protected override void UnloadContent()
+        {
+            base.UnloadContent();
+            FullScreenQuad.Dispose();
+            ShadowMapRenderTarget.Dispose();
+        }
+
     }
 }

@@ -114,17 +114,71 @@
 /processorParam:DebugMode=Auto
 /build:Effect/BasicShader.fx
 
+#begin Effect/BasicShader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effect/BasicShader.fx
+
 #begin Effect/BlinnPhong.fx
 /importer:EffectImporter
 /processor:EffectProcessor
 /processorParam:DebugMode=Debug
 /build:Effect/BlinnPhong.fx
 
+#begin Effect/BlinnPhong.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effect/BlinnPhong.fx
+
+#begin Effect/Bloom.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effect/Bloom.fx
+
 #begin Effect/ComboRata.fx
 /importer:EffectImporter
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:Effect/ComboRata.fx
+
+#begin Effect/ComboRata.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effect/ComboRata.fx
+
+#begin Effect/DebugTexture.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effect/DebugTexture.fx
+
+#begin Effect/EnvironmentMap.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effect/EnvironmentMap.fx
+
+#begin Effect/GaussianBlur.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effect/GaussianBlur.fx
+
+#begin Effect/ShadowMap.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effect/ShadowMap.fx
+
+#begin Effect/TextureMerge.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effect/TextureMerge.fx
 
 #begin Music/RetroPlatforming.mp3
 /importer:Mp3Importer
@@ -150,6 +204,18 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:SpriteFonts/Arial.spritefont
+
+#begin Textures/overlay.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/overlay.png
 
 #begin Textures/Tunel/level2.png
 /importer:TextureImporter

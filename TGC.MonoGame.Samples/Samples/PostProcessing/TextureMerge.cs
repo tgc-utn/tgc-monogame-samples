@@ -112,6 +112,12 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             base.Draw(gameTime);
         }
 
+        protected override void UnloadContent()
+        {
+            base.UnloadContent();
+            FullScreenQuad.Dispose();
+            SceneRenderTarget.Dispose();
+        }
 
     }
 }
