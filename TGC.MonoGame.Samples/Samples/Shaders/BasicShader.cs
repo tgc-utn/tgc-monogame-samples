@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Cameras;
@@ -75,7 +76,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 
             AxisLines.Draw(Camera.View, Camera.Projection);
 
-            time += gameTime.ElapsedGameTime.Milliseconds;
+            time += Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
 
             var mesh = Model.Meshes.FirstOrDefault();
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Viewer;
@@ -22,12 +23,14 @@ namespace TGC.MonoGame.Samples.Samples
 
         private Camera Camera { get; set; }
         private Model Model { get; set; }
-        private float Rotation { get; set; }
+        private Matrix ModelWorld { get; set; }
+        private float ModelRotation { get; set; }
 
         ///<inheritdoc/>
         public override void Initialize()
         {
             Camera = new StaticCamera(GraphicsDevice.Viewport.AspectRatio, Vector3.UnitZ * 150, Vector3.Zero);
+
             base.Initialize();
         }
 
@@ -36,13 +39,19 @@ namespace TGC.MonoGame.Samples.Samples
         {
             // Load mesh.
             Model = Game.Content.Load<Model>(ContentFolder3D + "tgc-logo/tgc-logo");
+            var modelEffect = (BasicEffect)Model.Meshes[0].Effects[0];
+            modelEffect.DiffuseColor = Color.DarkBlue.ToVector3();
+            modelEffect.EnableDefaultLighting();
+            ModelWorld = Matrix.CreateRotationY(MathHelper.Pi);
+
             base.LoadContent();
         }
 
         ///<inheritdoc/>
         public override void Update(GameTime gameTime)
         {
-            Rotation += gameTime.ElapsedGameTime.Milliseconds * 0.001f;
+            ModelRotation += Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
+
             base.Update(gameTime);
         }
 
@@ -50,23 +59,9 @@ namespace TGC.MonoGame.Samples.Samples
         public override void Draw(GameTime gameTime)
         {
             Game.Background = Color.Black;
-
             Game.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            foreach (var mesh in Model.Meshes)
-            {
-                foreach (var effect in mesh.Effects)
-                {
-                    var castEffect = (BasicEffect)effect;
-                    castEffect.World = Matrix.CreateRotationY(Rotation) *
-                                       Matrix.CreateTranslation(new Vector3(0, -40, 0));
-                    castEffect.View = Camera.View;
-                    castEffect.Projection = Camera.Projection;
-                    castEffect.EnableDefaultLighting();
-                }
-
-                mesh.Draw();
-            }
+            Model.Draw(ModelWorld * Matrix.CreateRotationY(ModelRotation), Camera.View, Camera.Projection);
 
             base.Draw(gameTime);
         }

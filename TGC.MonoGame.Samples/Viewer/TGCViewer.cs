@@ -119,9 +119,9 @@ namespace TGC.MonoGame.Samples.Viewer
 
             GraphicsDevice.Clear(Background);
 
-            Model.DrawSampleExplorer(gameTime);
-
             base.Draw(gameTime);
+
+            Model.DrawSampleExplorer(gameTime);
         }
 
         /// <summary>
