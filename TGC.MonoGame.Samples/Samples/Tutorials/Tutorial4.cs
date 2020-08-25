@@ -30,14 +30,19 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         /// <inheritdoc />
         public override void Initialize()
         {
-            Game.Background = Color.CornflowerBlue;
             Camera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 20, 60), Vector3.Zero);
 
-            var texture = Game.Content.Load<Texture2D>(ContentFolderTextures + "Wood/cajaMadera3");
+            base.Initialize();
+        }
+
+        /// <inheritdoc />
+        protected override void LoadContent()
+        {
+            var texture = Game.Content.Load<Texture2D>(ContentFolderTextures + "wood/caja-madera-3");
             Quad = new QuadPrimitive(Game.GraphicsDevice, Vector3.Zero, Vector3.Backward, Vector3.Up, 22, 22, texture,
                 2);
 
-            base.Initialize();
+            base.LoadContent();
         }
 
         /// <inheritdoc />

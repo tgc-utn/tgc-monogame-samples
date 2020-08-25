@@ -12,7 +12,7 @@ namespace TGC.MonoGame.Samples.Samples
     {
         public const string ContentFolder2D = "2D/";
         public const string ContentFolder3D = "3D/";
-        public const string ContentFolderEffect = "Effect/";
+        public const string ContentFolderEffects = "Effects/";
         public const string ContentFolderMusic = "Music/";
         public const string ContentFolderSounds = "Sounds/";
         public const string ContentFolderSpriteFonts = "SpriteFonts/";

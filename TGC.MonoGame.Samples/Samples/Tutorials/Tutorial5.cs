@@ -32,14 +32,20 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         {
             Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 0, 55), 5);
 
+            base.Initialize();
+        }
+
+        /// <inheritdoc />
+        protected override void LoadContent()
+        {
             Model1 = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
-            ((BasicEffect) Model1.Meshes.FirstOrDefault()?.Effects.FirstOrDefault())?.EnableDefaultLighting();
+            ((BasicEffect)Model1.Meshes.FirstOrDefault()?.Effects.FirstOrDefault())?.EnableDefaultLighting();
 
             Model2 = Game.Content.Load<Model>(ContentFolder3D + "tank/tank");
 
-            foreach (var mesh in Model2.Meshes) ((BasicEffect) mesh.Effects.FirstOrDefault())?.EnableDefaultLighting();
+            foreach (var mesh in Model2.Meshes) ((BasicEffect)mesh.Effects.FirstOrDefault())?.EnableDefaultLighting();
 
-            base.Initialize();
+            base.LoadContent();
         }
 
         /// <inheritdoc />

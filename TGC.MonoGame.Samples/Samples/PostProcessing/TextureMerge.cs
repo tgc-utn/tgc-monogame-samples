@@ -53,7 +53,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             Overlay = Game.Content.Load<Texture2D>(ContentFolderTextures + "overlay");
 
             // Load the shadowmap effect
-            Effect = Game.Content.Load<Effect>(ContentFolderEffect + "TextureMerge");
+            Effect = Game.Content.Load<Effect>(ContentFolderEffects + "TextureMerge");
             Effect.Parameters["overlayTexture"].SetValue(Overlay);
 
             // Create a full screen quad to post-process

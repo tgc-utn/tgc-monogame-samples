@@ -64,14 +64,14 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             BasicEffect = (BasicEffect)Model.Meshes[0].Effects[0];
 
             // Load the base bloom pass effect
-            Effect = Game.Content.Load<Effect>(ContentFolderEffect + "Bloom");
+            Effect = Game.Content.Load<Effect>(ContentFolderEffects + "Bloom");
 
             // Load the blur effect to blur the bloom texture
-            BlurEffect = Game.Content.Load<Effect>(ContentFolderEffect + "GaussianBlur");
+            BlurEffect = Game.Content.Load<Effect>(ContentFolderEffects + "GaussianBlur");
             BlurEffect.Parameters["screenSize"].SetValue(new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height));
 
             // Load the debug texture effect to visualize the bloom
-            DebugTextureEffect = Game.Content.Load<Effect>(ContentFolderEffect + "DebugTexture");
+            DebugTextureEffect = Game.Content.Load<Effect>(ContentFolderEffects + "DebugTexture");
             // Transform the quad to be in a smaller part of the screen
             QuadSceneWorld = Matrix.CreateScale(0.2f) * Matrix.CreateTranslation(new Vector3(-0.75f, -0.75f, 0f));
             // Transform the quad to be in a smaller part of the screen
