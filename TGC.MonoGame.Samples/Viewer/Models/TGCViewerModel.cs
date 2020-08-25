@@ -126,7 +126,7 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         {
             if (ActiveSample != null)
             {
-                ActiveSample.Dispose();
+                ActiveSample.UnloadSampleContent();
                 ActiveSample.Enabled = false;
                 ActiveSample.Visible = false;
             }
@@ -289,6 +289,18 @@ namespace TGC.MonoGame.Samples.Viewer.Models
             }
 
             ImGui.End();
+        }
+
+
+
+        /// <summary>
+        ///     Unloads every sample.
+        /// </summary>
+        public void Dispose()
+        {
+            foreach(var sample in SamplesByName)
+                if(Game.Components.Contains(sample.Value))
+                    sample.Value.Dispose();
         }
     }
 }
