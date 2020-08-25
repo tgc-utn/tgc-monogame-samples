@@ -54,27 +54,32 @@ namespace TGC.MonoGame.Samples.Cameras
         private void ProcessKeyboard(float elapsedTime)
         {
             var keyboardState = Keyboard.GetState();
+
+            var currentMovementSpeed = MovementSpeed;
+            if (keyboardState.IsKeyDown(Keys.LeftShift))
+                currentMovementSpeed *= 5f;
+
             if (keyboardState.IsKeyDown(Keys.A) || keyboardState.IsKeyDown(Keys.Left))
             {
-                Position += -RightDirection * MovementSpeed * elapsedTime;
+                Position += -RightDirection * currentMovementSpeed * elapsedTime;
                 changed = true;
             }
 
             if (keyboardState.IsKeyDown(Keys.D) || keyboardState.IsKeyDown(Keys.Right))
             {
-                Position += RightDirection * MovementSpeed * elapsedTime;
+                Position += RightDirection * currentMovementSpeed * elapsedTime;
                 changed = true;
             }
 
             if (keyboardState.IsKeyDown(Keys.W) || keyboardState.IsKeyDown(Keys.Up))
             {
-                Position += FrontDirection * MovementSpeed * elapsedTime;
+                Position += FrontDirection * currentMovementSpeed * elapsedTime;
                 changed = true;
             }
 
             if (keyboardState.IsKeyDown(Keys.S) || keyboardState.IsKeyDown(Keys.Down))
             {
-                Position += -FrontDirection * MovementSpeed * elapsedTime;
+                Position += -FrontDirection * currentMovementSpeed * elapsedTime;
                 changed = true;
             }
         }
@@ -104,6 +109,8 @@ namespace TGC.MonoGame.Samples.Cameras
                     Mouse.SetPosition(screenCenter.X, screenCenter.Y);
                     Mouse.SetCursor(MouseCursor.Crosshair);
                 }
+                else
+                    Mouse.SetCursor(MouseCursor.Arrow);
             }
 
             pastMousePosition = Mouse.GetState().Position.ToVector2();

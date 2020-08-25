@@ -19,7 +19,11 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
         private BasicEffect BasicEffect;
 
-        private RenderTarget2D MainSceneRenderTarget, FirstPassBloomRenderTarget, SecondPassBloomRenderTarget;
+        private RenderTarget2D MainSceneRenderTarget;
+        
+        private RenderTarget2D FirstPassBloomRenderTarget;
+        
+        private RenderTarget2D SecondPassBloomRenderTarget;
 
         private FullScreenQuad FullScreenQuad;
 

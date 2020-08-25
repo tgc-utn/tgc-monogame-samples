@@ -25,7 +25,9 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
         private Effect Effect { get; set; }
 
-        private RenderTarget2D MainRenderTarget, HorizontalRenderTarget;
+        private RenderTarget2D MainRenderTarget;
+
+        private RenderTarget2D HorizontalRenderTarget;
 
         private FullScreenQuad FullScreenQuad;
 

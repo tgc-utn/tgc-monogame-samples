@@ -18,7 +18,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
         private FreeCamera Camera { get; set; }
 
-        private StaticCamera StaticLightCamera { get; set; }
+        private TargetCamera TargetLightCamera { get; set; }
 
         private Model Model { get; set; }
 
@@ -65,8 +65,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(700, 700, 700), screenSize);
             Camera.BuildProjection(GraphicsDevice.Viewport.AspectRatio, MathHelper.PiOver4, 0.1f, 3000f);
 
-            StaticLightCamera = new StaticCamera(1f, LightPosition, Vector3.Zero);
-            StaticLightCamera.BuildProjection(1f, MathHelper.PiOver2, LightCameraNearPlaneDistance, LightCameraFarPlaneDistance);
+            TargetLightCamera = new TargetCamera(1f, LightPosition, Vector3.Zero);
+            TargetLightCamera.BuildProjection(1f, MathHelper.PiOver2, LightCameraNearPlaneDistance, LightCameraFarPlaneDistance);
 
             base.Initialize();
         }
@@ -116,7 +116,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             UpdateLightPosition((float)gameTime.ElapsedGameTime.TotalSeconds);
 
-            StaticLightCamera.SetPosition(LightPosition);
+            TargetLightCamera.Position = LightPosition;
+            TargetLightCamera.UpdateView();
 
             // Turn the effect on or off depending on the keyboard state
             var currentKeyPressed = Keyboard.GetState().IsKeyDown(Keys.J);
@@ -193,7 +194,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
                 var worldMatrix = modelMeshesBaseTransforms[modelMesh.ParentBone.Index];
 
                 // WorldViewProjection is used to transform from model space to clip space
-                Effect.Parameters["WorldViewProjection"].SetValue(worldMatrix * StaticLightCamera.View * StaticLightCamera.Projection);
+                Effect.Parameters["WorldViewProjection"].SetValue(worldMatrix * TargetLightCamera.View * TargetLightCamera.Projection);
 
                 // Once we set these matrices we draw
                 modelMesh.Draw();
@@ -212,7 +213,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             Effect.Parameters["shadowMap"].SetValue(ShadowMapRenderTarget);
             Effect.Parameters["lightPosition"].SetValue(LightPosition);
             Effect.Parameters["shadowMapSize"].SetValue(Vector2.One * SHADOWMAP_SIZE);
-            Effect.Parameters["LightViewProjection"].SetValue(StaticLightCamera.View * StaticLightCamera.Projection);
+            Effect.Parameters["LightViewProjection"].SetValue(TargetLightCamera.View * TargetLightCamera.Projection);
             foreach (var modelMesh in Model.Meshes)
             {
                 foreach (var part in modelMesh.MeshParts)

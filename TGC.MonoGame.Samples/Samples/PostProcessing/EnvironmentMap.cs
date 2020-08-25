@@ -16,12 +16,11 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
         private FreeCamera Camera { get; set; }
 
-        private UnrestrictedCamera CubeMapCamera { get; set; }
+        private StaticCamera CubeMapCamera { get; set; }
 
         private Model Scene { get; set; }
 
         private Model Robot { get; set; }
-
 
         private SpherePrimitive Sphere { get; set; }
 
@@ -34,6 +33,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         private FullScreenQuad FullScreenQuad { get; set; }
 
         private RenderTargetCube EnvironmentMapRenderTarget { get; set; }
+
 
         private Matrix QuadWorld;
 
@@ -58,10 +58,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         {
             Point screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
             Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(700, 700, 700), screenSize);
-            Camera.MovementSpeed *= 2f;
 
-            CubeMapCamera = new UnrestrictedCamera(1f);
-            CubeMapCamera.Position = RobotPosition;
+            CubeMapCamera = new StaticCamera(1f, RobotPosition, Vector3.UnitX, Vector3.Up);
             CubeMapCamera.BuildProjection(1f, MathHelper.PiOver2, 1f, 3000f);
 
             base.Initialize();
@@ -180,7 +178,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
                 GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1f, 0);
 
                 SetCubemapCameraForOrientation(face);
-                CubeMapCamera.Update();
+                CubeMapCamera.UpdateView();
 
                 // Draw our scene. Do not draw our tank as it would be occluded by itself 
                 // (if it has backface culling on)

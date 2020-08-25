@@ -114,18 +114,6 @@
 /processorParam:DebugMode=Auto
 /build:Effect/BasicShader.fx
 
-#begin Effect/BasicShader.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:Effect/BasicShader.fx
-
-#begin Effect/BlinnPhong.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Debug
-/build:Effect/BlinnPhong.fx
-
 #begin Effect/BlinnPhong.fx
 /importer:EffectImporter
 /processor:EffectProcessor
@@ -137,12 +125,6 @@
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:Effect/Bloom.fx
-
-#begin Effect/ComboRata.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:Effect/ComboRata.fx
 
 #begin Effect/ComboRata.fx
 /importer:EffectImporter

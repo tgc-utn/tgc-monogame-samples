@@ -42,7 +42,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         public override void Initialize()
         {
             Game.Background = Color.CornflowerBlue;
-            Camera = new StaticCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 20, 60), Vector3.Zero);
+            Camera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 20, 60), Vector3.Zero);
 
             Box = new BoxPrimitive(GraphicsDevice, new Vector3(10, 10, 10), Vector3.Zero, Color.Cyan, Color.Black,
                 Color.Magenta, Color.Yellow, Color.Green, Color.Blue, Color.Red, Color.White);
