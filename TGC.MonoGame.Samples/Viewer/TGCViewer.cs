@@ -129,6 +129,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// </summary>
         protected override void UnloadContent()
         {
+            Model.Dispose();
             Content.Unload();
         }
 
