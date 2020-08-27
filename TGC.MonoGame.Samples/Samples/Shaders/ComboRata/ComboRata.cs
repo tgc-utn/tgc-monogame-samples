@@ -7,12 +7,11 @@ using TGC.MonoGame.Samples.Viewer;
 namespace TGC.MonoGame.Samples.Samples.Shaders.ComboRata
 {
     /// <summary>
-    /// Basic Shader:
-    /// Units Involved:
-    /// # Unit 8 - Video Adapters - Shaders.
-    ///
-    /// Basic Shader Sample. Animation by vertex shader and coloring by pixel shader.
-    /// Author: Mariano Banquiero
+    ///     Basic Shader:
+    ///     Units Involved:
+    ///     # Unit 8 - Video Adapters - Shaders.
+    ///     Basic Shader Sample. Animation by vertex shader and coloring by pixel shader.
+    ///     Author: Mariano Banquiero
     /// </summary>
     public class ComboRata : TGCSample
     {

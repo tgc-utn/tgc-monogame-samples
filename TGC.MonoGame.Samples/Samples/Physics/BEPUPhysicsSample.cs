@@ -57,23 +57,16 @@ namespace TGC.MonoGame.Samples.Samples.Physics
         public SimpleThreadDispatcher ThreadDispatcher { get; private set; }
 
         private Model Model { get; set; }
-        private Effect Effect { get; set; }
-        private Texture2D Texture { get; set; }
+
 
         /// <inheritdoc />
         public override void Initialize()
         {
-            Model = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
-            Texture = ((BasicEffect)Model.Meshes.FirstOrDefault()?.MeshParts.FirstOrDefault()?.Effect)?.Texture;
-            
-            // Load a shader using Content pipeline.
-            Effect = Game.Content.Load<Effect>(ContentFolderEffect + "BasicShader");
-
             Random = new Random(5);
             //The buffer pool is a source of raw memory blobs for the engine to use.
             BufferPool = new BufferPool();
 
-            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(20, 8, 350), 15);
+            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(20, 10, 250), 50);
 
             //The PositionFirstTimestepper is the simplest timestepping mode, but since it integrates velocity into position at the start of the frame, directly modified velocities outside of the timestep
             //will be integrated before collision detection or the solver has a chance to intervene. That's fine in this demo. Other built-in options include the PositionLastTimestepper and the SubsteppingTimestepper.
@@ -81,6 +74,9 @@ namespace TGC.MonoGame.Samples.Samples.Physics
             Simulation = Simulation.Create(BufferPool, new NarrowPhaseCallbacks(), new PoseIntegratorCallbacks(new System.Numerics.Vector3(0, -100, 0)), new PositionFirstTimestepper());
 
             // This are meshes/model/primitives colections to render
+            Model = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
+            ((BasicEffect)Model.Meshes.FirstOrDefault()?.Effects.FirstOrDefault())?.EnableDefaultLighting();
+
             Boxes = new List<SpherePrimitive>();
             Spheres = new List<SpherePrimitive>();
 
@@ -99,8 +95,8 @@ namespace TGC.MonoGame.Samples.Samples.Physics
                     boxShape.ComputeInertia(0.4f, out BodyInertia boxInertia);
                     var boxIndex = Simulation.Shapes.Add(boxShape);
                     var position = new System.Numerics.Vector3(-30 + i * 10 + 1, j * 10 + 1, -40);
-                    
-                    var bodyDescription = BodyDescription.CreateDynamic(position, boxInertia, new CollidableDescription(boxIndex, 0.1f),new BodyActivityDescription(0.01f));
+
+                    var bodyDescription = BodyDescription.CreateDynamic(position, boxInertia, new CollidableDescription(boxIndex, 0.1f), new BodyActivityDescription(0.01f));
                     Boxes.Add(new SpherePrimitive(GraphicsDevice, radius, 16, Color.RosyBrown));
 
                     var bodyHandle = Simulation.Bodies.Add(bodyDescription);
@@ -108,8 +104,7 @@ namespace TGC.MonoGame.Samples.Samples.Physics
                     BodiesBoxesHandles.Add(bodyHandle);
                 }
             }
-            
-            
+
             // Creates a floor
             Simulation.Statics.Add(new StaticDescription(new System.Numerics.Vector3(0, -0.5f, 0), new CollidableDescription(Simulation.Shapes.Add(new Box(2500, 1, 2500)), 0.1f)));
 
@@ -134,7 +129,7 @@ namespace TGC.MonoGame.Samples.Samples.Physics
                 //Create the shape that we'll launch at the pyramids when the user presses a button.
                 var radius = 0.5f + 5 * (float)Random.NextDouble();
                 var bulletShape = new Sphere(radius);
-                
+
                 //Note that the use of radius^3 for mass can produce some pretty serious mass ratios. 
                 //Observe what happens when a large ball sits on top of a few boxes with a fraction of the mass-
                 //the collision appears much squishier and less stable. For most games, if you want to maintain rigidity, you'll want to use some combination of:
@@ -145,11 +140,11 @@ namespace TGC.MonoGame.Samples.Samples.Physics
                 //Unfortunately, at the moment, bepuphysics v2 does not contain any alternative solvers, so if you can't afford to brute force the the problem away,
                 //the best solution is to cheat as much as possible to avoid the corner cases.
                 var position = new System.Numerics.Vector3(-40 + 210 * (float)Random.NextDouble(), 130, 130);
-                var bodyDescription = BodyDescription.CreateConvexDynamic(position, new BodyVelocity(new System.Numerics.Vector3((float)Random.NextDouble(), 0,- 110)), bulletShape.Radius * bulletShape.Radius * bulletShape.Radius, Simulation.Shapes, bulletShape);
-                
-                Spheres.Add(new SpherePrimitive(GraphicsDevice, radius * 2, 16,Color.Aqua));
-                
-               var bodyHandle = Simulation.Bodies.Add(bodyDescription);
+                var bodyDescription = BodyDescription.CreateConvexDynamic(position, new BodyVelocity(new System.Numerics.Vector3((float)Random.NextDouble(), 0, -110)), bulletShape.Radius * bulletShape.Radius * bulletShape.Radius, Simulation.Shapes, bulletShape);
+
+                Spheres.Add(new SpherePrimitive(GraphicsDevice, radius * 2, 16, Color.Aqua));
+
+                var bodyHandle = Simulation.Bodies.Add(bodyDescription);
 
                 BodiesSphereHandles.Add(bodyHandle);
             }
@@ -159,12 +154,13 @@ namespace TGC.MonoGame.Samples.Samples.Physics
                 canShoot = true;
             }
 
-                base.Update(gameTime);
+            base.Update(gameTime);
         }
 
         /// <inheritdoc />
         public override void Draw(GameTime gameTime)
         {
+            Game.Background = Color.Black;
             Game.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             for (int i = 0; i < BodiesBoxesHandles.Count; i++)
@@ -175,10 +171,10 @@ namespace TGC.MonoGame.Samples.Samples.Physics
                     var quaternion = Simulation.Bodies.GetBodyReference(BodiesBoxesHandles[i]).Pose.Orientation;
                     var transform = Matrix.CreateScale(0.1f) * Matrix.CreateFromQuaternion(new Quaternion(quaternion.X, quaternion.Y, quaternion.Z, quaternion.W)) * Matrix.CreateTranslation(new Vector3(position.X, position.Y, position.Z));
 
-                    DrawModel( transform);
+                    Model.Draw(transform, Camera.View, Camera.Projection);
                 });
             }
-            
+
             for (int i = 0; i < BodiesSphereHandles.Count; i++)
             {
                 Spheres.ForEach(sphere =>
@@ -187,8 +183,8 @@ namespace TGC.MonoGame.Samples.Samples.Physics
                     var quaternion = Simulation.Bodies.GetBodyReference(BodiesSphereHandles[i]).Pose.Orientation;
                     var transform = Matrix.CreateFromQuaternion(new Quaternion(quaternion.X, quaternion.Y, quaternion.Z, quaternion.W)) * Matrix.CreateTranslation(new Vector3(position.X, position.Y, position.Z));
 
-                    DrawGeometry(sphere, transform);
-                });     
+                    sphere.Draw(transform, Camera.View, Camera.Projection);
+                });
             }
 
             base.Draw(gameTime);
@@ -207,41 +203,6 @@ namespace TGC.MonoGame.Samples.Samples.Physics
             BufferPool.Clear();
 
             base.UnloadContent();
-        }
-
-        /// <summary>
-        ///     Draw the geometry applying a rotation and translation.
-        /// </summary>
-        /// <param name="geometry">The geometry to draw.</param>
-        /// <param name="transform">The transform of the geometry.</param>
-        private void DrawGeometry(GeometricPrimitive geometry, Matrix transform)
-        {
-            var effect = geometry.Effect;
-
-            effect.World = transform;
-            effect.View = Camera.View;
-            effect.Projection = Camera.Projection;
-
-            geometry.Draw(effect);
-        }
-
-        private void DrawModel(Matrix transform)
-        {
-            var mesh = Model.Meshes.FirstOrDefault();
-
-            if (mesh != null)
-            {
-                foreach (var part in mesh.MeshParts)
-                {
-                    part.Effect = Effect;
-                    Effect.Parameters["World"].SetValue(transform);
-                    Effect.Parameters["View"].SetValue(Camera.View);
-                    Effect.Parameters["Projection"].SetValue(Camera.Projection);
-                    Effect.Parameters["ModelTexture"].SetValue(Texture);
-                }
-
-                mesh.Draw();
-            }
         }
     }
 }

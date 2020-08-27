@@ -30,7 +30,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         /// <inheritdoc />
         public override void Initialize()
         {
-            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 0, 55), 5);
+            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 0, 55), 10);
 
             base.Initialize();
         }

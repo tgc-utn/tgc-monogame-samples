@@ -9,27 +9,6 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.SkyBox
     public class SkyBox
     {
         /// <summary>
-        ///     The size of the cube, used so that we can resize the box
-        ///     for different sized environments.
-        /// </summary>
-        private float Size { get; set; }
-
-        /// <summary>
-        ///     The effect file that the SkyBox will use to render
-        /// </summary>
-        private Effect Effect { get; set; }
-
-        /// <summary>
-        ///     The actual SkyBox texture
-        /// </summary>
-        private TextureCube Texture { get; set; }
-
-        /// <summary>
-        ///     The SkyBox model, which will just be a cube
-        /// </summary>
-        public Model Model { get; set; }
-
-        /// <summary>
         ///     Creates a new SkyBox
         /// </summary>
         /// <param name="model">The geometry to use for SkyBox.</param>
@@ -53,6 +32,27 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.SkyBox
             Effect = effect;
             Size = size;
         }
+
+        /// <summary>
+        ///     The size of the cube, used so that we can resize the box
+        ///     for different sized environments.
+        /// </summary>
+        private float Size { get; }
+
+        /// <summary>
+        ///     The effect file that the SkyBox will use to render
+        /// </summary>
+        private Effect Effect { get; }
+
+        /// <summary>
+        ///     The actual SkyBox texture
+        /// </summary>
+        private TextureCube Texture { get; }
+
+        /// <summary>
+        ///     The SkyBox model, which will just be a cube
+        /// </summary>
+        public Model Model { get; set; }
 
         /// <summary>
         ///     Does the actual drawing of the SkyBox with our SkyBox effect.

@@ -16,20 +16,18 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
     /// </summary>
     public class SolarSystem : TGCSample
     {
-        private const float AXIS_ROTATION_SPEED = 0.125f;
-        private const float EARTH_AXIS_ROTATION_SPEED = 2.5f;
-        private const float EARTH_ORBIT_SPEED = 0.5f;
-        private const float MOON_ORBIT_SPEED = 2.5f;
+        private const float AxisRotationSpeed = 0.125f;
+        private const float EarthAxisRotationSpeed = 2.5f;
+        private const float EarthOrbitSpeed = 0.5f;
+        private const float MoonOrbitSpeed = 2.5f;
 
-        private const float EARTH_ORBIT_OFFSET = 700;
-        private const float MOON_ORBIT_OFFSET = 80;
+        private const float EarthOrbitOffset = 700;
+        private const float MoonOrbitOffset = 80;
 
-        private readonly Vector3 EARTH_SCALE = new Vector3(3, 3, 3);
-        private readonly Vector3 MOON_SCALE = new Vector3(0.5f, 0.5f, 0.5f);
-
-        //Escalas de cada uno de los astros
-        private readonly Vector3 SUN_SCALE = new Vector3(12, 12, 12);
-        private float AxisRotation;
+        // Scales of each of the celestial bodies.
+        private readonly Vector3 _earthScale = new Vector3(3, 3, 3);
+        private readonly Vector3 _moonScale = new Vector3(0.5f, 0.5f, 0.5f);
+        private readonly Vector3 _sunScale = new Vector3(12, 12, 12);
 
         /// <inheritdoc />
         public SolarSystem(TGCViewer game) : base(game)
@@ -40,6 +38,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
                 "Shows how to concatenate transformations to generate movements of planets in the solar system. You can move around the scene with a simple camera that handles asdw and arrows keys.";
         }
 
+        private float AxisRotation { get; set; }
         private Camera Camera { get; set; }
         private SpherePrimitive Sun { get; set; }
         private Matrix SunTranslation { get; set; }
@@ -49,44 +48,37 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         private Matrix EarthTranslation { get; set; }
         private SpherePrimitive Moon { get; set; }
         private float MoonOrbitRotation { get; set; }
-
         private Matrix MoonTranslation { get; set; }
 
         /// <inheritdoc />
         public override void Initialize()
         {
-            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 100, 1500), 5);
+            Camera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 100, 1500), Vector3.Zero, 1,
+                3000);
 
-            Sun = new SpherePrimitive(GraphicsDevice, 10, 16, Color.MonoGameOrange);
-            Earth = new SpherePrimitive(GraphicsDevice, 10, 16, Color.LightSkyBlue);
-            Moon = new SpherePrimitive(GraphicsDevice, 10, 16, Color.LightSlateGray);
+            Sun = new SpherePrimitive(GraphicsDevice, 20, 16, Color.MonoGameOrange);
+            Earth = new SpherePrimitive(GraphicsDevice, 20, 16, Color.LightSkyBlue);
+            Moon = new SpherePrimitive(GraphicsDevice, 20, 16, Color.LightSlateGray);
 
             base.Initialize();
-        }
-
-        /// <inheritdoc />
-        protected override void LoadContent()
-        {
-            //TODO load textures to set in the spheres.
-            base.LoadContent();
         }
 
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
             Camera.Update(gameTime);
-            //Actualizar transformacion el sol
+            // Update transformation of the sun.
             SunTranslation = GetSunTransform();
-            //Actualizar transformacion la tierra
+            // Update transformation of the earth.
             EarthTranslation = GetEarthTransform();
-            //Actualizar transformacion la luna
+            // Update transformation of the moon.
             MoonTranslation = GetMoonTransform(EarthTranslation);
 
             var elapsedTime = Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
-            AxisRotation += AXIS_ROTATION_SPEED * elapsedTime;
-            EarthAxisRotation += EARTH_AXIS_ROTATION_SPEED * elapsedTime;
-            EarthOrbitRotation += EARTH_ORBIT_SPEED * elapsedTime;
-            MoonOrbitRotation += MOON_ORBIT_SPEED * elapsedTime;
+            AxisRotation += AxisRotationSpeed * elapsedTime;
+            EarthAxisRotation += EarthAxisRotationSpeed * elapsedTime;
+            EarthOrbitRotation += EarthOrbitSpeed * elapsedTime;
+            MoonOrbitRotation += MoonOrbitSpeed * elapsedTime;
 
             base.Update(gameTime);
         }
@@ -99,13 +91,13 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
 
             AxisLines.Draw(Camera.View, Camera.Projection);
 
-            //Renderizar el sol
+            // Render the sun.
             DrawGeometry(Sun, SunTranslation);
 
-            //Renderizar la tierra
+            // Render the earth.
             DrawGeometry(Earth, EarthTranslation);
 
-            //Renderizar la luna
+            // Render the moon.
             DrawGeometry(Moon, MoonTranslation);
 
             base.Draw(gameTime);
@@ -113,7 +105,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
 
         private Matrix GetSunTransform()
         {
-            var scale = Matrix.CreateScale(SUN_SCALE);
+            var scale = Matrix.CreateScale(_sunScale);
             var yRot = Matrix.CreateRotationY(AxisRotation);
 
             return scale * yRot;
@@ -121,9 +113,9 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
 
         private Matrix GetEarthTransform()
         {
-            var scale = Matrix.CreateScale(EARTH_SCALE);
+            var scale = Matrix.CreateScale(_earthScale);
             var yRot = Matrix.CreateRotationY(EarthAxisRotation);
-            var sunOffset = Matrix.CreateTranslation(EARTH_ORBIT_OFFSET, 0, 0);
+            var sunOffset = Matrix.CreateTranslation(EarthOrbitOffset, 0, 0);
             var earthOrbit = Matrix.CreateRotationY(EarthOrbitRotation);
 
             return scale * yRot * sunOffset * earthOrbit;
@@ -131,9 +123,9 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
 
         private Matrix GetMoonTransform(Matrix earthTransform)
         {
-            var scale = Matrix.CreateScale(MOON_SCALE);
+            var scale = Matrix.CreateScale(_moonScale);
             var yRot = Matrix.CreateRotationY(AxisRotation);
-            var earthOffset = Matrix.CreateTranslation(MOON_ORBIT_OFFSET, 0, 0);
+            var earthOffset = Matrix.CreateTranslation(MoonOrbitOffset, 0, 0);
             var moonOrbit = Matrix.CreateRotationY(MoonOrbitRotation);
 
             return scale * yRot * earthOffset * moonOrbit * earthTransform;

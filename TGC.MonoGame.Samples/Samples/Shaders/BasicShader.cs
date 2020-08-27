@@ -8,12 +8,11 @@ using TGC.MonoGame.Samples.Viewer;
 namespace TGC.MonoGame.Samples.Samples.Shaders
 {
     /// <summary>
-    /// Basic Shader:
-    /// Units Involved:
-    /// # Unit 8 - Video Adapters - Shaders.
-    ///
-    /// It's the hello world of shaders.
-    /// Author: Mariano Banquiero
+    ///     Basic Shader:
+    ///     Units Involved:
+    ///     # Unit 8 - Video Adapters - Shaders.
+    ///     It's the hello world of shaders.
+    ///     Author: Mariano Banquiero
     /// </summary>
     public class BasicShader : TGCSample
     {
@@ -45,7 +44,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         {
             Model = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
             // From the effect of the model I keep the texture.
-            Texture = ((BasicEffect)Model.Meshes.FirstOrDefault()?.MeshParts.FirstOrDefault()?.Effect)?.Texture;
+            Texture = ((BasicEffect) Model.Meshes.FirstOrDefault()?.MeshParts.FirstOrDefault()?.Effect)?.Texture;
 
             // Load a shader in runtime, outside the Content pipeline.
             // First you must run "mgfxc <SourceFile> <OutputFile> [/Debug] [/Profile:<DirectX_11,OpenGL>]"
