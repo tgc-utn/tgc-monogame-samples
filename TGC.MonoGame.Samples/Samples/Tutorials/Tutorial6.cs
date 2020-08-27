@@ -20,18 +20,19 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         {
             Category = TGCSampleCategory.Tutorials;
             Name = "Tutorial 6";
-            Description = "";
+            Description = "This sample shows how to apply simple program controlled rigid body animation to a model.";
         }
 
         private Camera Camera { get; set; }
         private Tank TankModel { get; set; }
-        private Matrix TankWorld { get; set; } = Matrix.Identity;
+        private Matrix TankWorld { get; set; }
         private Model TgcitoModel { get; set; }
 
         /// <inheritdoc />
         public override void Initialize()
         {
-            Camera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(1000, 600, 0), new Vector3(0, 150, 0));
+            Camera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(1000, 600, 0),
+                Vector3.UnitY * 150);
 
             base.Initialize();
         }
@@ -44,6 +45,8 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             var model = Game.Content.Load<Model>(ContentFolder3D + "tank/tank");
             TankModel.Load(model);
 
+            TankWorld = Matrix.Identity;
+
             // TODO tgcito animation import from de tgcito model.
             TgcitoModel = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
 
@@ -55,9 +58,8 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         {
             var time = (float)gameTime.TotalGameTime.TotalSeconds;
 
-            // Update the animation properties on the tank object. In a real game
-            // you would probably take this data from user inputs or the physics
-            // system, rather than just making everything rotate like this!
+            // Update the animation properties on the tank object. In a real game you would probably take this data from user inputs
+            // or the physics system, rather than just making everything rotate like this!
             TankModel.WheelRotation = time * 5;
             TankModel.SteerRotation = (float)Math.Sin(time * 0.75f) * 0.5f;
             TankModel.TurretRotation = (float)Math.Sin(time * 0.333f) * 1.25f;

@@ -29,7 +29,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         /// <inheritdoc />
         public override void Initialize()
         {
-            Point size = GraphicsDevice.Viewport.Bounds.Size;
+            var size = GraphicsDevice.Viewport.Bounds.Size;
             size.X /= 2;
             size.Y /= 2;
             Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 50, 1000), size);

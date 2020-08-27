@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System.Diagnostics;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
@@ -10,34 +9,27 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 {
     public class Bloom : TGCSample
     {
-        private FreeCamera Camera { get; set; }
-        private Model Model { get; set; }
-
-        private Effect Effect { get; set; }
-        private Effect BlurEffect { get; set; }
-        private Effect DebugTextureEffect { get; set; }
+        private const int PassCount = 2;
 
         private BasicEffect BasicEffect;
 
-        private RenderTarget2D MainSceneRenderTarget;
-        
+        private bool EffectOn = true;
+
         private RenderTarget2D FirstPassBloomRenderTarget;
-        
-        private RenderTarget2D SecondPassBloomRenderTarget;
 
         private FullScreenQuad FullScreenQuad;
 
-        private SpriteFont SpriteFont;
+        private RenderTarget2D MainSceneRenderTarget;
 
-        private bool EffectOn = true;
-
-        private Matrix QuadSceneWorld;
+        private bool PastKeyPressed;
 
         private Matrix QuadBloomWorld;
 
-        private bool PastKeyPressed = false;
+        private Matrix QuadSceneWorld;
 
-        private const int PassCount = 2;
+        private RenderTarget2D SecondPassBloomRenderTarget;
+
+        private SpriteFont SpriteFont;
 
         /// <inheritdoc />
         public Bloom(TGCViewer game) : base(game)
@@ -47,11 +39,18 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             Description = "Applying a Bloom post-process to a scene";
         }
 
+        private FreeCamera Camera { get; set; }
+        private Model Model { get; set; }
+
+        private Effect Effect { get; set; }
+        private Effect BlurEffect { get; set; }
+        private Effect DebugTextureEffect { get; set; }
+
         /// <inheritdoc />
         public override void Initialize()
         {
-            Point screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
-            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 50, 400), screenSize);
+            var screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
+            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(-350, 50, 400), screenSize);
 
             base.Initialize();
         }
@@ -68,7 +67,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             // Load the blur effect to blur the bloom texture
             BlurEffect = Game.Content.Load<Effect>(ContentFolderEffects + "GaussianBlur");
-            BlurEffect.Parameters["screenSize"].SetValue(new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height));
+            BlurEffect.Parameters["screenSize"]
+                .SetValue(new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height));
 
             // Load the debug texture effect to visualize the bloom
             DebugTextureEffect = Game.Content.Load<Effect>(ContentFolderEffects + "DebugTexture");
@@ -80,21 +80,24 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             // Create a full screen quad to post-process
             FullScreenQuad = new FullScreenQuad(GraphicsDevice);
 
-
-
             // Create render targets. 
             // MainRenderTarget is used to store the scene color
             // BloomRenderTarget is used to store the bloom color and switches with MultipassBloomRenderTarget
             // depending on the pass count, to blur the bloom color
-            MainSceneRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.DiscardContents);
-            FirstPassBloomRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.DiscardContents);
-            SecondPassBloomRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.DiscardContents);
+            MainSceneRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
+                GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0,
+                RenderTargetUsage.DiscardContents);
+            FirstPassBloomRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
+                GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0,
+                RenderTargetUsage.DiscardContents);
+            SecondPassBloomRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
+                GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.None, 0,
+                RenderTargetUsage.DiscardContents);
 
             SpriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "Arial");
 
             base.LoadContent();
         }
-
 
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
@@ -119,10 +122,11 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             else
                 DrawRegular();
 
-
             Game.SpriteBatch.Begin();
-            Game.SpriteBatch.DrawString(SpriteFont, "Con la tecla 'J' se prende y apaga el efecto", new Vector2(50, 50), Color.Black);
-            Game.SpriteBatch.DrawString(SpriteFont, "Efecto " + (EffectOn ? "prendido" : "apagado"), new Vector2(50, 80), Color.Black);
+            Game.SpriteBatch.DrawString(SpriteFont, "Con la tecla 'J' se prende y apaga el efecto", new Vector2(50, 50),
+                Color.Black);
+            Game.SpriteBatch.DrawString(SpriteFont, "Efecto " + (EffectOn ? "prendido" : "apagado"),
+                new Vector2(50, 80), Color.Black);
             Game.SpriteBatch.End();
 
             AxisLines.Draw(Camera.View, Camera.Projection);
@@ -143,7 +147,6 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             Model.Draw(Matrix.Identity, Camera.View, Camera.Projection);
         }
-
 
         /// <summary>
         ///     Draws the scene with a multiple-light bloom.
@@ -187,7 +190,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
                 // We set the main matrices for each mesh to draw
                 var worldMatrix = modelMeshesBaseTransforms[modelMesh.ParentBone.Index];
-                
+
                 // WorldViewProjection is used to transform from model space to clip space
                 Effect.Parameters["WorldViewProjection"].SetValue(worldMatrix * Camera.View * Camera.Projection);
 
@@ -208,7 +211,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             var bloomTexture = FirstPassBloomRenderTarget;
             var finalBloomRenderTarget = SecondPassBloomRenderTarget;
 
-            for (int index = 0; index < PassCount; index++)
+            for (var index = 0; index < PassCount; index++)
             {
                 //Exchange(ref SecondaPassBloomRenderTarget, ref FirstPassBloomRenderTarget);
 
@@ -219,7 +222,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
                 BlurEffect.Parameters["baseTexture"].SetValue(bloomTexture);
                 FullScreenQuad.Draw(BlurEffect);
 
-                if(index != (PassCount - 1))
+                if (index != PassCount - 1)
                 {
                     var auxiliar = bloomTexture;
                     bloomTexture = finalBloomRenderTarget;
@@ -227,9 +230,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
                 }
             }
 
-
             #endregion
-
 
             #region Final Pass
 
@@ -243,7 +244,6 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             // Set the technique to our blur technique
             // Then draw a texture into a full-screen quad
             // using our rendertarget as texture
-
             Effect.CurrentTechnique = Effect.Techniques["Integrate"];
             Effect.Parameters["baseTexture"].SetValue(MainSceneRenderTarget);
             Effect.Parameters["bloomTexture"].SetValue(finalBloomRenderTarget);
@@ -257,7 +257,6 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             DebugTextureEffect.Parameters["baseTexture"].SetValue(MainSceneRenderTarget);
             FullScreenQuad.Draw(DebugTextureEffect);
 
-
             // Debug our bloom texture!
             // Show a simple quad with the texture
             DebugTextureEffect.Parameters["World"].SetValue(QuadBloomWorld);
@@ -265,7 +264,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             FullScreenQuad.Draw(DebugTextureEffect);
 
             // Set the render targets as they were
-           // Exchange(ref SecondPassBloomRenderTarget, ref FirstPassBloomRenderTarget);
+            // Exchange(ref SecondPassBloomRenderTarget, ref FirstPassBloomRenderTarget);
         }
 
         private void Exchange(ref RenderTarget2D first, ref RenderTarget2D second)
@@ -275,7 +274,6 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             first = auxiliar;
         }
 
-
         protected override void UnloadContent()
         {
             base.UnloadContent();
@@ -284,6 +282,5 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             MainSceneRenderTarget.Dispose();
             SecondPassBloomRenderTarget.Dispose();
         }
-
     }
 }

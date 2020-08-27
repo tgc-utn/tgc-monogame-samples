@@ -1,10 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.Linq;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
@@ -13,8 +11,37 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 {
     public class ShadowMap : TGCSample
     {
+        private const int ShadowmapSize = 2048;
 
-        private const int SHADOWMAP_SIZE = 2048;
+        private readonly float LightCameraFarPlaneDistance = 3000f;
+
+        private readonly float LightCameraNearPlaneDistance = 5f;
+
+        private bool EffectOn = true;
+
+        private FullScreenQuad FullScreenQuad;
+
+        private BoxPrimitive LightBox;
+
+        private Vector3 LightPosition = Vector3.One * 500f;
+
+        private bool PastKeyPressed;
+
+        private Matrix QuadShadowsWorld;
+
+        private RenderTarget2D ShadowMapRenderTarget;
+
+        private SpriteFont SpriteFont;
+
+        private float Timer;
+
+        /// <inheritdoc />
+        public ShadowMap(TGCViewer game) : base(game)
+        {
+            Category = TGCSampleCategory.PostProcess;
+            Name = "Shadow Map";
+            Description = "Projecting shadows in a scene";
+        }
 
         private FreeCamera Camera { get; set; }
 
@@ -28,45 +55,16 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
         private Effect DebugTextureEffect { get; set; }
 
-        private RenderTarget2D ShadowMapRenderTarget;
-
-        private FullScreenQuad FullScreenQuad;
-
-        private SpriteFont SpriteFont;
-
-        private bool EffectOn = true;
-
-        private Matrix QuadShadowsWorld;
-
-        private bool PastKeyPressed = false;
-
-        private Vector3 LightPosition = Vector3.One * 500f;
-
-        private BoxPrimitive LightBox;
-
-        private float Timer = 0f;
-
-        private float LightCameraNearPlaneDistance = 5f;
-
-        private float LightCameraFarPlaneDistance = 3000f;
-
-        /// <inheritdoc />
-        public ShadowMap(TGCViewer game) : base(game)
-        {
-            Category = TGCSampleCategory.PostProcess;
-            Name = "Shadow Map";
-            Description = "Projecting shadows in a scene";
-        }
-
         /// <inheritdoc />
         public override void Initialize()
         {
-            Point screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
-            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(700, 700, 700), screenSize);
-            Camera.BuildProjection(GraphicsDevice.Viewport.AspectRatio, MathHelper.PiOver4, 0.1f, 3000f);
+            var screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
+            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(-600, 250, 1500), screenSize);
+            Camera.BuildProjection(GraphicsDevice.Viewport.AspectRatio, 0.1f, 3000f, MathHelper.PiOver4);
 
             TargetLightCamera = new TargetCamera(1f, LightPosition, Vector3.Zero);
-            TargetLightCamera.BuildProjection(1f, MathHelper.PiOver2, LightCameraNearPlaneDistance, LightCameraFarPlaneDistance);
+            TargetLightCamera.BuildProjection(1f, LightCameraNearPlaneDistance, LightCameraFarPlaneDistance,
+                MathHelper.PiOver2);
 
             base.Initialize();
         }
@@ -80,7 +78,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             // Load the shadowmap effect
             Effect = Game.Content.Load<Effect>(ContentFolderEffects + "ShadowMap");
 
-            BasicEffect = (BasicEffect)Model.Meshes.FirstOrDefault().Effects.FirstOrDefault();
+            BasicEffect = (BasicEffect)Model.Meshes.FirstOrDefault()?.Effects.FirstOrDefault();
 
             // Load the debug texture effect to visualize the shadow map
             DebugTextureEffect = Game.Content.Load<Effect>(ContentFolderEffects + "DebugTexture");
@@ -96,7 +94,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             FullScreenQuad = new FullScreenQuad(GraphicsDevice);
 
             // Create a shadow map. It stores depth from the light position
-            ShadowMapRenderTarget = new RenderTarget2D(GraphicsDevice, SHADOWMAP_SIZE, SHADOWMAP_SIZE, false, SurfaceFormat.Single, DepthFormat.Depth24, 0, RenderTargetUsage.PlatformContents);
+            ShadowMapRenderTarget = new RenderTarget2D(GraphicsDevice, ShadowmapSize, ShadowmapSize, false,
+                SurfaceFormat.Single, DepthFormat.Depth24, 0, RenderTargetUsage.PlatformContents);
 
             LightBox = new BoxPrimitive(GraphicsDevice, Vector3.One * 5f, Vector3.Zero, Color.White);
 
@@ -117,7 +116,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             UpdateLightPosition((float)gameTime.ElapsedGameTime.TotalSeconds);
 
             TargetLightCamera.Position = LightPosition;
-            TargetLightCamera.UpdateView();
+            TargetLightCamera.BuildView();
 
             // Turn the effect on or off depending on the keyboard state
             var currentKeyPressed = Keyboard.GetState().IsKeyDown(Keys.J);
@@ -144,8 +143,10 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
 
             Game.SpriteBatch.Begin();
-            Game.SpriteBatch.DrawString(SpriteFont, "Con la tecla 'J' se prende y apaga el efecto", new Vector2(50, 50), Color.Black);
-            Game.SpriteBatch.DrawString(SpriteFont, "Efecto " + (EffectOn ? "prendido" : "apagado"), new Vector2(50, 80), Color.Black);
+            Game.SpriteBatch.DrawString(SpriteFont, "Con la tecla 'J' se prende y apaga el efecto", new Vector2(50, 50),
+                Color.Black);
+            Game.SpriteBatch.DrawString(SpriteFont, "Efecto " + (EffectOn ? "prendido" : "apagado"),
+                new Vector2(50, 80), Color.Black);
             Game.SpriteBatch.End();
 
             AxisLines.Draw(Camera.View, Camera.Projection);
@@ -194,7 +195,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
                 var worldMatrix = modelMeshesBaseTransforms[modelMesh.ParentBone.Index];
 
                 // WorldViewProjection is used to transform from model space to clip space
-                Effect.Parameters["WorldViewProjection"].SetValue(worldMatrix * TargetLightCamera.View * TargetLightCamera.Projection);
+                Effect.Parameters["WorldViewProjection"]
+                    .SetValue(worldMatrix * TargetLightCamera.View * TargetLightCamera.Projection);
 
                 // Once we set these matrices we draw
                 modelMesh.Draw();
@@ -212,7 +214,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             Effect.Parameters["baseTexture"].SetValue(BasicEffect.Texture);
             Effect.Parameters["shadowMap"].SetValue(ShadowMapRenderTarget);
             Effect.Parameters["lightPosition"].SetValue(LightPosition);
-            Effect.Parameters["shadowMapSize"].SetValue(Vector2.One * SHADOWMAP_SIZE);
+            Effect.Parameters["shadowMapSize"].SetValue(Vector2.One * ShadowmapSize);
             Effect.Parameters["LightViewProjection"].SetValue(TargetLightCamera.View * TargetLightCamera.Projection);
             foreach (var modelMesh in Model.Meshes)
             {
@@ -240,11 +242,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             DebugTextureEffect.Parameters["World"].SetValue(QuadShadowsWorld);
             DebugTextureEffect.Parameters["baseTexture"].SetValue(ShadowMapRenderTarget);
             FullScreenQuad.Draw(DebugTextureEffect);
-
-
-
         }
-
 
 
         /// <inheritdoc />
@@ -254,6 +252,5 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             FullScreenQuad.Dispose();
             ShadowMapRenderTarget.Dispose();
         }
-
     }
 }

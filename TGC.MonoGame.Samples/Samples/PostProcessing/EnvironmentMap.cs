@@ -1,9 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Linq;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
@@ -12,7 +10,17 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 {
     public class EnvironmentMap : TGCSample
     {
-        private const int ENVIRONMENTMAP_SIZE = 2048;
+        private const int EnvironmentmapSize = 2048;
+
+        private Matrix QuadWorld;
+
+        /// <inheritdoc />
+        public EnvironmentMap(TGCViewer game) : base(game)
+        {
+            Category = TGCSampleCategory.PostProcess;
+            Name = "Environment Map";
+            Description = "Render an environment map from the scene and use it for reflections";
+        }
 
         private FreeCamera Camera { get; set; }
 
@@ -34,33 +42,22 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
         private RenderTargetCube EnvironmentMapRenderTarget { get; set; }
 
-
-        private Matrix QuadWorld;
-
         private bool EffectOn { get; set; } = true;
 
-        private Vector3 RobotPosition { get; set; } = Vector3.UnitX * -500f;
+        private Vector3 RobotPosition { get; } = Vector3.UnitX * -500f;
 
-        private Vector3 SpherePosition { get; set; } = Vector3.UnitX * -500f + Vector3.UnitZ * -500f;
+        private Vector3 SpherePosition { get; } = Vector3.UnitX * -500f + Vector3.UnitZ * -500f;
 
-        private bool PastKeyPressed { get; set; } = false;
-
-        /// <inheritdoc />
-        public EnvironmentMap(TGCViewer game) : base(game)
-        {
-            Category = TGCSampleCategory.PostProcess;
-            Name = "Environment Map";
-            Description = "Render an environment map from the scene and use it for reflections";
-        }
+        private bool PastKeyPressed { get; set; }
 
         /// <inheritdoc />
         public override void Initialize()
         {
-            Point screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
-            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(700, 700, 700), screenSize);
+            var screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
+            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(-250, 100, 700), screenSize);
 
             CubeMapCamera = new StaticCamera(1f, RobotPosition, Vector3.UnitX, Vector3.Up);
-            CubeMapCamera.BuildProjection(1f, MathHelper.PiOver2, 1f, 3000f);
+            CubeMapCamera.BuildProjection(1f, 1f, 3000f, MathHelper.PiOver2);
 
             base.Initialize();
         }
@@ -80,12 +77,12 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             // Load the shadowmap effect
             Effect = Game.Content.Load<Effect>(ContentFolderEffects + "EnvironmentMap");
 
-            BasicEffect = (BasicEffect)Robot.Meshes.FirstOrDefault().Effects[0];
+            BasicEffect = (BasicEffect) Robot.Meshes.FirstOrDefault().Effects[0];
 
             // Assign the Environment map effect to our robot
             foreach (var modelMesh in Robot.Meshes)
-                foreach (var part in modelMesh.MeshParts)
-                    part.Effect = Effect;
+            foreach (var part in modelMesh.MeshParts)
+                part.Effect = Effect;
 
             DebugTextureEffect = Game.Content.Load<Effect>(ContentFolderEffects + "DebugTexture");
             DebugTextureEffect.CurrentTechnique = DebugTextureEffect.Techniques["DebugCubeMap"];
@@ -96,13 +93,13 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             QuadWorld = Matrix.CreateScale(new Vector3(0.9f, 0.2f, 0f)) * Matrix.CreateTranslation(Vector3.Down * 0.7f);
 
             // Create a render target for the scene
-            EnvironmentMapRenderTarget = new RenderTargetCube(GraphicsDevice, ENVIRONMENTMAP_SIZE, false, SurfaceFormat.Color, DepthFormat.Depth24, 0, RenderTargetUsage.DiscardContents);
+            EnvironmentMapRenderTarget = new RenderTargetCube(GraphicsDevice, EnvironmentmapSize, false,
+                SurfaceFormat.Color, DepthFormat.Depth24, 0, RenderTargetUsage.DiscardContents);
             GraphicsDevice.BlendState = BlendState.Opaque;
 
             base.LoadContent();
         }
-
-
+        
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
@@ -116,21 +113,20 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             if (!currentKeyPressed && PastKeyPressed)
             {
                 EffectOn = !EffectOn;
-                if(EffectOn)
+                if (EffectOn)
                     foreach (var modelMesh in Robot.Meshes)
-                        foreach (var part in modelMesh.MeshParts)
-                            part.Effect = Effect;
+                    foreach (var part in modelMesh.MeshParts)
+                        part.Effect = Effect;
                 else
                     foreach (var modelMesh in Robot.Meshes)
-                        foreach (var part in modelMesh.MeshParts)
-                            part.Effect = BasicEffect;
+                    foreach (var part in modelMesh.MeshParts)
+                        part.Effect = BasicEffect;
             }
+
             PastKeyPressed = currentKeyPressed;
 
             base.Update(gameTime);
         }
-
-
 
         /// <inheritdoc />
         public override void Draw(GameTime gameTime)
@@ -145,8 +141,6 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             AxisLines.Draw(Camera.View, Camera.Projection);
             base.Draw(gameTime);
         }
-
-
 
         /// <summary>
         ///     Draws the scene.
@@ -178,7 +172,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
                 GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1f, 0);
 
                 SetCubemapCameraForOrientation(face);
-                CubeMapCamera.UpdateView();
+                CubeMapCamera.BuildView();
 
                 // Draw our scene. Do not draw our tank as it would be occluded by itself 
                 // (if it has backface culling on)
@@ -216,9 +210,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             Sphere.Draw(Effect);
 
-
             #endregion
-
 
 
             #region Draw Robot
@@ -250,7 +242,6 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             DebugTextureEffect.Parameters["World"].SetValue(QuadWorld);
             DebugTextureEffect.Parameters["cubeMapTexture"]?.SetValue(EnvironmentMapRenderTarget);
             FullScreenQuad.Draw(DebugTextureEffect);
-
 
             #endregion
         }
@@ -293,7 +284,6 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
                     CubeMapCamera.UpDirection = Vector3.Down;
                     break;
             }
-
         }
 
         /// <inheritdoc />

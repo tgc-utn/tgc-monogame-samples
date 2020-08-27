@@ -65,6 +65,11 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         private int ActiveSampleTreeNode { get; set; }
 
         /// <summary>
+        ///     If the About modal in visible or not.
+        /// </summary>
+        private bool AboutVisible { get; set; }
+
+        /// <summary>
         ///     Initialize imgui to be able to build the menu.
         /// </summary>
         public void LoadImgGUI()
@@ -175,6 +180,7 @@ namespace TGC.MonoGame.Samples.Viewer.Models
                 GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 100));
 
             ImGui.Begin("TGC samples explorer", ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoMove);
+
             if (ImGui.BeginMenuBar())
             {
                 if (ImGui.BeginMenu("File"))
@@ -235,10 +241,7 @@ namespace TGC.MonoGame.Samples.Viewer.Models
                         /* Do stuff */
                     }
 
-                    if (ImGui.MenuItem("About"))
-                    {
-                        /* Do stuff */
-                    }
+                    if (ImGui.MenuItem("About")) AboutVisible = !AboutVisible;
 
                     ImGui.EndMenu();
                 }
@@ -287,6 +290,24 @@ namespace TGC.MonoGame.Samples.Viewer.Models
                     i++;
                 }
             }
+
+            if (AboutVisible) ShowAboutWindow();
+
+            ImGui.End();
+        }
+
+        /// <summary>
+        ///     About Window / ShowAboutWindow()
+        /// </summary>
+        private void ShowAboutWindow()
+        {
+            ImGui.Begin("About",
+                ImGuiWindowFlags.Modal | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoCollapse);
+            ImGui.Text("MonoGame samples made by TGC UTN Group.");
+            ImGui.Text("With <3 from Argentine.");
+            ImGui.Spacing();
+
+            if (ImGui.Button("Close")) AboutVisible = !AboutVisible;
 
             ImGui.End();
         }

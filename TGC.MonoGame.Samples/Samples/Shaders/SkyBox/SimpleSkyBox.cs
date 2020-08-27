@@ -6,16 +6,25 @@ using TGC.MonoGame.Samples.Viewer;
 namespace TGC.MonoGame.Samples.Samples.Shaders.SkyBox
 {
     /// <summary>
-    /// Simple SkyBox:
-    /// Units Involved:
-    /// # Unidad 4 - Texturas e Iluminación - SkyBox.
-    /// # Unit 8 - Video Adapters - Shaders.
-    ///
-    /// Shows how to use a cube with a texture on each of its faces, which allows to achieve the effect of an enveloping sky in the scene.
-    /// Author: René Juan Rico Mendoza
+    ///     Simple SkyBox:
+    ///     Units Involved:
+    ///     # Unidad 4 - Texturas e Iluminación - SkyBox.
+    ///     # Unit 8 - Video Adapters - Shaders.
+    ///     Shows how to use a cube with a texture on each of its faces, which allows to achieve the effect of an enveloping
+    ///     sky in the scene.
+    ///     Author: René Juan Rico Mendoza
     /// </summary>
     public class SimpleSkyBox : TGCSample
     {
+        /// <inheritdoc />
+        public SimpleSkyBox(TGCViewer game) : base(game)
+        {
+            Category = TGCSampleCategory.Shaders;
+            Name = "Simple SkyBox";
+            Description =
+                "Shows how to use a cube with a texture on each of its faces, which allows to achieve the effect of an enveloping sky in the scene.";
+        }
+
         private float Angle { get; set; }
         private Vector3 CameraPosition { get; set; }
         private Vector3 CameraTarget { get; set; }
@@ -26,19 +35,13 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.SkyBox
         private SkyBox SkyBox { get; set; }
 
         /// <inheritdoc />
-        public SimpleSkyBox(TGCViewer game) : base(game)
-        {
-            Category = TGCSampleCategory.Shaders;
-            Name = "Simple SkyBox";
-            Description = "Shows how to use a cube with a texture on each of its faces, which allows to achieve the effect of an enveloping sky in the scene.";
-        }
-
-        /// <inheritdoc />
         public override void Initialize()
         {
             CameraTarget = Vector3.Zero;
             View = Matrix.CreateLookAt(Vector3.UnitX * 20, CameraTarget, Vector3.UnitY);
-            Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 0.1f, 100f);
+            Projection =
+                Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 0.1f,
+                    100f);
             Distance = 20;
 
             base.Initialize();
@@ -60,7 +63,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.SkyBox
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
-            CameraPosition = Distance * new Vector3((float)Math.Sin(Angle), 0, (float)Math.Cos(Angle));
+            CameraPosition = Distance * new Vector3((float) Math.Sin(Angle), 0, (float) Math.Cos(Angle));
             ViewVector = Vector3.Transform(CameraTarget - CameraPosition, Matrix.CreateRotationY(0));
             ViewVector.Normalize();
 

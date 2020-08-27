@@ -6,13 +6,13 @@ namespace TGC.MonoGame.Samples.Cameras
 {
     internal class FreeCamera : Camera
     {
-        private bool changed;
         private readonly bool lockMouse;
+
+        private readonly Point screenCenter;
+        private bool changed;
 
         private Vector2 pastMousePosition;
         private float pitch;
-
-        private readonly Point screenCenter;
 
         // Angles
         private float yaw = -90f;
@@ -110,7 +110,9 @@ namespace TGC.MonoGame.Samples.Cameras
                     Mouse.SetCursor(MouseCursor.Crosshair);
                 }
                 else
+                {
                     Mouse.SetCursor(MouseCursor.Arrow);
+                }
             }
 
             pastMousePosition = Mouse.GetState().Position.ToVector2();

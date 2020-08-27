@@ -8,6 +8,13 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 {
     public class TextureMerge : TGCSample
     {
+        /// <inheritdoc />
+        public TextureMerge(TGCViewer game) : base(game)
+        {
+            Category = TGCSampleCategory.PostProcess;
+            Name = "Texture Merge";
+            Description = "Merging the scene render target with a texture";
+        }
 
         private FreeCamera Camera { get; set; }
 
@@ -21,28 +28,17 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
         private RenderTarget2D SceneRenderTarget { get; set; }
 
-        private float Time { get; set; } = 0f;
-
-
-        /// <inheritdoc />
-        public TextureMerge(TGCViewer game) : base(game)
-        {
-            Category = TGCSampleCategory.PostProcess;
-            Name = "Texture Merge";
-            Description = "Merging the scene render target with a texture";
-        }
-
+        private float Time { get; set; }
 
         /// <inheritdoc />
         public override void Initialize()
         {
-            Point screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
-            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(700, 700, 700), screenSize);
+            var screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
+            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(-300, 100, 0), screenSize);
 
             base.Initialize();
         }
-
-
+        
         /// <inheritdoc />
         protected override void LoadContent()
         {
@@ -60,14 +56,15 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             FullScreenQuad = new FullScreenQuad(GraphicsDevice);
 
             // Create a render target for the scene
-            SceneRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.Depth24, 0, RenderTargetUsage.DiscardContents);
+            SceneRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
+                GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.Depth24, 0,
+                RenderTargetUsage.DiscardContents);
 
             GraphicsDevice.BlendState = BlendState.Opaque;
 
             base.LoadContent();
         }
-
-
+        
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
@@ -79,8 +76,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             base.Update(gameTime);
         }
-
-
+        
         /// <inheritdoc />
         public override void Draw(GameTime gameTime)
         {
@@ -94,8 +90,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             Model.Draw(Matrix.Identity, Camera.View, Camera.Projection);
 
             #endregion
-
-
+            
             #region Pass 1
 
             // No depth needed
@@ -105,7 +100,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             Effect.Parameters["baseTexture"].SetValue(SceneRenderTarget);
             FullScreenQuad.Draw(Effect);
-            
+
             #endregion
 
             AxisLines.Draw(Camera.View, Camera.Projection);
@@ -118,6 +113,5 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             FullScreenQuad.Dispose();
             SceneRenderTarget.Dispose();
         }
-
     }
 }

@@ -1,9 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
@@ -12,26 +9,13 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 {
     public class GaussianBlur : TGCSample
     {
-        private enum BlurType
-        {
-            NONE,
-            SIMPLE,
-            SEPARATED_PASSES,
-        }
-
-        private FreeCamera Camera { get; set; }
-        private Model Model { get; set; }
-
-
-        private Effect Effect { get; set; }
-
-        private RenderTarget2D MainRenderTarget;
-
-        private RenderTarget2D HorizontalRenderTarget;
+        private BlurType currentBlurType;
 
         private FullScreenQuad FullScreenQuad;
 
-        private BlurType currentBlurType;
+        private RenderTarget2D HorizontalRenderTarget;
+
+        private RenderTarget2D MainRenderTarget;
 
         private SpriteFont spriteFont;
 
@@ -43,11 +27,17 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             Description = "Applying a Gaussian Blur post-process to a scene";
         }
 
+        private FreeCamera Camera { get; set; }
+        private Model Model { get; set; }
+
+
+        private Effect Effect { get; set; }
+
         /// <inheritdoc />
         public override void Initialize()
         {
-            Point screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
-            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 50, 400), screenSize);
+            var screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
+            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(-400, 50, 400), screenSize);
 
             base.Initialize();
         }
@@ -62,15 +52,20 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             Effect = Game.Content.Load<Effect>(ContentFolderEffects + "GaussianBlur");
 
             // Create a full screen quad to post-process
-            FullScreenQuad = new FullScreenQuad(GraphicsDevice);             
+            FullScreenQuad = new FullScreenQuad(GraphicsDevice);
 
             // Create render targets. One can be used for simple gaussian blur
             // mainRenderTarget is also used as a render target in the separated filter
             // horizontalRenderTarget is used as the horizontal render target in the separated filter
-            MainRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.DiscardContents);
-            HorizontalRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.DiscardContents);
+            MainRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
+                GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0,
+                RenderTargetUsage.DiscardContents);
+            HorizontalRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
+                GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.None, 0,
+                RenderTargetUsage.DiscardContents);
 
-            Effect.Parameters["screenSize"].SetValue(new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height));
+            Effect.Parameters["screenSize"]
+                .SetValue(new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height));
 
             currentBlurType = BlurType.SEPARATED_PASSES;
 
@@ -107,8 +102,10 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
 
             Game.SpriteBatch.Begin();
-            Game.SpriteBatch.DrawString(spriteFont, "Con las teclas 'J', 'K' y 'L' se cambia el modo de Blur", new Vector2(50, 50), Color.Black);
-            Game.SpriteBatch.DrawString(spriteFont, "Modo de Blur: " + currentBlurType, new Vector2(50, 80), Color.Black);
+            Game.SpriteBatch.DrawString(spriteFont, "Con las teclas 'J', 'K' y 'L' se cambia el modo de Blur",
+                new Vector2(50, 50), Color.Black);
+            Game.SpriteBatch.DrawString(spriteFont, "Modo de Blur: " + currentBlurType, new Vector2(50, 80),
+                Color.Black);
             Game.SpriteBatch.End();
 
             AxisLines.Draw(Camera.View, Camera.Projection);
@@ -206,7 +203,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             Effect.Parameters["baseTexture"].SetValue(MainRenderTarget);
             FullScreenQuad.Draw(Effect);
 
-            #endregion  
+            #endregion
 
             #region Pass 3
 
@@ -234,5 +231,11 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             MainRenderTarget.Dispose();
         }
 
+        private enum BlurType
+        {
+            NONE,
+            SIMPLE,
+            SEPARATED_PASSES
+        }
     }
 }

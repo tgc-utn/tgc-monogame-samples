@@ -7,16 +7,15 @@ using TGC.MonoGame.Samples.Viewer;
 namespace TGC.MonoGame.Samples.Samples.Audio
 {
     /// <summary>
-    /// Music:
-    /// Units Involved:
-    /// # Unit 3 - 3D Basics - Game Engine.
-    /// 
-    /// Shows how to play a song file.
-    /// Authors: Matias Leone, Leandro Barbagallo.
+    ///     Music:
+    ///     Units Involved:
+    ///     # Unit 3 - 3D Basics - Game Engine.
+    ///     Shows how to play a song file.
+    ///     Authors: Matias Leone, Leandro Barbagallo.
     /// </summary>
     public class Music : TGCSample
     {
-        ///<inheritdoc/>
+        /// <inheritdoc />
         public Music(TGCViewer game) : base(game)
         {
             Category = TGCSampleCategory.Audio;
@@ -31,7 +30,7 @@ namespace TGC.MonoGame.Samples.Samples.Audio
         private Song Song { get; set; }
         private string SongName { get; set; }
 
-        ///<inheritdoc/>
+        /// <inheritdoc />
         public override void Initialize()
         {
             Game.Background = Color.CornflowerBlue;
@@ -41,7 +40,7 @@ namespace TGC.MonoGame.Samples.Samples.Audio
             base.Initialize();
         }
 
-        ///<inheritdoc/>
+        /// <inheritdoc />
         protected override void LoadContent()
         {
             Font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "Arial");
@@ -54,7 +53,7 @@ namespace TGC.MonoGame.Samples.Samples.Audio
             base.LoadContent();
         }
 
-        ///<inheritdoc/>
+        /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
             if (Game.CurrentKeyboardState.IsKeyDown(Keys.Y) && MediaPlayer.State == MediaState.Stopped)
@@ -73,7 +72,7 @@ namespace TGC.MonoGame.Samples.Samples.Audio
             base.Update(gameTime);
         }
 
-        ///<inheritdoc/>
+        /// <inheritdoc />
         public override void Draw(GameTime gameTime)
         {
             Game.Background = Color.CornflowerBlue;
