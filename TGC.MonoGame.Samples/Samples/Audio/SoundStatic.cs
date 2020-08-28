@@ -7,20 +7,19 @@ using TGC.MonoGame.Samples.Viewer;
 namespace TGC.MonoGame.Samples.Samples.Audio
 {
     /// <summary>
-    /// Static Sound:
-    /// Units Involved:
-    /// # Unit 3 - 3D Basics - Game Engine.
-    /// 
-    /// Shows how to play a static sound file.
-    /// Authors: Matias Leone, Leandro Barbagallo.
+    ///     Static Sound:
+    ///     Units Involved:
+    ///     # Unit 3 - 3D Basics - Game Engine.
+    ///     Shows how to play a static sound file.
+    ///     Authors: Matias Leone, Leandro Barbagallo.
     /// </summary>
     public class SoundStatic : TGCSample
     {
-        ///<inheritdoc/>
+        /// <inheritdoc />
         public SoundStatic(TGCViewer game) : base(game)
         {
             Category = TGCSampleCategory.Audio;
-            Name = "StaticSound effect";
+            Name = "Sound effect";
             Description = "Shows how to play a sound file. Audio from https://www.fesliyanstudios.com";
         }
 
@@ -31,7 +30,7 @@ namespace TGC.MonoGame.Samples.Samples.Audio
         private SoundEffectInstance Instance { get; set; }
         private string SoundName { get; set; }
 
-        ///<inheritdoc/>
+        /// <inheritdoc />
         public override void Initialize()
         {
             Instructions = "Y = Play a new instance in loop, I = Play and forget.";
@@ -40,18 +39,18 @@ namespace TGC.MonoGame.Samples.Samples.Audio
             base.Initialize();
         }
 
-        ///<inheritdoc/>
+        /// <inheritdoc />
         protected override void LoadContent()
         {
             Font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "Arial");
             InstructionsSize = Font.MeasureString(Instructions);
-            SoundName = "A2-8bit";
+            SoundName = "a2-8bit";
             Sound = Game.Content.Load<SoundEffect>(ContentFolderSounds + SoundName);
 
             base.LoadContent();
         }
 
-        ///<inheritdoc/>
+        /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
             if (Game.CurrentKeyboardState.IsKeyDown(Keys.Y))
@@ -70,9 +69,11 @@ namespace TGC.MonoGame.Samples.Samples.Audio
             base.Update(gameTime);
         }
 
-        ///<inheritdoc/>
+        /// <inheritdoc />
         public override void Draw(GameTime gameTime)
         {
+            Game.Background = Color.CornflowerBlue;
+
             Game.SpriteBatch.Begin();
 
             var soundNamePosition = new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2f, 20) -

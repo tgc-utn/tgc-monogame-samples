@@ -29,6 +29,9 @@ namespace TGC.MonoGame.Samples.Viewer
             //Graphics.PreferMultiSampling = true;
             Content.RootDirectory = ContentFolder;
             IsMouseVisible = true;
+
+            Model = new TGCViewerModel(this);
+            Model.LoadTreeSamples();
         }
 
         /// <summary>
@@ -71,8 +74,7 @@ namespace TGC.MonoGame.Samples.Viewer
             Graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 100;
             Graphics.ApplyChanges();
 
-            Model = new TGCViewerModel(this);
-            Model.LoadTreeSamples();
+            Model.LoadImgGUI();
             Model.LoadWelcomeSample();
 
             Background = Color.CornflowerBlue;
@@ -117,9 +119,9 @@ namespace TGC.MonoGame.Samples.Viewer
 
             GraphicsDevice.Clear(Background);
 
-            Model.DrawSampleExplorer(gameTime);
-
             base.Draw(gameTime);
+
+            Model.DrawSampleExplorer(gameTime);
         }
 
         /// <summary>
@@ -127,6 +129,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// </summary>
         protected override void UnloadContent()
         {
+            Model.Dispose();
             Content.Unload();
         }
 

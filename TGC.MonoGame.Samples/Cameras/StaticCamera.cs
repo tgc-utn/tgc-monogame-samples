@@ -3,38 +3,38 @@ using Microsoft.Xna.Framework;
 namespace TGC.MonoGame.Samples.Cameras
 {
     /// <summary>
-    /// Static camera looking at a particular point.
+    ///     Static camera without restrictions, where each component is configured and nothing is inferred.
     /// </summary>
     public class StaticCamera : Camera
     {
         /// <summary>
-        /// The direction that is "up" from the camera's point of view.
-        /// </summary>
-        public readonly Vector3 DefaultWorldUpVector = Vector3.Up;
-
-        /// <summary>
-        /// Static camera looking at a particular direction, which has the up vector (0,1,0).
+        ///     Static camera looking at a particular direction, which has the up vector (0,1,0).
         /// </summary>
         /// <param name="aspectRatio">Aspect ratio, defined as view space width divided by height.</param>
-        /// <param name="fieldOfViewDegrees">Field of view in the y direction, in radians.</param>
-        /// <param name="nearPlane">Distance to the near view plane.</param>
-        /// <param name="farPlane">Distance to the far view plane.</param>
         /// <param name="position">The position of the camera.</param>
-        /// <param name="lookAt">The target towards which the camera is pointing.</param>
-        public StaticCamera(float aspectRatio, float fieldOfViewDegrees, float nearPlane, float farPlane,
-            Vector3 position, Vector3 lookAt)
+        /// <param name="frontDirection">The direction where the camera is pointing.</param>
+        /// <param name="upDirection">The direction that is "up" from the camera's point of view.</param>
+        public StaticCamera(float aspectRatio, Vector3 position, Vector3 frontDirection, Vector3 upDirection) : base(
+            aspectRatio)
         {
-            AspectRatio = aspectRatio;
-            FieldOfView = fieldOfViewDegrees;
-            NearPlane = nearPlane;
-            FarPlane = farPlane;
             Position = position;
-            LookAtDirection = Vector3.Normalize(position - lookAt);
-            RightDirection = Vector3.Normalize(Vector3.Cross(DefaultWorldUpVector, LookAtDirection));
-            UpDirection = Vector3.Cross(LookAtDirection, RightDirection);
-            ViewMatrix = Matrix.CreateLookAt(Position, LookAtDirection, UpDirection);
-            ProjectionMatrix = Matrix.CreatePerspectiveFieldOfView(FieldOfView, AspectRatio, NearPlane, FarPlane);
-            WorldMatrix = Matrix.Identity;
+            FrontDirection = frontDirection;
+            UpDirection = upDirection;
+            BuildView();
+        }
+
+        /// <summary>
+        ///     Build the camera View matrix using its properties.
+        /// </summary>
+        public void BuildView()
+        {
+            View = Matrix.CreateLookAt(Position, Position + FrontDirection, UpDirection);
+        }
+
+        /// <inheritdoc />
+        public override void Update(GameTime gameTime)
+        {
+            // This camera has no movement, once initialized with position and lookAt it is no longer updated automatically.
         }
     }
 }
