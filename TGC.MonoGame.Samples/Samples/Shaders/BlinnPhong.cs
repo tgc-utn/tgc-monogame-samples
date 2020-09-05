@@ -10,7 +10,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 {
     public class BlinnPhong : TGCSample
     {
-        private BoxPrimitive lightBox;
+        private CubePrimitive lightBox;
 
         /// <inheritdoc />
         public BlinnPhong(TGCViewer game) : base(game)
@@ -67,7 +67,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             Effect.Parameters["KSpecular"].SetValue(0.8f);
             Effect.Parameters["shininess"].SetValue(16.0f);
 
-            lightBox = new BoxPrimitive(GraphicsDevice, Vector3.One * 25f, Vector3.Zero, Color.Blue);
+            lightBox = new CubePrimitive(GraphicsDevice, 25, Color.Blue);
 
             base.LoadContent();
         }
@@ -97,7 +97,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         {
             // Set the background color to black, and use the default depth configuration
             Game.Background = Color.Black;
-            Game.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             AxisLines.Draw(Camera.View, Camera.Projection);
 

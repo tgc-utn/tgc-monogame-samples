@@ -142,7 +142,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.ComboRata
         public override void Draw(GameTime gameTime)
         {
             Game.Background = Tunel.colision ? Color.GreenYellow : Color.Gray;
-            Game.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             //AxisLines.Draw(GraphicsDevice, Camera);
 
             Tunel.Draw(GraphicsDevice, Effect);
@@ -185,8 +185,8 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.ComboRata
 
         public void DrawCenterText(string msg, float escala)
         {
-            var W = Game.GraphicsDevice.Viewport.Width;
-            var H = Game.GraphicsDevice.Viewport.Height;
+            var W = GraphicsDevice.Viewport.Width;
+            var H = GraphicsDevice.Viewport.Height;
             var size = font.MeasureString(msg) * escala;
             spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null,
                 Matrix.CreateScale(escala) * Matrix.CreateTranslation((W - size.X) / 2, (H - size.Y) / 2, 0));
@@ -196,8 +196,8 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.ComboRata
 
         public void DrawCenterTextY(string msg, float Y, float escala)
         {
-            var W = Game.GraphicsDevice.Viewport.Width;
-            var H = Game.GraphicsDevice.Viewport.Height;
+            var W = GraphicsDevice.Viewport.Width;
+            var H = GraphicsDevice.Viewport.Height;
             var size = font.MeasureString(msg) * escala;
             spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null,
                 Matrix.CreateScale(escala) * Matrix.CreateTranslation((W - size.X) / 2, Y, 0));
@@ -207,8 +207,8 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.ComboRata
 
         public void DrawRightText(string msg, float Y, float escala)
         {
-            var W = Game.GraphicsDevice.Viewport.Width;
-            var H = Game.GraphicsDevice.Viewport.Height;
+            var W = GraphicsDevice.Viewport.Width;
+            var H = GraphicsDevice.Viewport.Height;
             var size = font.MeasureString(msg) * escala;
             spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null,
                 Matrix.CreateScale(escala) * Matrix.CreateTranslation(W - size.X - 20, Y, 0));

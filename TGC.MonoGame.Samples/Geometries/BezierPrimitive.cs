@@ -20,8 +20,8 @@ using Microsoft.Xna.Framework;
 namespace TGC.MonoGame.Samples.Geometries
 {
     /// <summary>
-    ///     Base class for primitives that are made out of cubic bezier patches (a type of curved surface). This is used by the
-    ///     TeapotPrimitive.
+    ///     Base class for primitives that are made out of cubic bezier patches (a type of curved surface).
+    ///     This is used by the TeapotPrimitive.
     /// </summary>
     public abstract class BezierPrimitive : GeometricPrimitive
     {
@@ -102,8 +102,14 @@ namespace TGC.MonoGame.Samples.Geometries
                     }
                     else
                     {
-                        // In a tidy and well constructed bezier patch, the preceding normal computation will always work. But the classic teapot model is not tidy or well constructed! At the top and bottom of the teapot, it contains degenerate geometry where a patch has several control points in the same place, which causes the tangent computation to fail and produce a zero normal.
-                        // We 'fix' these cases by just hard-coding a normal that points either straight up or straight down, depending on whether we are on the top or bottom of the teapot. This is not a robust solution for all possible degenerate bezier patches, but hey, it's good enough to make the teapot work correctly!
+                        // In a tidy and well constructed bezier patch, the preceding normal computation will always work.
+                        // But the classic teapot model is not tidy or well constructed! At the top and bottom of the teapot,
+                        // it contains degenerate geometry where a patch has several control points in the same place,
+                        // which causes the tangent computation to fail and produce a zero normal.
+                        // We 'fix' these cases by just hard-coding a normal that points either straight up or straight down,
+                        // depending on whether we are on the top or bottom of the teapot.
+                        // This is not a robust solution for all possible degenerate bezier patches, but hey,
+                        // it's good enough to make the teapot work correctly!
 
                         if (position.Y > 0)
                             normal = Vector3.Up;
@@ -112,15 +118,14 @@ namespace TGC.MonoGame.Samples.Geometries
                     }
 
                     // Create the vertex.
-                    //AddVertex(position, normal);
-                    AddVertex(position, Color.BurlyWood);
+                    AddVertex(position, Color.BurlyWood, normal);
                 }
             }
         }
 
         /// <summary>
-        ///     Performs a cubic bezier interpolation between four scalar control points, returning the value at the specified time
-        ///     (t ranges 0 to 1).
+        ///     Performs a cubic bezier interpolation between four scalar control points,
+        ///     returning the value at the specified time (t ranges 0 to 1).
         /// </summary>
         private static float Bezier(float p1, float p2, float p3, float p4, float t)
         {
@@ -131,8 +136,8 @@ namespace TGC.MonoGame.Samples.Geometries
         }
 
         /// <summary>
-        ///     Performs a cubic bezier interpolation between four Vector3 control points, returning the value at the specified
-        ///     time (t ranges 0 to 1).
+        ///     Performs a cubic bezier interpolation between four Vector3 control points,
+        ///     returning the value at the specified time (t ranges 0 to 1).
         /// </summary>
         private static Vector3 Bezier(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4, float t)
         {
@@ -157,11 +162,10 @@ namespace TGC.MonoGame.Samples.Geometries
         }
 
         /// <summary>
-        ///     Computes the tangent of a cubic bezier curve at the specified time, when given four Vector3 control points. This is
-        ///     used for calculating normals (by crossing the horizontal and vertical tangent vectors).
+        ///     Computes the tangent of a cubic bezier curve at the specified time, when given four Vector3 control points.
+        ///     This is used for calculating normals (by crossing the horizontal and vertical tangent vectors).
         /// </summary>
-        private static Vector3 BezierTangent(Vector3 p1, Vector3 p2,
-            Vector3 p3, Vector3 p4, float t)
+        private static Vector3 BezierTangent(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4, float t)
         {
             var result = new Vector3();
 

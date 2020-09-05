@@ -228,29 +228,24 @@ namespace TGC.MonoGame.Samples.Geometries
         };
 
         /// <summary>
-        ///     Constructs a new teapot primitive, using default settings.
-        /// </summary>
-        public TeapotPrimitive(GraphicsDevice graphicsDevice) : this(graphicsDevice, 1, 8)
-        {
-        }
-
-        /// <summary>
         ///     Constructs a new teapot primitive, with the specified size and tessellation level.
         /// </summary>
-        public TeapotPrimitive(GraphicsDevice graphicsDevice, float size, int tessellation)
+        public TeapotPrimitive(GraphicsDevice graphicsDevice, float size = 1, int tessellation = 8)
         {
             if (tessellation < 1)
-                throw new ArgumentOutOfRangeException("tessellation");
+                throw new ArgumentOutOfRangeException(nameof(tessellation));
 
             foreach (var patch in TeapotPatches)
             {
-                // Because the teapot is symmetrical from left to right, we only store data for one side, then tessellate each patch twice, mirroring in X.
+                // Because the teapot is symmetrical from left to right, we only store data for one side,
+                // then tessellate each patch twice, mirroring in X.
                 TessellatePatch(patch, tessellation, new Vector3(size, size, size));
                 TessellatePatch(patch, tessellation, new Vector3(-size, size, size));
 
                 if (patch.MirrorZ)
                 {
-                    // Some parts of the teapot (the body, lid, and rim, but not the handle or spout) are also symmetrical from front to back, so we tessellate them four times, mirroring in Z as well as X.
+                    // Some parts of the teapot (the body, lid, and rim, but not the handle or spout) are also symmetrical from front to back,
+                    // so we tessellate them four times, mirroring in Z as well as X.
                     TessellatePatch(patch, tessellation, new Vector3(size, size, -size));
                     TessellatePatch(patch, tessellation, new Vector3(-size, size, -size));
                 }

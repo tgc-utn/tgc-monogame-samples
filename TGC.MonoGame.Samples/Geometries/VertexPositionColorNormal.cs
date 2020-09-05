@@ -19,19 +19,25 @@ using Microsoft.Xna.Framework.Graphics;
 namespace TGC.MonoGame.Samples.Geometries
 {
     /// <summary>
-    ///     Custom vertex type for vertices that have just a position and a normal, without any texture coordinates.
+    ///     Custom vertex type for vertices that have just a position a color and a normal,
+    ///     without any texture coordinates.
     /// </summary>
-    public struct VertexPositionNormal : IVertexType
+    public struct VertexPositionColorNormal : IVertexType
     {
         public Vector3 Position;
+        public Color Color;
         public Vector3 Normal;
 
         /// <summary>
-        ///     Constructor.
+        ///     Initializes a new instance of the VertexPositionColorNormal class.
         /// </summary>
-        public VertexPositionNormal(Vector3 position, Vector3 normal)
+        /// <param name="position">The vertex position.</param>
+        /// <param name="color">The vertex color.</param>
+        /// <param name="normal">The vertex normal.</param>
+        public VertexPositionColorNormal(Vector3 position, Color color, Vector3 normal)
         {
             Position = position;
+            Color = color;
             Normal = normal;
         }
 
@@ -41,7 +47,8 @@ namespace TGC.MonoGame.Samples.Geometries
         public static readonly VertexDeclaration VertexDeclaration = new VertexDeclaration
         (
             new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
-            new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0)
+            new VertexElement(sizeof(float) * 3, VertexElementFormat.Color, VertexElementUsage.Color, 0),
+            new VertexElement(sizeof(float) * 3 + 4, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0)
         );
 
         VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;

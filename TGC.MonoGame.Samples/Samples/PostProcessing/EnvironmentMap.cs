@@ -17,7 +17,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         /// <inheritdoc />
         public EnvironmentMap(TGCViewer game) : base(game)
         {
-            Category = TGCSampleCategory.PostProcess;
+            Category = TGCSampleCategory.PostProcessing;
             Name = "Environment Map";
             Description = "Render an environment map from the scene and use it for reflections";
         }

@@ -23,7 +23,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         }
 
         private Camera Camera { get; set; }
-        private BoxPrimitive Box { get; set; }
+        private CubePrimitive Box { get; set; }
         private Vector3 BoxPosition { get; set; }
         private CylinderPrimitive Cylinder { get; set; }
         private Vector3 CylinderPosition { get; set; }
@@ -44,14 +44,14 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             Game.Background = Color.CornflowerBlue;
             Camera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 20, 60), Vector3.Zero);
 
-            Box = new BoxPrimitive(GraphicsDevice, new Vector3(10, 10, 10), Vector3.Zero, Color.Cyan, Color.Black,
-                Color.Magenta, Color.Yellow, Color.Green, Color.Blue, Color.Red, Color.White);
+            Box = new CubePrimitive(GraphicsDevice, 10, Color.DarkCyan, Color.DarkMagenta, Color.DarkGreen,
+                Color.MonoGameOrange, Color.Black, Color.DarkGray);
             BoxPosition = Vector3.Zero;
             Cylinder = new CylinderPrimitive(GraphicsDevice, 20, 10, 16);
             CylinderPosition = new Vector3(-20, 0, 0);
-            Sphere = new SpherePrimitive(GraphicsDevice, 10, 16);
+            Sphere = new SpherePrimitive(GraphicsDevice, 10);
             SpherePosition = new Vector3(0, -15, 0);
-            Teapot = new TeapotPrimitive(GraphicsDevice, 10, 8);
+            Teapot = new TeapotPrimitive(GraphicsDevice, 10);
             TeapotPosition = new Vector3(20, 0, 0);
             Torus = new TorusPrimitive(GraphicsDevice, 10, 1, 16);
             TorusPosition = new Vector3(-20, 15, 0);
@@ -77,7 +77,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         {
             Game.Background = Color.CornflowerBlue;
 
-            Game.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             AxisLines.Draw(Camera.View, Camera.Projection);
 
@@ -91,6 +91,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             triangleEffect.World = Matrix.Identity;
             triangleEffect.View = Camera.View;
             triangleEffect.Projection = Camera.Projection;
+            triangleEffect.LightingEnabled = false;
             Triangle.Draw(triangleEffect);
 
             base.Draw(gameTime);

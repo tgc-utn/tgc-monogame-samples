@@ -78,7 +78,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             {
                 pass.Apply();
 
-                Game.GraphicsDevice.DrawUserPrimitives(
+                GraphicsDevice.DrawUserPrimitives(
                     // We’ll be rendering one triangles
                     PrimitiveType.TriangleList,
                     // The array of verts that we want to render
