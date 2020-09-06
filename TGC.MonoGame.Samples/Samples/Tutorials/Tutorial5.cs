@@ -30,7 +30,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         /// <inheritdoc />
         public override void Initialize()
         {
-            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 0, 55), 10);
+            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, Vector3.UnitZ * 55, 15, 0.5f);
 
             base.Initialize();
         }
@@ -39,11 +39,11 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         protected override void LoadContent()
         {
             Model1 = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
-            ((BasicEffect)Model1.Meshes.FirstOrDefault()?.Effects.FirstOrDefault())?.EnableDefaultLighting();
+            ((BasicEffect) Model1.Meshes.FirstOrDefault()?.Effects.FirstOrDefault())?.EnableDefaultLighting();
 
             Model2 = Game.Content.Load<Model>(ContentFolder3D + "tank/tank");
 
-            foreach (var mesh in Model2.Meshes) ((BasicEffect)mesh.Effects.FirstOrDefault())?.EnableDefaultLighting();
+            foreach (var mesh in Model2.Meshes) ((BasicEffect) mesh.Effects.FirstOrDefault())?.EnableDefaultLighting();
 
             base.LoadContent();
         }
@@ -61,7 +61,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         {
             Game.Background = Color.CornflowerBlue;
 
-            Game.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             AxisLines.Draw(Camera.View, Camera.Projection);
 

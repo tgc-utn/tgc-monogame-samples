@@ -71,7 +71,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         {
             Game.Background = Color.CornflowerBlue;
 
-            Game.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             AxisLines.Draw(Camera.View, Camera.Projection);
 

@@ -87,7 +87,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         public override void Draw(GameTime gameTime)
         {
             Game.Background = Color.Black;
-            Game.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             AxisLines.Draw(Camera.View, Camera.Projection);
 

@@ -26,9 +26,10 @@ namespace TGC.MonoGame.Samples.Cameras
         /// <param name="aspectRatio">Aspect ratio, defined as view space width divided by height.</param>
         /// <param name="position">The position of the camera.</param>
         /// <param name="speed">The speed of movement.</param>
-        public SimpleCamera(float aspectRatio, Vector3 position, float speed) : base(aspectRatio)
+        /// <param name="angle">The angle of movement.</param>
+        public SimpleCamera(float aspectRatio, Vector3 position, float speed, float angle) : base(aspectRatio)
         {
-            BuildView(position, speed);
+            BuildView(position, speed, angle);
         }
 
         /// <summary>
@@ -38,29 +39,37 @@ namespace TGC.MonoGame.Samples.Cameras
         /// <param name="aspectRatio">Aspect ratio, defined as view space width divided by height.</param>
         /// <param name="position">The position of the camera.</param>
         /// <param name="speed">The speed of movement.</param>
+        /// <param name="angle">The angle of movement.</param>
         /// <param name="nearPlaneDistance">Distance to the near view plane.</param>
         /// <param name="farPlaneDistance">Distance to the far view plane.</param>
-        public SimpleCamera(float aspectRatio, Vector3 position, float speed, float nearPlaneDistance,
+        public SimpleCamera(float aspectRatio, Vector3 position, float speed, float angle, float nearPlaneDistance,
             float farPlaneDistance) : base(aspectRatio, nearPlaneDistance, farPlaneDistance)
         {
-            BuildView(position, speed);
+            BuildView(position, speed, angle);
         }
 
         /// <summary>
         ///     Value with which the camera is going to move.
         /// </summary>
         public float Speed { get; set; }
+        
+        /// <summary>
+        ///     Value with which the camera is going to move the angle.
+        /// </summary>
+        public float Angle { get; set; }
 
         /// <summary>
         ///     Build view matrix and update the internal directions.
         /// </summary>
         /// <param name="position">The position of the camera.</param>
         /// <param name="speed">The speed of movement.</param>
-        private void BuildView(Vector3 position, float speed)
+        /// <param name="angle">The angle of movement.</param>
+        private void BuildView(Vector3 position, float speed, float angle)
         {
             Position = position;
             FrontDirection = DefaultWorldFrontVector;
             Speed = speed;
+            Angle = angle;
             View = Matrix.CreateLookAt(Position, Position + FrontDirection, DefaultWorldUpVector);
         }
 
@@ -73,18 +82,18 @@ namespace TGC.MonoGame.Samples.Cameras
             // Check for input to rotate the camera.
             var pitch = 0f;
             var turn = 0f;
-
+            
             if (keyboardState.IsKeyDown(Keys.Up))
-                pitch += time * 0.1f;
+                pitch += time * Angle;
 
             if (keyboardState.IsKeyDown(Keys.Down))
-                pitch -= time * 0.1f;
+                pitch -= time * Angle;
 
             if (keyboardState.IsKeyDown(Keys.Left))
-                turn += time * 0.1f;
+                turn += time * Angle;
 
             if (keyboardState.IsKeyDown(Keys.Right))
-                turn -= time * 0.1f;
+                turn -= time * Angle;
 
             RightDirection = Vector3.Cross(DefaultWorldUpVector, FrontDirection);
             var flatFront = Vector3.Cross(RightDirection, DefaultWorldUpVector);

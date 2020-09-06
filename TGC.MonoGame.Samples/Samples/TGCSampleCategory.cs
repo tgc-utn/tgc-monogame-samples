@@ -9,7 +9,7 @@
         public const string Models = "Models";
         public const string Optimizations = "Optimizations";
         public const string Physics = "Physics";
-        public const string PostProcess = "Post Process";
+        public const string PostProcessing = "Post Processing";
         public const string Shaders = "Shaders";
         public const string Transformations = "Transformations";
         public const string Tutorials = "Tutorials";
