@@ -52,7 +52,7 @@ namespace TGC.MonoGame.Samples.Cameras
         ///     Value with which the camera is going to move.
         /// </summary>
         public float Speed { get; set; }
-        
+
         /// <summary>
         ///     Value with which the camera is going to move the angle.
         /// </summary>
@@ -82,7 +82,7 @@ namespace TGC.MonoGame.Samples.Cameras
             // Check for input to rotate the camera.
             var pitch = 0f;
             var turn = 0f;
-            
+
             if (keyboardState.IsKeyDown(Keys.Up))
                 pitch += time * Angle;
 
