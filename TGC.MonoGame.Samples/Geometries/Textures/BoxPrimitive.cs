@@ -38,7 +38,7 @@ namespace TGC.MonoGame.Samples.Geometries.Textures
         private IndexBuffer Indices { get; set; }
 
         /// <summary>
-        /// Built-in effect that supports optional texturing, vertex coloring, fog, and lighting.
+        ///     Built-in effect that supports optional texturing, vertex coloring, fog, and lighting.
         /// </summary>
         private BasicEffect Effect { get; }
 
@@ -70,9 +70,9 @@ namespace TGC.MonoGame.Samples.Geometries.Textures
                 // Bottom-Left Back.
                 new Vector3(-x, -y, z),
                 // Bottom-Right Back.
-                new Vector3(x, -y, z),
+                new Vector3(x, -y, z)
             };
-                
+
             // A box has six faces, each one pointing in a different direction.
             var normals = new[]
             {
@@ -133,7 +133,7 @@ namespace TGC.MonoGame.Samples.Geometries.Textures
                 new VertexPositionNormalTexture(vectors[2], normals[2], textureCoordinates[0]),
                 new VertexPositionNormalTexture(vectors[3], normals[2], textureCoordinates[1]),
                 new VertexPositionNormalTexture(vectors[6], normals[2], textureCoordinates[2]),
-                new VertexPositionNormalTexture(vectors[7], normals[2], textureCoordinates[3]),
+                new VertexPositionNormalTexture(vectors[7], normals[2], textureCoordinates[3])
             };
 
             Vertices = new VertexBuffer(graphicsDevice, VertexPositionNormalTexture.VertexDeclaration, vertices.Length,
@@ -213,7 +213,7 @@ namespace TGC.MonoGame.Samples.Geometries.Textures
             // Draw the model, using BasicEffect.
             Draw(Effect);
         }
-        
+
         /// <summary>
         ///     Draws the primitive model, using the specified effect. Unlike the other Draw overload where you just specify the
         ///     world/view/projection matrices and color, this method does not set any render states, so you must make sure all
