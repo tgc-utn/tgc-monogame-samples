@@ -18,11 +18,10 @@ namespace TGC.MonoGame.Samples.Geometries.Textures
         /// <param name="texture">The box texture.</param>
         public BoxPrimitive(GraphicsDevice graphicsDevice, Vector3 size, Texture2D texture)
         {
-            var effect = new BasicEffect(graphicsDevice);
-            Effect = effect;
-            effect.TextureEnabled = true;
-            effect.Texture = texture;
-            effect.EnableDefaultLighting();
+            Effect = new BasicEffect(graphicsDevice);
+            Effect.TextureEnabled = true;
+            Effect.Texture = texture;
+            Effect.EnableDefaultLighting();
 
             CreateVertexBuffer(graphicsDevice, size);
             CreateIndexBuffer(graphicsDevice);
@@ -39,9 +38,9 @@ namespace TGC.MonoGame.Samples.Geometries.Textures
         private IndexBuffer Indices { get; set; }
 
         /// <summary>
-        ///     Used to set and query effects, and to choose techniques.
+        /// Built-in effect that supports optional texturing, vertex coloring, fog, and lighting.
         /// </summary>
-        private Effect Effect { get; }
+        private BasicEffect Effect { get; }
 
         /// <summary>
         ///     Create a vertex buffer for the figure with the given information.
@@ -206,16 +205,32 @@ namespace TGC.MonoGame.Samples.Geometries.Textures
         /// <param name="projection">The projection matrix, normally from the application.</param>
         public void Draw(Matrix world, Matrix view, Matrix projection)
         {
-            var graphicsDevice = Effect.GraphicsDevice;
+            // Set BasicEffect parameters.
+            Effect.World = world;
+            Effect.View = view;
+            Effect.Projection = projection;
+
+            // Draw the model, using BasicEffect.
+            Draw(Effect);
+        }
+        
+        /// <summary>
+        ///     Draws the primitive model, using the specified effect. Unlike the other Draw overload where you just specify the
+        ///     world/view/projection matrices and color, this method does not set any render states, so you must make sure all
+        ///     states are set to sensible values before you call it.
+        /// </summary>
+        /// <param name="effect">Used to set and query effects, and to choose techniques.</param>
+        public void Draw(Effect effect)
+        {
+            var graphicsDevice = effect.GraphicsDevice;
+
+            // Set our vertex declaration, vertex buffer, and index buffer.
             graphicsDevice.SetVertexBuffer(Vertices);
             graphicsDevice.Indices = Indices;
 
-            Effect.Parameters["World"].SetValue(world);
-            Effect.Parameters["WorldViewProj"].SetValue(world * view * projection);
-
-            foreach (var pass in Effect.CurrentTechnique.Passes)
+            foreach (var effectPass in effect.CurrentTechnique.Passes)
             {
-                pass.Apply();
+                effectPass.Apply();
                 graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, NumberOfIndices / 3);
             }
         }
