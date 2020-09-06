@@ -11,7 +11,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
     ///     Tutorial 4:
     ///     Units Involved:
     ///     # Unit 4 - Textures and lighting - Textures
-    ///     Shows how to create a Quad with a 2D image as a texture to give it color.
+    ///     Shows how to create a Quad and a Box with a 2D image as a texture to give it color.
     ///     Author: Matías Leone.
     /// </summary>
     public class Tutorial4 : TGCSample
@@ -21,7 +21,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         {
             Category = TGCSampleCategory.Tutorials;
             Name = "Tutorial 4";
-            Description = "Shows how to create a Quad with a 2D image as a texture to give it color.";
+            Description = "Shows how to create a Quad and a Box with a 2D image as a texture to give it color.";
         }
 
         private Camera Camera { get; set; }
