@@ -43,12 +43,12 @@ namespace TGC.MonoGame.Samples.Viewer.GUI
             var linesVertices = new VertexPositionColor[NumberOfVertices];
             // Red = +x Axis
             linesVertices[0] = new VertexPositionColor(Vector3.Zero, Color.Red);
-            linesVertices[1] = new VertexPositionColor(Vector3.UnitX * 60, Color.Red);
+            linesVertices[1] = new VertexPositionColor(Vector3.UnitX, Color.Red);
             // Green = +y Axis
             linesVertices[2] = new VertexPositionColor(Vector3.Zero, Color.Green);
-            linesVertices[3] = new VertexPositionColor(Vector3.UnitY * 60, Color.Green);
+            linesVertices[3] = new VertexPositionColor(Vector3.UnitY, Color.Green);
             // Blue = +z Axis
-            linesVertices[4] = new VertexPositionColor(Vector3.UnitZ * 60, Color.Blue);
+            linesVertices[4] = new VertexPositionColor(Vector3.UnitZ, Color.Blue);
             linesVertices[5] = new VertexPositionColor(Vector3.Zero, Color.Blue);
 
             Vertices = new VertexBuffer(graphicsDevice, VertexPositionColor.VertexDeclaration, linesVertices.Length,
@@ -78,7 +78,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI
             //Transform the screen space into 3D space
             var worldCoordPos = graphicsDevice.Viewport.Unproject(screenPosition, projection, view, Matrix.Identity);
 
-            Effect.World = Matrix.CreateTranslation(worldCoordPos);
+            Effect.World = Matrix.CreateScale(40) * Matrix.CreateTranslation(worldCoordPos);
             Effect.View = view;
             Effect.Projection = projection;
 

@@ -50,7 +50,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             // First you must run "mgfxc <SourceFile> <OutputFile> [/Debug] [/Profile:<DirectX_11,OpenGL>]"
             // https://docs.monogame.net/articles/tools/mgfxc.html
             //byte[] byteCode = File.ReadAllBytes(Game.Content.RootDirectory + "/" + ContentFolderEffects + "BasicShader.fx");
-            //Effect = new Effect(Game.GraphicsDevice, byteCode);
+            //Effect = new Effect(GraphicsDevice, byteCode);
 
             // Load a shader using Content pipeline.
             Effect = Game.Content.Load<Effect>(ContentFolderEffects + "BasicShader");

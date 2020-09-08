@@ -43,10 +43,10 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         protected override void LoadContent()
         {
             var texture = Game.Content.Load<Texture2D>(ContentFolderTextures + "wood/caja-madera-3");
-            Quad = new QuadPrimitive(Game.GraphicsDevice, Vector3.Zero, Vector3.Backward, Vector3.Up, 22, 22, texture,
+            Quad = new QuadPrimitive(GraphicsDevice, Vector3.Zero, Vector3.Backward, Vector3.Up, 22, 22, texture,
                 2);
             QuadWorld = Matrix.CreateTranslation(Vector3.UnitX * 14);
-            Box = new BoxPrimitive(Game.GraphicsDevice, Vector3.One * 20, texture);
+            Box = new BoxPrimitive(GraphicsDevice, Vector3.One * 20, texture);
             BoxWorld = Matrix.CreateTranslation(Vector3.UnitX * -14);
 
             base.LoadContent();
