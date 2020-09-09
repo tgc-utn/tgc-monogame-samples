@@ -82,7 +82,6 @@ namespace TGC.MonoGame.Samples.Viewer.GUI
             var scale = (worldCoordPosEnd - worldCoordPos).Length();
 
             Effect.World = Matrix.CreateScale(scale) * Matrix.CreateTranslation(worldCoordPos);
-
             Effect.View = view;
             Effect.Projection = projection;
 

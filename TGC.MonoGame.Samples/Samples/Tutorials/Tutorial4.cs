@@ -44,7 +44,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         {
             var texture = Game.Content.Load<Texture2D>(ContentFolderTextures + "wood/caja-madera-3");
             Quad = new QuadPrimitive(GraphicsDevice, Vector3.Zero, Vector3.Backward, Vector3.Up, 22, 22, texture,
-                2);
+                4);
             QuadWorld = Matrix.CreateTranslation(Vector3.UnitX * 14);
             Box = new BoxPrimitive(GraphicsDevice, Vector3.One * 20, texture);
             BoxWorld = Matrix.CreateTranslation(Vector3.UnitX * -14);
