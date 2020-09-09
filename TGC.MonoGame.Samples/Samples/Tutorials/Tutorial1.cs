@@ -82,7 +82,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
                     PrimitiveType.TriangleList,
                     // The offset, which is 0 since we want to start at the beginning of the floorVerts array.
                     0,
-                    // The number of triangles to draw..
+                    // The number of triangles to draw.
                     1);
             }
 

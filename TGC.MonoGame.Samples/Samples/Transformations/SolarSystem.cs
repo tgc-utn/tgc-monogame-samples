@@ -56,9 +56,9 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
             Camera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 100, 1500), Vector3.Zero, 1,
                 3000);
 
-            Sun = new SpherePrimitive(GraphicsDevice, 20, 16, Color.MonoGameOrange);
-            Earth = new SpherePrimitive(GraphicsDevice, 20, 16, Color.LightSkyBlue);
-            Moon = new SpherePrimitive(GraphicsDevice, 20, 16, Color.LightSlateGray);
+            Sun = new SpherePrimitive(GraphicsDevice, 20, 32, Color.MonoGameOrange);
+            Earth = new SpherePrimitive(GraphicsDevice, 20, 32, Color.LightSkyBlue);
+            Moon = new SpherePrimitive(GraphicsDevice, 20, 32, Color.LightSlateGray);
 
             base.Initialize();
         }
