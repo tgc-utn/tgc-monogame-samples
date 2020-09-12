@@ -43,10 +43,10 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         protected override void LoadContent()
         {
             var texture = Game.Content.Load<Texture2D>(ContentFolderTextures + "wood/caja-madera-3");
-            Quad = new QuadPrimitive(Game.GraphicsDevice, Vector3.Zero, Vector3.Backward, Vector3.Up, 22, 22, texture,
-                2);
+            Quad = new QuadPrimitive(GraphicsDevice, Vector3.Zero, Vector3.Backward, Vector3.Up, 22, 22, texture,
+                4);
             QuadWorld = Matrix.CreateTranslation(Vector3.UnitX * 14);
-            Box = new BoxPrimitive(Game.GraphicsDevice, Vector3.One * 20, texture);
+            Box = new BoxPrimitive(GraphicsDevice, Vector3.One * 20, texture);
             BoxWorld = Matrix.CreateTranslation(Vector3.UnitX * -14);
 
             base.LoadContent();
@@ -65,10 +65,9 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         public override void Draw(GameTime gameTime)
         {
             Game.Background = Color.CornflowerBlue;
-
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-
             AxisLines.Draw(Camera.View, Camera.Projection);
+            
             Box.Draw(Matrix.CreateRotationY(BoxRotation) * BoxWorld, Camera.View, Camera.Projection);
             Quad.Draw(QuadWorld, Camera.View, Camera.Projection);
 

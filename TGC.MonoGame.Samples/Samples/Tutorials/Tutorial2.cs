@@ -13,9 +13,6 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
     /// </summary>
     public class Tutorial2 : TGCSample
     {
-        private const int NumberOfVertices = 8;
-        private const int NumberOfIndices = 36;
-
         /// <inheritdoc />
         public Tutorial2(TGCViewer game) : base(game)
         {
@@ -52,7 +49,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
 
             Effect = new BasicEffect(GraphicsDevice);
             Effect.VertexColorEnabled = true;
-            
+
             CreateVertexBuffer(Vector3.One * 25, Vector3.Zero, Color.Cyan, Color.Black, Color.Magenta, Color.Yellow,
                 Color.Green, Color.Blue, Color.Red, Color.White);
             CreateIndexBuffer(GraphicsDevice);
@@ -79,9 +76,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         public override void Draw(GameTime gameTime)
         {
             Game.Background = Color.CornflowerBlue;
-
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-
             AxisLines.Draw(Camera.View, Camera.Projection);
 
             GraphicsDevice.SetVertexBuffer(Vertices);
@@ -94,7 +89,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             foreach (var pass in Effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, NumberOfIndices / 3);
+                GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, Indices.IndexCount / 3);
             }
 
             base.Draw(gameTime);
@@ -120,33 +115,27 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             var y = size.Y / 2;
             var z = size.Z / 2;
 
-            var cubeVertices = new VertexPositionColor[NumberOfVertices];
-            // Bottom-Left Front.
-            cubeVertices[0].Position = new Vector3(-x + center.X, -y + center.Y, -z + center.Z);
-            cubeVertices[0].Color = color1;
-            // Bottom-Left Back.
-            cubeVertices[1].Position = new Vector3(-x + center.X, -y + center.Y, z + center.Z);
-            cubeVertices[1].Color = color2;
-            // Bottom-Right Back.
-            cubeVertices[2].Position = new Vector3(x + center.X, -y + center.Y, z + center.Z);
-            cubeVertices[2].Color = color3;
-            // Bottom-Right Front.
-            cubeVertices[3].Position = new Vector3(x + center.X, -y + center.Y, -z + center.Z);
-            cubeVertices[3].Color = color4;
-            // Top-Left Front.
-            cubeVertices[4].Position = new Vector3(-x + center.X, y + center.Y, -z + center.Z);
-            cubeVertices[4].Color = color5;
-            // Top-Left Back.
-            cubeVertices[5].Position = new Vector3(-x + center.X, y + center.Y, z + center.Z);
-            cubeVertices[5].Color = color6;
-            // Top-Right Back.
-            cubeVertices[6].Position = new Vector3(x + center.X, y + center.Y, z + center.Z);
-            cubeVertices[6].Color = color7;
-            // Top-Right Front.
-            cubeVertices[7].Position = new Vector3(x + center.X, y + center.Y, -z + center.Z);
-            cubeVertices[7].Color = color8;
+            var cubeVertices = new[]
+            {
+                // Bottom-Left Front.
+                new VertexPositionColor(new Vector3(-x + center.X, -y + center.Y, -z + center.Z), color1),
+                // Bottom-Left Back.
+                new VertexPositionColor(new Vector3(-x + center.X, -y + center.Y, z + center.Z), color2),
+                // Bottom-Right Back.
+                new VertexPositionColor(new Vector3(x + center.X, -y + center.Y, z + center.Z), color3),
+                // Bottom-Right Front.
+                new VertexPositionColor(new Vector3(x + center.X, -y + center.Y, -z + center.Z), color4),
+                // Top-Left Front.
+                new VertexPositionColor(new Vector3(-x + center.X, y + center.Y, -z + center.Z), color5),
+                // Top-Left Back.
+                new VertexPositionColor(new Vector3(-x + center.X, y + center.Y, z + center.Z), color6),
+                // Top-Right Back.
+                new VertexPositionColor(new Vector3(x + center.X, y + center.Y, z + center.Z), color7),
+                // Top-Right Front.
+                new VertexPositionColor(new Vector3(x + center.X, y + center.Y, -z + center.Z), color8)
+            };
 
-            Vertices = new VertexBuffer(GraphicsDevice, VertexPositionColor.VertexDeclaration, NumberOfVertices,
+            Vertices = new VertexBuffer(GraphicsDevice, VertexPositionColor.VertexDeclaration, cubeVertices.Length,
                 BufferUsage.WriteOnly);
             Vertices.SetData(cubeVertices);
         }
@@ -157,57 +146,23 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         /// <param name="device">The GraphicsDevice object to associate with the index buffer.</param>
         private void CreateIndexBuffer(GraphicsDevice device)
         {
-            var cubeIndices = new ushort[NumberOfIndices];
+            var cubeIndices = new ushort[]
+            {
+                // Bottom face.
+                0, 2, 3, 0, 1, 2,
+                // Top face.
+                4, 6, 5, 4, 7, 6,
+                // Front face.
+                5, 2, 1, 5, 6, 2,
+                // Back face.
+                0, 7, 4, 0, 3, 7,
+                // Left face.
+                0, 4, 1, 1, 4, 5,
+                // Right face.
+                2, 6, 3, 3, 6, 7
+            };
 
-            // Bottom face.
-            cubeIndices[0] = 0;
-            cubeIndices[1] = 2;
-            cubeIndices[2] = 3;
-            cubeIndices[3] = 0;
-            cubeIndices[4] = 1;
-            cubeIndices[5] = 2;
-
-            // Top face.
-            cubeIndices[6] = 4;
-            cubeIndices[7] = 6;
-            cubeIndices[8] = 5;
-            cubeIndices[9] = 4;
-            cubeIndices[10] = 7;
-            cubeIndices[11] = 6;
-
-            // Front face.
-            cubeIndices[12] = 5;
-            cubeIndices[13] = 2;
-            cubeIndices[14] = 1;
-            cubeIndices[15] = 5;
-            cubeIndices[16] = 6;
-            cubeIndices[17] = 2;
-
-            // Back face.
-            cubeIndices[18] = 0;
-            cubeIndices[19] = 7;
-            cubeIndices[20] = 4;
-            cubeIndices[21] = 0;
-            cubeIndices[22] = 3;
-            cubeIndices[23] = 7;
-
-            // Left face.
-            cubeIndices[24] = 0;
-            cubeIndices[25] = 4;
-            cubeIndices[26] = 1;
-            cubeIndices[27] = 1;
-            cubeIndices[28] = 4;
-            cubeIndices[29] = 5;
-
-            // Right face.
-            cubeIndices[30] = 2;
-            cubeIndices[31] = 6;
-            cubeIndices[32] = 3;
-            cubeIndices[33] = 3;
-            cubeIndices[34] = 6;
-            cubeIndices[35] = 7;
-
-            Indices = new IndexBuffer(device, IndexElementSize.SixteenBits, NumberOfIndices, BufferUsage.WriteOnly);
+            Indices = new IndexBuffer(device, IndexElementSize.SixteenBits, cubeIndices.Length, BufferUsage.WriteOnly);
             Indices.SetData(cubeIndices);
         }
     }

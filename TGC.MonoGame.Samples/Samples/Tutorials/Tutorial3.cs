@@ -76,9 +76,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         public override void Draw(GameTime gameTime)
         {
             Game.Background = Color.CornflowerBlue;
-
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-
             AxisLines.Draw(Camera.View, Camera.Projection);
 
             DrawGeometry(Box, BoxPosition, Yaw, Pitch, Roll);

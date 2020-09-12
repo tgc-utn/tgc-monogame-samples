@@ -8,8 +8,6 @@ namespace TGC.MonoGame.Samples.Geometries.Textures
     /// </summary>
     public class BoxPrimitive
     {
-        private const int NumberOfIndices = 36;
-
         /// <summary>
         ///     Create a box with a center at the given point, with a size and a color in each vertex.
         /// </summary>
@@ -147,50 +145,21 @@ namespace TGC.MonoGame.Samples.Geometries.Textures
         /// <param name="graphicsDevice">The graphics device.</param>
         private void CreateIndexBuffer(GraphicsDevice graphicsDevice)
         {
-            var indices = new ushort[NumberOfIndices];
-
-            // Top.
-            indices[0] = 2;
-            indices[1] = 1;
-            indices[2] = 0;
-            indices[3] = 2;
-            indices[4] = 3;
-            indices[5] = 1;
-            // Back.
-            indices[6] = 18;
-            indices[7] = 17;
-            indices[8] = 16;
-            indices[9] = 18;
-            indices[10] = 19;
-            indices[11] = 17;
-            // Left.
-            indices[12] = 10;
-            indices[13] = 9;
-            indices[14] = 8;
-            indices[15] = 10;
-            indices[16] = 11;
-            indices[17] = 9;
-            // Front.
-            indices[18] = 22;
-            indices[19] = 21;
-            indices[20] = 20;
-            indices[21] = 22;
-            indices[22] = 23;
-            indices[23] = 21;
-            // Right.
-            indices[24] = 14;
-            indices[25] = 13;
-            indices[26] = 12;
-            indices[27] = 14;
-            indices[28] = 15;
-            indices[29] = 13;
-            // Bottom.
-            indices[30] = 6;
-            indices[31] = 5;
-            indices[32] = 4;
-            indices[33] = 6;
-            indices[34] = 7;
-            indices[35] = 5;
+            var indices = new ushort[]
+            {
+                // Top.
+                2, 1, 0, 2, 3, 1,
+                // Back.
+                18, 17, 16, 18, 19, 17,
+                // Left.
+                10, 9, 8, 10, 11, 9,
+                // Front.
+                22, 21, 20, 22, 23, 21,
+                // Right.
+                14, 13, 12, 14, 15, 13,
+                // Bottom.
+                6, 5, 4, 6, 7, 5
+            };
 
             Indices = new IndexBuffer(graphicsDevice, IndexElementSize.SixteenBits, indices.Length,
                 BufferUsage.WriteOnly);
@@ -231,7 +200,7 @@ namespace TGC.MonoGame.Samples.Geometries.Textures
             foreach (var effectPass in effect.CurrentTechnique.Passes)
             {
                 effectPass.Apply();
-                graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, NumberOfIndices / 3);
+                graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, Indices.IndexCount / 3);
             }
         }
     }

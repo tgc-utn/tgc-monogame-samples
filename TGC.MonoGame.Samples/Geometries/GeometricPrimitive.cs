@@ -126,7 +126,7 @@ namespace TGC.MonoGame.Samples.Geometries
         #endregion Initialization
 
         #region Draw
-        
+
         /// <summary>
         ///     Draws the primitive model, using the specified effect. Unlike the other Draw overload where you just specify the
         ///     world/view/projection matrices and color, this method does not set any render states, so you must make sure all

@@ -56,7 +56,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
-            var time = (float) gameTime.TotalGameTime.TotalSeconds;
+            var time = Convert.ToSingle(gameTime.TotalGameTime.TotalSeconds);
 
             // Update the animation properties on the tank object. In a real game you would probably take this data from user inputs
             // or the physics system, rather than just making everything rotate like this!
@@ -73,14 +73,12 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         public override void Draw(GameTime gameTime)
         {
             Game.Background = Color.CornflowerBlue;
-
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-
             AxisLines.Draw(Camera.View, Camera.Projection);
 
             // Calculate the camera matrices.
-            var time = (float) gameTime.TotalGameTime.TotalSeconds;
-
+            var time = Convert.ToSingle(gameTime.TotalGameTime.TotalSeconds);
+            
             // Draw the tank model.
             TankModel.Draw(TankWorld * Matrix.CreateRotationY(time * 0.1f), Camera.View, Camera.Projection);
 

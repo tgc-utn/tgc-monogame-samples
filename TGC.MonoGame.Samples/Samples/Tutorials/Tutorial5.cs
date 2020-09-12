@@ -60,9 +60,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         public override void Draw(GameTime gameTime)
         {
             Game.Background = Color.CornflowerBlue;
-
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-
             AxisLines.Draw(Camera.View, Camera.Projection);
 
             Model1.Draw(Matrix.CreateScale(0.1f) * Matrix.CreateTranslation(Vector3.UnitX * -8), Camera.View,
