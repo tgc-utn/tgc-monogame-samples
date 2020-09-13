@@ -11,12 +11,12 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps
     ///     Apply a texture to color (DiffuseMap) on the ground.
     ///     The texture is parsed and a VertexBuffer is created based on the different heights of the image.
     ///     Author: Matias Leone, Leandro Barbagallo.
-    /// </summary>dd
-    public class SimpleHeightmap : TGCSample
+    /// </summary>
+    public class SimpleHeightMap : TGCSample
     {
-        public SimpleHeightmap(TGCViewer game) : base(game)
+        public SimpleHeightMap(TGCViewer game) : base(game)
         {
-            Category = TGCSampleCategory.Heightmaps;
+            Category = TGCSampleCategory.HeightMaps;
             Name = "Simple Heightmap";
             Description = "Shows how to create a terrain based on a HeightMap texture manually.";
         }

@@ -7,7 +7,7 @@
     {
         public const string Audio = "Audio";
         public const string CompleteSolutions = "Complete Solutions";
-        public const string Heightmaps = "Heightmaps";
+        public const string HeightMaps = "HeightMaps";
         public const string Models = "Models";
         public const string Optimizations = "Optimizations";
         public const string Physics = "Physics";
