@@ -1,7 +1,7 @@
 ﻿namespace TGC.MonoGame.Samples.Samples
 {
     /// <summary>
-    /// Utility class for de category samples.
+    ///     Utility class for de category samples.
     /// </summary>
     public static class TGCSampleCategory
     {

@@ -78,7 +78,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
 
             // Calculate the camera matrices.
             var time = Convert.ToSingle(gameTime.TotalGameTime.TotalSeconds);
-            
+
             // Draw the tank model.
             TankModel.Draw(TankWorld * Matrix.CreateRotationY(time * 0.1f), Camera.View, Camera.Projection);
 

@@ -77,7 +77,8 @@ namespace TGC.MonoGame.Samples.Viewer.GUI
 
             //Transform the screen space into 3D space
             var worldCoordPos = graphicsDevice.Viewport.Unproject(screenPosition, projection, view, Matrix.Identity);
-            var worldCoordPosEnd = graphicsDevice.Viewport.Unproject(new Vector3(width - AxisPosDistance, height - AxisPosDistance, 1.0f),
+            var worldCoordPosEnd = graphicsDevice.Viewport.Unproject(
+                new Vector3(width - AxisPosDistance, height - AxisPosDistance, 1.0f),
                 projection, view, Matrix.Identity);
             var scale = (worldCoordPosEnd - worldCoordPos).Length();
 
