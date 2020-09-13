@@ -12,7 +12,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
     ///     Units Involved:
     ///     # Unit 5 - Animation
     ///     Sample showing how to apply simple animation to a rigid body tank model.
-    ///     Autor: Leandro Barbagallo, Matías Leone.
+    ///     Author: Leandro Barbagallo, Matías Leone.
     /// </summary>
     public class Tutorial6 : TGCSample
     {

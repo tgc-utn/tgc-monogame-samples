@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Viewer;
 
-namespace TGC.MonoGame.Samples.Samples.Shaders.Heightmap
+namespace TGC.MonoGame.Samples.Samples.Heightmaps
 {
     /// <summary>
     ///     Create Basic Heightmap:
@@ -11,13 +11,13 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.Heightmap
     ///     Apply a texture to color (DiffuseMap) on the ground.
     ///     The texture is parsed and a VertexBuffer is created based on the different heights of the image.
     ///     Author: Matias Leone, Leandro Barbagallo.
-    /// </summary>
+    /// </summary>dd
     public class SimpleHeightmap : TGCSample
     {
         public SimpleHeightmap(TGCViewer game) : base(game)
         {
-            Category = "Heightmaps";
-            Name = "Simple Heightmap.";
+            Category = TGCSampleCategory.Heightmaps;
+            Name = "Simple Heightmap";
             Description = "Shows how to create a terrain based on a HeightMap texture manually.";
         }
 
@@ -88,9 +88,9 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.Heightmap
 
             base.Draw(gameTime);
         }
-        
+
         /// <summary>
-        /// Create and load the VertexBuffer based on a Heightmap texture.
+        ///     Create and load the VertexBuffer based on a Heightmap texture.
         /// </summary>
         /// <param name="texture">The Heightmap texture.</param>
         /// <param name="scaleXZ">ScaleXZ is the distance between the vertices in the XZ plane, where the terrain does not rise.</param>
