@@ -13,12 +13,12 @@ using TGC.MonoGame.Samples.Physics;
 using TGC.MonoGame.Samples.Viewer;
 using NumericVector3 = System.Numerics.Vector3;
 
-namespace TGC.MonoGame.Samples.Samples.Physics
+namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
 {
-    public class BepuPhysicsSample : TGCSample
+    public class WallOfBoxes : TGCSample
     {
         /// <inheritdoc />
-        public BepuPhysicsSample(TGCViewer game) : base(game)
+        public WallOfBoxes(TGCViewer game) : base(game)
         {
             Category = TGCSampleCategory.Physics;
             Name = "BepuPhysics 2 - Wall demo";
@@ -67,26 +67,7 @@ namespace TGC.MonoGame.Samples.Samples.Physics
         /// <inheritdoc />
         public override void Initialize()
         {
-            Random = new Random(5);
-            //The buffer pool is a source of raw memory blobs for the engine to use.
-            BufferPool = new BufferPool();
-
-            Radii = new List<float>();
-            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(20, 10, 250), 55, 0.4f);
-
-           
-            Box = new CubePrimitive(GraphicsDevice, 10f, Color.Red);
-            Sphere = new SpherePrimitive(GraphicsDevice, 1f, 16);
-
             CanShoot = true;
-
-            SphereHandles = new List<BodyHandle>();
-            BoxHandles = new List<BodyHandle>();
-
-            
-            var targetThreadCount = Math.Max(1, Environment.ProcessorCount > 4 ? Environment.ProcessorCount - 2 : Environment.ProcessorCount - 1);
-            ThreadDispatcher = new SimpleThreadDispatcher(targetThreadCount);
-
 
             base.Initialize();
         }
@@ -94,6 +75,27 @@ namespace TGC.MonoGame.Samples.Samples.Physics
         /// <inheritdoc />
         protected override void LoadContent()
         {
+            Random = new Random(5);
+
+            //The buffer pool is a source of raw memory blobs for the engine to use.
+            BufferPool = new BufferPool();
+
+            Radii = new List<float>();
+            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(20, 10, 250), 55, 0.4f);
+
+
+            Box = new CubePrimitive(GraphicsDevice, 10f, Color.Red);
+            Sphere = new SpherePrimitive(GraphicsDevice, 1f, 16);
+
+            SphereHandles = new List<BodyHandle>();
+            BoxHandles = new List<BodyHandle>();
+
+
+            var targetThreadCount = Math.Max(1, Environment.ProcessorCount > 4 ? Environment.ProcessorCount - 2 : Environment.ProcessorCount - 1);
+            ThreadDispatcher = new SimpleThreadDispatcher(targetThreadCount);
+
+
+
             // This are meshes/model/primitives collections to render
             //The PositionFirstTimestepper is the simplest timestepping mode, but since it integrates velocity into position at the start of the frame, directly modified velocities outside of the timestep
             //will be integrated before collision detection or the solver has a chance to intervene. That's fine in this demo. Other built-in options include the PositionLastTimestepper and the SubsteppingTimestepper.
@@ -180,9 +182,9 @@ namespace TGC.MonoGame.Samples.Samples.Physics
                 NumericVector3 position = pose.Position;
                 var quaternion = pose.Orientation;
                 Matrix world =
-                                    Matrix.CreateFromQuaternion(new Quaternion(quaternion.X, quaternion.Y, quaternion.Z,
-                                        quaternion.W)) *
-                                    Matrix.CreateTranslation(new Vector3(position.X, position.Y, position.Z));
+                    Matrix.CreateFromQuaternion(new Quaternion(quaternion.X, quaternion.Y, quaternion.Z,
+                        quaternion.W)) *
+                    Matrix.CreateTranslation(new Vector3(position.X, position.Y, position.Z));
                 BoxesWorld.Add(world);
             }
 
@@ -195,10 +197,10 @@ namespace TGC.MonoGame.Samples.Samples.Physics
                 NumericVector3 position = pose.Position;
                 var quaternion = pose.Orientation;
                 Matrix world =
-                                    Matrix.CreateScale(Radii[index]) * 
-                                    Matrix.CreateFromQuaternion(new Quaternion(quaternion.X, quaternion.Y, quaternion.Z,
-                                        quaternion.W)) *
-                                    Matrix.CreateTranslation(new Vector3(position.X, position.Y, position.Z));
+                    Matrix.CreateScale(Radii[index]) * 
+                    Matrix.CreateFromQuaternion(new Quaternion(quaternion.X, quaternion.Y, quaternion.Z,
+                        quaternion.W)) *
+                    Matrix.CreateTranslation(new Vector3(position.X, position.Y, position.Z));
                 SpheresWorld.Add(world);
             }
 
@@ -226,6 +228,10 @@ namespace TGC.MonoGame.Samples.Samples.Physics
             //Here, we dispose it, but it's not really required; we immediately thereafter clear the BufferPool of all held memory.
             //Note that failing to dispose buffer pools can result in memory leaks.
             Simulation.Dispose();
+
+            BufferPool.Clear();
+
+            ThreadDispatcher.Dispose();
 
             base.UnloadContent();
         }
