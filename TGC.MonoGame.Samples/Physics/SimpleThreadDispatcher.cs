@@ -8,80 +8,55 @@ namespace TGC.MonoGame.Samples.Physics
 {
     public class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
     {
-        private readonly BufferPool[] bufferPools;
-        private int completedWorkerCounter;
+        int threadCount;
+        public int ThreadCount => threadCount;
+        struct Worker
+        {
+            public Thread Thread;
+            public AutoResetEvent Signal;
+        }
 
-        private volatile bool disposed;
-        private readonly AutoResetEvent finished;
+        Worker[] workers;
+        AutoResetEvent finished;
 
-        private volatile Action<int> workerBody;
-        private int workerIndex;
-
-        private readonly Worker[] workers;
+        BufferPool[] bufferPools;
 
         public SimpleThreadDispatcher(int threadCount)
         {
-            ThreadCount = threadCount;
+            this.threadCount = threadCount;
             workers = new Worker[threadCount - 1];
-            for (var i = 0; i < workers.Length; ++i)
+            for (int i = 0; i < workers.Length; ++i)
             {
-                workers[i] = new Worker {Thread = new Thread(WorkerLoop), Signal = new AutoResetEvent(false)};
+                workers[i] = new Worker { Thread = new Thread(WorkerLoop), Signal = new AutoResetEvent(false) };
                 workers[i].Thread.IsBackground = true;
                 workers[i].Thread.Start(workers[i].Signal);
             }
-
             finished = new AutoResetEvent(false);
             bufferPools = new BufferPool[threadCount];
-            for (var i = 0; i < bufferPools.Length; ++i) bufferPools[i] = new BufferPool();
-        }
-
-        public void Dispose()
-        {
-            if (!disposed)
+            for (int i = 0; i < bufferPools.Length; ++i)
             {
-                disposed = true;
-                SignalThreads();
-                for (var i = 0; i < bufferPools.Length; ++i) bufferPools[i].Clear();
-                foreach (var worker in workers)
-                {
-                    worker.Thread.Join();
-                    worker.Signal.Dispose();
-                }
+                bufferPools[i] = new BufferPool();
             }
         }
 
-        public int ThreadCount { get; }
-
-        public void DispatchWorkers(Action<int> workerBody)
-        {
-            Debug.Assert(this.workerBody == null);
-            workerIndex =
-                1; //Just make the inline thread worker 0. While the other threads might start executing first, the user should never rely on the dispatch order.
-            completedWorkerCounter = 0;
-            this.workerBody = workerBody;
-            SignalThreads();
-            //Calling thread does work. No reason to spin up another worker and block this one!
-            DispatchThread(0);
-            finished.WaitOne();
-            this.workerBody = null;
-        }
-
-        public BufferPool GetThreadMemoryPool(int workerIndex)
-        {
-            return bufferPools[workerIndex];
-        }
-
-        private void DispatchThread(int workerIndex)
+        void DispatchThread(int workerIndex)
         {
             Debug.Assert(workerBody != null);
             workerBody(workerIndex);
 
-            if (Interlocked.Increment(ref completedWorkerCounter) == ThreadCount) finished.Set();
+            if (Interlocked.Increment(ref completedWorkerCounter) == threadCount)
+            {
+                finished.Set();
+            }
         }
 
-        private void WorkerLoop(object untypedSignal)
+        volatile Action<int> workerBody;
+        int workerIndex;
+        int completedWorkerCounter;
+
+        void WorkerLoop(object untypedSignal)
         {
-            var signal = (AutoResetEvent) untypedSignal;
+            var signal = (AutoResetEvent)untypedSignal;
             while (true)
             {
                 signal.WaitOne();
@@ -91,15 +66,50 @@ namespace TGC.MonoGame.Samples.Physics
             }
         }
 
-        private void SignalThreads()
+        void SignalThreads()
         {
-            for (var i = 0; i < workers.Length; ++i) workers[i].Signal.Set();
+            for (int i = 0; i < workers.Length; ++i)
+            {
+                workers[i].Signal.Set();
+            }
         }
 
-        private struct Worker
+        public void DispatchWorkers(Action<int> workerBody)
         {
-            public Thread Thread;
-            public AutoResetEvent Signal;
+            Debug.Assert(this.workerBody == null);
+            workerIndex = 1; //Just make the inline thread worker 0. While the other threads might start executing first, the user should never rely on the dispatch order.
+            completedWorkerCounter = 0;
+            this.workerBody = workerBody;
+            SignalThreads();
+            //Calling thread does work. No reason to spin up another worker and block this one!
+            DispatchThread(0);
+            finished.WaitOne();
+            this.workerBody = null;
+        }
+
+        volatile bool disposed;
+        public void Dispose()
+        {
+            if (!disposed)
+            {
+                disposed = true;
+                SignalThreads();
+                for (int i = 0; i < bufferPools.Length; ++i)
+                {
+                    bufferPools[i].Clear();
+                }
+                foreach (var worker in workers)
+                {
+                    worker.Thread.Join();
+                    worker.Signal.Dispose();
+                }
+            }
+        }
+
+        public BufferPool GetThreadMemoryPool(int workerIndex)
+        {
+            return bufferPools[workerIndex];
         }
     }
+
 }
