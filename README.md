@@ -26,10 +26,12 @@ dotnet build
 dotnet run --project TGC.MonoGame.Samples
 ```
 
-### General problems in [MGCB Editor](https://docs.monogame.net/articles/tools/mgcb_editor.html)
+### Known issues
+
+#### [MGCB Editor](https://docs.monogame.net/articles/tools/mgcb_editor.html)
 * Open Asset Import Library with Obj and Dae fails, you have to change it to Fbx importer.
 
-#### Windows 10 Problems
+#### Windows 10
 * Unable to load DLL 'freetype6.dll' - Install [Microsoft Visual C++ Redistributable 2012](https://www.microsoft.com/en-us/download/details.aspx?id=30679)
 * Unable to load DLL 'libmojoshader_64.dll' - Install [Microsoft Visual C++ Redistributable 2013](https://aka.ms/highdpimfc2013x64enu)
 * Unable to load DLL 'FreeImage' - Install [Microsoft Visual C++ Redistributable for Visual Studio 2015, 2017 and 2019](https://aka.ms/vs/16/release/vc_redist.x64.exe)
