@@ -4,7 +4,7 @@ using System.Threading;
 using BepuUtilities;
 using BepuUtilities.Memory;
 
-namespace TGC.MonoGame.Samples.Physics
+namespace TGC.MonoGame.Samples.Physics.Bepu
 {
     public class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
     {

@@ -12,7 +12,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
     ///     Units Involved:
     ///     # Unit 3 - 3D Basics - Transformations
     ///     Shows how to concatenate transformations to generate movements of planets in the solar system.
-    ///     Author: Matias Leone, Leandro Barbagallo.
+    ///     Authors: Matias Leone, Leandro Barbagallo.
     /// </summary>
     public class SolarSystem : TGCSample
     {
