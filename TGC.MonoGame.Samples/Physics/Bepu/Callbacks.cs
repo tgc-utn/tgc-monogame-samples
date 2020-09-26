@@ -1,15 +1,13 @@
-﻿using BepuPhysics;
+﻿using System;
+using System.Numerics;
+using System.Runtime.CompilerServices;
+using BepuPhysics;
 using BepuPhysics.Collidables;
 using BepuPhysics.CollisionDetection;
 using BepuPhysics.Constraints;
 using BepuUtilities;
-using System;
-using System.Collections.Generic;
-using System.Numerics;
-using System.Runtime.CompilerServices;
-using System.Text;
 
-namespace TGC.MonoGame.Samples.Physics
+namespace TGC.MonoGame.Samples.Physics.Bepu
 {
     public struct PoseIntegratorCallbacks : IPoseIntegratorCallbacks
     {

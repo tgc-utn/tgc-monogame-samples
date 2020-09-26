@@ -1,71 +1,76 @@
-﻿using BepuPhysics;
+﻿using System;
+using System.Collections.Generic;
+using BepuPhysics;
 using BepuPhysics.Collidables;
 using BepuUtilities.Memory;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
-using TGC.MonoGame.Samples.Physics;
+using TGC.MonoGame.Samples.Physics.Bepu;
 using TGC.MonoGame.Samples.Viewer;
 using NumericVector3 = System.Numerics.Vector3;
 using NumericQuaternion = System.Numerics.Quaternion;
 
-namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
+namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
 {
-    public class BoxPyramid : TGCSample
+    /// <summary>
+    ///     Pyramid Of Boxes:
+    ///     Ported sample from bepu physics 2
+    ///     https://github.com/bepu/bepuphysics2/blob/master/Demos/Demos/PyramidDemo.cs
+    ///     Author: Ronán Ariel Vinitzca.
+    /// </summary>
+    public class PyramidOfBoxes : TGCSample
     {
+        private List<Matrix> ActiveBoxesWorld;
+
+        private List<BodyHandle> BoxHandles;
+
+        private Camera Camera;
+
+        private bool CanShoot = true;
+
+        private CubePrimitive cubePrimitive;
+
+        private List<Matrix> InactiveBoxesWorld;
+
+        private List<float> Radii;
+
+        private Random Random;
+
+        private List<BodyHandle> SphereHandles;
+
+        private SpherePrimitive spherePrimitive;
+
+        private List<Matrix> SpheresWorld;
+
+        public PyramidOfBoxes(TGCViewer game) : base(game)
+        {
+            Category = TGCSampleCategory.Physics;
+            Name = "BepuPhysics - Pyramid of boxes";
+            Description = "A pyramid of boxes, because you can't have a physics engine without pyramids of boxes.";
+        }
+
         /// <summary>
-        /// Gets the simulation created by the demo's Initialize call.
+        ///     Gets the simulation created by the demo's Initialize call.
         /// </summary>
         public Simulation Simulation { get; protected set; }
 
         //Note that the buffer pool used by the simulation is not considered to be *owned* by the simulation. The simulation merely uses the pool.
         //Disposing the simulation will not dispose or clear the buffer pool.
         /// <summary>
-        /// Gets the buffer pool used by the demo's simulation.
+        ///     Gets the buffer pool used by the demo's simulation.
         /// </summary>
         public BufferPool BufferPool { get; private set; }
 
         /// <summary>
-        /// Gets the thread dispatcher available for use by the simulation.
+        ///     Gets the thread dispatcher available for use by the simulation.
         /// </summary>
         public SimpleThreadDispatcher ThreadDispatcher { get; private set; }
 
-        private CubePrimitive cubePrimitive;
-
-        private Camera Camera;
-
-        private List<BodyHandle> BoxHandles;
-
-        private List<Matrix> ActiveBoxesWorld;
-
-        private List<Matrix> InactiveBoxesWorld;
-
-        private List<Matrix> SpheresWorld;
-
-        private bool CanShoot = true;
-
-        private Random Random;
-
-        private List<float> Radii;
-
-        private List<BodyHandle> SphereHandles;
-
-        private SpherePrimitive spherePrimitive;
-
-        public BoxPyramid(TGCViewer game) : base(game)
-        {
-            Category = TGCSampleCategory.Physics;
-            Name = "BepuPhysics 3 - Boxes demo";
-            Description = "Spawning boxes dinamically.";
-        }
-
         public override void Initialize()
         {
-
             BufferPool = new BufferPool();
             //Generally, shoving as many threads as possible into the simulation won't produce the best results on systems with multiple logical cores per physical core.
             //Environment.ProcessorCount reports logical core count only, so we'll use a simple heuristic here- it'll leave one or two logical cores idle.
@@ -79,23 +84,22 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
             //there won't be enough memory bandwidth to even feed half the physical cores. Using all 128 logical cores would just add overhead.
 
             //It may be worth using something like hwloc to extract extra information to reason about.
-            var targetThreadCount = Math.Max(1, Environment.ProcessorCount > 4 ? Environment.ProcessorCount - 2 : Environment.ProcessorCount - 1);
+            var targetThreadCount = Math.Max(1,
+                Environment.ProcessorCount > 4 ? Environment.ProcessorCount - 2 : Environment.ProcessorCount - 1);
             ThreadDispatcher = new SimpleThreadDispatcher(targetThreadCount);
-            
-            
 
             var size = GraphicsDevice.Viewport.Bounds.Size;
             size.X /= 2;
             size.Y /= 2;
-            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 50, 50), size);
-
+            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 40, 200), size);
 
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
-            Simulation = Simulation.Create(BufferPool, new NarrowPhaseCallbacks(), new PoseIntegratorCallbacks(new NumericVector3(0, -10, 0)), new PositionFirstTimestepper());
+            Simulation = Simulation.Create(BufferPool, new NarrowPhaseCallbacks(),
+                new PoseIntegratorCallbacks(new NumericVector3(0, -10, 0)), new PositionFirstTimestepper());
 
             SphereHandles = new List<BodyHandle>();
             ActiveBoxesWorld = new List<Matrix>();
@@ -109,18 +113,18 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
             boxShape.ComputeInertia(1, out var boxInertia);
             var boxIndex = Simulation.Shapes.Add(boxShape);
             const int pyramidCount = 40;
-            for (int pyramidIndex = 0; pyramidIndex < pyramidCount; ++pyramidIndex)
+            for (var pyramidIndex = 0; pyramidIndex < pyramidCount; ++pyramidIndex)
             {
                 const int rowCount = 20;
-                for (int rowIndex = 0; rowIndex < rowCount; ++rowIndex)
+                for (var rowIndex = 0; rowIndex < rowCount; ++rowIndex)
                 {
-                    int columnCount = rowCount - rowIndex;
-                    for (int columnIndex = 0; columnIndex < columnCount; ++columnIndex)
+                    var columnCount = rowCount - rowIndex;
+                    for (var columnIndex = 0; columnIndex < columnCount; ++columnIndex)
                     {
-                        var bh = Simulation.Bodies.Add(BodyDescription.CreateDynamic(new NumericVector3(
-                            (-columnCount * 0.5f + columnIndex) * boxShape.Width,
-                            (rowIndex + 0.5f) * boxShape.Height,
-                            (pyramidIndex - pyramidCount * 0.5f) * (boxShape.Length + 4)),
+                        var bh = Simulation.Bodies.Add(BodyDescription.CreateDynamic(
+                            new NumericVector3((-columnCount * 0.5f + columnIndex) * boxShape.Width,
+                                (rowIndex + 0.5f) * boxShape.Height,
+                                (pyramidIndex - pyramidCount * 0.5f) * (boxShape.Length + 4)),
                             boxInertia,
                             new CollidableDescription(boxIndex, 0.1f),
                             new BodyActivityDescription(0.01f)));
@@ -129,36 +133,31 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
                 }
             }
 
-
             //Prevent the boxes from falling into the void.
-            Simulation.Statics.Add(new StaticDescription(new NumericVector3(0, -0.5f, 0), new CollidableDescription(Simulation.Shapes.Add(new Box(2500, 1, 2500)), 0.1f)));
+            Simulation.Statics.Add(new StaticDescription(new NumericVector3(0, -0.5f, 0),
+                new CollidableDescription(Simulation.Shapes.Add(new Box(2500, 1, 2500)), 0.1f)));
 
             cubePrimitive = new CubePrimitive(GraphicsDevice, 1f, Color.White);
 
-            spherePrimitive = new SpherePrimitive(GraphicsDevice, 1f, 16);
+            spherePrimitive = new SpherePrimitive(GraphicsDevice);
 
-            int count = BoxHandles.Count;
+            var count = BoxHandles.Count;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            for (int index = 0; index < count; index++)
+            for (var index = 0; index < count; index++)
             {
                 var bodyHandle = BoxHandles[index];
                 var bodyReference = Simulation.Bodies.GetBodyReference(bodyHandle);
-                NumericVector3 position = bodyReference.Pose.Position;
-                NumericQuaternion quaternion = bodyReference.Pose.Orientation;
-                Matrix world =
-                                Matrix.CreateFromQuaternion(new Quaternion(quaternion.X, quaternion.Y, quaternion.Z,
-                                    quaternion.W)) *
-                                Matrix.CreateTranslation(new Vector3(position.X, position.Y, position.Z));
+                var position = bodyReference.Pose.Position;
+                var quaternion = bodyReference.Pose.Orientation;
+                var world =
+                    Matrix.CreateFromQuaternion(new Quaternion(quaternion.X, quaternion.Y, quaternion.Z,
+                        quaternion.W)) * Matrix.CreateTranslation(new Vector3(position.X, position.Y, position.Z));
 
                 cubePrimitive.Draw(world, Camera.View, Camera.Projection);
             }
 
-
-
-
             base.LoadContent();
         }
-
 
         public override void Update(GameTime gameTime)
         {
@@ -173,13 +172,11 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
             //Note that taking steps of variable length can reduce stability. Gradual or one-off changes can work reasonably well.
             Simulation.Timestep(1 / 60f, ThreadDispatcher);
 
-
-
             if (Game.CurrentKeyboardState.IsKeyDown(Keys.Z) && CanShoot)
             {
                 CanShoot = false;
                 //Create the shape that we'll launch at the pyramids when the user presses a button.
-                var radius = 0.5f + 5 * (float)Random.NextDouble();
+                var radius = 0.5f + 5 * (float) Random.NextDouble();
                 var bulletShape = new Sphere(radius);
 
                 //Note that the use of radius^3 for mass can produce some pretty serious mass ratios. 
@@ -191,7 +188,7 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
                 //#2 and #3 can become very expensive. In pathological cases, it can end up slower than using a quality-focused solver for the same simulation.
                 //Unfortunately, at the moment, bepuphysics v2 does not contain any alternative solvers, so if you can't afford to brute force the the problem away,
                 //the best solution is to cheat as much as possible to avoid the corner cases.
-                Vector3 velocity = Camera.FrontDirection * 30f;
+                var velocity = Camera.FrontDirection * 30f;
                 var position = new NumericVector3(Camera.Position.X, Camera.Position.Y, Camera.Position.Z);
                 var bodyDescription = BodyDescription.CreateConvexDynamic(position,
                     new BodyVelocity(new NumericVector3(velocity.X, velocity.Y, velocity.Z)),
@@ -207,36 +204,34 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
 
             ActiveBoxesWorld.Clear();
             InactiveBoxesWorld.Clear();
-            int count = BoxHandles.Count;
-            for (int index = 0; index < count; index++)
+            var count = BoxHandles.Count;
+            for (var index = 0; index < count; index++)
             {
                 var bodyHandle = BoxHandles[index];
                 var bodyReference = Simulation.Bodies.GetBodyReference(bodyHandle);
-                NumericVector3 position = bodyReference.Pose.Position;
-                NumericQuaternion quaternion = bodyReference.Pose.Orientation;
-                Matrix world =
-                                Matrix.CreateFromQuaternion(new Quaternion(quaternion.X, quaternion.Y, quaternion.Z,
-                                    quaternion.W)) *
-                                Matrix.CreateTranslation(new Vector3(position.X, position.Y, position.Z));
+                var position = bodyReference.Pose.Position;
+                var quaternion = bodyReference.Pose.Orientation;
+                var world =
+                    Matrix.CreateFromQuaternion(new Quaternion(quaternion.X, quaternion.Y, quaternion.Z,
+                        quaternion.W)) * Matrix.CreateTranslation(new Vector3(position.X, position.Y, position.Z));
 
-                if(bodyReference.Awake)
+                if (bodyReference.Awake)
                     ActiveBoxesWorld.Add(world);
                 else
                     InactiveBoxesWorld.Add(world);
             }
 
             SpheresWorld.Clear();
-            int sphereCount = SphereHandles.Count;
-            for (int index = 0; index < sphereCount; index++)
+            var sphereCount = SphereHandles.Count;
+            for (var index = 0; index < sphereCount; index++)
             {
                 var bodyHandle = SphereHandles[index];
                 var bodyReference = Simulation.Bodies.GetBodyReference(bodyHandle);
-                NumericVector3 position = bodyReference.Pose.Position;
-                NumericQuaternion quaternion = bodyReference.Pose.Orientation;
-                Matrix world =
-                                Matrix.CreateFromQuaternion(new Quaternion(quaternion.X, quaternion.Y, quaternion.Z,
-                                    quaternion.W)) *
-                                Matrix.CreateTranslation(new Vector3(position.X, position.Y, position.Z));
+                var position = bodyReference.Pose.Position;
+                var quaternion = bodyReference.Pose.Orientation;
+                var world =
+                    Matrix.CreateFromQuaternion(new Quaternion(quaternion.X, quaternion.Y, quaternion.Z,
+                        quaternion.W)) * Matrix.CreateTranslation(new Vector3(position.X, position.Y, position.Z));
                 SpheresWorld.Add(world);
             }
 
@@ -246,7 +241,7 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
 
         public override void Draw(GameTime gameTime)
         {
-            int count = BoxHandles.Count;
+            var count = BoxHandles.Count;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             cubePrimitive.Effect.DiffuseColor = new Vector3(1f, 0f, 0f);
