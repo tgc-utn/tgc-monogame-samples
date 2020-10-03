@@ -23,14 +23,21 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps
 
         private BasicEffect Effect { get; set; }
         private Texture2D TerrainTexture { get; set; }
-        private VertexBuffer VertexBufferTerrain { get; set; }
+        private VertexBuffer TerrainVertexBuffer { get; set; }
+
+        private IndexBuffer TerrainIndexBuffer { get; set; }
+
         private Camera Camera { get; set; }
+
+        // Triangle count in this case
+        private int PrimitiveCount { get; set; }
 
         /// <inheritdoc />
         public override void Initialize()
         {
-            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(1500f, 450f, 3000f), 200, 0.5f,
+            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0f, 1000f, 0f), 400, 1.0f,
                 1, 5000);
+
 
             base.Initialize();
         }
@@ -41,9 +48,9 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps
             // Heightmap texture of the terrain.
             var currentHeightmap = Game.Content.Load<Texture2D>(ContentFolderTextures + "heightmaps/heightmap-3");
 
-            var currentScaleXZ = 50f;
-            var currentScaleY = 1.5f;
-            CreateHeightMapMesh(currentHeightmap, currentScaleXZ, currentScaleY);
+            var scaleXZ = 50f;
+            var scaleY = 4f;
+            CreateHeightMapMesh(currentHeightmap, scaleXZ, scaleY);
 
             // Terrain texture.
             TerrainTexture = Game.Content.Load<Texture2D>(ContentFolderTextures + "heightmaps/terrain-texture-3");
@@ -72,7 +79,8 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps
         {
             Game.Background = Color.Black;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            GraphicsDevice.SetVertexBuffer(VertexBufferTerrain);
+            GraphicsDevice.SetVertexBuffer(TerrainVertexBuffer);
+            GraphicsDevice.Indices = TerrainIndexBuffer;
 
             // Render terrain.
             Effect.View = Camera.View;
@@ -81,13 +89,14 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps
             foreach (var pass in Effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, VertexBufferTerrain.VertexCount / 3);
+                GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, PrimitiveCount);
             }
 
             AxisLines.Draw(Camera.View, Camera.Projection);
 
             base.Draw(gameTime);
         }
+
 
         /// <summary>
         ///     Create and load the VertexBuffer based on a Heightmap texture.
@@ -98,79 +107,144 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps
         private void CreateHeightMapMesh(Texture2D texture, float scaleXZ, float scaleY)
         {
             // Parse bitmap and load height matrix.
-            var heightmap = LoadHeightMap(texture);
+            float[,] heightMap = LoadHeightMap(texture);
 
-            // Gets the number of vertices the terrain has.
-            var totalVertices = 2 * 3 * (heightmap.GetLength(0) - 1) * (heightmap.GetLength(1) - 1);
 
-            // Create temporary array of vertices.
-            var dataIdx = 0;
-            var data = new VertexPositionTexture[totalVertices];
+            CreateVertexBuffer(heightMap, scaleXZ, scaleY);
 
-            // Iterate over the entire Heightmap matrix and create the necessary triangles for the terrain.
-            for (var i = 0; i < heightmap.GetLength(0) - 1; i++)
-            for (var j = 0; j < heightmap.GetLength(1) - 1; j++)
-            {
-                // Create the four vertices that make up this quadrant, applying the corresponding scale.
-                var v1 = new Vector3(i * scaleXZ, heightmap[i, j] * scaleY, j * scaleXZ);
-                var v2 = new Vector3(i * scaleXZ, heightmap[i, j + 1] * scaleY, (j + 1) * scaleXZ);
-                var v3 = new Vector3((i + 1) * scaleXZ, heightmap[i + 1, j] * scaleY, j * scaleXZ);
-                var v4 = new Vector3((i + 1) * scaleXZ, heightmap[i + 1, j + 1] * scaleY, (j + 1) * scaleXZ);
+            int heightMapWidthMinusOne = heightMap.GetLength(0) - 1;
+            int heightMapLengthMinusOne = heightMap.GetLength(1) - 1;
 
-                // Create the texture coordinates for the four vertices of the quadrant.
-                var t1 = new Vector2(i / (float) heightmap.GetLength(0), j / (float) heightmap.GetLength(1));
-                var t2 = new Vector2(i / (float) heightmap.GetLength(0), (j + 1) / (float) heightmap.GetLength(1));
-                var t3 = new Vector2((i + 1) / (float) heightmap.GetLength(0), j / (float) heightmap.GetLength(1));
-                var t4 = new Vector2((i + 1) / (float) heightmap.GetLength(0),
-                    (j + 1) / (float) heightmap.GetLength(1));
+            PrimitiveCount = 2 * heightMapWidthMinusOne * heightMapLengthMinusOne;
 
-                // Load first triangle.
-                data[dataIdx] = new VertexPositionTexture(v1, t1);
-                data[dataIdx + 1] = new VertexPositionTexture(v2, t2);
-                data[dataIdx + 2] = new VertexPositionTexture(v4, t4);
-
-                // Load second triangle.
-                data[dataIdx + 3] = new VertexPositionTexture(v1, t1);
-                data[dataIdx + 4] = new VertexPositionTexture(v4, t4);
-                data[dataIdx + 5] = new VertexPositionTexture(v3, t3);
-
-                dataIdx += 6;
-            }
-
-            // Fill the entire VertexBuffer with the temporary array.
-            VertexBufferTerrain = new VertexBuffer(GraphicsDevice, typeof(VertexPositionTexture), totalVertices,
-                BufferUsage.WriteOnly);
-            VertexBufferTerrain.SetData(data);
+            CreateIndexBuffer(heightMapWidthMinusOne, heightMapLengthMinusOne);
         }
 
         /// <summary>
         ///     Load Bitmap and get the grayscale value of Y for each coordinate (x, z).
         /// </summary>
         /// <param name="texture">The Heightmap texture.</param>
-        /// <returns>The height of each vertex.</returns>
-        private int[,] LoadHeightMap(Texture2D texture)
+        /// <returns>The height of each vertex from zero to one.</returns>
+        private float[,] LoadHeightMap(Texture2D texture)
         {
-            var rawData = new Color[texture.Width * texture.Height];
-            texture.GetData(rawData);
-            var heightmap = new int[texture.Width, texture.Height];
-            for (var i = 0; i < texture.Width; i++)
-            for (var j = 0; j < texture.Height; j++)
-            {
-                // Get the color.
-                // (j, i) inverted to sweep rows first and then columns.
-                var pixel = rawData[j * texture.Width + i];
-                // Calculate intensity in grayscale.
-                var intensity = pixel.R * 0.299f + pixel.G * 0.587f + pixel.B * 0.114f;
-                heightmap[i, j] = (int) intensity;
-            }
+            Color[] texels = new Color[texture.Width * texture.Height];
+            
+            // Obtains each texel color from the texture, note that this is an expensive operation
+            texture.GetData(texels);
+
+            float[,] heightmap = new float[texture.Width, texture.Height];
+            for (var x = 0; x < texture.Width; x++)
+                for (var y = 0; y < texture.Height; y++)
+                {
+                    // Get the color.
+                    // (j, i) inverted to sweep rows first and then columns.
+                    Color texel = texels[y * texture.Width + x];
+                    // Calculate intensity in grayscale.
+                    //var intensity = texel.R * 0.299f + texel.G * 0.587f + texel.B * 0.114f;
+                    heightmap[x, y] = texel.R;
+                }
 
             return heightmap;
+        }
+
+        /// <summary>
+        ///     Create a Vertex Buffer from a HeightMap
+        /// </summary>
+        /// <param name="heightMap">The Heightmap which specifies height for each vertex</param>
+        /// <param name="scaleXZ">The distance between the vertices in both the X and Z axis</param>
+        /// <param name="scaleY">The scale in the Y axis for the vertices of the HeightMap</param>
+        private void CreateVertexBuffer(float[,] heightMap, float scaleXZ, float scaleY)
+        {
+            int heightMapWidth = heightMap.GetLength(0);
+            int heightMapLength = heightMap.GetLength(1);
+
+            float offsetX = heightMapWidth * scaleXZ * 0.5f;
+            float offsetZ = heightMapLength * scaleXZ * 0.5f;
+
+            // Amount of subdivisions in X times amount of subdivisions in Z.
+            int vertexCount = heightMapWidth * heightMapLength;
+
+            // Create temporary array of vertices.
+            VertexPositionTexture[] vertices = new VertexPositionTexture[vertexCount];
+
+            int index = 0;
+            Vector3 position;
+            Vector2 textureCoordinates;
+
+            for (int x = 0; x < heightMapWidth; x++)
+                for (int z = 0; z < heightMapLength; z++)
+                {
+                    position = new Vector3(x * scaleXZ - offsetX, heightMap[x, z] * scaleY, z * scaleXZ - offsetZ);
+                    textureCoordinates = new Vector2((float)x / heightMapWidth, (float)z / heightMapLength);
+                    vertices[index] = new VertexPositionTexture(position, textureCoordinates);
+                    index++;
+                }
+
+            // Create the actual vertex buffer
+            TerrainVertexBuffer = new VertexBuffer(GraphicsDevice, VertexPositionTexture.VertexDeclaration, vertexCount, BufferUsage.None);
+            TerrainVertexBuffer.SetData(vertices);
+        }
+
+
+        /// <summary>
+        ///     Create an Index Buffer for a tesselated plane
+        /// </summary>
+        /// <param name="quadsInX">The amount of quads in the X axis</param>
+        /// <param name="quadsInZ">The amount of quads in the Z axis</param>
+        private void CreateIndexBuffer(int quadsInX, int quadsInZ)
+        {
+            int indexCount = 3 * 2 * quadsInX * quadsInZ;
+
+            ushort[] indices = new ushort[indexCount];
+            int index = 0;
+
+            int right;
+            int top;
+            int bottom;
+
+            int vertexCountX = quadsInX + 1;
+            for (int x = 0; x < quadsInX; x++)
+                for (int z = 0; z < quadsInZ; z++)
+                {
+                    right = x + 1;
+                    bottom = z * vertexCountX;
+                    top = (z + 1) * vertexCountX;
+
+                    //  D __ C  
+                    //   | /|
+                    //   |/_|
+                    //  A    B
+
+                    ushort A = (ushort)(x + bottom);
+                    ushort B = (ushort)(right + bottom);
+                    ushort C = (ushort)(right + top);
+                    ushort D = (ushort)(x + top);
+
+                    // ACB
+                    indices[index] = A;
+                    index++;
+                    indices[index] = C;
+                    index++;
+                    indices[index] = B;
+                    index++;
+
+                    // ADC
+                    indices[index] = A;
+                    index++;
+                    indices[index] = D;
+                    index++;
+                    indices[index] = C;
+                    index++;
+                }
+
+            TerrainIndexBuffer = new IndexBuffer(GraphicsDevice, IndexElementSize.SixteenBits, indexCount, BufferUsage.None);
+            TerrainIndexBuffer.SetData(indices);
         }
 
         /// <inheritdoc />
         protected override void UnloadContent()
         {
-            VertexBufferTerrain.Dispose();
+            TerrainVertexBuffer.Dispose();
 
             base.UnloadContent();
         }
