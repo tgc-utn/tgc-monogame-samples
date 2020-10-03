@@ -1,0 +1,103 @@
+﻿
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.IO;
+using System.Reflection;
+using TGC.MonoGame.Samples.Geometries;
+using TGC.MonoGame.Samples.Viewer;
+
+namespace TGC.MonoGame.Samples.Samples.Shaders
+{
+    /// <summary>
+    ///     Shader Visualizer
+    ///     Reloads and compiles a shader file in runtime
+    /// </summary>
+    public class ShaderVisualizer : TGCSample
+    {
+        private readonly static string ShaderName = "ShaderVisualizer";
+
+
+        private FullScreenQuad Quad { get; set; }
+
+        private Effect Effect { get; set; }
+
+        private ShaderReloader ShaderReloader { get; set; }
+
+
+        /// <inheritdoc />
+        public ShaderVisualizer(TGCViewer game) : base(game)
+        {
+            Category = TGCSampleCategory.Shaders;
+            Name = "Shader Visualizer";
+            Description = "Shader Visualizer. Reloads and compiles a shader file in runtime.";
+        }
+
+        /// <inheritdoc />
+        protected override void LoadContent()
+        {
+            Quad = new FullScreenQuad(GraphicsDevice);
+
+            Effect = Game.Content.Load<Effect>(ContentFolderEffects + ShaderName);
+
+            string projectDirectory = FindProjectDirectory();
+            ShaderReloader = new ShaderReloader(projectDirectory + @"/Content/" + ContentFolderEffects + ShaderName + ".fx", GraphicsDevice);
+            ShaderReloader.OnCompile += OnShaderCompile;
+
+            // Make the window squared
+            Game.Graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 100;
+            Game.Graphics.ApplyChanges();
+
+            base.LoadContent();
+        }
+
+        private void OnShaderCompile(Effect effect)
+        {
+            Effect.Dispose();
+            Effect = effect;
+        }
+
+        private string FindProjectDirectory()
+        {
+            string rootDirectory;
+            if (Assembly.GetEntryAssembly() != null)
+                rootDirectory = Assembly.GetEntryAssembly().GetName().Name;
+            else
+                rootDirectory = Assembly.GetExecutingAssembly().GetName().Name;
+
+            var environment = Environment.CurrentDirectory;
+
+            var actual = new DirectoryInfo(environment);
+            while (actual.Name.CompareTo(rootDirectory) != 0)
+            {
+                actual = actual.Parent;
+                if (actual == null)
+                    throw new DirectoryNotFoundException("Cannot find the project root");
+            }
+            return actual.FullName;
+        }
+
+        /// <inheritdoc />
+        public override void Draw(GameTime gameTime)
+        {
+            Effect.Parameters["Time"]?.SetValue((float)gameTime.TotalGameTime.TotalSeconds);
+            Quad.Draw(Effect);
+            base.Draw(gameTime);
+        }
+
+        /// <inheritdoc />
+        protected override void UnloadContent()
+        {
+            base.UnloadContent();
+            Quad.Dispose();
+            ShaderReloader.Dispose();
+            Effect.Dispose();
+            
+            // Restore window width
+            Game.Graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width - 100;
+            Game.Graphics.ApplyChanges();
+        }
+
+
+    }
+}

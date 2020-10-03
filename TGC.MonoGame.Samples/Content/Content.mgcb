@@ -175,6 +175,12 @@
 /processorParam:DebugMode=Auto
 /build:Effects/GaussianBlur.fx
 
+#begin Effects/ShaderVisualizer.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/ShaderVisualizer.fx
+
 #begin Effects/ShadowMap.fx
 /importer:EffectImporter
 /processor:EffectProcessor
