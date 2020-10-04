@@ -2,16 +2,16 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
 
-namespace TGC.MonoGame.Samples.Samples.Shaders.ComboRata
+namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
 {
     /// <summary>
-    ///     Basic Shader:
-    ///     Units Involved:
-    ///     # Unit 8 - Video Adapters - Shaders.
-    ///     Basic Shader Sample. Animation by vertex shader and coloring by pixel shader.
+    ///     Combo Rata:
+    ///     A mini game with some effects.
     ///     Author: Mariano Banquiero
+    ///     TODO needs a refactor.
     /// </summary>
     public class ComboRata : TGCSample
     {
@@ -23,7 +23,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.ComboRata
         public const int ST_STAGE_5 = 5;
         public const int ST_GAME_OVER = 99;
         public const int ST_CAMBIO_NIVEL = 98;
-        public MyBoxPrimitive Box;
+        public CubePrimitive Box;
         public Effect Effect;
         public SpriteFont font;
 
@@ -38,15 +38,15 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.ComboRata
         /// <inheritdoc />
         public ComboRata(TGCViewer game) : base(game)
         {
-            Category = TGCSampleCategory.Shaders;
+            Category = TGCSampleCategory.CompleteSolutions;
             Name = "Combo Rata";
-            Description = "Basic Shader Sample. Animation by vertex shader and coloring by pixel shader.";
+            Description = "A mini game with some effects.";
         }
 
         /// <inheritdoc />
         public override void Initialize()
         {
-            Box = new MyBoxPrimitive(GraphicsDevice);
+            Box = new CubePrimitive(GraphicsDevice);
             base.Initialize();
         }
 
@@ -60,11 +60,10 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.ComboRata
             Tunel = new TunelMesh();
             Effect.Parameters["World"].SetValue(Matrix.Identity);
             var projectionMatrix =
-                Matrix.CreatePerspectiveFieldOfView(MathF.PI / 4.0f, GraphicsDevice.Viewport.AspectRatio, 50, 50000);
+                Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 50, 50000);
             Effect.Parameters["Projection"].SetValue(projectionMatrix);
             Effect.Parameters["ModelTexture"].SetValue(Texture);
-            Box.Effect = Effect;
-            font = Game.Content.Load<SpriteFont>("SpriteFonts/Arial");
+            font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "Arial");
             spriteBatch = new SpriteBatch(GraphicsDevice);
             Effect.CurrentTechnique = Effect.Techniques["ColorDrawing"];
             base.LoadContent();
@@ -146,10 +145,13 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.ComboRata
             //AxisLines.Draw(GraphicsDevice, Camera);
 
             Tunel.Draw(GraphicsDevice, Effect);
-            // debug 
-            //Box.Draw(GraphicsDevice, Tunel.PosGamer, new Vector3(40, 40, 40));
-            //Box.Draw(GraphicsDevice, Tunel.PosGamer - Tunel.ViewDir * 50, new Vector3(10, 10, 10));
-            //Box.Draw(GraphicsDevice, Tunel.PosGamer + Tunel.ViewDir * 50, new Vector3(10, 10, 10));
+            
+            // Debug
+            //var world = Matrix.CreateScale(Vector3.One * 40) * Matrix.CreateTranslation(Tunel.PosGamer);
+            //var world = Matrix.CreateScale(Vector3.One * 10) * Matrix.CreateTranslation(Tunel.PosGamer - Tunel.ViewDir * 50);
+            //var world = Matrix.CreateScale(Vector3.One * 10) * Matrix.CreateTranslation(Tunel.PosGamer + Tunel.ViewDir * 50);
+            //Effect.Parameters["World"].SetValue(world);
+            //Box.Draw(Effect);
 
             switch (status)
             {

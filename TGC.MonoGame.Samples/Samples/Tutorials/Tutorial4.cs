@@ -67,7 +67,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             Game.Background = Color.CornflowerBlue;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             AxisLines.Draw(Camera.View, Camera.Projection);
-            
+
             Box.Draw(Matrix.CreateRotationY(BoxRotation) * BoxWorld, Camera.View, Camera.Projection);
             Quad.Draw(QuadWorld, Camera.View, Camera.Projection);
 
