@@ -1,15 +1,13 @@
-﻿using BepuPhysics;
+﻿using System;
+using System.Numerics;
+using System.Runtime.CompilerServices;
+using BepuPhysics;
 using BepuPhysics.Collidables;
 using BepuPhysics.CollisionDetection;
 using BepuPhysics.Constraints;
 using BepuUtilities;
-using System;
-using System.Collections.Generic;
-using System.Numerics;
-using System.Runtime.CompilerServices;
-using System.Text;
 
-namespace TGC.MonoGame.Samples.Physics
+namespace TGC.MonoGame.Samples.Physics.Bepu
 {
     public struct PoseIntegratorCallbacks : IPoseIntegratorCallbacks
     {
@@ -62,14 +60,7 @@ namespace TGC.MonoGame.Samples.Physics
     }
     public unsafe struct NarrowPhaseCallbacks : INarrowPhaseCallbacks
     {
-        public SpringSettings ContactSpringiness;
-
-        public void Initialize(Simulation simulation)
-        {
-            //Use a default if the springiness value wasn't initialized.
-            if (ContactSpringiness.AngularFrequency == 0 && ContactSpringiness.TwiceDampingRatio == 0)
-                ContactSpringiness = new SpringSettings(30, 1);
-        }
+        public void Initialize(Simulation simulation) { }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool AllowContactGeneration(int workerIndex, CollidableReference a, CollidableReference b)
@@ -89,9 +80,12 @@ namespace TGC.MonoGame.Samples.Physics
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public unsafe bool ConfigureContactManifold<TManifold>(int workerIndex, CollidablePair pair, ref TManifold manifold, out PairMaterialProperties pairMaterial) where TManifold : struct, IContactManifold<TManifold>
         {
-            pairMaterial.FrictionCoefficient = 1f;
-            pairMaterial.MaximumRecoveryVelocity = 2f;
-            pairMaterial.SpringSettings = ContactSpringiness;
+            pairMaterial = new PairMaterialProperties 
+            {
+                FrictionCoefficient = 1, 
+                MaximumRecoveryVelocity = 2, 
+                SpringSettings = new SpringSettings(30, 1) 
+            };
             return true;
         }
 
@@ -101,8 +95,6 @@ namespace TGC.MonoGame.Samples.Physics
             return true;
         }
 
-        public void Dispose()
-        {
-        }
+        public void Dispose() { }
     }
 }

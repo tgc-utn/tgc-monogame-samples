@@ -30,9 +30,9 @@ namespace TGC.MonoGame.Samples.Geometries
         #region Fields
 
         // During the process of constructing a primitive model, vertex and index data is stored on the CPU in these managed lists.
-        private List<VertexPositionColorNormal> Vertices { get; } = new List<VertexPositionColorNormal>();
+        public List<VertexPositionColorNormal> Vertices { get; } = new List<VertexPositionColorNormal>();
 
-        private List<ushort> Indices { get; } = new List<ushort>();
+        public List<ushort> Indices { get; } = new List<ushort>();
 
         // Once all the geometry has been specified, the InitializePrimitive method copies the vertex and index data into these buffers,
         // which store it on the GPU ready for efficient rendering.
