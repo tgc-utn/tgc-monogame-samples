@@ -50,9 +50,12 @@ namespace TGC.MonoGame.Samples.Geometries
             AddIndex(CurrentVertex + 1);
             AddIndex(CurrentVertex + 2);
 
-            AddVertex(vertex1, vertexColor1);
-            AddVertex(vertex2, vertexColor2);
-            AddVertex(vertex3, vertexColor3);
+            var normal = Vector3.Cross(vertex2 - vertex1, vertex3 - vertex2);
+            normal.Normalize();
+
+            AddVertex(vertex1, vertexColor1, normal);
+            AddVertex(vertex2, vertexColor2, normal);
+            AddVertex(vertex3, vertexColor3, normal);
 
             InitializePrimitive(graphicsDevice);
         }

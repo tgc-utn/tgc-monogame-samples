@@ -34,7 +34,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         /// <inheritdoc />
         public Bloom(TGCViewer game) : base(game)
         {
-            Category = TGCSampleCategory.PostProcess;
+            Category = TGCSampleCategory.PostProcessing;
             Name = "Bloom";
             Description = "Applying a Bloom post-process to a scene";
         }

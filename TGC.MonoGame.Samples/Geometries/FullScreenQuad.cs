@@ -1,22 +1,19 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace TGC.MonoGame.Samples.Geometries
 {
     public class FullScreenQuad
     {
-        private GraphicsDevice device;
-        private VertexBuffer vertexBuffer;
+        private readonly GraphicsDevice device;
         private IndexBuffer indexBuffer;
+        private VertexBuffer vertexBuffer;
 
         /// <summary>
-        /// Create a quad used in clip space
+        ///     Create a quad used in clip space
         /// </summary>
         /// <param name="device">Used to initialize and control the presentation of the graphics device.</param>
-        public FullScreenQuad(GraphicsDevice device) 
+        public FullScreenQuad(GraphicsDevice device)
         {
             this.device = device;
             CreateVertexBuffer();
@@ -56,13 +53,12 @@ namespace TGC.MonoGame.Samples.Geometries
         }
 
 
-
         public void Draw(Effect effect)
         {
             device.SetVertexBuffer(vertexBuffer);
             device.Indices = indexBuffer;
-            
-            foreach(var pass in effect.CurrentTechnique.Passes)
+
+            foreach (var pass in effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
                 device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 2);
@@ -74,6 +70,5 @@ namespace TGC.MonoGame.Samples.Geometries
             vertexBuffer.Dispose();
             indexBuffer.Dispose();
         }
-
     }
 }

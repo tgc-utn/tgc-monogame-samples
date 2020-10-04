@@ -97,7 +97,7 @@ namespace TGC.MonoGame.Samples.Samples
         }
 
         /// <summary>
-        ///     Unloads the content for this sample. 
+        ///     Unloads the content for this sample.
         ///     This sample can be shown again and is not yet disposed.
         /// </summary>
         public void UnloadSampleContent()

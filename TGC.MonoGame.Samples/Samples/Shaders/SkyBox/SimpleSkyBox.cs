@@ -79,7 +79,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.SkyBox
             Game.Background = Color.Black;
             AxisLines.Draw(View, Projection);
 
-            var originalRasterizerState = Game.GraphicsDevice.RasterizerState;
+            var originalRasterizerState = GraphicsDevice.RasterizerState;
             var rasterizerState = new RasterizerState();
             rasterizerState.CullMode = CullMode.None;
             Game.Graphics.GraphicsDevice.RasterizerState = rasterizerState;
@@ -87,7 +87,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.SkyBox
             //TODO why I have to set 1 in the alpha channel in the fx file?
             SkyBox.Draw(View, Projection, CameraPosition);
 
-            Game.GraphicsDevice.RasterizerState = originalRasterizerState;
+            GraphicsDevice.RasterizerState = originalRasterizerState;
 
             base.Draw(gameTime);
         }

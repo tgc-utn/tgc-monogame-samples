@@ -22,7 +22,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         /// <inheritdoc />
         public GaussianBlur(TGCViewer game) : base(game)
         {
-            Category = TGCSampleCategory.PostProcess;
+            Category = TGCSampleCategory.PostProcessing;
             Name = "Gaussian Blur";
             Description = "Applying a Gaussian Blur post-process to a scene";
         }

@@ -9,25 +9,20 @@ namespace TGC.MonoGame.Samples.Viewer.GUI
     public class AxisLines
     {
         private const float AxisPosOffset = 40;
-        private const float AxisPosDistance = 25;
+        private const float AxisPosDistance = 20;
         private const int NumberOfVertices = 6;
-
-        private readonly GraphicsDevice device;
 
         /// <summary>
         ///     Default constructor.
         /// </summary>
-        /// <param name="device">Used to initialize and control the presentation of the graphics device.</param>
-        public AxisLines(GraphicsDevice device)
+        /// <param name="graphicsDevice">Used to initialize and control the presentation of the graphics device.</param>
+        public AxisLines(GraphicsDevice graphicsDevice)
         {
-            this.device = device;
-            CreateVertexBuffer();
-        }
+            Effect = new BasicEffect(graphicsDevice);
+            Effect.VertexColorEnabled = true;
 
-        /// <summary>
-        ///     Array of vertex positions and colors.
-        /// </summary>
-        private VertexPositionColor[] AxisLinesVertices { get; set; }
+            CreateVertexBuffer(graphicsDevice);
+        }
 
         /// <summary>
         ///     Represents a list of 3D vertices to be streamed to the graphics device.
@@ -37,29 +32,28 @@ namespace TGC.MonoGame.Samples.Viewer.GUI
         /// <summary>
         ///     Built-in effect that supports optional texturing, vertex coloring, fog, and lighting.
         /// </summary>
-        private BasicEffect Effect { get; set; }
+        private BasicEffect Effect { get; }
 
         /// <summary>
         ///     Create a vertex buffer for the figure with the given information.
         /// </summary>
-        private void CreateVertexBuffer()
+        /// <param name="graphicsDevice">Used to initialize and control the presentation of the graphics device.</param>
+        private void CreateVertexBuffer(GraphicsDevice graphicsDevice)
         {
-            AxisLinesVertices = new VertexPositionColor[NumberOfVertices];
+            var linesVertices = new VertexPositionColor[NumberOfVertices];
             // Red = +x Axis
-            AxisLinesVertices[0] = new VertexPositionColor(Vector3.Zero, Color.Red);
-            AxisLinesVertices[1] = new VertexPositionColor(Vector3.UnitX * 60, Color.Red);
+            linesVertices[0] = new VertexPositionColor(Vector3.Zero, Color.Red);
+            linesVertices[1] = new VertexPositionColor(Vector3.UnitX, Color.Red);
             // Green = +y Axis
-            AxisLinesVertices[2] = new VertexPositionColor(Vector3.Zero, Color.Green);
-            AxisLinesVertices[3] = new VertexPositionColor(Vector3.UnitY * 60, Color.Green);
+            linesVertices[2] = new VertexPositionColor(Vector3.Zero, Color.Green);
+            linesVertices[3] = new VertexPositionColor(Vector3.UnitY, Color.Green);
             // Blue = +z Axis
-            AxisLinesVertices[4] = new VertexPositionColor(Vector3.UnitZ * 60, Color.Blue);
-            AxisLinesVertices[5] = new VertexPositionColor(Vector3.Zero, Color.Blue);
+            linesVertices[4] = new VertexPositionColor(Vector3.UnitZ, Color.Blue);
+            linesVertices[5] = new VertexPositionColor(Vector3.Zero, Color.Blue);
 
-            Effect = new BasicEffect(device);
-
-            Vertices = new VertexBuffer(device, VertexPositionColor.VertexDeclaration, NumberOfVertices,
+            Vertices = new VertexBuffer(graphicsDevice, VertexPositionColor.VertexDeclaration, linesVertices.Length,
                 BufferUsage.WriteOnly);
-            Vertices.SetData(AxisLinesVertices);
+            Vertices.SetData(linesVertices);
         }
 
         /// <summary>
@@ -69,25 +63,33 @@ namespace TGC.MonoGame.Samples.Viewer.GUI
         /// <param name="projection">The projection matrix, normally from the application.</param>
         public void Draw(Matrix view, Matrix projection)
         {
-            //Obtener World coordinate de la esquina inferior de la pantalla
-            var width = device.Viewport.Width;
-            var height = device.Viewport.Height;
-            var sx = AxisPosOffset;
+            var graphicsDevice = Effect.GraphicsDevice;
+
+            // Set our vertex buffer.
+            graphicsDevice.SetVertexBuffer(Vertices);
+
+            // Get World coordinate from the bottom corner of the screen.
+            var width = graphicsDevice.Viewport.Width;
+            var height = graphicsDevice.Viewport.Height;
+            var sx = width - AxisPosOffset;
             var sy = height - AxisPosOffset;
-            var v = new Vector3(sx, sy, 1.0f);
+            var screenPosition = new Vector3(sx, sy, 1.0f);
 
             //Transform the screen space into 3D space
-            var worldCoordPos = device.Viewport.Unproject(v, projection, view, Matrix.Identity);
+            var worldCoordPos = graphicsDevice.Viewport.Unproject(screenPosition, projection, view, Matrix.Identity);
+            var worldCoordPosEnd = graphicsDevice.Viewport.Unproject(
+                new Vector3(width - AxisPosDistance, height - AxisPosDistance, 1.0f),
+                projection, view, Matrix.Identity);
+            var scale = (worldCoordPosEnd - worldCoordPos).Length();
 
-            Effect.World = Matrix.CreateTranslation(worldCoordPos);
+            Effect.World = Matrix.CreateScale(scale) * Matrix.CreateTranslation(worldCoordPos);
             Effect.View = view;
             Effect.Projection = projection;
-            Effect.VertexColorEnabled = true;
 
             foreach (var pass in Effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                device.DrawUserPrimitives(PrimitiveType.LineList, AxisLinesVertices, 0, 3);
+                graphicsDevice.DrawPrimitives(PrimitiveType.LineList, 0, NumberOfVertices / 2);
             }
         }
     }

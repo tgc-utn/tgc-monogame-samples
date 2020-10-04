@@ -25,19 +25,13 @@ namespace TGC.MonoGame.Samples.Geometries
     public class TorusPrimitive : GeometricPrimitive
     {
         /// <summary>
-        ///     Constructs a new torus primitive, using default settings.
-        /// </summary>
-        public TorusPrimitive(GraphicsDevice graphicsDevice) : this(graphicsDevice, 1, 0.333f, 32)
-        {
-        }
-
-        /// <summary>
         ///     Constructs a new torus primitive, with the specified size and tessellation level.
         /// </summary>
-        public TorusPrimitive(GraphicsDevice graphicsDevice, float diameter, float thickness, int tessellation)
+        public TorusPrimitive(GraphicsDevice graphicsDevice, float diameter = 1, float thickness = 0.333f,
+            int tessellation = 32)
         {
             if (tessellation < 3)
-                throw new ArgumentOutOfRangeException("tessellation");
+                throw new ArgumentOutOfRangeException(nameof(tessellation));
 
             // First we loop around the main ring of the torus.
             for (var i = 0; i < tessellation; i++)
@@ -62,8 +56,7 @@ namespace TGC.MonoGame.Samples.Geometries
                     position = Vector3.Transform(position, transform);
                     normal = Vector3.TransformNormal(normal, transform);
 
-                    //AddVertex(position, normal);
-                    AddVertex(position, Color.Beige);
+                    AddVertex(position, Color.DarkGray, normal);
 
                     // And create indices for two triangles.
                     var nextI = (i + 1) % tessellation;

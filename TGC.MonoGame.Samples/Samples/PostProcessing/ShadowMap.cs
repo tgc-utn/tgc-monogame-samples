@@ -21,7 +21,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
         private FullScreenQuad FullScreenQuad;
 
-        private BoxPrimitive LightBox;
+        private CubePrimitive LightBox;
 
         private Vector3 LightPosition = Vector3.One * 500f;
 
@@ -38,7 +38,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         /// <inheritdoc />
         public ShadowMap(TGCViewer game) : base(game)
         {
-            Category = TGCSampleCategory.PostProcess;
+            Category = TGCSampleCategory.PostProcessing;
             Name = "Shadow Map";
             Description = "Projecting shadows in a scene";
         }
@@ -97,7 +97,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             ShadowMapRenderTarget = new RenderTarget2D(GraphicsDevice, ShadowmapSize, ShadowmapSize, false,
                 SurfaceFormat.Single, DepthFormat.Depth24, 0, RenderTargetUsage.PlatformContents);
 
-            LightBox = new BoxPrimitive(GraphicsDevice, Vector3.One * 5f, Vector3.Zero, Color.White);
+            LightBox = new CubePrimitive(GraphicsDevice, 5, Color.White);
 
             SpriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "Arial");
 

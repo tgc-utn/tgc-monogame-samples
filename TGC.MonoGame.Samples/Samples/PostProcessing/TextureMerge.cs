@@ -11,7 +11,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         /// <inheritdoc />
         public TextureMerge(TGCViewer game) : base(game)
         {
-            Category = TGCSampleCategory.PostProcess;
+            Category = TGCSampleCategory.PostProcessing;
             Name = "Texture Merge";
             Description = "Merging the scene render target with a texture";
         }

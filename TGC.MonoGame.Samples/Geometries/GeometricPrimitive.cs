@@ -15,7 +15,6 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using TGC.MonoGame.Samples.Cameras;
 
 #endregion Using Statements
 
@@ -31,12 +30,12 @@ namespace TGC.MonoGame.Samples.Geometries
         #region Fields
 
         // During the process of constructing a primitive model, vertex and index data is stored on the CPU in these managed lists.
-        //private List<VertexPositionNormal> Vertices = new List<VertexPositionNormal>();
-        private List<VertexPositionColor> Vertices { get; } = new List<VertexPositionColor>();
+        public List<VertexPositionColorNormal> Vertices { get; } = new List<VertexPositionColorNormal>();
 
-        private List<ushort> Indices { get; } = new List<ushort>();
+        public List<ushort> Indices { get; } = new List<ushort>();
 
-        // Once all the geometry has been specified, the InitializePrimitive method copies the vertex and index data into these buffers, which store it on the GPU ready for efficient rendering.
+        // Once all the geometry has been specified, the InitializePrimitive method copies the vertex and index data into these buffers,
+        // which store it on the GPU ready for efficient rendering.
         private VertexBuffer VertexBuffer { get; set; }
 
         private IndexBuffer IndexBuffer { get; set; }
@@ -50,9 +49,9 @@ namespace TGC.MonoGame.Samples.Geometries
         ///     Adds a new vertex to the primitive model. This should only be called during the initialization process, before
         ///     InitializePrimitive.
         /// </summary>
-        protected void AddVertex(Vector3 position, Color color)
+        protected void AddVertex(Vector3 position, Color color, Vector3 normal)
         {
-            Vertices.Add(new VertexPositionColor(position, color));
+            Vertices.Add(new VertexPositionColorNormal(position, color, normal));
         }
 
         /// <summary>
@@ -62,7 +61,7 @@ namespace TGC.MonoGame.Samples.Geometries
         protected void AddIndex(int index)
         {
             if (index > ushort.MaxValue)
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
 
             Indices.Add((ushort) index);
         }
@@ -81,7 +80,7 @@ namespace TGC.MonoGame.Samples.Geometries
             // Create a vertex declaration, describing the format of our vertex data.
 
             // Create a vertex buffer, and copy our vertex data into it.
-            VertexBuffer = new VertexBuffer(graphicsDevice, VertexPositionColor.VertexDeclaration, Vertices.Count,
+            VertexBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionColorNormal), Vertices.Count,
                 BufferUsage.None);
             VertexBuffer.SetData(Vertices.ToArray());
 
@@ -93,6 +92,7 @@ namespace TGC.MonoGame.Samples.Geometries
             // Create a BasicEffect, which will be used to render the primitive.
             Effect = new BasicEffect(graphicsDevice);
             Effect.VertexColorEnabled = true;
+            Effect.EnableDefaultLighting();
         }
 
         /// <summary>
@@ -117,12 +117,10 @@ namespace TGC.MonoGame.Samples.Geometries
         /// </summary>
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
-            {
-                VertexBuffer?.Dispose();
-                IndexBuffer?.Dispose();
-                Effect?.Dispose();
-            }
+            if (!disposing) return;
+            VertexBuffer?.Dispose();
+            IndexBuffer?.Dispose();
+            Effect?.Dispose();
         }
 
         #endregion Initialization
@@ -134,6 +132,7 @@ namespace TGC.MonoGame.Samples.Geometries
         ///     world/view/projection matrices and color, this method does not set any render states, so you must make sure all
         ///     states are set to sensible values before you call it.
         /// </summary>
+        /// <param name="effect">Used to set and query effects, and to choose techniques.</param>
         public void Draw(Effect effect)
         {
             var graphicsDevice = effect.GraphicsDevice;
@@ -154,7 +153,7 @@ namespace TGC.MonoGame.Samples.Geometries
         }
 
         /// <summary>
-        /// Draw the box.
+        ///     Draw the box.
         /// </summary>
         /// <param name="world">The world matrix for this box.</param>
         /// <param name="view">The view matrix, normally from the camera.</param>

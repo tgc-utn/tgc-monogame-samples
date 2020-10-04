@@ -12,7 +12,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
     ///     Units Involved:
     ///     # Unit 3 - 3D Basics - Transformations
     ///     Shows how to concatenate transformations to generate movements of planets in the solar system.
-    ///     Author: Matias Leone, Leandro Barbagallo.
+    ///     Authors: Matias Leone, Leandro Barbagallo.
     /// </summary>
     public class SolarSystem : TGCSample
     {
@@ -56,9 +56,9 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
             Camera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 100, 1500), Vector3.Zero, 1,
                 3000);
 
-            Sun = new SpherePrimitive(GraphicsDevice, 20, 16, Color.MonoGameOrange);
-            Earth = new SpherePrimitive(GraphicsDevice, 20, 16, Color.LightSkyBlue);
-            Moon = new SpherePrimitive(GraphicsDevice, 20, 16, Color.LightSlateGray);
+            Sun = new SpherePrimitive(GraphicsDevice, 20, 32, Color.MonoGameOrange);
+            Earth = new SpherePrimitive(GraphicsDevice, 20, 32, Color.LightSkyBlue);
+            Moon = new SpherePrimitive(GraphicsDevice, 20, 32, Color.LightSlateGray);
 
             base.Initialize();
         }
@@ -87,7 +87,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         public override void Draw(GameTime gameTime)
         {
             Game.Background = Color.Black;
-            Game.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             AxisLines.Draw(Camera.View, Camera.Projection);
 

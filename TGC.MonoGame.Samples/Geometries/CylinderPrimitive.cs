@@ -25,21 +25,13 @@ namespace TGC.MonoGame.Samples.Geometries
     public class CylinderPrimitive : GeometricPrimitive
     {
         /// <summary>
-        ///     Constructs a new cylinder primitive, using default settings.
-        /// </summary>
-        public CylinderPrimitive(GraphicsDevice graphicsDevice)
-            : this(graphicsDevice, 1, 1, 32)
-        {
-        }
-
-        /// <summary>
         ///     Constructs a new cylinder primitive, with the specified size and tessellation level.
         /// </summary>
-        public CylinderPrimitive(GraphicsDevice graphicsDevice,
-            float height, float diameter, int tessellation)
+        public CylinderPrimitive(GraphicsDevice graphicsDevice, float height = 1, float diameter = 1,
+            int tessellation = 32)
         {
             if (tessellation < 3)
-                throw new ArgumentOutOfRangeException("tessellation");
+                throw new ArgumentOutOfRangeException(nameof(tessellation));
 
             height /= 2;
 
@@ -50,11 +42,8 @@ namespace TGC.MonoGame.Samples.Geometries
             {
                 var normal = GetCircleVector(i, tessellation);
 
-                //AddVertex(normal * radius + Vector3.Up * height, normal);
-                //AddVertex(normal * radius + Vector3.Down * height, normal);
-
-                AddVertex(normal * radius + Vector3.Up * height, Color.AliceBlue);
-                AddVertex(normal * radius + Vector3.Down * height, Color.DarkGray);
+                AddVertex(normal * radius + Vector3.Up * height, Color.AliceBlue, normal);
+                AddVertex(normal * radius + Vector3.Down * height, Color.DarkGray, normal);
 
                 AddIndex(i * 2);
                 AddIndex(i * 2 + 1);
@@ -95,11 +84,9 @@ namespace TGC.MonoGame.Samples.Geometries
             // Create cap vertices.
             for (var i = 0; i < tessellation; i++)
             {
-                var position = GetCircleVector(i, tessellation) * radius +
-                               normal * height;
+                var position = GetCircleVector(i, tessellation) * radius + normal * height;
 
-                //AddVertex(position, normal);
-                AddVertex(position, Color.Azure);
+                AddVertex(position, Color.Azure, normal);
             }
         }
 

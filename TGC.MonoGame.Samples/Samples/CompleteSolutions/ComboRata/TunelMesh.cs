@@ -2,9 +2,12 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using TGC.MonoGame.Samples.Collisions;
+using TGC.MonoGame.Samples.Physics;
 
-namespace TGC.MonoGame.Samples.Samples.Shaders.ComboRata
+namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
 {
+    // TODO needs a refactor.
     public class TunelMesh
     {
         public const int max_path = 800;
@@ -42,10 +45,11 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.ComboRata
             float r = level == 0 ? 300 : 200;
 
             for (var s = 0; s < max_path; ++s)
+            {
                 Path[s] = new Vector3(MathF.Cos(s * 16f * MathF.PI / max_path) * 10000f, s * 10f,
                     MathF.Sin(s * 16f * MathF.PI / max_path) * 10000f);
-            /*
-                // x = jCos(a * t) - Cos(b * t) ^ 3 y = Sin(c * t) - Sin(d * t) ^ 3
+                /*
+                //x = jCos(a * t) - Cos(b * t) ^ 3 y = Sin(c * t) - Sin(d * t) ^ 3;
                 float ts = s * 0.01f;
                 float a = 1;
                 float b = 3;
@@ -57,6 +61,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.ComboRata
                 //float Y = 0;
                 Path[s] = new Vector3(X * 10000f, s * 0f, Y * 10000f);
                 */
+            }
 
             var colores = new Color[6];
             colores[0] = new Color(255, 0, 0);
@@ -303,8 +308,8 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.ComboRata
                     var Ip = new Vector3();
                     float t;
 
-                    if (TgcCollisionUtils.IntersectSegmentTriangle(p, q, p0, p1, p2, out uvw, out t, out Ip) ||
-                        TgcCollisionUtils.IntersectSegmentTriangle(p, q, p0, p2, p3, out uvw, out t, out Ip))
+                    if (TGCCollisionUtils.IntersectSegmentTriangle(p, q, p0, p1, p2, out uvw, out t, out Ip) ||
+                        TGCCollisionUtils.IntersectSegmentTriangle(p, q, p0, p2, p3, out uvw, out t, out Ip))
                         colision = true;
                 }
             }

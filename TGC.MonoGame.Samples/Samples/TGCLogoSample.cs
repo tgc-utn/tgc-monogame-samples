@@ -7,12 +7,12 @@ using TGC.MonoGame.Samples.Viewer;
 namespace TGC.MonoGame.Samples.Samples
 {
     /// <summary>
-    /// Default example with TGC logo.
+    ///     Default example with TGC logo.
     /// </summary>
     public class TGCLogoSample : TGCSample
     {
         /// <summary>
-        /// Default constructor.
+        ///     Default constructor.
         /// </summary>
         /// <param name="game">The game.</param>
         public TGCLogoSample(TGCViewer game) : base(game)
@@ -26,7 +26,7 @@ namespace TGC.MonoGame.Samples.Samples
         private Matrix ModelWorld { get; set; }
         private float ModelRotation { get; set; }
 
-        ///<inheritdoc/>
+        /// <inheritdoc />
         public override void Initialize()
         {
             Camera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, Vector3.UnitZ * 150, Vector3.UnitZ);
@@ -34,12 +34,12 @@ namespace TGC.MonoGame.Samples.Samples
             base.Initialize();
         }
 
-        ///<inheritdoc/>
+        /// <inheritdoc />
         protected override void LoadContent()
         {
             // Load mesh.
             Model = Game.Content.Load<Model>(ContentFolder3D + "tgc-logo/tgc-logo");
-            var modelEffect = (BasicEffect)Model.Meshes[0].Effects[0];
+            var modelEffect = (BasicEffect) Model.Meshes[0].Effects[0];
             modelEffect.DiffuseColor = Color.DarkBlue.ToVector3();
             modelEffect.EnableDefaultLighting();
             ModelWorld = Matrix.CreateRotationY(MathHelper.Pi);
@@ -47,7 +47,7 @@ namespace TGC.MonoGame.Samples.Samples
             base.LoadContent();
         }
 
-        ///<inheritdoc/>
+        /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
             ModelRotation += Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
@@ -55,11 +55,11 @@ namespace TGC.MonoGame.Samples.Samples
             base.Update(gameTime);
         }
 
-        ///<inheritdoc/>
+        /// <inheritdoc />
         public override void Draw(GameTime gameTime)
         {
             Game.Background = Color.Black;
-            Game.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             Model.Draw(ModelWorld * Matrix.CreateRotationY(ModelRotation), Camera.View, Camera.Projection);
 
