@@ -4,7 +4,8 @@ using Microsoft.Xna.Framework.Graphics;
 namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
 {
     /// <summary>
-    ///     Permite crear la malla de un terreno en base a una textura de Heightmap
+    ///     Permite crear la malla de un terreno en base a una textura de Heightmap.
+    ///     TODO needs a refactor.
     /// </summary>
     public class SimpleTerrain
     {

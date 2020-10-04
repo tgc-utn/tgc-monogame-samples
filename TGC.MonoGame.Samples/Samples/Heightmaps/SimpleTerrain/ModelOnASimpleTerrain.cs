@@ -12,6 +12,7 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
     ///     This sample demonstrates how to use information about a heightmap's vertex normals to follow the contour of the
     ///     terrain.
     ///     Author: Mariano Banquiero
+    ///     TODO needs a refactor.
     /// </summary>
     public class ModelOnASimpleTerrain : TGCSample
     {
@@ -28,7 +29,7 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
         /// <inheritdoc />
         public ModelOnASimpleTerrain(TGCViewer game) : base(game)
         {
-            Category = TGCSampleCategory.HeightMaps;
+            Category = TGCSampleCategory.Heightmaps;
             Name = "Model On A Simple Terrain";
             Description =
                 "This sample demonstrates how to use information about a heightmap's vertex normals to follow the contour of the terrain.";

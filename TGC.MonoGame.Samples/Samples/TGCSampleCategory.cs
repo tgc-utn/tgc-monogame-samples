@@ -7,11 +7,12 @@
     {
         public const string Audio = "Audio";
         public const string CompleteSolutions = "Complete Solutions";
-        public const string HeightMaps = "HeightMaps";
+        public const string Heightmaps = "Heightmaps";
         public const string Models = "Models";
         public const string Optimizations = "Optimizations";
         public const string Physics = "Physics";
         public const string PostProcessing = "Post Processing";
+        public const string RenderPipeline = "Render Pipeline";
         public const string Shaders = "Shaders";
         public const string Transformations = "Transformations";
         public const string Tutorials = "Tutorials";

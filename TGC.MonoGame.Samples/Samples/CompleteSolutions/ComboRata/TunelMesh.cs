@@ -7,6 +7,7 @@ using TGC.MonoGame.Samples.Physics;
 
 namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
 {
+    // TODO needs a refactor.
     public class TunelMesh
     {
         public const int max_path = 800;

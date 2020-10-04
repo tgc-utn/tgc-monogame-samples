@@ -11,6 +11,7 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
     ///     Combo Rata:
     ///     A mini game with some effects.
     ///     Author: Mariano Banquiero
+    ///     TODO needs a refactor.
     /// </summary>
     public class ComboRata : TGCSample
     {

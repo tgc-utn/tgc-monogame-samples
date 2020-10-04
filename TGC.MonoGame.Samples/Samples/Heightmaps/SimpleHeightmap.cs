@@ -16,7 +16,7 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps
     {
         public SimpleHeightMap(TGCViewer game) : base(game)
         {
-            Category = TGCSampleCategory.HeightMaps;
+            Category = TGCSampleCategory.Heightmaps;
             Name = "Simple Heightmap";
             Description = "Shows how to create a terrain based on a HeightMap texture manually.";
         }
@@ -24,9 +24,7 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps
         private BasicEffect Effect { get; set; }
         private Texture2D TerrainTexture { get; set; }
         private VertexBuffer TerrainVertexBuffer { get; set; }
-
         private IndexBuffer TerrainIndexBuffer { get; set; }
-
         private Camera Camera { get; set; }
 
         // Triangle count in this case
@@ -35,9 +33,8 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps
         /// <inheritdoc />
         public override void Initialize()
         {
-            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0f, 1000f, 0f), 400, 1.0f,
-                1, 5000);
-
+            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(-400f, 1000f, 2000f), 400, 1.0f, 1,
+                6000);
 
             base.Initialize();
         }
@@ -97,7 +94,6 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps
             base.Draw(gameTime);
         }
 
-
         /// <summary>
         ///     Create and load the VertexBuffer based on a Heightmap texture.
         /// </summary>
@@ -107,13 +103,12 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps
         private void CreateHeightMapMesh(Texture2D texture, float scaleXZ, float scaleY)
         {
             // Parse bitmap and load height matrix.
-            float[,] heightMap = LoadHeightMap(texture);
-
+            var heightMap = LoadHeightMap(texture);
 
             CreateVertexBuffer(heightMap, scaleXZ, scaleY);
 
-            int heightMapWidthMinusOne = heightMap.GetLength(0) - 1;
-            int heightMapLengthMinusOne = heightMap.GetLength(1) - 1;
+            var heightMapWidthMinusOne = heightMap.GetLength(0) - 1;
+            var heightMapLengthMinusOne = heightMap.GetLength(1) - 1;
 
             PrimitiveCount = 2 * heightMapWidthMinusOne * heightMapLengthMinusOne;
 
@@ -127,22 +122,21 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps
         /// <returns>The height of each vertex from zero to one.</returns>
         private float[,] LoadHeightMap(Texture2D texture)
         {
-            Color[] texels = new Color[texture.Width * texture.Height];
-            
+            var texels = new Color[texture.Width * texture.Height];
+
             // Obtains each texel color from the texture, note that this is an expensive operation
             texture.GetData(texels);
 
-            float[,] heightmap = new float[texture.Width, texture.Height];
+            var heightmap = new float[texture.Width, texture.Height];
+
             for (var x = 0; x < texture.Width; x++)
-                for (var y = 0; y < texture.Height; y++)
-                {
-                    // Get the color.
-                    // (j, i) inverted to sweep rows first and then columns.
-                    Color texel = texels[y * texture.Width + x];
-                    // Calculate intensity in grayscale.
-                    //var intensity = texel.R * 0.299f + texel.G * 0.587f + texel.B * 0.114f;
-                    heightmap[x, y] = texel.R;
-                }
+            for (var y = 0; y < texture.Height; y++)
+            {
+                // Get the color.
+                // (j, i) inverted to sweep rows first and then columns.
+                var texel = texels[y * texture.Width + x];
+                heightmap[x, y] = texel.R;
+            }
 
             return heightmap;
         }
@@ -155,33 +149,34 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps
         /// <param name="scaleY">The scale in the Y axis for the vertices of the HeightMap</param>
         private void CreateVertexBuffer(float[,] heightMap, float scaleXZ, float scaleY)
         {
-            int heightMapWidth = heightMap.GetLength(0);
-            int heightMapLength = heightMap.GetLength(1);
+            var heightMapWidth = heightMap.GetLength(0);
+            var heightMapLength = heightMap.GetLength(1);
 
-            float offsetX = heightMapWidth * scaleXZ * 0.5f;
-            float offsetZ = heightMapLength * scaleXZ * 0.5f;
+            var offsetX = heightMapWidth * scaleXZ * 0.5f;
+            var offsetZ = heightMapLength * scaleXZ * 0.5f;
 
             // Amount of subdivisions in X times amount of subdivisions in Z.
-            int vertexCount = heightMapWidth * heightMapLength;
+            var vertexCount = heightMapWidth * heightMapLength;
 
             // Create temporary array of vertices.
-            VertexPositionTexture[] vertices = new VertexPositionTexture[vertexCount];
+            var vertices = new VertexPositionTexture[vertexCount];
 
-            int index = 0;
+            var index = 0;
             Vector3 position;
             Vector2 textureCoordinates;
 
-            for (int x = 0; x < heightMapWidth; x++)
-                for (int z = 0; z < heightMapLength; z++)
-                {
-                    position = new Vector3(x * scaleXZ - offsetX, heightMap[x, z] * scaleY, z * scaleXZ - offsetZ);
-                    textureCoordinates = new Vector2((float)x / heightMapWidth, (float)z / heightMapLength);
-                    vertices[index] = new VertexPositionTexture(position, textureCoordinates);
-                    index++;
-                }
+            for (var x = 0; x < heightMapWidth; x++)
+            for (var z = 0; z < heightMapLength; z++)
+            {
+                position = new Vector3(x * scaleXZ - offsetX, heightMap[x, z] * scaleY, z * scaleXZ - offsetZ);
+                textureCoordinates = new Vector2((float) x / heightMapWidth, (float) z / heightMapLength);
+                vertices[index] = new VertexPositionTexture(position, textureCoordinates);
+                index++;
+            }
 
             // Create the actual vertex buffer
-            TerrainVertexBuffer = new VertexBuffer(GraphicsDevice, VertexPositionTexture.VertexDeclaration, vertexCount, BufferUsage.None);
+            TerrainVertexBuffer = new VertexBuffer(GraphicsDevice, VertexPositionTexture.VertexDeclaration, vertexCount,
+                BufferUsage.None);
             TerrainVertexBuffer.SetData(vertices);
         }
 
@@ -193,51 +188,52 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps
         /// <param name="quadsInZ">The amount of quads in the Z axis</param>
         private void CreateIndexBuffer(int quadsInX, int quadsInZ)
         {
-            int indexCount = 3 * 2 * quadsInX * quadsInZ;
+            var indexCount = 3 * 2 * quadsInX * quadsInZ;
 
-            ushort[] indices = new ushort[indexCount];
-            int index = 0;
+            var indices = new ushort[indexCount];
+            var index = 0;
 
             int right;
             int top;
             int bottom;
 
-            int vertexCountX = quadsInX + 1;
-            for (int x = 0; x < quadsInX; x++)
-                for (int z = 0; z < quadsInZ; z++)
-                {
-                    right = x + 1;
-                    bottom = z * vertexCountX;
-                    top = (z + 1) * vertexCountX;
+            var vertexCountX = quadsInX + 1;
+            for (var x = 0; x < quadsInX; x++)
+            for (var z = 0; z < quadsInZ; z++)
+            {
+                right = x + 1;
+                bottom = z * vertexCountX;
+                top = (z + 1) * vertexCountX;
 
-                    //  D __ C  
-                    //   | /|
-                    //   |/_|
-                    //  A    B
+                //  d __ c  
+                //   | /|
+                //   |/_|
+                //  a    b
 
-                    ushort A = (ushort)(x + bottom);
-                    ushort B = (ushort)(right + bottom);
-                    ushort C = (ushort)(right + top);
-                    ushort D = (ushort)(x + top);
+                var a = (ushort) (x + bottom);
+                var b = (ushort) (right + bottom);
+                var c = (ushort) (right + top);
+                var d = (ushort) (x + top);
 
-                    // ACB
-                    indices[index] = A;
-                    index++;
-                    indices[index] = C;
-                    index++;
-                    indices[index] = B;
-                    index++;
+                // ACB
+                indices[index] = a;
+                index++;
+                indices[index] = c;
+                index++;
+                indices[index] = b;
+                index++;
 
-                    // ADC
-                    indices[index] = A;
-                    index++;
-                    indices[index] = D;
-                    index++;
-                    indices[index] = C;
-                    index++;
-                }
+                // ADC
+                indices[index] = a;
+                index++;
+                indices[index] = d;
+                index++;
+                indices[index] = c;
+                index++;
+            }
 
-            TerrainIndexBuffer = new IndexBuffer(GraphicsDevice, IndexElementSize.SixteenBits, indexCount, BufferUsage.None);
+            TerrainIndexBuffer =
+                new IndexBuffer(GraphicsDevice, IndexElementSize.SixteenBits, indexCount, BufferUsage.None);
             TerrainIndexBuffer.SetData(indices);
         }
 
