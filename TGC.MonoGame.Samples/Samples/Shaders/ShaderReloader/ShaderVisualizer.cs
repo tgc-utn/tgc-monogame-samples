@@ -15,7 +15,9 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
     /// </summary>
     public class ShaderVisualizer : TGCSample
     {
-        private readonly static string ShaderName = "ShaderVisualizer";
+        private static readonly string ShaderName = "ShaderVisualizer";
+
+        private static readonly string ContentFolderName = "Content/";
 
 
         private FullScreenQuad Quad { get; set; }
@@ -40,8 +42,8 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 
             Effect = Game.Content.Load<Effect>(ContentFolderEffects + ShaderName);
 
-            string projectDirectory = FindProjectDirectory();
-            ShaderReloader = new ShaderReloader(projectDirectory + @"/Content/" + ContentFolderEffects + ShaderName + ".fx", GraphicsDevice);
+            string projectDirectory = FindProjectDirectory() + "/";
+            ShaderReloader = new ShaderReloader(projectDirectory + ContentFolderName + ContentFolderEffects + ShaderName + ".fx", GraphicsDevice);
             ShaderReloader.OnCompile += OnShaderCompile;
 
             // Make the window squared
@@ -60,10 +62,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         private string FindProjectDirectory()
         {
             string rootDirectory;
-            if (Assembly.GetEntryAssembly() != null)
-                rootDirectory = Assembly.GetEntryAssembly().GetName().Name;
-            else
-                rootDirectory = Assembly.GetExecutingAssembly().GetName().Name;
+            rootDirectory = Assembly.GetEntryAssembly()?.GetName().Name ?? Assembly.GetExecutingAssembly().GetName().Name;
 
             var environment = Environment.CurrentDirectory;
 

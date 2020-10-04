@@ -13,7 +13,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 
         private string ShaderCodePath;
         private string ShaderCompiledPath;
-        private string FileNameWithExtension;
+        private string ShaderCodeFileName;
 
         private FileSystemWatcher FileWatcher;
         private ProcessStartInfo ProcessStartInfo;
@@ -29,26 +29,23 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         public ShaderReloader(string path, GraphicsDevice device)
         {
             ShaderCodePath = path;
-            FileNameWithExtension = Path.GetFileName(path);
-            var fileName = Path.GetFileNameWithoutExtension(path);
-            var ShaderCodeFolder = path.Split(fileName)[0];
-            ShaderCompiledPath = ShaderCodeFolder + fileName + CompiledShaderFileExtension;
+            ShaderCompiledPath = Path.ChangeExtension(path, CompiledShaderFileExtension);
+            ShaderCodeFileName = Path.GetFileName(ShaderCodePath);
 
             GraphicsDevice = device;
 
             ConfigureProcessStartInfo();
-            ConfigureWatcher(ShaderCodeFolder, FileNameWithExtension);
+            ConfigureWatcher();
         }
 
 
 
-        private void ConfigureWatcher(string folder, string fileName)
+        private void ConfigureWatcher()
         {
             FileWatcher = new FileSystemWatcher();
 
-            FileWatcher.Path = folder;
-
-            FileWatcher.Filter = fileName;
+            FileWatcher.Path = Path.GetDirectoryName(ShaderCodePath);
+            FileWatcher.Filter = ShaderCodeFileName;
 
             // Add event handlers
             // Listen to any event, as VS renames files instead of changing them
@@ -64,22 +61,19 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         private void ReplaceShader(object sender, FileSystemEventArgs eventArgs)
         {
             // Can be triggered by temp files with suffixes
-            if (!eventArgs.Name.Equals(FileNameWithExtension))
-                return;
-            
-            CompileError = false;
-
-            CompileShader();
-
-            if (!CompileError)
+            if (!eventArgs.Name.Equals(ShaderCodeFileName))
             {
-                var byteCode = File.ReadAllBytes(ShaderCompiledPath);
-                var effect = new Effect(GraphicsDevice, byteCode);
+                CompileShader();
+                if (!CompileError)
+                {
+                    var byteCode = File.ReadAllBytes(ShaderCompiledPath);
+                    var effect = new Effect(GraphicsDevice, byteCode);
 
-                // Delete the file as we don't need it anymore
-                File.Delete(ShaderCompiledPath);
+                    // Delete the file as we don't need it anymore
+                    File.Delete(ShaderCompiledPath);
 
-                OnCompile.Invoke(effect);
+                    OnCompile.Invoke(effect);
+                }
             }
         }
 
@@ -100,6 +94,8 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 
         private void CompileShader()
         {
+            CompileError = false;
+
             Process pProcess = new Process();
             pProcess.StartInfo = ProcessStartInfo;
             pProcess.EnableRaisingEvents = true;
@@ -114,7 +110,8 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             pProcess.BeginOutputReadLine();
             stdError = pProcess.StandardError.ReadToEnd();
             pProcess.WaitForExit();
-            if (!(stdError.Equals(null) || stdError.Equals("")))
+
+            if (!stdError.Equals(""))
                 ProcessError(stdError);
         }
 
