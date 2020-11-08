@@ -9,6 +9,7 @@
   * [Visual Studio for Mac](https://visualstudio.microsoft.com/es/vs/mac)
   * [Rider](https://www.jetbrains.com/rider)
 * [MGCB Editor](https://docs.monogame.net/articles/tools/mgcb_editor.html)
+* [MGFXC](https://docs.monogame.net/articles/tools/mgfxc.html)
 
 Read more about [.NET Core CLI Tools telemetry](https://aka.ms/dotnet-cli-telemetry) and [Visual Studio Code telemetry](https://code.visualstudio.com/docs/getstarted/telemetry) are enabled by default.
 
