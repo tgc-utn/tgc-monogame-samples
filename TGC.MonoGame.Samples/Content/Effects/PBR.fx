@@ -8,7 +8,6 @@
 #endif
 
 float4x4 matWorld; //Matriz de transformacion World
-float4x4 matWorldView; //Matriz World * View
 float4x4 matWorldViewProj; //Matriz World * View * Projection
 float4x4 matInverseTransposeWorld; //Matriz Transpose(Invert(World))
 
@@ -98,8 +97,8 @@ struct VertexShaderOutput
 {
 	float4 Position : POSITION0;
 	float2 TextureCoordinates : TEXCOORD0;
-	float3 WorldNormal : TEXCOORD1;
-	float3 WorldPosition : TEXCOORD2;
+	float4 WorldNormal : TEXCOORD1;
+	float4 WorldPosition : TEXCOORD2;
 };
 
 //Vertex Shader
@@ -114,7 +113,7 @@ VertexShaderOutput MainVS(VertexShaderInput input)
 	output.TextureCoordinates = input.TextureCoordinates;
 
 	// Usamos la matriz normal para proyectar el vector normal
-	output.WorldNormal = /*mul(*/input.Normal/*, matInverseTransposeWorld).xyz*/;
+	output.WorldNormal = mul(float4(input.Normal.xyz, 0.0), matInverseTransposeWorld);
 
 	// Usamos la matriz de world para proyectar la posicion
 	output.WorldPosition = mul(input.Position, matWorld);
@@ -131,7 +130,7 @@ float3 getNormalFromMap(float2 textureCoordinates, float3 worldPosition, float3 
 	float2 st1 = ddx(textureCoordinates);
 	float2 st2 = ddy(textureCoordinates);
 
-	worldNormal = normalize(worldNormal);
+	worldNormal = normalize(worldNormal.xyz);
 	float3 T = normalize(Q1 * st2.y - Q2 * st1.y);
 	float3 B = -normalize(cross(worldNormal, T));
 	float3x3 TBN = float3x3(T, B, worldNormal);
@@ -185,24 +184,32 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 	float3 albedo = pow(tex2D(albedoSampler, input.TextureCoordinates).rgb, float3(2.2, 2.2, 2.2));
 	float metallic = tex2D(metallicSampler, input.TextureCoordinates).r;
 	float roughness = tex2D(roughnessSampler, input.TextureCoordinates).r;
-	float ao = tex2D(aoSampler, input.TextureCoordinates).rgb;
+	float ao = tex2D(aoSampler, input.TextureCoordinates).r;
 
-	float3 normal = getNormalFromMap(input.TextureCoordinates, input.WorldPosition, input.WorldNormal);
-	float3 view = normalize(eyePosition - input.WorldPosition);
+	float3 worldNormal = input.WorldNormal.xyz;
+	float3 normal = getNormalFromMap(input.TextureCoordinates, input.WorldPosition.xyz, worldNormal);
+    float3 view = normalize(eyePosition - input.WorldPosition.xyz);
 
 	float3 F0 = float3(0.04, 0.04, 0.04);
 	F0 = lerp(F0, albedo, metallic);
 	
 	// Reflectance equation
 	float3 Lo = float3(0.0, 0.0, 0.0);
-	for (int i = 0; i < 4; ++i)
+	for (int i = 0; i < 1; ++i)
 	{
-		float3 light = normalize(lights[i].Position - input.WorldPosition);
+
+		/*
+		float3 light = normalize(lights[i].Position - input.WorldPosition.xyz);
 		float3 halfVector = normalize(view + light);
-        
-		float distance = length(lights[i].Position - input.WorldPosition);
+		float distance = length(lights[i].Position - input.WorldPosition.xyz);
+		float attenuation = 1.0 / (distance * distance);
+		float3 radiance = lights[i].Color * attenuation;*/
+		float3 light = normalize(float3(45, 45, 45) - input.WorldPosition.xyz);
+		float3 halfVector = normalize(view + light);
+		float distance = length(float3(45, 45, 45) - input.WorldPosition.xyz);
 		float attenuation = 1.0 / (distance);
-		float3 radiance = lights[i].Color * attenuation;
+		float3 radiance = float3(200, 200, 200) * attenuation;
+
 
 		// Cook-Torrance BRDF
 		float NDF = DistributionGGX(normal, halfVector, roughness);
@@ -210,12 +217,12 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 		float3 F = fresnelSchlick(max(dot(halfVector, view), 0.0), F0);
 
 		float3 nominator = NDF * G * F;
-		float denominator = 4 * max(dot(normal, view), 0.0) + 0.001;
+		float denominator = 4.0 * max(dot(normal, view), 0.0) + 0.001;
 		float3 specular = nominator / denominator;
 
 		float3 kS = F;
         
-		float3 kD = float3(1, 1, 1) - kS;
+		float3 kD = float3(1.0, 1.0, 1.0) - kS;
         
 		kD *= 1.0 - metallic;
 
@@ -223,7 +230,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 		float NdotL = max(dot(normal, light), 0.0);
 
         //TODO
-		//Lo += (kD * NdotL * albedo / PI + specular) * radiance;
+		Lo += (kD * NdotL * albedo / PI + specular) * radiance;
 	}
 
 	float3 ambient = float3(0.03, 0.03, 0.03) * albedo * ao;
@@ -233,10 +240,11 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 	// HDR tonemapping
 	color = color / (color + float3(1, 1, 1));
     
+	float exponent = 1.0 / 2.2;
 	// Gamma correct
-	color = pow(color, float3(1.0 / 2.2, 1.0 / 2.2, 1.0 / 2.2));
+	color = pow(color, float3(exponent, exponent, exponent));
 
-	return float4(color, 1.0);
+    return float4(color, 1.0);
 }
 
 technique PBR
