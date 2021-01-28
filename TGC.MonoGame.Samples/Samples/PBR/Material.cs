@@ -2,8 +2,8 @@
 {
     public enum Material
     {
-        Grass,
         RustedMetal,
+        Grass,
         Gold,
         Marble,
         Metal

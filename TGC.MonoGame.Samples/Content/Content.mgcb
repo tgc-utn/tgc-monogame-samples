@@ -327,18 +327,6 @@
 /processorParam:TextureFormat=Color
 /build:Textures/green.bmp
 
-#begin Textures/ground.jpg
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Textures/ground.jpg
-
 #begin Textures/heightmaps/colormap.jpg
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -398,6 +386,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/overlay.png
+
+#begin Textures/pbr/gold/ao.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/pbr/gold/ao.png
 
 #begin Textures/pbr/gold/color.jpg
 /importer:TextureImporter
@@ -459,7 +459,7 @@
 /processorParam:TextureFormat=Color
 /build:Textures/pbr/gold/roughness.jpg
 
-#begin Textures/pbr/ground/ambient-occlusion.jpg
+#begin Textures/pbr/ground/ao.jpg
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -469,7 +469,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Textures/pbr/ground/ambient-occlusion.jpg
+/build:Textures/pbr/ground/ao.jpg
 
 #begin Textures/pbr/ground/color.jpg
 /importer:TextureImporter
@@ -495,6 +495,18 @@
 /processorParam:TextureFormat=Color
 /build:Textures/pbr/ground/displacement.jpg
 
+#begin Textures/pbr/ground/metalness.jpg
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/pbr/ground/metalness.jpg
+
 #begin Textures/pbr/ground/normal.jpg
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -518,6 +530,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/pbr/ground/roughness.jpg
+
+#begin Textures/pbr/harsh-metal/ao.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/pbr/harsh-metal/ao.png
 
 #begin Textures/pbr/harsh-metal/color.jpg
 /importer:TextureImporter
@@ -579,6 +603,18 @@
 /processorParam:TextureFormat=Color
 /build:Textures/pbr/harsh-metal/roughness.jpg
 
+#begin Textures/pbr/marble/ao.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/pbr/marble/ao.png
+
 #begin Textures/pbr/marble/color.jpg
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -603,6 +639,18 @@
 /processorParam:TextureFormat=Color
 /build:Textures/pbr/marble/displacement.jpg
 
+#begin Textures/pbr/marble/metalness.jpg
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/pbr/marble/metalness.jpg
+
 #begin Textures/pbr/marble/normal.jpg
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -626,6 +674,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/pbr/marble/roughness.jpg
+
+#begin Textures/pbr/metal/ao.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/pbr/metal/ao.png
 
 #begin Textures/pbr/metal/color.jpg
 /importer:TextureImporter

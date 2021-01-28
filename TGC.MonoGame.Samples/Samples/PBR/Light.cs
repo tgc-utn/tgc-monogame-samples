@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 
 namespace TGC.MonoGame.Samples.Samples.PBR
 {
@@ -7,11 +8,18 @@ namespace TGC.MonoGame.Samples.Samples.PBR
     {
         public Vector3 Position;
         public Vector3 Color;
+        public Vector3 ShowColor;
 
-        public void SetLight(int index, Effect effect)
+        private Light(Vector3 position, Vector3 color, Vector3 showColor) 
         {
-            effect.Parameters["lights[" + index + "].Position"].SetValue(new[] {Position.X, Position.Y, Position.Z});
-            effect.Parameters["lights[" + index + "].Color"].SetValue(new[] {Color.X, Color.Y, Color.Z});
+            Position = position;
+            Color = color;
+            ShowColor = showColor;
+        }
+
+        internal Light GenerateShowColor()
+        {
+            return new Light(Position, Color, Vector3.Normalize(Color) * 2f);
         }
     }
 }

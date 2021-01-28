@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Geometries.Textures;
@@ -22,19 +24,21 @@ namespace TGC.MonoGame.Samples.Samples.PBR
             Description = "Ejemplo de PBR regular.";
         }
 
-        private Material current;
-        private List<Material> materials;
+        private static Material MaxMaterialValue = (Material)Enum.GetValues(typeof(Material)).Cast<int>().Max();
+        private static Material MinMaterialValue = (Material)Enum.GetValues(typeof(Material)).Cast<int>().Min();
 
-        private Model sphere;
-        private Texture2D sphereTexture;
-        private string texturePath;
-        private Effect sphereEffect;
-        private List<Light> lights;
-        private CubePrimitive lightBox;
-        private List<Texture2D> textures;
+        private Material Current = MinMaterialValue;
+
+        private SpriteFont SpriteFont;
+        private Model Sphere;
+        private string TexturePath;
+        private Effect SphereEffect;
+        private List<Light> Lights;
+
+        private CubePrimitive LightBox;
         private Texture2D albedo, ao, metalness, roughness, normals;
 
-        private Matrix sphereWorld; 
+        private Matrix SphereWorld; 
 
         private Camera Camera { get; set; }
 
@@ -58,17 +62,31 @@ namespace TGC.MonoGame.Samples.Samples.PBR
             InitializeSphere();
             InitializeLightBox();
 
+            SpriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "Arial");
+
+
             base.LoadContent();
         }
+
+        private bool PastKeyPressed;
 
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
-            //UpdateMaterial();
             Camera.Update(gameTime);
 
-            sphereEffect.Parameters["eyePosition"]?.SetValue(Camera.Position);
-            //textures.ForEach(texture => texture.Update());
+            SphereEffect.Parameters["eyePosition"].SetValue(Camera.Position);
+            
+            var currentKeyPressed = Keyboard.GetState().IsKeyDown(Keys.J);
+            if (!currentKeyPressed && PastKeyPressed)
+            {
+                Current++;
+                if (Current > MaxMaterialValue)
+                    Current = MinMaterialValue;
+                SwitchMaterial();
+            }
+
+            PastKeyPressed = currentKeyPressed;
 
             base.Update(gameTime);
         }
@@ -80,18 +98,25 @@ namespace TGC.MonoGame.Samples.Samples.PBR
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
 
-            var worldView = sphereWorld * Camera.View;
-            sphereEffect.Parameters["matWorld"].SetValue(sphereWorld);
-            sphereEffect.Parameters["matWorldViewProj"].SetValue(worldView * Camera.Projection);
-            sphereEffect.Parameters["matInverseTransposeWorld"]?.SetValue(Matrix.Transpose(Matrix.Invert(worldView)));
 
-            sphere.Meshes[0].Draw();
+            var worldView = SphereWorld * Camera.View;
+            SphereEffect.Parameters["matWorld"].SetValue(SphereWorld);
+            SphereEffect.Parameters["matWorldViewProj"].SetValue(worldView * Camera.Projection);
+            SphereEffect.Parameters["matInverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(SphereWorld)));
 
-            for (int index = 0; index < lights.Count; index++)
+            Sphere.Meshes.FirstOrDefault().Draw();
+
+            for (int index = 0; index < Lights.Count; index++)
             {
-                lightBox.Effect.DiffuseColor = lights[index].Color;
-                lightBox.Draw(Matrix.CreateTranslation(lights[index].Position), Camera.View, Camera.Projection);
+                LightBox.Effect.DiffuseColor = Lights[index].ShowColor;
+                LightBox.Draw(Matrix.CreateTranslation(Lights[index].Position), Camera.View, Camera.Projection);
             }
+
+
+            Game.SpriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
+            Game.SpriteBatch.DrawString(SpriteFont, "Con la tecla 'J' se cambia el material", new Vector2(100, GraphicsDevice.Viewport.Height - 100), Color.White);
+            Game.SpriteBatch.End();
+
 
             base.Draw(gameTime);
         }
@@ -99,11 +124,8 @@ namespace TGC.MonoGame.Samples.Samples.PBR
         /// <inheritdoc />
         protected override void UnloadContent()
         {
-            sphereEffect.Dispose();
-            lightBox.Dispose();
-            //TODO que hago con el mesh?
-
-            DisposeTextures();
+            SphereEffect.Dispose();
+            LightBox.Dispose();
 
             base.UnloadContent();
         }
@@ -111,35 +133,39 @@ namespace TGC.MonoGame.Samples.Samples.PBR
         private void InitializeSphere()
         {
             // Got to set a texture, else the translation to mesh does not map UV
-            //sphereTexture = Game.Content.Load<Texture2D>(ContentFolderTextures + "white");
+            Sphere = Game.Content.Load<Model>(ContentFolder3D + "geometries/sphere");
+            SphereWorld = Matrix.CreateScale(30f) * Matrix.CreateRotationX(MathF.PI * 0.5f);
 
-            sphere = Game.Content.Load<Model>(ContentFolder3D + "geometries/sphere");
-            sphereWorld = Matrix.CreateScale(30f) * Matrix.CreateRotationX(MathF.PI * 0.5f);
-            sphere.Meshes[0].MeshParts[0].Effect = sphereEffect;
+            // Apply the effect to all mesh parts
+            Sphere.Meshes.FirstOrDefault().MeshParts.FirstOrDefault().Effect = SphereEffect;
         }
 
         private void InitializeEffect()
         {
-            sphereEffect = Game.Content.Load<Effect>(ContentFolderEffects + "PBR");
-            sphereEffect.CurrentTechnique = sphereEffect.Techniques["PBR"];
+            SphereEffect = Game.Content.Load<Effect>(ContentFolderEffects + "PBR");
+            SphereEffect.CurrentTechnique = SphereEffect.Techniques["PBR"];
+
+            var positions = SphereEffect.Parameters["lightPositions"].Elements;
+            var colors = SphereEffect.Parameters["lightColors"].Elements;
 
 
-            int index = 0;
-            lights.ForEach(light =>
+            for(int index = 0; index < Lights.Count; index++)
             {
-                light.SetLight(index, sphereEffect);
-                index++;
-            });
+                var light = Lights[index];
+                positions[index].SetValue(light.Position);
+                colors[index].SetValue(light.Color);
+            }
         }
 
         private void InitializeLightBox()
         {
-            lightBox = new CubePrimitive(GraphicsDevice, 10, Color.White);
+            LightBox = new CubePrimitive(GraphicsDevice, 10, Color.White);
+            LightBox.Effect.LightingEnabled = false;
         }
 
         private void InitializeLights()
         {
-            lights = new List<Light>();
+            Lights = new List<Light>();
             var lightOne = new Light();
 
             float distance = 45f;
@@ -159,80 +185,69 @@ namespace TGC.MonoGame.Samples.Samples.PBR
             lightFour.Position = Vector3.One * -distance + new Vector3(2f * distance, 0f, 0f);
             lightFour.Color = new Vector3(0f, 100f, 100f);
 
-            lights.Add(lightOne);
-            lights.Add(lightTwo);
-            lights.Add(lightThree);
-            lights.Add(lightFour);
+            Lights.Add(lightOne);
+            Lights.Add(lightTwo);
+            Lights.Add(lightThree);
+            Lights.Add(lightFour);
+
+            Lights = Lights.ConvertAll(light => light.GenerateShowColor());
         }
 
         private void InitializeTextures()
         {
-            current = Material.RustedMetal;
             UpdateMaterialPath();
-            textures = new List<Texture2D>();
             LoadTextures();
         }
 
         private void LoadTextures()
         {
-            normals = Game.Content.Load<Texture2D>(texturePath + "normal");
-            ao = Game.Content.Load<Texture2D>(texturePath + "ao");
-            metalness = Game.Content.Load<Texture2D>(texturePath + "metalness");
-            roughness = Game.Content.Load<Texture2D>(texturePath + "roughness");
-            albedo = Game.Content.Load<Texture2D>(texturePath + "color");
+            normals = Game.Content.Load<Texture2D>(TexturePath + "normal");
+            ao = Game.Content.Load<Texture2D>(TexturePath + "ao");
+            metalness = Game.Content.Load<Texture2D>(TexturePath + "metalness");
+            roughness = Game.Content.Load<Texture2D>(TexturePath + "roughness");
+            albedo = Game.Content.Load<Texture2D>(TexturePath + "color");
 
-            textures.Add(normals);
-            textures.Add(ao);
-            textures.Add(metalness);
-            textures.Add(roughness);
-            textures.Add(albedo);
-
-            sphereEffect.Parameters["albedoTexture"]?.SetValue(albedo);
-            sphereEffect.Parameters["normalTexture"]?.SetValue(normals);
-            sphereEffect.Parameters["metallicTexture"]?.SetValue(metalness);
-            sphereEffect.Parameters["roughnessTexture"]?.SetValue(roughness);
-            sphereEffect.Parameters["aoTexture"]?.SetValue(ao);
+            SphereEffect.Parameters["albedoTexture"]?.SetValue(albedo);
+            SphereEffect.Parameters["normalTexture"]?.SetValue(normals);
+            SphereEffect.Parameters["metallicTexture"]?.SetValue(metalness);
+            SphereEffect.Parameters["roughnessTexture"]?.SetValue(roughness);
+            SphereEffect.Parameters["aoTexture"]?.SetValue(ao);
         }
         
         private void UpdateMaterialPath()
         {
-            texturePath = ContentFolderTextures + "pbr/";
-            switch (current)
+            TexturePath = ContentFolderTextures + "pbr/";
+            switch (Current)
             {
                 case Material.RustedMetal:
-                    texturePath += "harsh-metal";
+                    TexturePath += "harsh-metal";
                     break;
 
                 case Material.Marble:
-                    texturePath += "marble";
+                    TexturePath += "marble";
                     break;
 
                 case Material.Gold:
-                    texturePath += "gold";
+                    TexturePath += "gold";
                     break;
 
                 case Material.Metal:
-                    texturePath += "metal";
+                    TexturePath += "metal";
                     break;
 
                 case Material.Grass:
-                    texturePath += "ground";
+                    TexturePath += "ground";
                     break;
             }
-            texturePath += "/";
+            TexturePath += "/";
         }
 
         private void SwitchMaterial()
         {
-            DisposeTextures();
+            // We do not dispose textures, as they cannot be loaded again
             UpdateMaterialPath();
             LoadTextures();
         }
 
-        private void DisposeTextures()
-        {
-            textures.ForEach(t => t.Dispose());
-            textures.Clear();
-        }
     }
 }

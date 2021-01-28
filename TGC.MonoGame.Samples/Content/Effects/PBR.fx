@@ -9,7 +9,7 @@
 
 float4x4 matWorld; //Matriz de transformacion World
 float4x4 matWorldViewProj; //Matriz World * View * Projection
-float4x4 matInverseTransposeWorld; //Matriz Transpose(Invert(World))
+float3x3 matInverseTransposeWorld; //Matriz Transpose(Invert(World))
 
 //Textura para Albedo
 texture albedoTexture;
@@ -76,9 +76,12 @@ struct Light
 {
 	float3 Position;
 	float3 Color;
-};
+} ;
 
-Light lights[4];
+#define LIGHT_COUNT 4
+
+float3 lightPositions[4];
+float3 lightColors[4];
 
 float3 eyePosition; //Posicion de la camara
 
@@ -97,7 +100,7 @@ struct VertexShaderOutput
 {
 	float4 Position : POSITION0;
 	float2 TextureCoordinates : TEXCOORD0;
-	float4 WorldNormal : TEXCOORD1;
+	float3 WorldNormal : TEXCOORD1;
 	float4 WorldPosition : TEXCOORD2;
 };
 
@@ -113,7 +116,7 @@ VertexShaderOutput MainVS(VertexShaderInput input)
 	output.TextureCoordinates = input.TextureCoordinates;
 
 	// Usamos la matriz normal para proyectar el vector normal
-	output.WorldNormal = mul(float4(input.Normal.xyz, 0.0), matInverseTransposeWorld);
+	output.WorldNormal = mul(input.Normal, matInverseTransposeWorld);
 
 	// Usamos la matriz de world para proyectar la posicion
 	output.WorldPosition = mul(input.Position, matWorld);
@@ -186,7 +189,9 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 	float roughness = tex2D(roughnessSampler, input.TextureCoordinates).r;
 	float ao = tex2D(aoSampler, input.TextureCoordinates).r;
 
-	float3 worldNormal = input.WorldNormal.xyz;
+
+
+	float3 worldNormal = input.WorldNormal;
 	float3 normal = getNormalFromMap(input.TextureCoordinates, input.WorldPosition.xyz, worldNormal);
     float3 view = normalize(eyePosition - input.WorldPosition.xyz);
 
@@ -195,20 +200,16 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 	
 	// Reflectance equation
 	float3 Lo = float3(0.0, 0.0, 0.0);
-	for (int i = 0; i < 1; ++i)
+	
+	for (int index = 0; index < 4; index++)
 	{
-
-		/*
-		float3 light = normalize(lights[i].Position - input.WorldPosition.xyz);
-		float3 halfVector = normalize(view + light);
-		float distance = length(lights[i].Position - input.WorldPosition.xyz);
-		float attenuation = 1.0 / (distance * distance);
-		float3 radiance = lights[i].Color * attenuation;*/
-		float3 light = normalize(float3(45, 45, 45) - input.WorldPosition.xyz);
-		float3 halfVector = normalize(view + light);
-		float distance = length(float3(45, 45, 45) - input.WorldPosition.xyz);
+		float3 light = lightPositions[index] - input.WorldPosition.xyz;
+		float distance = length(light);
+		// Normalize our light vector after using its length
+		light = normalize(light);
+		float3 halfVector = normalize(view + light);		
 		float attenuation = 1.0 / (distance);
-		float3 radiance = float3(200, 200, 200) * attenuation;
+		float3 radiance = lightColors[index] * attenuation;
 
 
 		// Cook-Torrance BRDF
