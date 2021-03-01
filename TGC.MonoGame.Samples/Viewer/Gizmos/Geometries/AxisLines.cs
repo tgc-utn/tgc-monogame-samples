@@ -23,6 +23,8 @@ namespace TGC.MonoGame.Samples.Viewer
 
         private Matrix CloserProjection;
 
+        private Matrix BaseRotation;
+
         /// <summary>
         ///     Constructs an AxisLines drawable object.
         /// </summary>
@@ -49,6 +51,7 @@ namespace TGC.MonoGame.Samples.Viewer
             FarVector.X -= AxisScreenDistance;
             FarVector.Y -= AxisScreenDistance;
 
+            BaseRotation = Matrix.CreateRotationX(MathHelper.PiOver2);
 
             Effect.EnableDefaultLighting();
         }
@@ -77,7 +80,7 @@ namespace TGC.MonoGame.Samples.Viewer
                 var worldCoordPos = GraphicsDevice.Viewport.Unproject(FarVector, CloserProjection, view, Matrix.CreateTranslation(0f, 0f, 2f));
                 var worldCoordPosEnd = GraphicsDevice.Viewport.Unproject(NearVector, CloserProjection, view, Matrix.CreateTranslation(0f, 0f, 2f));
                 var scale = (worldCoordPosEnd - worldCoordPos).Length();
-                Effect.World = Matrix.CreateScale(scale) * Matrix.CreateTranslation(worldCoordPos);
+                Effect.World = BaseRotation * Matrix.CreateScale(scale) * Matrix.CreateTranslation(worldCoordPos);
             }
             Effect.View = view;
         }
