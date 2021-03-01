@@ -236,6 +236,9 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
             }
 
             Camera.Update(gameTime);
+
+            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+
             base.Update(gameTime);
         }
 

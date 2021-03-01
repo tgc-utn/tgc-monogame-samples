@@ -74,6 +74,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             Time += (float)gameTime.ElapsedGameTime.TotalSeconds;
             Effect.Parameters["time"].SetValue(Time);
 
+            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+
             base.Update(gameTime);
         }
         
@@ -103,7 +105,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             #endregion
 
-            AxisLines.Draw(Camera.View, Camera.Projection);
+            
             base.Draw(gameTime);
         }
 

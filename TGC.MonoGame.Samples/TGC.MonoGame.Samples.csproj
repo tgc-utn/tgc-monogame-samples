@@ -34,8 +34,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />
-    <Folder Include="Samples\Collisions" />
     <Folder Include="Samples\CompleteSolutions" />
-    <Folder Include="Viewer\" />
   </ItemGroup>
 </Project>

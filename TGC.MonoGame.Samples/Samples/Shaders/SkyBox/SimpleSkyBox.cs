@@ -70,6 +70,9 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.SkyBox
             Angle += 0.002f;
             View = Matrix.CreateLookAt(CameraPosition, CameraTarget, Vector3.UnitY);
 
+
+            Game.Gizmos.UpdateViewProjection(View, Projection);
+
             base.Update(gameTime);
         }
 
@@ -77,7 +80,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.SkyBox
         public override void Draw(GameTime gameTime)
         {
             Game.Background = Color.Black;
-            AxisLines.Draw(View, Projection);
+            
 
             var originalRasterizerState = GraphicsDevice.RasterizerState;
             var rasterizerState = new RasterizerState();

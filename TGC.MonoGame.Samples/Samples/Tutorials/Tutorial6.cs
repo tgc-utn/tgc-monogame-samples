@@ -66,6 +66,9 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             TankModel.CannonRotation = (float) Math.Sin(time * 0.25f) * 0.333f - 0.333f;
             TankModel.HatchRotation = MathHelper.Clamp((float) Math.Sin(time * 2) * 2, -1, 0);
 
+
+            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+
             base.Update(gameTime);
         }
 
@@ -74,7 +77,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         {
             Game.Background = Color.CornflowerBlue;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            AxisLines.Draw(Camera.View, Camera.Projection);
+            
 
             // Calculate the camera matrices.
             var time = Convert.ToSingle(gameTime.TotalGameTime.TotalSeconds);
