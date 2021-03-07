@@ -57,7 +57,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         public override void Initialize()
         {
             var screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
-            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0f, 0f, 10f), screenSize);
+            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0f, 0f, 50f), screenSize);
             
             BaseScale = Matrix.CreateScale(BaseScaleScalar);
 
@@ -65,8 +65,6 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
             base.Initialize();
         }
-
-
 
         /// <inheritdoc />
         protected override void LoadContent()
@@ -90,9 +88,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
             DrawDepthEffect = Game.Content.Load<Effect>(ContentFolderEffects + "ShadowMap");
 
-
             FullScreenQuad = new FullScreenQuad(GraphicsDevice);
-
 
             // Create a depth render target. It stores depth from the camera
             DepthRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, false,
@@ -153,7 +149,6 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
                     AddArrow(displacedAverage, -normal, Color.Yellow);
 
                 }
-
             }
         }
 
@@ -174,7 +169,6 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         {
             return  (new Vector2(position.X, position.Y)).Length() <= 0.2f;
         }
-
 
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
@@ -216,7 +210,6 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             base.Update(gameTime);
         }
 
-
         /// <inheritdoc />
         public override void Draw(GameTime gameTime)
         {
@@ -231,7 +224,6 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
             DrawSpheres(DrawDepthEffect, viewProjection);
 
-
             // Set the render target as null, we are drawing on the screen!
             GraphicsDevice.SetRenderTarget(null);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1f, 0);
@@ -245,7 +237,6 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             if (ShowArrows)
                 Arrows.ForEach(arrow => arrow.Draw(Matrix.Identity, Camera.View, Camera.Projection));
 
-
             // Debug our shadowmap!
             // Show a simple quad with the texture
             DebugTextureEffect.Parameters["World"].SetValue(Matrix.CreateScale(0.2f) * Matrix.CreateTranslation(new Vector3(-0.75f, -0.75f, 0f)));
@@ -253,12 +244,12 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             FullScreenQuad.Draw(DebugTextureEffect);
 
             Game.SpriteBatch.Begin();
-            Game.SpriteBatch.DrawString(SpriteFont, "Con la tecla 'J' se prende y apaga el modo Wireframe",
-                new Vector2(50, 50), Color.Yellow);
-            Game.SpriteBatch.DrawString(SpriteFont, "Con la tecla 'K' se prenden y apagan las flechas", new Vector2(50, 80),
-                Color.LightYellow);
-            Game.SpriteBatch.DrawString(SpriteFont, "Con la tecla 'L' se habilita y deshabilita el back-face culling", new Vector2(50, 110),
-                Color.LightGreen);
+            Game.SpriteBatch.DrawString(SpriteFont, "Con la tecla 'J' se prende y apaga el modo Wireframe.", 
+                new Vector2(GraphicsDevice.Viewport.Width - 700, 50), Color.Yellow);
+            Game.SpriteBatch.DrawString(SpriteFont, "Con la tecla 'K' se prenden y apagan las flechas.",
+                new Vector2(GraphicsDevice.Viewport.Width - 700, 80), Color.LightYellow);
+            Game.SpriteBatch.DrawString(SpriteFont, "Con la tecla 'L' se habilita y deshabilita el back-face culling.",
+                new Vector2(GraphicsDevice.Viewport.Width - 700, 110), Color.LightGreen);
             Game.SpriteBatch.End();
 
             AxisLines.Draw(Camera.View, Camera.Projection);
@@ -316,6 +307,5 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             DebugTextureEffect.Dispose();
             base.UnloadContent();
         }
-
     }
 }

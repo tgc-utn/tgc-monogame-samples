@@ -14,9 +14,9 @@ namespace TGC.MonoGame.Samples.Physics.Bepu
         public Vector3 Gravity;
         public float LinearDamping;
         public float AngularDamping;
-        Vector3 gravityDt;
-        float linearDampingDt;
-        float angularDampingDt;
+        private Vector3 gravityDt;
+        private float linearDampingDt;
+        private float angularDampingDt;
 
         public AngularIntegrationMode AngularIntegrationMode => AngularIntegrationMode.Nonconserving;
 
@@ -25,6 +25,16 @@ namespace TGC.MonoGame.Samples.Physics.Bepu
             Gravity = gravity;
             LinearDamping = linearDamping;
             AngularDamping = angularDamping;
+        }
+
+        /// <summary>
+        /// Performs any required initialization logic after the Simulation instance has been constructed.
+        /// </summary>
+        /// <param name="simulation">Simulation that owns these callbacks.</param>
+        public void Initialize(Simulation simulation)
+        {
+            //In this demo, we don't need to initialize anything.
+            //If you had a simulation with per body gravity stored in a CollidableProperty<T> or something similar, having the simulation provided in a callback can be helpful.
         }
 
         public void PrepareForIntegration(float dt)
@@ -56,7 +66,6 @@ namespace TGC.MonoGame.Samples.Physics.Bepu
 
             //This is also a handy spot to implement things like position dependent gravity or per-body damping.
         }
-
     }
     public unsafe struct NarrowPhaseCallbacks : INarrowPhaseCallbacks
     {

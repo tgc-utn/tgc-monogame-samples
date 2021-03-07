@@ -135,6 +135,16 @@ namespace TGC.MonoGame.Samples.Physics.Bepu
             }
 
             /// <summary>
+            /// Performs any required initialization logic after the Simulation instance has been constructed.
+            /// </summary>
+            /// <param name="simulation">Simulation that owns these callbacks.</param>
+            public void Initialize(Simulation simulation)
+            {
+                //In this demo, we don't need to initialize anything.
+                //If you had a simulation with per body gravity stored in a CollidableProperty<T> or something similar, having the simulation provided in a callback can be helpful.
+            }
+
+            /// <summary>
             /// Called prior to integrating the simulation's active bodies. When used with a substepping timestepper, this could be called multiple times per frame with different time step values.
             /// </summary>
             /// <param name="dt">Current time step duration.</param>

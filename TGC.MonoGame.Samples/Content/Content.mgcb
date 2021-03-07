@@ -327,6 +327,18 @@
 /processorParam:TextureFormat=Color
 /build:Textures/green.bmp
 
+#begin Textures/ground.jpg
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/ground.jpg
+
 #begin Textures/heightmaps/colormap.jpg
 /importer:TextureImporter
 /processor:TextureProcessor
