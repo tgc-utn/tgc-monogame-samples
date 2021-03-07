@@ -10,6 +10,7 @@
         public const string Heightmaps = "Heightmaps";
         public const string Models = "Models";
         public const string Optimizations = "Optimizations";
+        public const string PBR = "PBR";
         public const string Physics = "Physics";
         public const string PostProcessing = "Post Processing";
         public const string RenderPipeline = "Render Pipeline";
