@@ -119,8 +119,11 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
             Game.Background = Color.CornflowerBlue;
             Game.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            // dibujo el terreno
+            // dibujo el terreno, apagando el backface culling
+            var oldRasterizerState = GraphicsDevice.RasterizerState;
+            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
             terrain.Draw(Matrix.Identity, Camera.View, Camera.Projection);
+            GraphicsDevice.RasterizerState = oldRasterizerState;
 
             // computo 3 puntos sobre la superficie del heighmap
             var dir = new Vector2(MathF.Cos(angle), MathF.Sin(angle));
