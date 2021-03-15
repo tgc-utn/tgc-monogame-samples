@@ -53,26 +53,37 @@ namespace TGC.MonoGame.Samples.Geometries.Textures
 
             var positions = new Vector3[]
             {
+                // Back face
                 new Vector3(x, -y, z),
                 new Vector3(-x, -y, z),
                 new Vector3(x, y, z),
                 new Vector3(-x, y, z),
+
+                // Front face
                 new Vector3(x, y, -z),
                 new Vector3(-x, y, -z),
                 new Vector3(x, -y, -z),
                 new Vector3(-x, -y, -z),
+
+                // Top face
                 new Vector3(x, y, z),
                 new Vector3(-x, y, z),
                 new Vector3(x, y, -z),
                 new Vector3(-x, y, -z),
+
+                // Bottom face
                 new Vector3(x, -y, -z),
                 new Vector3(x, -y, z),
                 new Vector3(-x, -y, z),
                 new Vector3(-x, -y, -z),
+
+                // Left face
                 new Vector3(-x, -y, z),
                 new Vector3(-x, y, z),
                 new Vector3(-x, y, -z),
                 new Vector3(-x, -y, -z),
+
+                // Right face
                 new Vector3(x, -y, -z),
                 new Vector3(x, y, -z),
                 new Vector3(x, y, z),
@@ -81,30 +92,30 @@ namespace TGC.MonoGame.Samples.Geometries.Textures
 
             var textureCoordinates = new Vector2[]
             {
-                new Vector2(0f, 0f),
-                new Vector2(1f, 0f),
-                new Vector2(0f, 1f),
-                new Vector2(1f, 1f),
-                new Vector2(0f, 1f),
-                new Vector2(1f, 1f),
-                new Vector2(0f, 1f),
-                new Vector2(1f, 1f),
-                new Vector2(0f, 0f),
-                new Vector2(1f, 0f),
-                new Vector2(0f, 0f),
-                new Vector2(1f, 0f),
-                new Vector2(0f, 0f),
-                new Vector2(0f, 1f),
-                new Vector2(1f, 1f),
-                new Vector2(1f, 0f),
-                new Vector2(0f, 0f),
-                new Vector2(0f, 1f),
-                new Vector2(1f, 1f),
-                new Vector2(1f, 0f),
-                new Vector2(0f, 0f),
-                new Vector2(0f, 1f),
-                new Vector2(1f, 1f),
-                new Vector2(1f, 0f),
+                Vector2.Zero,
+                Vector2.UnitX,
+                Vector2.UnitY,
+                Vector2.One,
+                Vector2.UnitY,
+                Vector2.One,
+                Vector2.UnitY,
+                Vector2.One,
+                Vector2.Zero,
+                Vector2.UnitX,
+                Vector2.Zero,
+                Vector2.UnitX,
+                Vector2.Zero,
+                Vector2.UnitY,
+                Vector2.One,
+                Vector2.UnitX,
+                Vector2.Zero,
+                Vector2.UnitY,
+                Vector2.One,
+                Vector2.UnitX,
+                Vector2.Zero,
+                Vector2.UnitY,
+                Vector2.One,
+                Vector2.UnitX,
             };
 
             var normals = new Vector3[]
@@ -154,21 +165,27 @@ namespace TGC.MonoGame.Samples.Geometries.Textures
         {
             var indices = new ushort[]
             {
+                // Back face
                 3, 2, 0,
                 1, 3, 0,
-
+                
+                // Front face
                 5, 4, 8,
                 9, 5, 8,
-
+                
+                // Top face
                 7, 6, 10,
                 11, 7, 10,
-
+                
+                // Bottom face
                 14, 13, 12,
                 15, 14, 12,
-
+                
+                // Left face
                 18, 17, 16,
                 19, 18, 16,
-
+                
+                // Right face
                 22, 21, 20,
                 23, 22, 20,
             };
