@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 using TGC.MonoGame.Samples.Viewer;
 using TGC.MonoGame.Samples.Viewer.GUI;
+using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
 namespace TGC.MonoGame.Samples.Samples
 {
@@ -25,6 +27,8 @@ namespace TGC.MonoGame.Samples.Samples
         public TGCSample(TGCViewer game) : base(game)
         {
             Game = game;
+
+            Modifiers = new List<IModifier>();
         }
 
         /// <summary>
@@ -51,6 +55,12 @@ namespace TGC.MonoGame.Samples.Samples
         ///     Description of the topics applied in the example.
         /// </summary>
         public string Description { get; set; }
+
+
+        /// <summary>
+        ///     List of modifiers to be rendered and used by each sample.
+        /// </summary>
+        public List<IModifier> Modifiers { get; protected set; }
 
         /// <summary>
         ///     Initialize the game settings here.

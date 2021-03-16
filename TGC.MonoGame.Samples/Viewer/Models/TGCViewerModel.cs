@@ -293,6 +293,10 @@ namespace TGC.MonoGame.Samples.Viewer.Models
 
             if (AboutVisible) ShowAboutWindow();
 
+            var modifiers = ActiveSample.Modifiers;
+            foreach(var modifier in modifiers)
+                modifier.Draw();
+
             ImGui.End();
         }
 
