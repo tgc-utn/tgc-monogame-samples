@@ -60,6 +60,8 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
         ///     Gets the simulation created by the sample's Initialize call.
         /// </summary>
         private Simulation Simulation { get; set; }
+        
+        private SpriteFont SpriteFont { get; set; }
 
         /// <summary>
         ///     Gets the thread dispatcher available for use by the simulation.
@@ -79,6 +81,8 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
         {
             Random = new Random(5);
 
+            SpriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "Arial");
+            
             //The buffer pool is a source of raw memory blobs for the engine to use.
             BufferPool = new BufferPool();
 
@@ -220,6 +224,10 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
             BoxesWorld.ForEach(boxWorld => Box.Draw(boxWorld, Camera.View, Camera.Projection));
             SpheresWorld.ForEach(sphereWorld => Sphere.Draw(sphereWorld, Camera.View, Camera.Projection));
 
+            Game.SpriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
+            Game.SpriteBatch.DrawString(SpriteFont, "Launch spheres with the 'Z' key.", new Vector2(GraphicsDevice.Viewport.Width - 400, 0), Color.White);
+            Game.SpriteBatch.End();
+            
             base.Draw(gameTime);
         }
 

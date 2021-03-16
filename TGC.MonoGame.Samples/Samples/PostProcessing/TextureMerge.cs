@@ -93,7 +93,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             #endregion
             
-            #region Pass 1
+            #region Pass 2
 
             // No depth needed
             GraphicsDevice.DepthStencilState = DepthStencilState.None;

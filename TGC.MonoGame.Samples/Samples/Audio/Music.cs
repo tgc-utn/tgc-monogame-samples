@@ -45,7 +45,7 @@ namespace TGC.MonoGame.Samples.Samples.Audio
         {
             Font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "Arial");
             InstructionsSize = Font.MeasureString(Instructions);
-            SongName = "RetroPlatforming";
+            SongName = "retro-platforming";
             Song = Game.Content.Load<Song>(ContentFolderMusic + SongName);
 
             MediaPlayer.IsRepeating = true;
