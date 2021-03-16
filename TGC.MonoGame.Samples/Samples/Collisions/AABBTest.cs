@@ -79,8 +79,8 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         
         public BoundingBox GetBounds(Model model)
         {
-            Vector3 min = Vector3.One * float.MaxValue;
-            Vector3 max = Vector3.One * float.MinValue;
+            var minPoint = Vector3.One * float.MaxValue;
+            var maxPoint = Vector3.One * float.MinValue;
 
             var meshes = model.Meshes;
             for (int index = 0; index < meshes.Count; index++)
@@ -98,12 +98,12 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
                     for (int vertexIndex = 0; vertexIndex < rawVertexBuffer.Length; vertexIndex += vertexSize)
                     {
                         Vector3 vertex = new Vector3(rawVertexBuffer[vertexIndex], rawVertexBuffer[vertexIndex + 1], rawVertexBuffer[vertexIndex + 2]);
-                        min = Vector3.Min(min, vertex);
-                        max = Vector3.Max(max, vertex);
+                        minPoint = Vector3.Min(minPoint, vertex);
+                        maxPoint = Vector3.Max(maxPoint, vertex);
                     }
                 }
             }
-            return new BoundingBox(min, max);
+            return new BoundingBox(minPoint, maxPoint);
         }
 
         /// <inheritdoc />
@@ -143,8 +143,8 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             // Size is the difference between max and min
             // Also draw red if they touch
 
-            Color colorOne = AreAABBsTouching ? Color.Red : Color.Yellow;
-            Color colorTwo = AreAABBsTouching ? Color.Red : Color.Green;
+            var colorOne = AreAABBsTouching ? Color.Red : Color.Yellow;
+            var colorTwo = AreAABBsTouching ? Color.Red : Color.Green;
 
             Game.Gizmos.DrawCube((RobotOneBox.Max + RobotOneBox.Min) / 2f, RobotOneBox.Max - RobotOneBox.Min, colorOne);
             Game.Gizmos.DrawCube((RobotTwoBox.Max + RobotTwoBox.Min) / 2f, RobotTwoBox.Max - RobotTwoBox.Min, colorTwo);

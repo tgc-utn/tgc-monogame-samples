@@ -19,25 +19,25 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="subdivisions">The number of subdivisions to </param>
         public CylinderGizmoGeometry(GraphicsDevice device, int subdivisions) : base(device)
         {
-            Vector2[] positions = GeneratePolygonPositions(subdivisions);
-            ushort[] originalIndices = GeneratePolygonIndices(subdivisions);
+            var positions = GeneratePolygonPositions(subdivisions);
+            var originalIndices = GeneratePolygonIndices(subdivisions);
 
-            int subdivisionsTimesTwo = subdivisions * 2;
+            var subdivisionsTimesTwo = subdivisions * 2;
             
             // Lines for each circle, and four lines joining them
-            ushort[] indices = new ushort[subdivisions * 6 + 8];
+            var indices = new ushort[subdivisions * 6 + 8];
 
             Array.Copy(originalIndices, 0, indices, 0, subdivisionsTimesTwo);
             Array.Copy(originalIndices.Select(index => (ushort)(index + subdivisions)).ToArray(), 0, indices, subdivisionsTimesTwo, subdivisionsTimesTwo);
             Array.Copy(originalIndices.Select(index => (ushort)(index + subdivisionsTimesTwo)).ToArray(), 0, indices, subdivisionsTimesTwo * 2, subdivisionsTimesTwo);
 
-            int index = subdivisions * 6;
-            ushort firstQuadrant = (ushort)(subdivisions / 4);
-            ushort firstQuadrantAdded = (ushort)(firstQuadrant + subdivisions);
-            ushort secondQuadrant = (ushort)(subdivisions / 2);
-            ushort secondQuadrantAdded = (ushort)(secondQuadrant + subdivisions);
-            ushort thirdQuadrant = (ushort)(firstQuadrant + secondQuadrant);
-            ushort thirdQuadrantAdded = (ushort)(thirdQuadrant + subdivisions);
+            var index = subdivisions * 6;
+            var firstQuadrant = (ushort)(subdivisions / 4);
+            var firstQuadrantAdded = (ushort)(firstQuadrant + subdivisions);
+            var secondQuadrant = (ushort)(subdivisions / 2);
+            var secondQuadrantAdded = (ushort)(secondQuadrant + subdivisions);
+            var thirdQuadrant = (ushort)(firstQuadrant + secondQuadrant);
+            var thirdQuadrantAdded = (ushort)(thirdQuadrant + subdivisions);
 
             // Joining lines
             indices[index] = 0;
@@ -57,7 +57,7 @@ namespace TGC.MonoGame.Samples.Viewer
             indices[index] = thirdQuadrantAdded;
             index++;
 
-            VertexPosition[] vertices = new VertexPosition[subdivisions * 3];
+            var vertices = new VertexPosition[subdivisions * 3];
             positions
                 .Select(position => new VertexPosition(new Vector3(position.X, 1f, position.Y)))
                 .ToArray()

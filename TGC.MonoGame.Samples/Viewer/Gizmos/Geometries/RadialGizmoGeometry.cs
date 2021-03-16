@@ -27,15 +27,15 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <returns>An array of positions in two dimensions describing a circle with the given subdivisions.</returns>
         protected Vector2[] GeneratePolygonPositions(int subdivisions)
         {
-            Vector2[] positions = new Vector2[subdivisions];
+            var positions = new Vector2[subdivisions];
 
-            float offset = 0;
+            var offset = 0f;
 
             // Odd? Then start at 90 degrees
             if (subdivisions % 2 == 1)
                 offset = MathHelper.PiOver2;
 
-            float increment = MathHelper.TwoPi / subdivisions;
+            var increment = MathHelper.TwoPi / subdivisions;
             for (ushort index = 0; index < subdivisions; index++)
             {
                 positions[index] = new Vector2(MathF.Cos(offset), MathF.Sin(offset));
@@ -52,8 +52,8 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <returns>An array of indices, in pairs, joining points to form lines of a circle.</returns>
         protected ushort[] GeneratePolygonIndices(int subdivisions)
         {
-            int subdivisionsTimesTwo = subdivisions * 2;
-            ushort[] indices = new ushort[subdivisionsTimesTwo];
+            var subdivisionsTimesTwo = subdivisions * 2;
+            var indices = new ushort[subdivisionsTimesTwo];
 
             for (ushort index = 0; index < subdivisions; index++)
             {

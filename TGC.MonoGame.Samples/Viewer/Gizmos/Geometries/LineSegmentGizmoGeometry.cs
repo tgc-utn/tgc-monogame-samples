@@ -35,7 +35,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <returns>The calculated World matrix</returns>
         public static Matrix CalculateWorld(Vector3 origin, Vector3 destination)
         {
-            Vector3 scale = destination - origin;
+            var scale = destination - origin;
             return Matrix.CreateScale(scale) * Matrix.CreateTranslation(origin);
         }
 

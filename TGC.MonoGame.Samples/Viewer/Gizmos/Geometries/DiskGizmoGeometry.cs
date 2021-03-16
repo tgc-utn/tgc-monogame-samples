@@ -19,13 +19,13 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="subdivisions">The amount of subdivisions the wire disk will take when forming a circle.</param>
         public DiskGizmoGeometry(GraphicsDevice graphicsDevice, int subdivisions) : base(graphicsDevice)
         {
-            Vector2[] positions = GeneratePolygonPositions(subdivisions);
-            ushort[] originalIndices = GeneratePolygonIndices(subdivisions);
+            var positions = GeneratePolygonPositions(subdivisions);
+            var originalIndices = GeneratePolygonIndices(subdivisions);
 
-            int subdivisionsTimesTwo = subdivisions * 2;
+            var subdivisionsTimesTwo = subdivisions * 2;
 
-            ushort[] indices = new ushort[subdivisionsTimesTwo];
-            VertexPosition[] vertices = new VertexPosition[subdivisions];
+            var indices = new ushort[subdivisionsTimesTwo];
+            var vertices = new VertexPosition[subdivisions];
 
             Array.Copy(originalIndices, 0, indices, 0, subdivisionsTimesTwo);
 
@@ -47,17 +47,15 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <returns>The calculated World matrix</returns>
         public static Matrix CalculateWorld(Vector3 origin, Vector3 normal, float radius)
         {
-            Matrix rotation;
+            var rotation = Matrix.Identity;
             if (!normal.Equals(Vector3.Up))
             {
                 // Rotate our disk!
                 // Pretty sure this can be optimized
-                Vector3 axis = Vector3.Cross(Vector3.Up, normal);
+                var axis = Vector3.Cross(Vector3.Up, normal);
                 float amplitude = Vector3.Dot(Vector3.Up, normal);
                 rotation = Matrix.CreateFromQuaternion(Quaternion.CreateFromAxisAngle(axis, amplitude));
             }
-            else
-                rotation = Matrix.Identity;
 
             return Matrix.CreateScale(radius) * rotation * Matrix.CreateTranslation(origin);
         }

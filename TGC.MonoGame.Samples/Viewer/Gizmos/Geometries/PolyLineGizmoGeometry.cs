@@ -39,8 +39,8 @@ namespace TGC.MonoGame.Samples.Viewer
         {
             var vertices = points.Select(point => new VertexPosition(point)).ToArray();
 
-            int primitiveCount = vertices.Length - 1;
-            int indexCount = primitiveCount * 2;
+            var primitiveCount = vertices.Length - 1;
+            var indexCount = primitiveCount * 2;
             var indices = Indices.Take(indexCount).ToArray();
 
             GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.LineList, vertices, 0, vertices.Length, indices, 0, primitiveCount);

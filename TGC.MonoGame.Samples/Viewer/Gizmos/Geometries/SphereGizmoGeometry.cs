@@ -19,18 +19,18 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="subdivisions">The amount of the subdivisions each sphere ring will have.</param>
         public SphereGizmoGeometry(GraphicsDevice graphicsDevice, int subdivisions) : base(graphicsDevice)
         {
-            Vector2[] positions = GeneratePolygonPositions(subdivisions);
-            ushort[] originalIndices = GeneratePolygonIndices(subdivisions);
+            var positions = GeneratePolygonPositions(subdivisions);
+            var originalIndices = GeneratePolygonIndices(subdivisions);
 
-            int subdivisionsTimesTwo = subdivisions * 2;
-            ushort[] indices = new ushort[subdivisions * 6];
+            var subdivisionsTimesTwo = subdivisions * 2;
+            var indices = new ushort[subdivisions * 6];
 
             Array.Copy(originalIndices, 0, indices, 0, subdivisionsTimesTwo);
             Array.Copy(originalIndices.Select(index => (ushort)(index + subdivisions)).ToArray(), 0, indices, subdivisionsTimesTwo, subdivisionsTimesTwo);
             Array.Copy(originalIndices.Select(index => (ushort)(index + subdivisionsTimesTwo)).ToArray(), 0, indices, subdivisionsTimesTwo * 2, subdivisionsTimesTwo);
 
 
-            VertexPosition[] vertices = new VertexPosition[subdivisions * 3];
+            var vertices = new VertexPosition[subdivisions * 3];
             positions
                 .Select(position => new VertexPosition(new Vector3(position, 0f)))
                 .ToArray()

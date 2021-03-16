@@ -106,7 +106,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <inheritdoc />
         public void DrawLine(Vector3 origin, Vector3 destination, Color color)
         {
-            Matrix world = LineSegmentGizmoGeometry.CalculateWorld(origin, destination);
+            var world = LineSegmentGizmoGeometry.CalculateWorld(origin, destination);
             AddDrawInstance(LineSegment, BaseColor, world);
         }
 
@@ -120,7 +120,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <inheritdoc />
         public void DrawCube(Vector3 origin, Vector3 size, Color color)
         {
-            Matrix world = CubeGizmoGeometry.CalculateWorld(origin, size);
+            var world = CubeGizmoGeometry.CalculateWorld(origin, size);
             AddDrawInstance(Cube, color, world);
         }
 
@@ -133,7 +133,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <inheritdoc />
         public void DrawSphere(Vector3 origin, Vector3 size, Color color)
         {
-            Matrix world = SphereGizmoGeometry.CalculateWorld(origin, size);
+            var world = SphereGizmoGeometry.CalculateWorld(origin, size);
             AddDrawInstance(Sphere, color, world);
         }
 
@@ -161,7 +161,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <inheritdoc />
         public void DrawFrustum(Matrix viewProjection, Color color)
         {
-            Matrix world = CubeGizmoGeometry.CalculateFrustumWorld(viewProjection);
+            var world = CubeGizmoGeometry.CalculateFrustumWorld(viewProjection);
             AddDrawInstance(Cube, color, world);
         }
 
@@ -174,7 +174,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <inheritdoc />
         public void DrawDisk(Vector3 origin, Vector3 normal, float radius, Color color)
         {
-            Matrix world = DiskGizmoGeometry.CalculateWorld(origin, normal, radius);
+            var world = DiskGizmoGeometry.CalculateWorld(origin, normal, radius);
             AddDrawInstance(Disk, color, world);
         }
 
@@ -187,7 +187,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <inheritdoc />
         public void DrawCylinder(Vector3 origin, Matrix rotation, Vector3 size, Color color)
         {
-            Matrix world = CylinderGizmoGeometry.CalculateWorld(origin, rotation, size);
+            var world = CylinderGizmoGeometry.CalculateWorld(origin, rotation, size);
             AddDrawInstance(Cylinder, color, world);
         }
 
@@ -235,7 +235,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="pass">The pass from an effect to draw the geometry with.</param>
         private void DrawBaseGizmosGeometries(EffectPass pass)
         {
-            int count = 0;
+            var count = 0;
             List<Matrix> matrices;
             foreach (var drawInstance in DrawInstances)
             {
@@ -266,7 +266,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="pass">The pass from an effect to draw the geometry with.</param>
         private void DrawPolyLines(EffectPass pass)
         {
-            int count = 0;
+            var count = 0;
             List<Vector3[]> positions;
             WorldViewProjectionParameter.SetValue(Matrix.Identity);
             foreach (var polyLineInstance in PolyLinesToDraw)

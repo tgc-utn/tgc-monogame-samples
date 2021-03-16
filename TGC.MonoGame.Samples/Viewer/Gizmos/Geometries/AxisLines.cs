@@ -42,7 +42,7 @@ namespace TGC.MonoGame.Samples.Viewer
             Effect.Projection = Matrix.Identity;
             Effect.View = Matrix.Identity;
             
-            Vector3 screenPosition = new Vector3(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, 1f);
+            var screenPosition = new Vector3(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, 1f);
             NearVector = screenPosition;
             NearVector.X -= AxisScreenOffset;
             NearVector.Y -= AxisScreenOffset;
