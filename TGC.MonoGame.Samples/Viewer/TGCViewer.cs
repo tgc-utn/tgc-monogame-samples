@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using TGC.MonoGame.Samples.Viewer.Models;
@@ -15,6 +16,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// </summary>
         public const string ContentFolder = "Content";
 
+
         /// <summary>
         ///     Initializes a new instance of the <see cref="TGCViewer" /> class.
         ///     The main game constructor is used to initialize the starting variables.
@@ -29,6 +31,8 @@ namespace TGC.MonoGame.Samples.Viewer
             //Graphics.PreferMultiSampling = true;
             Content.RootDirectory = ContentFolder;
             IsMouseVisible = true;
+
+            Gizmos = new Gizmos();
 
             Model = new TGCViewerModel(this);
             Model.LoadTreeSamples();
@@ -55,9 +59,16 @@ namespace TGC.MonoGame.Samples.Viewer
         private TGCViewerModel Model { get; }
 
         /// <summary>
+        ///     Gizmos are used to debug and visualize boundaries and vectors
+        /// </summary>
+        public Gizmos Gizmos { get; }
+
+        /// <summary>
         ///     Enables a group of sprites to be drawn using the same settings.
         /// </summary>
         public SpriteBatch SpriteBatch { get; set; }
+
+
 
         /// <summary>
         ///     This method is called after the constructor, but before the main game loop (Update/Draw).
@@ -79,6 +90,7 @@ namespace TGC.MonoGame.Samples.Viewer
 
             Background = Color.CornflowerBlue;
 
+
             base.Initialize();
         }
 
@@ -89,6 +101,7 @@ namespace TGC.MonoGame.Samples.Viewer
         protected override void LoadContent()
         {
             //TODO: use this.Content to load your game content here
+            Gizmos.LoadContent(GraphicsDevice, new ContentManager(Content.ServiceProvider, ContentFolder));
 
             // Create a new SpriteBatch, which can be used to draw textures.
             SpriteBatch = new SpriteBatch(GraphicsDevice);
@@ -122,6 +135,8 @@ namespace TGC.MonoGame.Samples.Viewer
             base.Draw(gameTime);
 
             Model.DrawSampleExplorer(gameTime);
+
+            Gizmos.Draw();
         }
 
         /// <summary>
@@ -129,6 +144,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// </summary>
         protected override void UnloadContent()
         {
+            Gizmos.Dispose();
             Model.Dispose();
             Content.Unload();
         }

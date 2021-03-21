@@ -63,6 +63,8 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         {
             Camera.Update(gameTime);
 
+            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+
             base.Update(gameTime);
         }
 
@@ -73,7 +75,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            AxisLines.Draw(Camera.View, Camera.Projection);
+            
 
             time += Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
 

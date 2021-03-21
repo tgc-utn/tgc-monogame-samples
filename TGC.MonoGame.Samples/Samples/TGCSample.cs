@@ -28,11 +28,6 @@ namespace TGC.MonoGame.Samples.Samples
         }
 
         /// <summary>
-        ///     Helper to visualize the Cartesian axes.
-        /// </summary>
-        public AxisLines AxisLines { get; set; }
-
-        /// <summary>
         ///     Category where the example belongs, this value is used to build the example tree.
         /// </summary>
         public string Category { get; set; }
@@ -57,8 +52,6 @@ namespace TGC.MonoGame.Samples.Samples
         /// </summary>
         public override void Initialize()
         {
-            AxisLines = new AxisLines(GraphicsDevice);
-
             base.Initialize();
         }
 

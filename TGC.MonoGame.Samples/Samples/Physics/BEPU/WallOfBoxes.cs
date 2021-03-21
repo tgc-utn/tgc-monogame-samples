@@ -208,6 +208,9 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
                 SpheresWorld.Add(world);
             }
 
+
+            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+
             base.Update(gameTime);
         }
 

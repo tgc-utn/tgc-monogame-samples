@@ -69,6 +69,8 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             Pitch += time * 0.8f;
             Roll += time * 0.9f;
 
+            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+
             base.Update(gameTime);
         }
 
@@ -77,7 +79,6 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         {
             Game.Background = Color.CornflowerBlue;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            AxisLines.Draw(Camera.View, Camera.Projection);
 
             DrawGeometry(Box, BoxPosition, Yaw, Pitch, Roll);
             DrawGeometry(Cylinder, CylinderPosition, Yaw, Pitch, Roll);

@@ -36,6 +36,8 @@ namespace TGC.MonoGame.Samples.Samples.Audio
             Instructions = "Y = Play a new instance in loop, I = Play and forget.";
             SoundName = "No sound";
 
+            Game.Gizmos.Enabled = false;
+
             base.Initialize();
         }
 

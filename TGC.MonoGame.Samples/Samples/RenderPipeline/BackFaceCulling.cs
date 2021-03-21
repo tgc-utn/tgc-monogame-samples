@@ -206,6 +206,8 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             else
                 PastBackFacePressed = false;
 
+            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+
             base.Update(gameTime);
         }
 
@@ -251,7 +253,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
                 new Vector2(GraphicsDevice.Viewport.Width - 700, 110), Color.LightGreen);
             Game.SpriteBatch.End();
 
-            AxisLines.Draw(Camera.View, Camera.Projection);
+            
             base.Draw(gameTime);
         }
 

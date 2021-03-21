@@ -125,6 +125,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             PastKeyPressed = currentKeyPressed;
 
+            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+
             base.Update(gameTime);
         }
 
@@ -138,7 +140,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
 
             GraphicsDevice.DepthStencilState = DepthStencilState.None;
-            AxisLines.Draw(Camera.View, Camera.Projection);
+            
             base.Draw(gameTime);
         }
 

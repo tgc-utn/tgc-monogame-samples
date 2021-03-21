@@ -107,6 +107,9 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
             var Position = new Vector3(pos2.X, DesiredLookAt.Y + H, pos2.Y);
             Camera.View = Matrix.CreateLookAt(Position, LookAt, new Vector3(0, 1, 0));
 
+            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+
+
             base.Update(gameTime);
         }
 
@@ -115,10 +118,12 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
         {
             Game.Background = Color.CornflowerBlue;
             Game.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            AxisLines.Draw(Camera.View, Camera.Projection);
 
-            // dibujo el terreno
+            // dibujo el terreno, apagando el backface culling
+            var oldRasterizerState = GraphicsDevice.RasterizerState;
+            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
             terrain.Draw(Matrix.Identity, Camera.View, Camera.Projection);
+            GraphicsDevice.RasterizerState = oldRasterizerState;
 
             // computo 3 puntos sobre la superficie del heighmap
             var dir = new Vector2(MathF.Cos(angle), MathF.Sin(angle));
