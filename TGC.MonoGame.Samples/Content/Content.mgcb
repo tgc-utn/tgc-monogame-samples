@@ -332,6 +332,11 @@
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:Effects/ToonShading.fx
+#begin Effects/Textures.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/Textures.fx
 
 #begin Music/retro-platforming.mp3
 /importer:Mp3Importer
