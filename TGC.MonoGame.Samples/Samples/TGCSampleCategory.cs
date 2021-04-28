@@ -6,6 +6,8 @@
     public static class TGCSampleCategory
     {
         public const string Audio = "Audio";
+
+        public const string Clases = "Clases";
         public const string Collisions = "Collisions";
         public const string CompleteSolutions = "Complete Solutions";
         public const string Heightmaps = "Heightmaps";
