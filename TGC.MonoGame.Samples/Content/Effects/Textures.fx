@@ -35,6 +35,7 @@ sampler2D textureClamp = sampler_state
     MinFilter = Linear;
     AddressU = Clamp;
     AddressV = Clamp;
+    MipFilter = Linear; // Mip-mapping
 };
 
 sampler2D textureMirror = sampler_state
@@ -129,7 +130,7 @@ float4 BorderPS(VertexShaderOutput input) : COLOR
 float4 LodPS(VertexShaderOutput input) : COLOR
 {
     // Get the texture texel textureSampler is the sampler, Texcoord is the interpolated coordinates
-    float4 textureColor = tex2Dlod(textureBorder, float4(input.TextureCoordinate,tiling,tiling));
+    float4 textureColor = tex2Dlod(textureClamp, float4(input.TextureCoordinate,tiling,tiling));
     textureColor.a = 1;
 	// Color and texture are combined in this example, 80% the color of the texture and 20% that of the vertex
     return textureColor;
