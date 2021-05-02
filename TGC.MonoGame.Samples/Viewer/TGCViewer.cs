@@ -49,6 +49,11 @@ namespace TGC.MonoGame.Samples.Viewer
         public KeyboardState CurrentKeyboardState { get; set; }
 
         /// <summary>
+        ///     Represents the state of the Mouse input device.
+        /// </summary>
+        public MouseState CurrentMouseState { get; set; }
+
+        /// <summary>
         ///     Handles the configuration and management of the graphics device.
         /// </summary>
         public GraphicsDeviceManager Graphics { get; }
@@ -155,6 +160,8 @@ namespace TGC.MonoGame.Samples.Viewer
         private void HandleInput()
         {
             CurrentKeyboardState = Keyboard.GetState();
+
+            CurrentMouseState = Mouse.GetState();
 
             // Check for exit.
             if (CurrentKeyboardState.IsKeyDown(Keys.Escape)) Exit();

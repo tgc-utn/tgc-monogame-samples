@@ -46,6 +46,8 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
         private List<Matrix> SpheresWorld { get; set; }
         private bool CanShoot { get; set; }
 
+        private Effect TilingEffect { get; set; }
+
         /// <summary>
         ///     Gets the buffer pool used by the demo's simulation.
         ///     Note that the buffer pool used by the simulation is not considered to be *owned* by the simulation.
@@ -110,8 +112,13 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
 
             // Creates a floor
             var floorTexture = Game.Content.Load<Texture2D>(ContentFolderTextures + "floor/adoquin-2");
-            Floor = new QuadPrimitive(GraphicsDevice, Vector3.Zero, Vector3.Backward, Vector3.Up, 400, 600, floorTexture, 20);
-            FloorWorld = Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateTranslation(new Vector3(75,0, -150));
+            Floor = new QuadPrimitive(GraphicsDevice);
+
+            TilingEffect = Game.Content.Load<Effect>(ContentFolderEffects + "TextureTiling");
+            TilingEffect.Parameters["Texture"].SetValue(floorTexture);
+            TilingEffect.Parameters["Tiling"].SetValue(Vector2.One * 50f);
+
+            FloorWorld = Matrix.CreateScale(400f) * Matrix.CreateTranslation(new Vector3(75,0, -150));
             Simulation.Statics.Add(new StaticDescription(new NumericVector3(0, -0.5f, 0),
                 new CollidableDescription(Simulation.Shapes.Add(new Box(2000, 1, 2000)), 0.1f)));
 
@@ -178,7 +185,8 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
                 SphereHandles.Add(bodyHandle);
             }
 
-            if (Game.CurrentKeyboardState.IsKeyUp(Keys.Z)) CanShoot = true;
+            if (Game.CurrentKeyboardState.IsKeyUp(Keys.Z)) 
+                CanShoot = true;
 
 
             BoxesWorld.Clear();
@@ -214,13 +222,16 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
             base.Update(gameTime);
         }
 
+
+
         /// <inheritdoc />
         public override void Draw(GameTime gameTime)
         {
             Game.Background = Color.Black;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            Floor.Draw(FloorWorld, Camera.View, Camera.Projection);
+            TilingEffect.Parameters["WorldViewProjection"].SetValue(FloorWorld * Camera.View * Camera.Projection);
+            Floor.Draw(TilingEffect);
             BoxesWorld.ForEach(boxWorld => Box.Draw(boxWorld, Camera.View, Camera.Projection));
             SpheresWorld.ForEach(sphereWorld => Sphere.Draw(sphereWorld, Camera.View, Camera.Projection));
 

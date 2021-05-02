@@ -70,5 +70,8 @@ namespace TGC.MonoGame.Samples.Collisions
             col = p + t * (p - q);
             return true;
         }
+
+
     }
+
 }

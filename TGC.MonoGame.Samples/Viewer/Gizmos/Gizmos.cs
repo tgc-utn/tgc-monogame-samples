@@ -105,6 +105,27 @@ namespace TGC.MonoGame.Samples.Viewer
             Renderer.DrawCube(origin, size);
         }
 
+
+        /// <summary>
+        ///     Draws a wire cube with a World matrix using the Gizmos color.
+        /// </summary>
+        /// <param name="world">The World matrix of the cube.</param>
+        public void DrawCube(Matrix world)
+        {
+            Renderer.DrawCube(world);
+        }
+
+        /// <summary>
+        ///     Draws a wire cube with a World matrix using the specified color.
+        /// </summary>
+        /// <param name="world">The World matrix of the cube.</param>
+        /// <param name="color">The color of the cube.</param>
+        public void DrawCube(Matrix world, Color color)
+        {
+            Renderer.DrawCube(world, color);
+        }
+
+
         /// <summary>
         ///     Draws a wire cube with an origin and size using the specified color.
         /// </summary>
@@ -176,6 +197,16 @@ namespace TGC.MonoGame.Samples.Viewer
         }
 
         /// <summary>
+        ///     Draws a wire frustum -ViewProjection matrix- using the specified color.
+        /// </summary>
+        /// <param name="viewProjection">The ViewProjection matrix of a virtual camera to draw its frustum.</param>
+        /// <param name="color">The color of the frustum.</param>
+        public void DrawView(Matrix viewProjection, Color color)
+        {
+            Renderer.DrawView(viewProjection, color);
+        }
+
+        /// <summary>
         ///     Draws a wire circle with an origin and normal direction using the Gizmos color.
         /// </summary>
         /// <param name="origin">The position of the disk.</param>
@@ -219,6 +250,26 @@ namespace TGC.MonoGame.Samples.Viewer
         public void DrawCylinder(Vector3 origin, Matrix rotation, Vector3 size, Color color)
         {
             Renderer.DrawCylinder(origin, rotation, size, color);
+        }
+
+        /// <summary>
+        ///     Draws a wire cylinder with a World matrix using the Gizmos color.
+        /// </summary>
+        /// <param name="world">The World matrix of the cylinder.</param>
+        /// <param name="color">The color of the cylinder.</param>
+        public void DrawCylinder(Matrix world)
+        {
+            Renderer.DrawCylinder(world);
+        }
+
+        /// <summary>
+        ///     Draws a wire cylinder with a World matrix using the specified color.
+        /// </summary>
+        /// <param name="world">The World matrix of the cylinder.</param>
+        /// <param name="color">The color of the cylinder.</param>
+        public void DrawCylinder(Matrix world, Color color)
+        {
+            Renderer.DrawCylinder(world, color);
         }
 
 

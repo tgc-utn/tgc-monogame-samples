@@ -23,10 +23,19 @@ namespace TGC.MonoGame.Samples.Viewer
         public void DrawCube(Vector3 origin, Vector3 size, Color color) { }
 
         /// <inheritdoc />
+        public void DrawCube(Matrix world) { }
+
+        /// <inheritdoc />
+        public void DrawCube(Matrix world, Color color) { }
+
+        /// <inheritdoc />
         public void DrawFrustum(Matrix viewProjection) { }
 
         /// <inheritdoc />
         public void DrawFrustum(Matrix viewProjection, Color color) { }
+
+        /// <inheritdoc />
+        public void DrawView(Matrix view, Color color) { }
 
         /// <inheritdoc />
         public void DrawLine(Vector3 origin, Vector3 direction) { }
@@ -59,6 +68,13 @@ namespace TGC.MonoGame.Samples.Viewer
         public void DrawCylinder(Vector3 origin, Matrix rotation, Vector3 size, Color color) { }
 
         /// <inheritdoc />
+        public void DrawCylinder(Matrix world) { }
+
+        /// <inheritdoc />
+        public void DrawCylinder(Matrix world, Color color) { }
+
+        /// <inheritdoc />
         void IGizmosRenderer.Draw() { }
+
     }
 }
