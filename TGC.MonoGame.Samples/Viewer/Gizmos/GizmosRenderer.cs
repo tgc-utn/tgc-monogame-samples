@@ -180,13 +180,6 @@ namespace TGC.MonoGame.Samples.Viewer
         }
 
         /// <inheritdoc />
-        public void DrawView(Matrix view, Color color)
-        {
-            var world = CubeGizmoGeometry.CalculateViewWorld(view);
-            AddDrawInstance(Cube, color, world);
-        }
-
-        /// <inheritdoc />
         public void DrawDisk(Vector3 origin, Vector3 normal, float radius)
         {
             DrawDisk(origin, normal, radius, BaseColor);

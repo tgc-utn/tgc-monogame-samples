@@ -197,16 +197,6 @@ namespace TGC.MonoGame.Samples.Viewer
         }
 
         /// <summary>
-        ///     Draws a wire frustum -ViewProjection matrix- using the specified color.
-        /// </summary>
-        /// <param name="viewProjection">The ViewProjection matrix of a virtual camera to draw its frustum.</param>
-        /// <param name="color">The color of the frustum.</param>
-        public void DrawView(Matrix viewProjection, Color color)
-        {
-            Renderer.DrawView(viewProjection, color);
-        }
-
-        /// <summary>
         ///     Draws a wire circle with an origin and normal direction using the Gizmos color.
         /// </summary>
         /// <param name="origin">The position of the disk.</param>

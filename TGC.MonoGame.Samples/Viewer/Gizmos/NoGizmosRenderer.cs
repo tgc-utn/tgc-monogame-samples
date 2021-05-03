@@ -35,9 +35,6 @@ namespace TGC.MonoGame.Samples.Viewer
         public void DrawFrustum(Matrix viewProjection, Color color) { }
 
         /// <inheritdoc />
-        public void DrawView(Matrix view, Color color) { }
-
-        /// <inheritdoc />
         public void DrawLine(Vector3 origin, Vector3 direction) { }
 
         /// <inheritdoc />
