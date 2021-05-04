@@ -68,6 +68,8 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps
         {
             Camera.Update(gameTime);
 
+            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+
             base.Update(gameTime);
         }
 
@@ -89,7 +91,7 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps
                 GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, PrimitiveCount);
             }
 
-            AxisLines.Draw(Camera.View, Camera.Projection);
+            
 
             base.Draw(gameTime);
         }

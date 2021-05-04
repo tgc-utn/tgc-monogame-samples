@@ -4,20 +4,22 @@
 ## Install
 * [.NET Core SDK](https://docs.microsoft.com/dotnet/core/install/sdk)
 * The IDE you prefer:
-  * [Visual Studio Code](https://code.visualstudio.com)
-  * [Visual Studio](https://visualstudio.microsoft.com/es/vs) or [Visual Studio for Mac](https://visualstudio.microsoft.com/es/vs/mac)
+  * [Visual Studio Code](https://code.visualstudio.com) and [HLSL extension](https://marketplace.visualstudio.com/items?itemName=TimGJones.hlsltools)
+  * [Visual Studio](https://visualstudio.microsoft.com/es/vs) and [HLSL extension](https://marketplace.visualstudio.com/items?itemName=TimGJones.HLSLToolsforVisualStudio)
+  * [Visual Studio for Mac](https://visualstudio.microsoft.com/es/vs/mac)
   * [Rider](https://www.jetbrains.com/rider)
 * [MGCB Editor](https://docs.monogame.net/articles/tools/mgcb_editor.html)
+* [MGFXC](https://docs.monogame.net/articles/tools/mgfxc.html)
 
 Read more about [.NET Core CLI Tools telemetry](https://aka.ms/dotnet-cli-telemetry) and [Visual Studio Code telemetry](https://code.visualstudio.com/docs/getstarted/telemetry) are enabled by default.
 
 ## Setting up your development environment
  * [Windows 10](https://docs.monogame.net/articles/getting_started/1_setting_up_your_development_environment_windows.html)
-   * You can use Visual Studio Code or Rider. The official documentation only explains it for Visual Studio but it is up to each one of you that you feel more comfortable with.
+   * You can use Visual Studio Code or Rider. The official documentation only explains it for Visual Studio but it is up to you which one you are more comfortable with.
  * [Linux (test on Ubuntu 20.04)](https://docs.monogame.net/articles/getting_started/1_setting_up_your_development_environment_ubuntu.html)
  * [Mac (test on macOS Mojave)](https://docs.monogame.net/articles/getting_started/1_setting_up_your_development_environment_macos.html)
 
-Outside of Windows you need [Wine's](https://www.winehq.org) help for Effects, at least for [now](https://github.com/MonoGame/MonoGame/issues/2167).
+Outside of Windows you need [Wine's](https://www.winehq.org) help for Effects(HLSL), at least for [now](https://github.com/MonoGame/MonoGame/issues/2167).
 
 ## To run in a terminal
 ```bash

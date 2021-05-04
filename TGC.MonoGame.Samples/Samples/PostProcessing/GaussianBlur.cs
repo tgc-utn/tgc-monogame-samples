@@ -87,6 +87,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             else if (Keyboard.GetState().IsKeyDown(Keys.L))
                 currentBlurType = BlurType.SEPARATED_PASSES;
 
+            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+
             base.Update(gameTime);
         }
 
@@ -108,7 +110,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
                 Color.Black);
             Game.SpriteBatch.End();
 
-            AxisLines.Draw(Camera.View, Camera.Projection);
+            
             base.Draw(gameTime);
         }
 

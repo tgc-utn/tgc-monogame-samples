@@ -80,6 +80,8 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
             EarthOrbitRotation += EarthOrbitSpeed * elapsedTime;
             MoonOrbitRotation += MoonOrbitSpeed * elapsedTime;
 
+            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+
             base.Update(gameTime);
         }
 
@@ -89,7 +91,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
             Game.Background = Color.Black;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            AxisLines.Draw(Camera.View, Camera.Projection);
+            
 
             // Render the sun.
             DrawGeometry(Sun, SunTranslation);

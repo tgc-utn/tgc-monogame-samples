@@ -40,6 +40,8 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
         private Random Random;
 
         private List<BodyHandle> SphereHandles;
+        
+        private SpriteFont SpriteFont { get; set; }
 
         private SpherePrimitive spherePrimitive;
 
@@ -98,6 +100,8 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
 
         protected override void LoadContent()
         {
+            SpriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "Arial");
+            
             Simulation = Simulation.Create(BufferPool, new NarrowPhaseCallbacks(),
                 new PoseIntegratorCallbacks(new NumericVector3(0, -10, 0)), new PositionFirstTimestepper());
 
@@ -236,11 +240,16 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
             }
 
             Camera.Update(gameTime);
+
+            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+
             base.Update(gameTime);
         }
 
         public override void Draw(GameTime gameTime)
         {
+            Game.Background = Color.Black;
+            
             var count = BoxHandles.Count;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
@@ -251,6 +260,11 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
 
             SpheresWorld.ForEach(sphereWorld => spherePrimitive.Draw(sphereWorld, Camera.View, Camera.Projection));
 
+            Game.SpriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
+            Game.SpriteBatch.DrawString(SpriteFont, "Box handled: " + count + ".", new Vector2(GraphicsDevice.Viewport.Width - 400, 0), Color.White);
+            Game.SpriteBatch.DrawString(SpriteFont, "Launch spheres with the 'Z' key.", new Vector2(GraphicsDevice.Viewport.Width - 400, 25), Color.White);
+            Game.SpriteBatch.End();
+            
             base.Draw(gameTime);
         }
 

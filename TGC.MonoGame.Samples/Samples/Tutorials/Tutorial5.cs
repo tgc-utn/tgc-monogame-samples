@@ -53,6 +53,8 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         {
             Camera.Update(gameTime);
 
+            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+
             base.Update(gameTime);
         }
 
@@ -61,7 +63,6 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         {
             Game.Background = Color.CornflowerBlue;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            AxisLines.Draw(Camera.View, Camera.Projection);
 
             Model1.Draw(Matrix.CreateScale(0.1f) * Matrix.CreateTranslation(Vector3.UnitX * -8), Camera.View,
                 Camera.Projection);

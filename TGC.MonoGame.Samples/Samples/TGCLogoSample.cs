@@ -53,6 +53,8 @@ namespace TGC.MonoGame.Samples.Samples
         {
             ModelRotation += Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
 
+            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+
             base.Update(gameTime);
         }
 

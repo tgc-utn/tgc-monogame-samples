@@ -50,6 +50,8 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             Game.Graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 100;
             Game.Graphics.ApplyChanges();
 
+            Game.Gizmos.Enabled = false;
+
             base.LoadContent();
         }
 
@@ -79,6 +81,10 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         /// <inheritdoc />
         public override void Draw(GameTime gameTime)
         {
+            Game.Background = Color.Black;
+            GraphicsDevice.DepthStencilState = DepthStencilState.None;
+            GraphicsDevice.BlendState = BlendState.Opaque;
+
             Effect.Parameters["Time"]?.SetValue((float)gameTime.TotalGameTime.TotalSeconds);
             Quad.Draw(Effect);
             base.Draw(gameTime);

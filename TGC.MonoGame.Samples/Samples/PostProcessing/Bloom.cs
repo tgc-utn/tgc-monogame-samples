@@ -111,6 +111,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
                 EffectOn = !EffectOn;
             PastKeyPressed = currentKeyPressed;
 
+            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+
             base.Update(gameTime);
         }
 
@@ -129,7 +131,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
                 new Vector2(50, 80), Color.Black);
             Game.SpriteBatch.End();
 
-            AxisLines.Draw(Camera.View, Camera.Projection);
+            
             base.Draw(gameTime);
         }
 

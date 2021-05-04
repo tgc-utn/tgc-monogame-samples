@@ -61,6 +61,8 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
                 BufferUsage.WriteOnly);
             Vertices.SetData(triangleVertices);
 
+            Game.Gizmos.Enabled = false;
+
             base.Initialize();
         }
 
@@ -68,7 +70,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         public override void Draw(GameTime gameTime)
         {
             Game.Background = Color.CornflowerBlue;
-            AxisLines.Draw(Effect.View, Effect.Projection);
+            
 
             // Set our vertex buffer.
             GraphicsDevice.SetVertexBuffer(Vertices);

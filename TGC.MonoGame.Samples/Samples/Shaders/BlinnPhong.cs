@@ -103,6 +103,8 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 
             Timer += (float) gameTime.ElapsedGameTime.TotalSeconds;
 
+            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+
             base.Update(gameTime);
         }
 
@@ -113,7 +115,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             Game.Background = Color.Black;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            AxisLines.Draw(Camera.View, Camera.Projection);
+            
 
             // We get the base transform for each mesh
             var modelMeshesBaseTransforms = new Matrix[Model.Bones.Count];
