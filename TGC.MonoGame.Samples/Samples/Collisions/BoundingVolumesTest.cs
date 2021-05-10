@@ -75,9 +75,9 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
         // The World Matrix for the Tank
         private Matrix TankWorld { get; set; }
-        
+
         // The BoundingSphere of the Tank
-        private BoundingSphere TankSphere;
+        private BoundingSphere _tankSphere;
 
         // The position of the Tank
         private Vector3 TankPosition { get; set; }
@@ -94,13 +94,13 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
 
         // Indicates if the Robot is touching the Chair
-        private bool TouchingChair = false;
+        private bool TouchingChair { get; set; } = false;
 
         // Indicates if the Robot is touching the Chair
-        private bool TouchingTank = false;
+        private bool TouchingTank { get; set; } = false;
 
         // Indicates if the Robot is touching the other Robot
-        private bool TouchingOtherRobot = false;
+        private bool TouchingOtherRobot { get; set; } = false;
 
         /// <inheritdoc />
         public override void Initialize()
@@ -152,7 +152,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             EnableDefaultLighting(Chair);
             
             // Save our RobotEffect
-            RobotEffect = ((BasicEffect)Robot.Meshes.FirstOrDefault().Effects.FirstOrDefault());
+            RobotEffect = ((BasicEffect)Robot.Meshes.FirstOrDefault()?.Effects.FirstOrDefault());
             
 
             // Create an AABB
@@ -178,9 +178,9 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
 
             // Create a Bounding Sphere for a model
-            TankSphere = BoundingVolumesExtensions.CreateSphereFrom(Tank);
-            TankSphere.Center = TankPosition;
-            TankSphere.Radius *= 3f;
+            _tankSphere = BoundingVolumesExtensions.CreateSphereFrom(Tank);
+            _tankSphere.Center = TankPosition;
+            _tankSphere.Radius *= 3f;
 
 
             // Set depth to default
@@ -233,7 +233,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
             // Update the boolean values depending on the intersection of the Bounding Volumes
             TouchingChair = ChairBox.Intersects(RobotBox);
-            TouchingTank = TankSphere.Intersects(RobotBox);
+            TouchingTank = _tankSphere.Intersects(RobotBox);
             TouchingOtherRobot = !RobotTwoCylinder.Intersects(RobotBox).Equals(BoxCylinderIntersection.None);
 
             base.Update(gameTime);
@@ -276,7 +276,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
             Game.Gizmos.DrawCube(ChairOBBWorld, TouchingChair ? Color.Orange : Color.Green);
 
-            Game.Gizmos.DrawSphere(TankSphere.Center, TankSphere.Radius * Vector3.One, TouchingTank ? Color.Orange : Color.Purple);
+            Game.Gizmos.DrawSphere(_tankSphere.Center, _tankSphere.Radius * Vector3.One, TouchingTank ? Color.Orange : Color.Purple);
 
             Game.Gizmos.DrawCylinder(RobotTwoCylinder.Transform, TouchingOtherRobot ? Color.Orange : Color.White);
 

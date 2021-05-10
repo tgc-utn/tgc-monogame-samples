@@ -52,7 +52,7 @@ namespace TGC.MonoGame.Samples.Geometries.Textures
             var z = size.Z / 2;
 
             var positions = new Vector3[]
-            {                
+            {
                 // Back face
                 new Vector3(x, -y, z),
                 new Vector3(-x, -y, z),

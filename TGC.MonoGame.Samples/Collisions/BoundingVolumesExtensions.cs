@@ -151,15 +151,15 @@ namespace TGC.MonoGame.Samples.Collisions
                 {
                     var vertexBuffer = meshParts[subIndex].VertexBuffer;
                     var declaration = vertexBuffer.VertexDeclaration;
-                    int vertexSize = declaration.VertexStride / sizeof(float);
+                    var vertexSize = declaration.VertexStride / sizeof(float);
 
-                    float[] rawVertexBuffer = new float[vertexBuffer.VertexCount * vertexSize];
+                    var rawVertexBuffer = new float[vertexBuffer.VertexCount * vertexSize];
                     vertexBuffer.GetData(rawVertexBuffer);
 
-                    for (int vertexIndex = 0; vertexIndex < rawVertexBuffer.Length; vertexIndex += vertexSize)
+                    for (var vertexIndex = 0; vertexIndex < rawVertexBuffer.Length; vertexIndex += vertexSize)
                     {
                         var transform = transforms[meshes[index].ParentBone.Index];
-                        Vector3 vertex = new Vector3(rawVertexBuffer[vertexIndex], rawVertexBuffer[vertexIndex + 1], rawVertexBuffer[vertexIndex + 2]);
+                        var vertex = new Vector3(rawVertexBuffer[vertexIndex], rawVertexBuffer[vertexIndex + 1], rawVertexBuffer[vertexIndex + 2]);
                         vertex = Vector3.Transform(vertex, transform);
                         minPoint = Vector3.Min(minPoint, vertex);
                         maxPoint = Vector3.Max(maxPoint, vertex);
@@ -183,19 +183,19 @@ namespace TGC.MonoGame.Samples.Collisions
             model.CopyAbsoluteBoneTransformsTo(transforms);
 
             var meshes = model.Meshes;
-            for (int index = 0; index < meshes.Count; index++)
+            for (var index = 0; index < meshes.Count; index++)
             {
                 var meshParts = meshes[index].MeshParts;
-                for (int subIndex = 0; subIndex < meshParts.Count; subIndex++)
+                for (var subIndex = 0; subIndex < meshParts.Count; subIndex++)
                 {
                     var vertexBuffer = meshParts[subIndex].VertexBuffer;
                     var declaration = vertexBuffer.VertexDeclaration;
                     int vertexSize = declaration.VertexStride / sizeof(float);
 
-                    float[] rawVertexBuffer = new float[vertexBuffer.VertexCount * vertexSize];
+                    var rawVertexBuffer = new float[vertexBuffer.VertexCount * vertexSize];
                     vertexBuffer.GetData(rawVertexBuffer);
 
-                    for (int vertexIndex = 0; vertexIndex < rawVertexBuffer.Length; vertexIndex += vertexSize)
+                    for (var vertexIndex = 0; vertexIndex < rawVertexBuffer.Length; vertexIndex += vertexSize)
                     {
                         var transform = transforms[meshes[index].ParentBone.Index];
                         var vertex = new Vector3(rawVertexBuffer[vertexIndex], rawVertexBuffer[vertexIndex + 1], rawVertexBuffer[vertexIndex + 2]);

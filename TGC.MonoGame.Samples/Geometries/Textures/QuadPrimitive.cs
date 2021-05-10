@@ -46,12 +46,23 @@ namespace TGC.MonoGame.Samples.Geometries.Textures
         private void CreateVertexBuffer(GraphicsDevice graphicsDevice)
         {
             // Set the position and texture coordinate for each vertex
+            // Normals point Up as the Quad is originally XZ aligned
+
+            var textureCoordinateLowerLeft = Vector2.Zero;
+            var textureCoordinateLowerRight = Vector2.UnitX;
+            var textureCoordinateUpperLeft = Vector2.UnitY;
+            var textureCoordinateUpperRight = Vector2.One;
+
             var vertices = new[]
             {
-                new VertexPositionNormalTexture(Vector3.UnitX + Vector3.UnitZ, Vector3.Up, Vector2.One),
-                new VertexPositionNormalTexture(Vector3.UnitX - Vector3.UnitZ, Vector3.Up, Vector2.UnitX),
-                new VertexPositionNormalTexture(Vector3.UnitZ - Vector3.UnitX, Vector3.Up, Vector2.UnitY),
-                new VertexPositionNormalTexture(-Vector3.UnitX - Vector3.UnitZ, Vector3.Up, Vector2.Zero)
+                // Possitive X, Possitive Z
+                new VertexPositionNormalTexture(Vector3.UnitX + Vector3.UnitZ, Vector3.Up, textureCoordinateUpperRight),
+                // Possitive X, Negative Z
+                new VertexPositionNormalTexture(Vector3.UnitX - Vector3.UnitZ, Vector3.Up, textureCoordinateLowerRight),
+                // Negative X, Possitive Z
+                new VertexPositionNormalTexture(Vector3.UnitZ - Vector3.UnitX, Vector3.Up, textureCoordinateUpperLeft),
+                // Negative X, Negative Z
+                new VertexPositionNormalTexture(-Vector3.UnitX - Vector3.UnitZ, Vector3.Up, textureCoordinateLowerLeft)
             };
 
             Vertices = new VertexBuffer(graphicsDevice, VertexPositionNormalTexture.VertexDeclaration, vertices.Length,
