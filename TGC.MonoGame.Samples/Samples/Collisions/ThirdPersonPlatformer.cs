@@ -10,6 +10,7 @@ using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Collisions;
 using TGC.MonoGame.Samples.Geometries.Textures;
 using TGC.MonoGame.Samples.Viewer;
+using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
 namespace TGC.MonoGame.Samples.Samples.Collisions
 {
@@ -82,6 +83,9 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         private BoundingCylinder RobotCylinder { get; set; }
 
 
+        private bool ShowGizmos { get; set; } = true;
+
+
         /// <inheritdoc />
         public ThirdPersonPlatformer(TGCViewer game) : base(game)
         {
@@ -149,9 +153,15 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             // Initialize the Velocity as zero
             RobotVelocity = Vector3.Zero;
 
+
+
+            Modifiers = new IModifier[]
+            {
+                new ToggleModifier("Show Gizmos", (show) => ShowGizmos = show),
+            };
+
             base.Initialize();
         }
-
 
         /// <inheritdoc />
         protected override void LoadContent()
@@ -298,6 +308,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
             // Update the Camera accordingly, as it follows the Robot
             UpdateCamera();
+
 
             // Update Gizmos with the View Projection matrices
             Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
@@ -534,16 +545,18 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
 
             // Gizmos Drawing
-
-            for (int index = 0; index < Colliders.Length; index++)
+            if (ShowGizmos)
             {
-                var box = Colliders[index];
-                var center = box.GetCenter();
-                var extents = box.GetExtents();
-                Game.Gizmos.DrawCube(center, extents * 2f, Color.Red);
-            }
+                for (int index = 0; index < Colliders.Length; index++)
+                {
+                    var box = Colliders[index];
+                    var center = box.GetCenter();
+                    var extents = box.GetExtents();
+                    Game.Gizmos.DrawCube(center, extents * 2f, Color.Red);
+                }
 
-            Game.Gizmos.DrawCylinder(RobotCylinder.Transform, Color.Yellow);
+                Game.Gizmos.DrawCylinder(RobotCylinder.Transform, Color.Yellow);
+            }
 
             base.Draw(gameTime);
         }

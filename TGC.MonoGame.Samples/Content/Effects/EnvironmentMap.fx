@@ -77,7 +77,10 @@ float4 EnvironmentMapPS(VertexShaderOutput input) : COLOR
 	float3 view = normalize(eyePosition.xyz - input.WorldPosition.xyz);
 	float3 reflection = reflect(view, normal);
 	float3 reflectionColor = texCUBE(environmentMapSampler, reflection).rgb;
-    return float4(lerp(baseColor, reflectionColor, 0.5), 1);
+
+    float fresnel = saturate((1.0 - dot(normal, view)));
+
+    return float4(lerp(baseColor, reflectionColor, fresnel), 1);
 }
 
 

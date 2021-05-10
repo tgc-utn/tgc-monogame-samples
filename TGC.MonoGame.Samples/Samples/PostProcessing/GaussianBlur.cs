@@ -1,23 +1,23 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
+using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
 namespace TGC.MonoGame.Samples.Samples.PostProcessing
 {
     public class GaussianBlur : TGCSample
     {
-        private BlurType currentBlurType;
+        private BlurType CurrentBlurType;
 
         private FullScreenQuad FullScreenQuad;
 
         private RenderTarget2D HorizontalRenderTarget;
 
         private RenderTarget2D MainRenderTarget;
-
-        private SpriteFont spriteFont;
 
         /// <inheritdoc />
         public GaussianBlur(TGCViewer game) : base(game)
@@ -39,7 +39,42 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             var screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
             Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(-400, 50, 400), screenSize);
 
+            Modifiers = new IModifier[]
+            {
+                new OptionsModifier("Blur Type", new string[]
+                {
+                    "Two Pass Separated Blur",
+                    "Single Pass Blur",
+                    "None"
+                }, 0, OnBlurTypeChange),
+
+            };
+
+            CurrentBlurType = BlurType.SEPARATED_PASSES;
+
             base.Initialize();
+        }
+
+        /// <summary>
+        ///     Processes a change in the Blur Type
+        /// </summary>
+        /// <param name="index">The index of the Blur selected option</param>
+        /// <param name="value">The name of the Blur type</param>
+        private void OnBlurTypeChange(int index, string value)
+        {
+            switch(index)
+            {
+                default:
+                case 0:
+                    CurrentBlurType = BlurType.SEPARATED_PASSES;
+                    break;
+                case 1:
+                    CurrentBlurType = BlurType.SIMPLE;
+                    break;
+                case 2:
+                    CurrentBlurType = BlurType.NONE;
+                    break;
+            }
         }
 
         /// <inheritdoc />
@@ -67,9 +102,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             Effect.Parameters["screenSize"]
                 .SetValue(new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height));
 
-            currentBlurType = BlurType.SEPARATED_PASSES;
-
-            spriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "Arial");
+            CurrentBlurType = BlurType.SEPARATED_PASSES;
 
             base.LoadContent();
         }
@@ -80,13 +113,6 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             // Update the state of the camera
             Camera.Update(gameTime);
 
-            if (Keyboard.GetState().IsKeyDown(Keys.J))
-                currentBlurType = BlurType.NONE;
-            else if (Keyboard.GetState().IsKeyDown(Keys.K))
-                currentBlurType = BlurType.SIMPLE;
-            else if (Keyboard.GetState().IsKeyDown(Keys.L))
-                currentBlurType = BlurType.SEPARATED_PASSES;
-
             Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
 
             base.Update(gameTime);
@@ -95,20 +121,12 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         /// <inheritdoc />
         public override void Draw(GameTime gameTime)
         {
-            if (currentBlurType.Equals(BlurType.NONE))
+            if (CurrentBlurType.Equals(BlurType.NONE))
                 DrawRegular();
-            else if (currentBlurType.Equals(BlurType.SIMPLE))
+            else if (CurrentBlurType.Equals(BlurType.SIMPLE))
                 DrawSimpleBlur();
             else
                 DrawSeparatedBlur();
-
-
-            Game.SpriteBatch.Begin();
-            Game.SpriteBatch.DrawString(spriteFont, "Con las teclas 'J', 'K' y 'L' se cambia el modo de Blur",
-                new Vector2(50, 50), Color.Black);
-            Game.SpriteBatch.DrawString(spriteFont, "Modo de Blur: " + currentBlurType, new Vector2(50, 80),
-                Color.Black);
-            Game.SpriteBatch.End();
 
             
             base.Draw(gameTime);
