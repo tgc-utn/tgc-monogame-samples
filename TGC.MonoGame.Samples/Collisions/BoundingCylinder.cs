@@ -190,9 +190,9 @@ namespace TGC.MonoGame.Samples.Collisions
             var z0 = origin.Z;
             var zt = direction.Z;
 
-            //nota: esta solucion esta planteada con las siguientes ecuaciones
-            //x^2 + z^2 = 1, -1 <= y <= 1 para el cilindro
-            //(x, y, z) = (x0, y0, z0) + t * (xt, yt, zt) para el rayo
+            // Note: This solution is based on these equations
+            // x^2 + z^2 = 1, -1 <= y <= 1 | For the cylinder
+            // (x, y, z) = (x0, y0, z0) + t * (xt, yt, zt) | For the ray
 
             float t1, t2;
 
@@ -213,17 +213,17 @@ namespace TGC.MonoGame.Samples.Collisions
                 b = 2 * x0 * xt + 2 * z0 * zt,
                 c = x0 * x0 + z0 * z0 - 1;
 
-            var raiz = b * b - 4 * a * c;
+            var root = b * b - 4 * a * c;
 
-            if (raiz < 0) return false;
-            if (raiz == 0)
+            if (root < 0) return false;
+            if (root == 0)
             {
                 var t = -b / (2 * a);
                 return t >= t1 && t <= t2;
             }
             var up = -b;
             var down = 2 * a;
-            var sqrt = MathF.Sqrt(raiz);
+            var sqrt = MathF.Sqrt(root);
 
             float t3, t4;
             t3 = (up - sqrt) / down;
@@ -247,12 +247,14 @@ namespace TGC.MonoGame.Samples.Collisions
         {
             var transformedPoint = Vector3.Transform(point, InverseRotation);
 
-            if (MathF.Abs(_center.Y - transformedPoint.Y) > _halfHeight) return ContainmentType.Disjoint;
+            if (MathF.Abs(_center.Y - transformedPoint.Y) > _halfHeight) 
+                return ContainmentType.Disjoint;
+
             var centerToPoint = transformedPoint - _center;
 
-            float squaredPointX = centerToPoint.X * centerToPoint.X;
-            float squaredPointZ = centerToPoint.Z * centerToPoint.Z;
-            float squaredRadius = _radius * _radius;
+            var squaredPointX = centerToPoint.X * centerToPoint.X;
+            var squaredPointZ = centerToPoint.Z * centerToPoint.Z;
+            var squaredRadius = _radius * _radius;
 
             return ((squaredPointX + squaredPointZ) <= squaredRadius) ? ContainmentType.Contains : ContainmentType.Disjoint;
         }
@@ -309,27 +311,31 @@ namespace TGC.MonoGame.Samples.Collisions
           
             // We check if there is intersection in UVW space
 
-            float sphereRadius = sphere.Radius;
+            var sphereRadius = sphere.Radius;
             var distanceY = MathF.Abs(uvwSphereCenter.Y - _center.Y);
 
             // If the sphere is way too high or too low there is no intersection
-            if (distanceY > _halfHeight + sphereRadius) return false;
+            if (distanceY > _halfHeight + sphereRadius)
+                return false;
 
             var centerToCenter = uvwSphereCenter - _center;
             centerToCenter.Y = 0;
 
-            float addedRadius = _radius + sphereRadius;
+            var addedRadius = _radius + sphereRadius;
             // If the sphere is too far in the XZ plane there is no intersection
-            if (centerToCenter.LengthSquared() > (addedRadius * addedRadius)) return false;
+            if (centerToCenter.LengthSquared() > (addedRadius * addedRadius)) 
+                return false;
 
             // If the sphere's center is inside the Y coordinates of the cylinder, there is an intersection
-            if (distanceY < _halfHeight) return true;
+            if (distanceY < _halfHeight) 
+                return true;
 
             // Check if the closest point to the center of the sphere belongs to the cylinder
             centerToCenter.Normalize();
             centerToCenter *= _radius;
             centerToCenter.Y = _halfHeight * MathF.Sign(uvwSphereCenter.Y - _center.Y);
             centerToCenter += _center;
+
             return (centerToCenter - uvwSphereCenter).LengthSquared() <= (sphereRadius * sphereRadius);
         }
 
@@ -349,7 +355,7 @@ namespace TGC.MonoGame.Samples.Collisions
             var cylinderInit = _center - halfHeight;
             var cylinderEnd = _center + halfHeight;
 
-            float t = -1f;
+            var t = -1f;
             var q = Vector3.Zero;
 
             Vector3 d = cylinderEnd - cylinderInit, m = pointA - cylinderInit, n = pointB - pointA;
@@ -368,24 +374,31 @@ namespace TGC.MonoGame.Samples.Collisions
             if (MathF.Abs(a) < float.Epsilon)
             {
                 // Segment runs parallel to cylinder axis
-                if (c > 0.0f) return null; // 'a' and thus the segment lie outside cylinder
+                if (c > 0.0f) 
+                    return null; // 'a' and thus the segment lie outside cylinder
                 // Now known that segment intersects cylinder; figure out how it intersects
-                if (md < 0.0f) t = -mn / nn; // Intersect segment against 'p' endcap
-                else if (md > dd) t = (nd - mn) / nn; // Intersect segment against ’q’ endcap
-                else t = 0.0f; // ’a’ lies inside cylinder
+                if (md < 0.0f)
+                    t = -mn / nn; // Intersect segment against 'p' endcap
+                else if (md > dd) 
+                    t = (nd - mn) / nn; // Intersect segment against ’q’ endcap
+                else 
+                    t = 0.0f; // 'a' lies inside cylinder
                 q = pointA + t * n;
                 return q;
             }
             var b = dd * mn - nd * md;
             var discr = b * b - a * c;
-            if (discr < 0.0f) return null; // No real roots; no intersection
+            if (discr < 0.0f) 
+                return null; // No real roots; no intersection
             t = (-b - MathF.Sqrt(discr)) / a;
-            if (t < 0.0f || t > 1.0f) return null; // Intersection lies outside segment
+            if (t < 0.0f || t > 1.0f) 
+                return null; // Intersection lies outside segment
 
             if (md + t * nd < 0.0f)
             {
                 // Intersection outside cylinder on 'p' side
-                if (nd <= 0.0f) return null; // Segment pointing away from endcap
+                if (nd <= 0.0f) 
+                    return null; // Segment pointing away from endcap
                 t = -md / nd;
                 // Keep intersection if Dot(S(t) - p, S(t) - p) <= r^2
                 if (k + t * (2.0f * mn + t * nn) <= 0.0f)
@@ -396,7 +409,8 @@ namespace TGC.MonoGame.Samples.Collisions
             if (md + t * nd > dd)
             {
                 // Intersection outside cylinder on 'q' side
-                if (nd >= 0.0f) return null; // Segment pointing away from endcap
+                if (nd >= 0.0f) 
+                    return null; // Segment pointing away from endcap
                 t = (dd - md) / nd;
                 // Keep intersection if Dot(S(t) - q, S(t) - q) <= r^2
                 if (k + dd - 2.0f * md + t * (2.0f * (mn - nd) + t * nn) <= 0.0f)
@@ -443,14 +457,14 @@ namespace TGC.MonoGame.Samples.Collisions
                 return BoxCylinderIntersection.Intersecting;
 
             // Distance in Y, is it greater, less, or in the center?
-            float differenceInY = MathF.Abs(closestPoint.Y - _center.Y);
+            var differenceInY = MathF.Abs(closestPoint.Y - _center.Y);
 
             // If the absolute of the distance is greater than half the height, we are not intersecting
             if (differenceInY > _halfHeight)
                 return BoxCylinderIntersection.None;
             else
             {
-                float radiusSquared = _radius * _radius;
+                var radiusSquared = _radius * _radius;
                 var centerDistance = new Vector2(_center.X - closestPoint.X, _center.Z - closestPoint.Z);
                 var differenceInRadius = centerDistance.LengthSquared() - radiusSquared;
 
@@ -459,7 +473,7 @@ namespace TGC.MonoGame.Samples.Collisions
                 // We are either on the edge or not colliding
                 if (differenceInY == _halfHeight)
                     return (differenceInRadius <= 0f) ? BoxCylinderIntersection.Edge : BoxCylinderIntersection.None;
-
+                
                 // If we got here, the closest point is not at the top/bottom
                 // It depends on our distance to classify the intersection
 

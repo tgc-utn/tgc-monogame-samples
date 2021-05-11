@@ -228,10 +228,10 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             var distanceToRobot = Vector3.Distance(RobotPosition, cameraPosition);
             var normalizedDifference = difference / distanceToRobot;
 
-            Ray cameraToPlayerRay = new Ray(cameraPosition, normalizedDifference);
+            var cameraToPlayerRay = new Ray(cameraPosition, normalizedDifference);
 
             // Test our ray against every wall Bounding Box
-            for (int index = 0; index < WallBoxes.Length; index++)
+            for (var index = 0; index < WallBoxes.Length; index++)
             {
                 // If there was an intersection 
                 // And this intersection happened between the Robot and the Camera (and not further away)

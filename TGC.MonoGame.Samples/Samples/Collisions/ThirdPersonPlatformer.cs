@@ -250,7 +250,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         public override void Update(GameTime gameTime)
         {
             // The time that passed between the last loop
-            float deltaTime = Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
+            var deltaTime = Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
 
 
 
@@ -334,7 +334,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
                 // Collision detection
                 var collided = false;
                 var foundIndex = -1;
-                for (int index = 0; index < Colliders.Length; index++)
+                for (var index = 0; index < Colliders.Length; index++)
                     if (RobotCylinder.Intersects(Colliders[index]).Equals(BoxCylinderIntersection.Intersecting))
                     {
                         // If we collided with something, set our velocity in Y to zero to reset acceleration
@@ -375,7 +375,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
                     collided = false;
 
                     // Check for collisions again
-                    for (int index = 0; index < Colliders.Length; index++)
+                    for (var index = 0; index < Colliders.Length; index++)
                         if (RobotCylinder.Intersects(Colliders[index]).Equals(BoxCylinderIntersection.Intersecting))
                         {
                             // Iterate until we don't collide with anything anymore
@@ -400,7 +400,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
                 RobotCylinder.Center += new Vector3(scaledVelocity.X, 0f, scaledVelocity.Z);
 
                 // Check intersection for every collider
-                for (int index = 0; index < Colliders.Length; index++)
+                for (var index = 0; index < Colliders.Length; index++)
                     if (RobotCylinder.Intersects(Colliders[index]).Equals(BoxCylinderIntersection.Intersecting))
                     {
                         // Get the intersected collider and its center
@@ -430,7 +430,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
                         // Our penetration is the difference between the radius of the Cylinder and the Normal Vector
                         // For precission problems, we push the cylinder with a small increment to prevent re-colliding into the geometry
-                        float penetration = RobotCylinder.Radius - normalVector.Length() + EPSILON;
+                        var penetration = RobotCylinder.Radius - normalVector.Length() + EPSILON;
 
                         // Push the center out of the box
                         // Normalize our Normal Vector using its length first

@@ -4,7 +4,7 @@ using System;
 namespace TGC.MonoGame.Samples.Collisions
 {
     /// <summary>
-    ///     Represents an Orientend-BoundingBox (OBB).
+    ///     Represents an Oriented-BoundingBox (OBB).
     /// </summary>
     public class OrientedBoundingBox
     {
@@ -91,9 +91,9 @@ namespace TGC.MonoGame.Samples.Collisions
             var minInitValues = Vector3.Zero;
             var minEndValues = Vector3.Zero;
             var transformedPoints = new Vector3[points.Length];
-            float x, y, z;
+            float y, z;
 
-            x = initValues.X;
+            var x = initValues.X;
             while (x <= endValues.X)
             {
                 y = initValues.Y;
@@ -141,7 +141,7 @@ namespace TGC.MonoGame.Samples.Collisions
                 x += step;
             }
 
-            //Recursividad en mejor intervalo encontrado
+            // Loop again if the step is higher than a given acceptance threshold
             if (step > 0.01f)
                 minObb = ComputeFromPointsRecursive(points, minInitValues, minEndValues, step / 10f);
 
@@ -151,7 +151,7 @@ namespace TGC.MonoGame.Samples.Collisions
         /// <summary>
         ///     Creates an <see cref="OrientedBoundingBox">OrientedBoundingBox</see> from a <see cref="BoundingBox">BoundingBox</see>.
         /// </summary>
-        /// <param name="aabb">A <see cref="BoundingBox">BoundingBox</see></param>
+        /// <param name="box">A <see cref="BoundingBox">BoundingBox</see> to create the <see cref="OrientedBoundingBox">OrientedBoundingBox</see> from</param>
         /// <returns>The generated <see cref="OrientedBoundingBox">OrientedBoundingBox</see></returns>
         public static OrientedBoundingBox FromAABB(BoundingBox box)
         {
@@ -177,7 +177,7 @@ namespace TGC.MonoGame.Samples.Collisions
         /// <returns>An array of length three with each position matching the Vector3 coordinates</returns>
         private float[] ToArray(Vector3 vector)
         {
-            return new float[3] { vector.X, vector.Y, vector.Z };
+            return new[] { vector.X, vector.Y, vector.Z };
         }
 
 
@@ -189,7 +189,7 @@ namespace TGC.MonoGame.Samples.Collisions
         /// <returns>An array of length nine with each position matching the matrix elements</returns>
         private float[] ToFloatArray(Matrix matrix)
         {
-            return new float[9]
+            return new[]
             {
                 matrix.M11, matrix.M21, matrix.M31,
                 matrix.M12, matrix.M22, matrix.M32,
@@ -204,7 +204,8 @@ namespace TGC.MonoGame.Samples.Collisions
         /// <returns>True if the two boxes intersect</returns>
         public bool Intersects(OrientedBoundingBox box)
         {
-            float ra, rb;
+            float ra;
+            float rb;
             var R = new float[3, 3];
             var AbsR = new float[3, 3];
             var ae = ToArray(Extents);
@@ -342,7 +343,7 @@ namespace TGC.MonoGame.Samples.Collisions
         /// <summary>
         ///     Tests if this OBB intersects with a Sphere.
         /// </summary>
-        /// <param name="ray">The sphere to test</param>
+        /// <param name="sphere">The sphere to test</param>
         /// <returns>True if the OBB intersects the Sphere</returns>
         public bool Intersects(BoundingSphere sphere)
         {
@@ -365,18 +366,18 @@ namespace TGC.MonoGame.Samples.Collisions
         public PlaneIntersectionType Intersects(Plane plane)
         {
             // Maximum extent in direction of plane normal 
-            Vector3 normal = Vector3.Transform(plane.Normal, Orientation);
+            var normal = Vector3.Transform(plane.Normal, Orientation);
 
             // Maximum extent in direction of plane normal 
-            float r = MathF.Abs(Extents.X * normal.X)
+            var r = MathF.Abs(Extents.X * normal.X)
                 + MathF.Abs(Extents.Y * normal.Y)
                 + MathF.Abs(Extents.Z * normal.Z);
 
             // signed distance between box center and plane
-            float d = Vector3.Dot(plane.Normal, Center) + plane.D;
+            var d = Vector3.Dot(plane.Normal, Center) + plane.D;
 
 
-            // return signed distance
+            // Return signed distance
             if (MathF.Abs(d) < r)
                 return PlaneIntersectionType.Intersecting;
             else if (d < 0.0f)
@@ -392,7 +393,7 @@ namespace TGC.MonoGame.Samples.Collisions
         /// <returns>True if the OBB intersects with the Frustum, false otherwise</returns>
         public bool Intersects(BoundingFrustum frustum)
         {
-            var planes = new Plane[6]
+            var planes = new[]
             {
                 frustum.Left,
                 frustum.Right,
@@ -401,7 +402,8 @@ namespace TGC.MonoGame.Samples.Collisions
                 frustum.Bottom,
                 frustum.Top
             };
-            for (int faceIndex = 0; faceIndex < 6; ++faceIndex)
+
+            for (var faceIndex = 0; faceIndex < 6; ++faceIndex)
             {
                 var side = Intersects(planes[faceIndex]);
                 if (side == PlaneIntersectionType.Back)
