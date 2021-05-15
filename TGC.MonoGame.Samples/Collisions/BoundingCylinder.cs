@@ -23,10 +23,26 @@ namespace TGC.MonoGame.Samples.Collisions
         // A matrix describing the Cylinder rotation
         private Matrix _rotation;
 
-        /// <summary>
-        ///     True if this Cylinder has no rotation, and its circular shape is aligned to the XZ plane
-        /// </summary>
-        public bool IsXZAligned { get; private set; }
+
+        // Matrices
+        // These are used to test for intersections, and serve to transform points to the Cylinder space or vice versa
+
+
+        // The opposite of the translation matrix, to calculate the InverseTransform
+        private Matrix _oppositeTranslation;
+
+        // The inverse of the rotation matrix, to calculate the InverseTransform
+        private Matrix _inverseRotation;
+
+        // An internal matrix to transform points from Cylinder space back to local space
+        private Matrix _inverseTransform;
+
+        // An internal scale matrix to calculate the final Transform matrix
+        private Matrix _scale;
+
+        // An internal translation matrix to calculate the final Transform matrix
+        private Matrix _translation;
+
 
         /// <summary>
         ///     The center of the Cylinder in World Space
@@ -86,30 +102,14 @@ namespace TGC.MonoGame.Samples.Collisions
             }
         }
 
-        // Matrices
-        // These are used to test for intersections, and serve to transform points to the Cylinder space or vice versa
-
-
-        // An internal scale matrix to calculate the final Transform matrix
-        private Matrix Scale;
-        
-        // An internal translation matrix to calculate the final Transform matrix
-        private Matrix Translation;
 
         // An internal matrix to transform points from local space to Cylinder space
         public Matrix Transform { get; private set; }
 
-
-        // The opposite of the translation matrix, to calculate the InverseTransform
-        private Matrix OppositeTranslation;
-
-        // The inverse of the rotation matrix, to calculate the InverseTransform
-        private Matrix InverseRotation;
-
-        // An internal matrix to transform points from Cylinder space back to local space
-        private Matrix InverseTransform;
-
-        
+        /// <summary>
+        ///     True if this Cylinder has no rotation, and its circular shape is aligned to the XZ plane
+        /// </summary>
+        public bool IsXZAligned { get; private set; }
 
 
 
@@ -180,8 +180,8 @@ namespace TGC.MonoGame.Samples.Collisions
         /// </returns>
         public bool Intersects(Ray ray)
         {
-            var origin = Vector3.Transform(ray.Position, InverseTransform);
-            var direction = Vector3.TransformNormal(ray.Direction, InverseTransform);
+            var origin = Vector3.Transform(ray.Position, _inverseTransform);
+            var direction = Vector3.TransformNormal(ray.Direction, _inverseTransform);
 
             var x0 = origin.X;
             var xt = direction.X;
@@ -245,7 +245,7 @@ namespace TGC.MonoGame.Samples.Collisions
         /// </returns>
         public ContainmentType Contains(Vector3 point)
         {
-            var transformedPoint = Vector3.Transform(point, InverseRotation);
+            var transformedPoint = Vector3.Transform(point, _inverseRotation);
 
             if (MathF.Abs(_center.Y - transformedPoint.Y) > _halfHeight) 
                 return ContainmentType.Disjoint;
@@ -268,7 +268,7 @@ namespace TGC.MonoGame.Samples.Collisions
         private Vector3 ClosestPoint(Vector3 point)
         {
             // Transform the point to cylindrical UVW coordinates
-            var uvwPoint = Vector3.Transform(point, InverseRotation);
+            var uvwPoint = Vector3.Transform(point, _inverseRotation);
 
             // Find the closest point in UVW coordinates
 
@@ -290,7 +290,7 @@ namespace TGC.MonoGame.Samples.Collisions
 
 
             // Transform that result back to world coordinates
-            var translatedRotation = Matrix.Invert(InverseRotation);
+            var translatedRotation = Matrix.Invert(_inverseRotation);
             return Vector3.Transform(uvwResult, translatedRotation);
         }
 
@@ -307,7 +307,7 @@ namespace TGC.MonoGame.Samples.Collisions
         public bool Intersects(BoundingSphere sphere)
         {
             // Transform the sphere center to cylindrical UVW coordinates
-            var uvwSphereCenter = Vector3.Transform(sphere.Center, InverseRotation);
+            var uvwSphereCenter = Vector3.Transform(sphere.Center, _inverseRotation);
           
             // We check if there is intersection in UVW space
 
@@ -322,6 +322,7 @@ namespace TGC.MonoGame.Samples.Collisions
             centerToCenter.Y = 0;
 
             var addedRadius = _radius + sphereRadius;
+
             // If the sphere is too far in the XZ plane there is no intersection
             if (centerToCenter.LengthSquared() > (addedRadius * addedRadius)) 
                 return false;
@@ -462,28 +463,26 @@ namespace TGC.MonoGame.Samples.Collisions
             // If the absolute of the distance is greater than half the height, we are not intersecting
             if (differenceInY > _halfHeight)
                 return BoxCylinderIntersection.None;
+            
+            var radiusSquared = _radius * _radius;
+            var centerDistance = new Vector2(_center.X - closestPoint.X, _center.Z - closestPoint.Z);
+            var differenceInRadius = centerDistance.LengthSquared() - radiusSquared;
+
+            // If the distance is equal, this means that we are on the top/bottom faces
+            // We are colliding on the top or bottom, so check if we are in the radius. 
+            // We are either on the edge or not colliding
+            if (differenceInY == _halfHeight)
+                return (differenceInRadius <= 0f) ? BoxCylinderIntersection.Edge : BoxCylinderIntersection.None;
+
+            // If we got here, the closest point is not at the top/bottom
+            // It depends on our distance to classify the intersection
+
+            if (differenceInRadius == 0f)
+                return BoxCylinderIntersection.Edge;
+            else if (differenceInRadius < 0f)
+                return BoxCylinderIntersection.Intersecting;
             else
-            {
-                var radiusSquared = _radius * _radius;
-                var centerDistance = new Vector2(_center.X - closestPoint.X, _center.Z - closestPoint.Z);
-                var differenceInRadius = centerDistance.LengthSquared() - radiusSquared;
-
-                // If the distance is equal, this means that we are on the top/bottom faces
-                // We are colliding on the top or bottom, so check if we are in the radius. 
-                // We are either on the edge or not colliding
-                if (differenceInY == _halfHeight)
-                    return (differenceInRadius <= 0f) ? BoxCylinderIntersection.Edge : BoxCylinderIntersection.None;
-                
-                // If we got here, the closest point is not at the top/bottom
-                // It depends on our distance to classify the intersection
-
-                if (differenceInRadius == 0f)
-                    return BoxCylinderIntersection.Edge;
-                else if (differenceInRadius < 0f)
-                    return BoxCylinderIntersection.Intersecting;
-                else
-                    return BoxCylinderIntersection.None;
-            }
+                return BoxCylinderIntersection.None;
         }
 
 
@@ -494,8 +493,8 @@ namespace TGC.MonoGame.Samples.Collisions
         /// </summary>
         private void UpdateTranslation()
         {
-            Translation = Matrix.CreateTranslation(_center);
-            OppositeTranslation = Matrix.CreateTranslation(-_center);
+            _translation = Matrix.CreateTranslation(_center);
+            _oppositeTranslation = Matrix.CreateTranslation(-_center);
         }
 
         /// <summary>
@@ -503,28 +502,28 @@ namespace TGC.MonoGame.Samples.Collisions
         /// </summary>
         private void UpdateScale()
         {
-            Scale = Matrix.CreateScale(_radius, _halfHeight, _radius);
+            _scale = Matrix.CreateScale(_radius, _halfHeight, _radius);
         }
 
         /// <summary>
         ///     Updates the Inverse Rotation matrix, used in intersection tests, based on the values of <see cref="_rotation"/>, 
-        ///     <see cref="Translation"/> and <see cref="OppositeTranslation"/>.
+        ///     <see cref="_translation"/> and <see cref="_oppositeTranslation"/>.
         /// </summary>
         private void UpdateInverseRotation()
         {
-            InverseRotation =
-                    OppositeTranslation *
+            _inverseRotation =
+                    _oppositeTranslation *
                     Matrix.Invert(_rotation) *
-                    Translation;
+                    _translation;
         }
 
         /// <summary>
-        ///     Updates the Transform and Inverse Transform matrices, based on the values of <see cref="Scale"/>, <see cref="_rotation"/> and <see cref="Translation"/>.
+        ///     Updates the Transform and Inverse Transform matrices, based on the values of <see cref="_scale"/>, <see cref="_rotation"/> and <see cref="_translation"/>.
         /// </summary>
         private void UpdateTransform()
         {
-            Transform = Scale * _rotation * Translation;
-            InverseTransform = Matrix.Invert(Transform);
+            Transform = _scale * _rotation * _translation;
+            _inverseTransform = Matrix.Invert(Transform);
         }
     }
 
