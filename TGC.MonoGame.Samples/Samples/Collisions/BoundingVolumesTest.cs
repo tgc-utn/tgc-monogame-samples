@@ -159,7 +159,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             // This gets an AABB with the bounds of the robot model
             RobotBox = BoundingVolumesExtensions.CreateAABBFrom(Robot);
             // Scale it down half-size as the model is scaled down as well
-            RobotBox = RobotBox.Scale(0.3f);
+            RobotBox = BoundingVolumesExtensions.Scale(RobotBox, 0.3f);
 
 
 
@@ -168,7 +168,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             // First, get an AABB from the model
             var temporaryCubeAABB = BoundingVolumesExtensions.CreateAABBFrom(Chair);
             // Scale it to match the model's transform
-            temporaryCubeAABB = temporaryCubeAABB.Scale(0.5f);
+            temporaryCubeAABB = BoundingVolumesExtensions.Scale(temporaryCubeAABB, 0.5f);
             // Create an Oriented Bounding Box from the AABB
             ChairBox = OrientedBoundingBox.FromAABB(temporaryCubeAABB);
             // Move the center
@@ -272,7 +272,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
             // Draw bounding volumes
 
-            Game.Gizmos.DrawCube(RobotBox.GetCenter(), RobotBox.GetExtents() * 2f, Color.Yellow);
+            Game.Gizmos.DrawCube(BoundingVolumesExtensions.GetCenter(RobotBox), BoundingVolumesExtensions.GetExtents(RobotBox) * 2f, Color.Yellow);
 
             Game.Gizmos.DrawCube(ChairOBBWorld, TouchingChair ? Color.Orange : Color.Green);
 

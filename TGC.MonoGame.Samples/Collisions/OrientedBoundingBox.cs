@@ -116,7 +116,7 @@ namespace TGC.MonoGame.Samples.Collisions
                         var aabb = BoundingBox.CreateFromPoints(transformedPoints);
 
                         // Calculate the volume of the AABB
-                        var volume = aabb.GetVolume();
+                        var volume = BoundingVolumesExtensions.GetVolume(aabb);
 
                         // Find lesser volume
                         if (volume < minimumVolume)
@@ -126,11 +126,11 @@ namespace TGC.MonoGame.Samples.Collisions
                             minEndValues = new Vector3(x + step, y + step, z + step);
 
                             // Restore the AABB center in World-Space
-                            var center = aabb.GetCenter();
+                            var center = BoundingVolumesExtensions.GetCenter(aabb);
                             center = Vector3.Transform(center, rotationMatrix);
 
                             // Create OBB
-                            minObb = new OrientedBoundingBox(center, aabb.GetExtents());
+                            minObb = new OrientedBoundingBox(center, BoundingVolumesExtensions.GetExtents(aabb));
                             minObb.Orientation = rotationMatrix;
                         }
 
@@ -155,7 +155,9 @@ namespace TGC.MonoGame.Samples.Collisions
         /// <returns>The generated <see cref="OrientedBoundingBox">OrientedBoundingBox</see></returns>
         public static OrientedBoundingBox FromAABB(BoundingBox box)
         {
-            return new OrientedBoundingBox(box.GetCenter(), box.GetExtents());
+            var center = BoundingVolumesExtensions.GetCenter(box);
+            var extents = BoundingVolumesExtensions.GetExtents(box);
+            return new OrientedBoundingBox(center, extents);
         }
 
         /// <summary>

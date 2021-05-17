@@ -13,8 +13,9 @@ namespace TGC.MonoGame.Samples.Collisions
         /// <summary>
         ///     Get an extents vector that contains the half-size on each axis of the box.
         /// </summary>
+        /// <param name="box">A <see cref="BoundingBox"/> to calculate its extents</param>
         /// <returns>The extents on each axis</returns>
-        public static Vector3 GetExtents(this BoundingBox box)
+        public static Vector3 GetExtents(BoundingBox box)
         {
             var max = box.Max;
             var min = box.Min;
@@ -25,8 +26,9 @@ namespace TGC.MonoGame.Samples.Collisions
         /// <summary>
         ///     Gets the total volume of the box in units.
         /// </summary>
+        /// <param name="box">A <see cref="BoundingBox"/> to calculate its volume</param>
         /// <returns>The volume of the box in units</returns>
-        public static float GetVolume(this BoundingBox box)
+        public static float GetVolume(BoundingBox box)
         {
             var difference = box.Max - box.Min;
             return difference.X * difference.Y * difference.Z;
@@ -35,8 +37,9 @@ namespace TGC.MonoGame.Samples.Collisions
         /// <summary>
         ///     Gets the center position of the box.
         /// </summary>
+        /// <param name="box">A <see cref="BoundingBox"/> to calculate its center</param>
         /// <returns>The position of the center of the box.</returns>
-        public static Vector3 GetCenter(this BoundingBox box)
+        public static Vector3 GetCenter(BoundingBox box)
         {
             return (box.Max + box.Min) * 0.5f;
         }
@@ -46,11 +49,12 @@ namespace TGC.MonoGame.Samples.Collisions
         ///     Scales the box by a given scalar.
         /// </summary>
         /// <param name="scale">The scale for every axis</param>
+        /// <param name="box">The <see cref="BoundingBox"/> to scale</param>
         /// <returns>A new box with its extents scaled</returns>
-        public static BoundingBox Scale(this BoundingBox box, float scale)
+        public static BoundingBox Scale(BoundingBox box, float scale)
         {
-            var center = box.GetCenter();
-            var extents = box.GetExtents();
+            var center = GetCenter(box);
+            var extents = GetExtents(box);
             var scaledExtents = extents * scale;
 
             return new BoundingBox(center - scaledExtents, center + scaledExtents);
@@ -59,12 +63,13 @@ namespace TGC.MonoGame.Samples.Collisions
         /// <summary>
         ///     Scales the box by a given scalar per axis.
         /// </summary>
+        /// <param name="box">The <see cref="BoundingBox"/> to calculate its scale</param>
         /// <param name="scale">The scale for each axis</param>
         /// <returns>A new <see cref="BoundingBox">BoundingBox</see> with its extents scaled</returns>
-        public static BoundingBox Scale(this BoundingBox box, Vector3 scale)
+        public static BoundingBox Scale(BoundingBox box, Vector3 scale)
         {
-            var center = box.GetCenter();
-            var extents = box.GetExtents();
+            var center = GetCenter(box);
+            var extents = GetExtents(box);
             var scaledExtents = extents * scale;
 
             return new BoundingBox(center - scaledExtents, center + scaledExtents);
@@ -73,9 +78,10 @@ namespace TGC.MonoGame.Samples.Collisions
         /// <summary>
         ///     Gets the closest point to the box.
         /// </summary>
+        /// <param name="box">A <see cref="BoundingBox"/> to calculate the closest point</param>
         /// <param name="point">The point to find the closest point from</param>
         /// <returns>The position inside the box that is closer to the given point</returns>
-        public static Vector3 ClosestPoint(this BoundingBox box, Vector3 point)
+        public static Vector3 ClosestPoint(BoundingBox box, Vector3 point)
         {
             var min = box.Min;
             var max = box.Max;
@@ -88,14 +94,16 @@ namespace TGC.MonoGame.Samples.Collisions
         /// <summary>
         ///     Gets the normal vector from a point in the box surface.
         /// </summary>
+        /// <param name="box">A <see cref="BoundingBox"/> to calculate the normal</param>
         /// <param name="point">The point in the surface of the box</param>
         /// <returns>The normal vector of the surface in which the point is in</returns>
-        public static Vector3 GetNormalFromPoint(this BoundingBox box, Vector3 point)
+        public static Vector3 GetNormalFromPoint(BoundingBox box, Vector3 point)
         {
             var normal = Vector3.Zero;
-            var min = float.MaxValue;            
-            point -= box.GetCenter();
-            var extents = box.GetExtents();
+            var min = float.MaxValue;
+
+            point -= GetCenter(box);
+            var extents = GetExtents(box);
 
             var distance = MathF.Abs(extents.X - Math.Abs(point.X));
             if (distance < min)

@@ -450,7 +450,7 @@ namespace TGC.MonoGame.Samples.Collisions
         private BoxCylinderIntersection IntersectsXZAligned(BoundingBox box)
         {
             // Calculate the closest point
-            var closestPoint = box.ClosestPoint(_center);
+            var closestPoint = BoundingVolumesExtensions.ClosestPoint(box, _center);
 
             // Is closest point the same as the center?
             // This means that the center is inside the box

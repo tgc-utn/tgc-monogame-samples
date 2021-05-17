@@ -82,6 +82,9 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         private BoundingCylinder RobotCylinder { get; set; }
 
 
+        private bool ShowGizmos { get; set; } = true;
+
+
         /// <inheritdoc />
         public ThirdPersonPlatformer(TGCViewer game) : base(game)
         {
@@ -149,9 +152,9 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             // Initialize the Velocity as zero
             RobotVelocity = Vector3.Zero;
 
+
             base.Initialize();
         }
-
 
         /// <inheritdoc />
         protected override void LoadContent()
@@ -299,6 +302,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             // Update the Camera accordingly, as it follows the Robot
             UpdateCamera();
 
+
             // Update Gizmos with the View Projection matrices
             Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
 
@@ -326,7 +330,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             var foundIndex = -1;
             for (var index = 0; index < Colliders.Length; index++)
             {
-                if (RobotCylinder.Intersects(Colliders[index]).Equals(BoxCylinderIntersection.Intersecting))
+                if (!RobotCylinder.Intersects(Colliders[index]).Equals(BoxCylinderIntersection.Intersecting))
                     continue;
                 
                 // If we collided with something, set our velocity in Y to zero to reset acceleration
@@ -345,9 +349,9 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             while (collided)
             {
                 var collider = Colliders[foundIndex];
-                var colliderY = collider.GetCenter().Y;
+                var colliderY = BoundingVolumesExtensions.GetCenter(collider).Y;
                 var cylinderY = RobotCylinder.Center.Y;
-                var extents = collider.GetExtents();
+                var extents = BoundingVolumesExtensions.GetExtents(collider);
 
                 float penetration;
                 // If we are on top of the collider, push up
@@ -402,7 +406,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
                 // Get the intersected collider and its center
                 var collider = Colliders[index];
-                var colliderCenter = collider.GetCenter();
+                var colliderCenter = BoundingVolumesExtensions.GetCenter(collider);
 
                 // The Robot collided with this thing
                 // Is it a step? Can the Robot climb it?
@@ -418,7 +422,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
                 sameLevelCenter.Y = colliderCenter.Y;
 
                 // Find the closest horizontal point from the box
-                var closestPoint = collider.ClosestPoint(sameLevelCenter);
+                var closestPoint = BoundingVolumesExtensions.ClosestPoint(collider, sameLevelCenter);
 
                 // Calculate our normal vector from the "Same Level Center" of the cylinder to the closest point
                 // This happens in a 2D fashion as we are on the same Y-Plane
@@ -446,18 +450,18 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         {
             // Get the collider properties to check if it's a step
             // Also, to calculate penetration
-            var extents = collider.GetExtents();
-            var colliderCenter = collider.GetCenter();
+            var extents = BoundingVolumesExtensions.GetExtents(collider);
+            var colliderCenter = BoundingVolumesExtensions.GetCenter(collider);
 
             // Is this collider a step?
             // If not, exit
-            if (extents.Y < 6f)
+            if (extents.Y >= 6f)
                 return false;
 
             // Is the base of the cylinder close to the step top?
             // If not, exit
             var distanceToTop = MathF.Abs((RobotCylinder.Center.Y - RobotCylinder.HalfHeight) - (colliderCenter.Y + extents.Y));
-            if (distanceToTop < 12f)
+            if (distanceToTop >= 12f)
                 return false;
 
             // We want to climb the step
@@ -537,12 +541,11 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
 
             // Gizmos Drawing
-
             for (int index = 0; index < Colliders.Length; index++)
             {
                 var box = Colliders[index];
-                var center = box.GetCenter();
-                var extents = box.GetExtents();
+                var center = BoundingVolumesExtensions.GetCenter(box);
+                var extents = BoundingVolumesExtensions.GetExtents(box);
                 Game.Gizmos.DrawCube(center, extents * 2f, Color.Red);
             }
 
