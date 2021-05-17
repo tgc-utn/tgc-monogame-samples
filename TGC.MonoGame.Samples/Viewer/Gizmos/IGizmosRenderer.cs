@@ -47,6 +47,18 @@ namespace TGC.MonoGame.Samples.Viewer
         public void DrawCube(Vector3 origin, Vector3 size);
 
         /// <summary>
+        ///     Draws a wire cube with a World matrix using the Gizmos color.
+        /// </summary>
+        /// <param name="world">The World matrix of the cube.</param>
+        public void DrawCube(Matrix world);
+
+        /// <summary>
+        ///     Draws a wire cube with a World matrix using the specified color.
+        /// </summary>
+        /// <param name="world">The World matrix of the cube.</param>
+        public void DrawCube(Matrix world, Color color);
+
+        /// <summary>
         ///     Draws a wire cube with an origin and size using the specified color.
         /// </summary>
         /// <param name="origin">The position of the cube.</param>
@@ -95,6 +107,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="color">The color of the frustum.</param>
         public void DrawFrustum(Matrix viewProjection, Color color);
 
+
         /// <summary>
         ///     Draws a wire circle with an origin and normal direction using the Gizmos color.
         /// </summary>
@@ -129,6 +142,20 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="size">The size of the cylinder.</param>
         /// <param name="color">The color of the cylinder.</param>
         public void DrawCylinder(Vector3 origin, Matrix rotation, Vector3 size, Color color);
+
+        /// <summary>
+        ///     Draws a wire cylinder with a World matrix using the Gizmos color.
+        /// </summary>
+        /// <param name="world">The World matrix of the cylinder.</param>
+        /// <param name="color">The color of the cylinder.</param>
+        public void DrawCylinder(Matrix world);
+
+        /// <summary>
+        ///     Draws a wire cylinder with a World matrix using the specified color.
+        /// </summary>
+        /// <param name="world">The World matrix of the cylinder.</param>
+        /// <param name="color">The color of the cylinder.</param>
+        public void DrawCylinder(Matrix world, Color color);
 
         /// <summary>
         ///     Effectively draws the geometry using the parameters from past draw calls. Should be used after calling the other draw methods.

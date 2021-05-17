@@ -107,7 +107,7 @@ namespace TGC.MonoGame.Samples.Viewer
         public void DrawLine(Vector3 origin, Vector3 destination, Color color)
         {
             var world = LineSegmentGizmoGeometry.CalculateWorld(origin, destination);
-            AddDrawInstance(LineSegment, BaseColor, world);
+            AddDrawInstance(LineSegment, color, world);
         }
 
 
@@ -118,10 +118,24 @@ namespace TGC.MonoGame.Samples.Viewer
         }
 
         /// <inheritdoc />
+        public void DrawCube(Matrix world)
+        {
+            DrawCube(world, BaseColor);
+        }
+
+
+        /// <inheritdoc />
+        public void DrawCube(Matrix world, Color color)
+        {
+            AddDrawInstance(Cube, color, world);
+        }
+
+
+        /// <inheritdoc />
         public void DrawCube(Vector3 origin, Vector3 size, Color color)
         {
             var world = CubeGizmoGeometry.CalculateWorld(origin, size);
-            AddDrawInstance(Cube, color, world);
+            DrawCube(world, color);
         }
 
         /// <inheritdoc />
@@ -184,10 +198,25 @@ namespace TGC.MonoGame.Samples.Viewer
             DrawCylinder(origin, rotation, size, BaseColor);
         }
 
+
         /// <inheritdoc />
         public void DrawCylinder(Vector3 origin, Matrix rotation, Vector3 size, Color color)
         {
             var world = CylinderGizmoGeometry.CalculateWorld(origin, rotation, size);
+            DrawCylinder(world, color);
+        }
+
+
+        /// <inheritdoc />
+        public void DrawCylinder(Matrix world)
+        {
+            DrawCylinder(world, BaseColor);
+        }
+
+
+        /// <inheritdoc />
+        public void DrawCylinder(Matrix world, Color color)
+        {
             AddDrawInstance(Cylinder, color, world);
         }
 
