@@ -8,11 +8,27 @@ using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Geometries.Textures;
 using TGC.MonoGame.Samples.Viewer;
+using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
 namespace TGC.MonoGame.Samples.Samples.PBR
 {
     public class BasicPBR : TGCSample
     {
+        private Material Current = Material.RustedMetal;
+
+        private SpriteFont SpriteFont;
+        private Model Sphere;
+        private string TexturePath;
+        private Effect SphereEffect;
+        private List<Light> Lights;
+
+        private CubePrimitive LightBox;
+        private Texture2D albedo, ao, metalness, roughness, normals;
+
+        private Matrix SphereWorld;
+
+        private Camera Camera { get; set; }
+
         /// <summary>
         ///     Default constructor.
         /// </summary>
@@ -24,24 +40,6 @@ namespace TGC.MonoGame.Samples.Samples.PBR
             Description = "Ejemplo de PBR regular.";
         }
 
-        private static Material MaxMaterialValue = (Material)Enum.GetValues(typeof(Material)).Cast<int>().Max();
-        private static Material MinMaterialValue = (Material)Enum.GetValues(typeof(Material)).Cast<int>().Min();
-
-        private Material Current = MinMaterialValue;
-
-        private SpriteFont SpriteFont;
-        private Model Sphere;
-        private string TexturePath;
-        private Effect SphereEffect;
-        private List<Light> Lights;
-
-        private CubePrimitive LightBox;
-        private Texture2D albedo, ao, metalness, roughness, normals;
-
-        private Matrix SphereWorld; 
-
-        private Camera Camera { get; set; }
-
         /// <inheritdoc />
         public override void Initialize()
         {
@@ -49,8 +47,31 @@ namespace TGC.MonoGame.Samples.Samples.PBR
             size.X /= 2;
             size.Y /= 2;
             Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 40, 200), size);
-            
+
+            Modifiers = new IModifier[]
+            {
+                new OptionsModifier("Material", new string[]
+                {
+                    "RustedMetal",
+                    "Grass",
+                    "Gold",
+                    "Marble",
+                    "Metal"
+                }, 0, OnMaterialChange)
+            };
+
             base.Initialize();
+        }
+
+        /// <summary>
+        ///     Processes a change in the selected Material.
+        /// </summary>
+        /// <param name="index">The index of the new selected Material</param>
+        /// <param name="name">The name of the new selected Material</param>
+        private void OnMaterialChange(int index, string name)
+        {
+            Current = (Material)index;
+            SwitchMaterial();
         }
         
         /// <inheritdoc />
@@ -68,25 +89,12 @@ namespace TGC.MonoGame.Samples.Samples.PBR
             base.LoadContent();
         }
 
-        private bool PastKeyPressed;
-
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
             Camera.Update(gameTime);
 
             SphereEffect.Parameters["eyePosition"].SetValue(Camera.Position);
-            
-            var currentKeyPressed = Keyboard.GetState().IsKeyDown(Keys.J);
-            if (!currentKeyPressed && PastKeyPressed)
-            {
-                Current++;
-                if (Current > MaxMaterialValue)
-                    Current = MinMaterialValue;
-                SwitchMaterial();
-            }
-
-            PastKeyPressed = currentKeyPressed;
 
             base.Update(gameTime);
         }
@@ -111,11 +119,6 @@ namespace TGC.MonoGame.Samples.Samples.PBR
                 LightBox.Effect.DiffuseColor = Lights[index].ShowColor;
                 LightBox.Draw(Matrix.CreateTranslation(Lights[index].Position), Camera.View, Camera.Projection);
             }
-
-
-            Game.SpriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
-            Game.SpriteBatch.DrawString(SpriteFont, "Con la tecla 'J' se cambia el material", new Vector2(100, GraphicsDevice.Viewport.Height - 100), Color.White);
-            Game.SpriteBatch.End();
 
 
             base.Draw(gameTime);
