@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using ImGuiNET;
+﻿using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using NumericVector2 = System.Numerics.Vector2;
 
 namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
@@ -41,8 +41,6 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
         private int _scrollWheelValue;
 
         private List<int> _keys = new List<int>();
-
-
 
         public ImGuiRenderer(Game game)
         {
@@ -204,7 +202,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
 
             _effect.World = Matrix.Identity;
             _effect.View = Matrix.Identity;
-            _effect.Projection = Matrix.CreateOrthographicOffCenter(0f, io.DisplaySize.X, io.DisplaySize.Y, 0f, -1f, 1f);            _effect.TextureEnabled = true;
+            _effect.Projection = Matrix.CreateOrthographicOffCenter(0f, io.DisplaySize.X, io.DisplaySize.Y, 0f, -1f, 1f); _effect.TextureEnabled = true;
             _effect.TextureEnabled = true;
             _effect.Texture = texture;
             _effect.VertexColorEnabled = true;
@@ -260,7 +258,6 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
             var lastScissorBox = _graphicsDevice.ScissorRectangle;
             var lastDepthState = _graphicsDevice.DepthStencilState;
             var lastRasterizerState = _graphicsDevice.RasterizerState;
-
 
             _graphicsDevice.BlendFactor = Color.White;
             _graphicsDevice.BlendState = BlendState.NonPremultiplied;

@@ -1,7 +1,5 @@
 ﻿using ImGuiNET;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
 {
@@ -16,7 +14,6 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
 
         private bool Checked;
 
-
         /// <summary>
         ///     Creates a Toggle Modifier with a given name and action
         /// </summary>
@@ -27,7 +24,6 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
             Name = name;
             OnChange = onChange;
         }
-
 
         /// <summary>
         ///     Creates a Toggle Modifier with a given name, action and default value

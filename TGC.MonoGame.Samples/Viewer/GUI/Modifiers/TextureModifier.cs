@@ -1,9 +1,7 @@
 ﻿using ImGuiNET;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
 using System.Numerics;
-using System.Text;
 using TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET;
 
 namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
@@ -11,7 +9,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     /// <summary>
     ///     A Texture Modifier that displays a bound texture
     /// </summary>
-    class TextureModifier : IModifier
+    internal class TextureModifier : IModifier
     {
         private static Vector4 BorderColor = new Vector4(0.3f, 0.3f, 0.3f, 0.7f);
 
@@ -56,13 +54,13 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         public void Draw()
         {
             ImGui.Spacing();
-            if(ImGui.CollapsingHeader(Name, ImGuiTreeNodeFlags.DefaultOpen))
-                ImGui.Image(TextureReference, 
+            if (ImGui.CollapsingHeader(Name, ImGuiTreeNodeFlags.DefaultOpen))
+                ImGui.Image(TextureReference,
                     // Size
-                    new Vector2(ImGui.CalcItemWidth(), ImGui.CalcItemWidth()), 
+                    new Vector2(ImGui.CalcItemWidth(), ImGui.CalcItemWidth()),
                     Vector2.Zero,
-                    Vector2.One, 
-                    Vector4.One, 
+                    Vector2.One,
+                    Vector4.One,
                     // Border Color
                     BorderColor);
         }

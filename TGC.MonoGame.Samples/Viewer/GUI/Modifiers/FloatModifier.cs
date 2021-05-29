@@ -1,8 +1,6 @@
 ﻿using ImGuiNET;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
 {
@@ -112,8 +110,8 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// </summary>
         public void Draw()
         {
-            bool valueChanged = HasBounds ? 
-                ImGui.DragFloat(Name, ref FloatValue, 0.01f, Min, Max) : 
+            bool valueChanged = HasBounds ?
+                ImGui.DragFloat(Name, ref FloatValue, 0.01f, Min, Max) :
                 ImGui.DragFloat(Name, ref FloatValue);
 
             if (valueChanged)

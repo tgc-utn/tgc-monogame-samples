@@ -1,7 +1,6 @@
 ﻿using ImGuiNET;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Drawing;
 using System.Numerics;
 using MonoGameColor = Microsoft.Xna.Framework.Color;
 
@@ -10,7 +9,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     /// <summary>
     ///     A Color modifier that allows for changing a Color value in real time
     /// </summary>
-    class ColorModifier : IModifier
+    internal class ColorModifier : IModifier
     {
         private string Name;
 
@@ -82,7 +81,6 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
             return new Vector4(monoGameVector.X, monoGameVector.Y, monoGameVector.Z, monoGameVector.W);
         }
 
-
         /// <summary>
         ///     Converts a System Vector4 to a Color from the MonoGame namespace.
         /// </summary>
@@ -101,7 +99,5 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
             if (ImGui.ColorEdit4(Name, ref ColorValue))
                 OnChange.Invoke(Convert(ColorValue));
         }
-
-
     }
 }

@@ -1,15 +1,13 @@
 ﻿using ImGuiNET;
-using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
 {
     /// <summary>
     ///     An Options Modifier that allows for selecting a value from a list
     /// </summary>
-    class OptionsModifier : IModifier
+    internal class OptionsModifier : IModifier
     {
         private string Name;
 
@@ -28,7 +26,6 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <param name="onChange">An action to be called when the selected option changes</param>
         public OptionsModifier(string name, List<string> options, int defaultOption, Action<int, string> onChange) : this(name, options.ToArray(), defaultOption, onChange)
         {
-
         }
 
         /// <summary>
@@ -45,7 +42,6 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
             CurrentOption = defaultOption;
             OnChange = onChange;
         }
-
 
         /// <summary>
         ///     Draws the Options Modifier

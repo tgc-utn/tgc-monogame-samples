@@ -37,7 +37,6 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <param name="onPress">The action to execute when the button is pressed</param>
         public ButtonModifier(string name, Action onPress) : this(name, onPress, true)
         {
-
         }
 
         /// <summary>

@@ -1,8 +1,6 @@
 ﻿using ImGuiNET;
 using System;
-using System.Collections.Generic;
 using System.Numerics;
-using System.Text;
 
 namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
 {
@@ -36,7 +34,6 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
             OnChange += baseOnChange;
         }
 
-
         /// <summary>
         ///     Draws the Vector4 Modifier.
         /// </summary>
@@ -46,6 +43,5 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
             if (valueChanged)
                 OnChange.Invoke(VectorValue);
         }
-
     }
 }
