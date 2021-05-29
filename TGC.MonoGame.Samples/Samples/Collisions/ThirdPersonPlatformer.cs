@@ -46,7 +46,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         private Vector3 RobotVelocity { get; set; }
         private Vector3 RobotAcceleration { get; set; }
         private Vector3 RobotFrontDirection { get; set; }
-        
+
         // A boolean indicating if the Robot is on the ground
         private bool OnGround { get; set; }
 
@@ -64,7 +64,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         private Texture2D WoodenTexture { get; set; }
         private Texture2D CobbleTexture { get; set; }
 
-        
+
         // Effects
 
         // Tiling Effect for the floor
@@ -73,8 +73,8 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         // Effect for the stairs and boxes
         private BasicEffect BoxesEffect { get; set; }
 
-        
-        
+
+
         // Colliders
 
         // Bounding Boxes representing our colliders (floor, stairs, boxes)
@@ -153,11 +153,9 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             // Initialize the Velocity as zero
             RobotVelocity = Vector3.Zero;
 
-
-
-            Modifiers = new IModifier[]
+            Modifiers = new[]
             {
-                new ToggleModifier("Show Gizmos", (show) => ShowGizmos = show),
+                new ToggleModifier("Show Gizmos", (value) => ShowGizmos = value, true),
             };
 
             base.Initialize();
@@ -172,7 +170,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             // Enable default lighting for the Robot
             foreach (var mesh in Robot.Meshes)
                 ((BasicEffect)mesh.Effects.FirstOrDefault())?.EnableDefaultLighting();
-            
+
             // Create a BasicEffect to draw the Box
             BoxesEffect = new BasicEffect(GraphicsDevice);
             BoxesEffect.TextureEnabled = true;
@@ -188,7 +186,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
             // Create our Quad (to draw the Floor)
             Quad = new QuadPrimitive(GraphicsDevice);
-            
+
             // Create our Box Model
             BoxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, WoodenTexture);
 
@@ -289,7 +287,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
             // Solve the Vertical Movement first (could be done in other order)
             SolveVerticalMovement(scaledVelocity);
-            
+
             // Take only the horizontal components of the velocity
             scaledVelocity = new Vector3(scaledVelocity.X, 0f, scaledVelocity.Z);
 
@@ -323,68 +321,73 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         private void SolveVerticalMovement(Vector3 scaledVelocity)
         {
             // If the Robot has vertical velocity
-            if (scaledVelocity.Y != 0f)
+            if (scaledVelocity.Y == 0f)
+                return;
+
+            // Start by moving the Cylinder
+            RobotCylinder.Center += Vector3.Up * scaledVelocity.Y;
+            // Set the OnGround flag on false, update it later if we find a collision
+            OnGround = false;
+
+
+            // Collision detection
+            var collided = false;
+            var foundIndex = -1;
+            for (var index = 0; index < Colliders.Length; index++)
             {
-                // Start by moving the Cylinder
-                RobotCylinder.Center += Vector3.Up * scaledVelocity.Y;
-                // Set the OnGround flag on false, update it later if we find a collision
-                OnGround = false;
+                if (!RobotCylinder.Intersects(Colliders[index]).Equals(BoxCylinderIntersection.Intersecting))
+                    continue;
+
+                // If we collided with something, set our velocity in Y to zero to reset acceleration
+                RobotVelocity = new Vector3(RobotVelocity.X, 0f, RobotVelocity.Z);
+
+                // Set our index and collision flag to true
+                // The index is to tell which collider the Robot intersects with
+                collided = true;
+                foundIndex = index;
+                break;
+            }
 
 
-                // Collision detection
-                var collided = false;
-                var foundIndex = -1;
-                for (var index = 0; index < Colliders.Length; index++)
-                    if (RobotCylinder.Intersects(Colliders[index]).Equals(BoxCylinderIntersection.Intersecting))
-                    {
-                        // If we collided with something, set our velocity in Y to zero to reset acceleration
-                        RobotVelocity = new Vector3(RobotVelocity.X, 0f, RobotVelocity.Z);
+            // We correct based on differences in Y until we don't collide anymore
+            // Not usual to iterate here more than once, but could happen
+            while (collided)
+            {
+                var collider = Colliders[foundIndex];
+                var colliderY = BoundingVolumesExtensions.GetCenter(collider).Y;
+                var cylinderY = RobotCylinder.Center.Y;
+                var extents = BoundingVolumesExtensions.GetExtents(collider);
 
-                        // Set our index and collision flag to true
-                        // The index is to tell which collider the Robot intersects with
-                        collided = true;
-                        foundIndex = index;
-                        break;
-                    }
-
-
-                // We correct based on differences in Y until we don't collide anymore
-                // Not usual to iterate here more than once, but could happen
-                while (collided)
+                float penetration;
+                // If we are on top of the collider, push up
+                // Also, set the OnGround flag to true
+                if (cylinderY > colliderY)
                 {
-                    var collider = Colliders[foundIndex];
-                    var colliderY = collider.GetCenter().Y;
-                    var cylinderY = RobotCylinder.Center.Y;
-                    var extents = collider.GetExtents();
+                    penetration = colliderY + extents.Y - cylinderY + RobotCylinder.HalfHeight;
+                    OnGround = true;
+                }
 
-                    float penetration;
-                    // If we are on top of the collider, push up
-                    // Also, set the OnGround flag to true
-                    if (cylinderY > colliderY)
-                    {
-                        penetration = colliderY + extents.Y - cylinderY + RobotCylinder.HalfHeight;
-                        OnGround = true;
-                    }
+                // If we are on bottom of the collider, push down
+                else
+                    penetration = -cylinderY - RobotCylinder.HalfHeight + colliderY - extents.Y;
 
-                    // If we are on bottom of the collider, push down
-                    else
-                        penetration = -cylinderY - RobotCylinder.HalfHeight + colliderY - extents.Y;
+                // Move our Cylinder so we are not colliding anymore
+                RobotCylinder.Center += Vector3.Up * penetration;
+                collided = false;
 
-                    // Move our Cylinder so we are not colliding anymore
-                    RobotCylinder.Center += Vector3.Up * penetration;
-                    collided = false;
+                // Check for collisions again
+                for (var index = 0; index < Colliders.Length; index++)
+                {
+                    if (!RobotCylinder.Intersects(Colliders[index]).Equals(BoxCylinderIntersection.Intersecting))
+                        continue;
 
-                    // Check for collisions again
-                    for (var index = 0; index < Colliders.Length; index++)
-                        if (RobotCylinder.Intersects(Colliders[index]).Equals(BoxCylinderIntersection.Intersecting))
-                        {
-                            // Iterate until we don't collide with anything anymore
-                            collided = true;
-                            foundIndex = index;
-                            break;
-                        }
+                    // Iterate until we don't collide with anything anymore
+                    collided = true;
+                    foundIndex = index;
+                    break;
                 }
             }
+
         }
 
         /// <summary>
@@ -394,49 +397,52 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         private void SolveHorizontalMovementSliding(Vector3 scaledVelocity)
         {
             // Has horizontal movement?
-            if (Vector3.Dot(scaledVelocity, new Vector3(1f, 0f, 1f)) != 0f)
+            if (Vector3.Dot(scaledVelocity, new Vector3(1f, 0f, 1f)) == 0f)
+                return;
+
+            // Start by moving the Cylinder horizontally
+            RobotCylinder.Center += new Vector3(scaledVelocity.X, 0f, scaledVelocity.Z);
+
+            // Check intersection for every collider
+            for (var index = 0; index < Colliders.Length; index++)
             {
-                // Start by moving the Cylinder horizontally
-                RobotCylinder.Center += new Vector3(scaledVelocity.X, 0f, scaledVelocity.Z);
+                if (!RobotCylinder.Intersects(Colliders[index]).Equals(BoxCylinderIntersection.Intersecting))
+                    continue;
 
-                // Check intersection for every collider
-                for (var index = 0; index < Colliders.Length; index++)
-                    if (RobotCylinder.Intersects(Colliders[index]).Equals(BoxCylinderIntersection.Intersecting))
-                    {
-                        // Get the intersected collider and its center
-                        var collider = Colliders[index];
-                        var colliderCenter = collider.GetCenter();
+                // Get the intersected collider and its center
+                var collider = Colliders[index];
+                var colliderCenter = BoundingVolumesExtensions.GetCenter(collider);
 
-                        // The Robot collided with this thing
-                        // Is it a step? Can the Robot climb it?
-                        bool stepClimbed = SolveStepCollision(collider, index);
+                // The Robot collided with this thing
+                // Is it a step? Can the Robot climb it?
+                bool stepClimbed = SolveStepCollision(collider, index);
 
-                        // If the Robot collided with a step and climbed it, stop here
-                        // Else go on
-                        if (stepClimbed)
-                            return;
+                // If the Robot collided with a step and climbed it, stop here
+                // Else go on
+                if (stepClimbed)
+                    return;
 
-                        // Get the cylinder center at the same Y-level as the box
-                        var sameLevelCenter = RobotCylinder.Center;
-                        sameLevelCenter.Y = colliderCenter.Y;
+                // Get the cylinder center at the same Y-level as the box
+                var sameLevelCenter = RobotCylinder.Center;
+                sameLevelCenter.Y = colliderCenter.Y;
 
-                        // Find the closest horizontal point from the box
-                        var closestPoint = collider.ClosestPoint(sameLevelCenter);
+                // Find the closest horizontal point from the box
+                var closestPoint = BoundingVolumesExtensions.ClosestPoint(collider, sameLevelCenter);
 
-                        // Calculate our normal vector from the "Same Level Center" of the cylinder to the closest point
-                        // This happens in a 2D fashion as we are on the same Y-Plane
-                        var normalVector = sameLevelCenter - closestPoint;
-                        var normalVectorLength = normalVector.Length();
+                // Calculate our normal vector from the "Same Level Center" of the cylinder to the closest point
+                // This happens in a 2D fashion as we are on the same Y-Plane
+                var normalVector = sameLevelCenter - closestPoint;
+                var normalVectorLength = normalVector.Length();
 
-                        // Our penetration is the difference between the radius of the Cylinder and the Normal Vector
-                        // For precission problems, we push the cylinder with a small increment to prevent re-colliding into the geometry
-                        var penetration = RobotCylinder.Radius - normalVector.Length() + EPSILON;
+                // Our penetration is the difference between the radius of the Cylinder and the Normal Vector
+                // For precission problems, we push the cylinder with a small increment to prevent re-colliding into the geometry
+                var penetration = RobotCylinder.Radius - normalVector.Length() + EPSILON;
 
-                        // Push the center out of the box
-                        // Normalize our Normal Vector using its length first
-                        RobotCylinder.Center += (normalVector / normalVectorLength * penetration);
-                    }
+                // Push the center out of the box
+                // Normalize our Normal Vector using its length first
+                RobotCylinder.Center += (normalVector / normalVectorLength * penetration);
             }
+
         }
 
         /// <summary>
@@ -449,42 +455,37 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         {
             // Get the collider properties to check if it's a step
             // Also, to calculate penetration
-            var extents = collider.GetExtents();
-            var colliderCenter = collider.GetCenter();
-
+            var extents = BoundingVolumesExtensions.GetExtents(collider);
+            var colliderCenter = BoundingVolumesExtensions.GetCenter(collider);
 
             // Is this collider a step?
-            if (extents.Y < 6f)
-            {
-                // Is the base of the cylinder close to the step top?
-                var distanceToTop = MathF.Abs((RobotCylinder.Center.Y - RobotCylinder.HalfHeight) - (colliderCenter.Y + extents.Y));
-                if (distanceToTop < 12f)
-                {
-                    // We want to climb the step
-                    // It is climbable if we can reposition our cylinder in a way that
-                    // it doesn't collide with anything else
-                    var pastPosition = RobotCylinder.Center;
-                    RobotCylinder.Center += Vector3.Up * distanceToTop;
-                    for (int index = 0; index < Colliders.Length; index++)
-                        if (index != colliderIndex && RobotCylinder.Intersects(Colliders[index]).Equals(BoxCylinderIntersection.Intersecting))
-                        {
-                            // We found a case in which the cylinder
-                            // intersects with other colliders, so the climb is not possible
-                            RobotCylinder.Center = pastPosition;
-                            return false;
-                        }
-
-                    // If we got here the climb was possible
-                    // (And the Robot position was already updated)
-                    return true;
-                }
-                else
-                    // The distance to the top is not enough to perform a climb
-                    return false;
-            }
-            else
-                // The collider is not a step
+            // If not, exit
+            if (extents.Y >= 6f)
                 return false;
+
+            // Is the base of the cylinder close to the step top?
+            // If not, exit
+            var distanceToTop = MathF.Abs((RobotCylinder.Center.Y - RobotCylinder.HalfHeight) - (colliderCenter.Y + extents.Y));
+            if (distanceToTop >= 12f)
+                return false;
+
+            // We want to climb the step
+            // It is climbable if we can reposition our cylinder in a way that
+            // it doesn't collide with anything else
+            var pastPosition = RobotCylinder.Center;
+            RobotCylinder.Center += Vector3.Up * distanceToTop;
+            for (int index = 0; index < Colliders.Length; index++)
+                if (index != colliderIndex && RobotCylinder.Intersects(Colliders[index]).Equals(BoxCylinderIntersection.Intersecting))
+                {
+                    // We found a case in which the cylinder
+                    // intersects with other colliders, so the climb is not possible
+                    RobotCylinder.Center = pastPosition;
+                    return false;
+                }
+
+            // If we got here the climb was possible
+            // (And the Robot position was already updated)
+            return true;
         }
 
 
@@ -499,7 +500,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             Robot.Draw(RobotWorld, Camera.View, Camera.Projection);
 
             // Floor drawing
-            
+
             // Set the Technique inside the TilingEffect to "BaseTiling", we want to control the tiling on the floor
             // Using its original Texture Coordinates
             TilingEffect.CurrentTechnique = TilingEffect.Techniques["BaseTiling"];
@@ -543,15 +544,14 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             BoxesEffect.Texture = WoodenTexture;
             BoxPrimitive.Draw(BoxesEffect);
 
-
-            // Gizmos Drawing
             if (ShowGizmos)
             {
+                // Gizmos Drawing
                 for (int index = 0; index < Colliders.Length; index++)
                 {
                     var box = Colliders[index];
-                    var center = box.GetCenter();
-                    var extents = box.GetExtents();
+                    var center = BoundingVolumesExtensions.GetCenter(box);
+                    var extents = BoundingVolumesExtensions.GetExtents(box);
                     Game.Gizmos.DrawCube(center, extents * 2f, Color.Red);
                 }
 

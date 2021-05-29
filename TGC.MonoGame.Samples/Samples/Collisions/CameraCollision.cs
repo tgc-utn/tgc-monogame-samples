@@ -367,8 +367,8 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             for (int index = 0; index < WallBoxes.Length; index++)
             {
                 var box = WallBoxes[index];
-                var center = box.GetCenter();
-                var extents = box.GetExtents();
+                var center = BoundingVolumesExtensions.GetCenter(box);
+                var extents = BoundingVolumesExtensions.GetExtents(box);
                 Game.Gizmos.DrawCube(center, extents * 2f, Color.Red);
             }
 
