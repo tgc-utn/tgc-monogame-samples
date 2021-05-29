@@ -26,6 +26,12 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         /// </summary>
         private VertexBuffer Vertices { get; set; }
 
+
+        /// <summary>
+        ///     A index array pointing to the vertices to conform triangles
+        /// </summary>
+        private IndexBuffer Indices { get; set; }
+
         /// <summary>
         ///     Built-in effect that supports optional texturing, vertex coloring, fog, and lighting.
         /// </summary>
@@ -36,9 +42,9 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         {
             // Setup our graphics scene matrices
             var worldMatrix = Matrix.Identity;
-            var viewMatrix = Matrix.CreateLookAt(new Vector3(0, 0, 50), Vector3.Zero, Vector3.Up);
+            var viewMatrix = Matrix.CreateLookAt(new Vector3(0, 0, 50), Vector3.Forward, Vector3.Up);
             var projectionMatrix =
-                Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 1, 100);
+                Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 1, 1000);
 
             // Setup our basic effect
             Effect = new BasicEffect(GraphicsDevice)
@@ -61,6 +67,15 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
                 BufferUsage.WriteOnly);
             Vertices.SetData(triangleVertices);
 
+            // Array of indices
+            var triangleIndices = new ushort[]
+            {
+                0, 1, 2
+            };
+
+            Indices = new IndexBuffer(GraphicsDevice, IndexElementSize.SixteenBits, 3, BufferUsage.None);
+            Indices.SetData(triangleIndices);
+
             Game.Gizmos.Enabled = false;
 
             base.Initialize();
@@ -70,19 +85,24 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         public override void Draw(GameTime gameTime)
         {
             Game.Background = Color.CornflowerBlue;
-            
+
 
             // Set our vertex buffer.
             GraphicsDevice.SetVertexBuffer(Vertices);
+
+            // Set our index buffer
+            GraphicsDevice.Indices = Indices;
 
             foreach (var pass in Effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
 
-                GraphicsDevice.DrawPrimitives(
+                GraphicsDevice.DrawIndexedPrimitives(
                     // We’ll be rendering one triangles.
                     PrimitiveType.TriangleList,
-                    // The offset, which is 0 since we want to start at the beginning of the floorVerts array.
+                    // The offset, which is 0 since we want to start at the beginning of the Vertices array.
+                    0,
+                    // The start index in the Vertices array.
                     0,
                     // The number of triangles to draw.
                     1);
