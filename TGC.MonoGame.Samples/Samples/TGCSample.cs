@@ -71,6 +71,15 @@ namespace TGC.MonoGame.Samples.Samples
             base.LoadContent();
         }
 
+
+        /// <summary>
+        ///     Prepares the Sample to be displayed.
+        /// </summary>
+        public void Prepare()
+        {
+            Game.Gizmos.Enabled = true;
+        }
+
         /// <summary>
         ///     Updates the game.
         /// </summary>

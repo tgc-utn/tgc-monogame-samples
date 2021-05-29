@@ -35,6 +35,13 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             Description = "Shader Visualizer. Reloads and compiles a shader file in runtime.";
         }
 
+        public override void Initialize()
+        {
+            Game.Gizmos.Enabled = false;
+            base.Initialize();
+        }
+
+
         /// <inheritdoc />
         protected override void LoadContent()
         {
@@ -49,8 +56,6 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             // Make the window squared
             Game.Graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 100;
             Game.Graphics.ApplyChanges();
-
-            Game.Gizmos.Enabled = false;
 
             base.LoadContent();
         }

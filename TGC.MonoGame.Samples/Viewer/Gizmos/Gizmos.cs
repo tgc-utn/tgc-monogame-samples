@@ -1,30 +1,57 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
 
 namespace TGC.MonoGame.Samples.Viewer
 {
     /// <summary>
-    ///     Gizmos drawer
+    ///     Renders Gizmos
     /// </summary>
     public class Gizmos
     {
-        private GizmosRenderer GizmosRenderer;
-        private NoGizmosRenderer NoGizmosRenderer;
+        private Dictionary<GizmoGeometry, Dictionary<Color, List<Matrix>>> DrawInstances = new Dictionary<GizmoGeometry, Dictionary<Color, List<Matrix>>>();
+        private Dictionary<Color, List<Vector3[]>> PolyLinesToDraw = new Dictionary<Color, List<Vector3[]>>();
 
-        private IGizmosRenderer Renderer;
+        private LineSegmentGizmoGeometry LineSegment;
+        private CubeGizmoGeometry Cube;
+        private SphereGizmoGeometry Sphere;
+        private PolyLineGizmoGeometry PolyLine;
+        private DiskGizmoGeometry Disk;
+        private CylinderGizmoGeometry Cylinder;
+        private AxisLines AxisLines;
 
-        private bool enabled;
+        private GraphicsDevice GraphicsDevice;
+        private ContentManager Content;
+
+        private Effect Effect;
+
+        private EffectPass BackgroundPass;
+        private EffectPass ForegroundPass;
+        private EffectParameter WorldViewProjectionParameter;
+        private EffectParameter ColorParameter;
+
+        private DepthStencilState NoDepth;
+
+        private Matrix View;
+        private Matrix Projection;
+        private Matrix ViewProjection;
+
+        private Color BaseColor;
+
+
+
+        public bool Enabled { get; set; } = true;
+
 
         /// <summary>
         ///     Creates a GizmosRenderer.
         /// </summary>
         public Gizmos()
         {
-            GizmosRenderer = new GizmosRenderer();
-            NoGizmosRenderer = new NoGizmosRenderer();
-
-            Enabled = true;
+            NoDepth = new DepthStencilState();
+            NoDepth.DepthBufferEnable = false;
+            NoDepth.DepthBufferFunction = CompareFunction.Always;
         }
 
         /// <summary>
@@ -34,43 +61,44 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="content">The ContentManager to manage Gizmos resources.</param>
         public void LoadContent(GraphicsDevice device, ContentManager content)
         {
-            GizmosRenderer.LoadContent(device, content);
+            GraphicsDevice = device;
+
+            Content = content;
+
+            Effect = Content.Load<Effect>("Effects/Gizmos");
+
+            BackgroundPass = Effect.CurrentTechnique.Passes["Background"];
+            ForegroundPass = Effect.CurrentTechnique.Passes["Foreground"];
+            WorldViewProjectionParameter = Effect.Parameters["WorldViewProjection"];
+            ColorParameter = Effect.Parameters["Color"];
+
+            LineSegment = new LineSegmentGizmoGeometry(GraphicsDevice);
+            Cube = new CubeGizmoGeometry(GraphicsDevice);
+            Sphere = new SphereGizmoGeometry(GraphicsDevice, 20);
+            PolyLine = new PolyLineGizmoGeometry(GraphicsDevice);
+            Disk = new DiskGizmoGeometry(GraphicsDevice, 20);
+            Cylinder = new CylinderGizmoGeometry(GraphicsDevice, 20);
+            AxisLines = new AxisLines(GraphicsDevice, Content.Load<Model>("3D/geometries/arrow"));
+
+            DrawInstances[LineSegment] = new Dictionary<Color, List<Matrix>>();
+            DrawInstances[Sphere] = new Dictionary<Color, List<Matrix>>();
+            DrawInstances[Cube] = new Dictionary<Color, List<Matrix>>();
+            DrawInstances[Disk] = new Dictionary<Color, List<Matrix>>();
+            DrawInstances[Cylinder] = new Dictionary<Color, List<Matrix>>();
         }
 
-        /// <summary>
-        ///     Enables or disables Gizmos drawing. This should be used before a frame, not during it.
-        /// </summary>
-        public bool Enabled
-        {
-            get { return enabled; }
-            set
-            {
-                enabled = value;
-                if (enabled)
-                    Renderer = GizmosRenderer;
-                else
-                    Renderer = NoGizmosRenderer;
-            }
-        }
-
 
         /// <summary>
-        ///     Sets the Gizmos color. All Gizmos drawn after are going to use this color if they do not specify one.
+        ///     Adds a draw instance specifying the geometry, its color and the world matrix to use when drawing. 
         /// </summary>
-        /// <param name="color">The Gizmos color to set.</param>
-        public void SetBaseColor(Color color)
+        /// <param name="type">The GizmoGeometry to be drawn.</param>
+        /// <param name="color">The color of the geometry.</param>
+        /// <param name="world">The world matrix to be used when drawing.</param>
+        private void AddDrawInstance(GizmoGeometry type, Color color, Matrix world)
         {
-            Renderer.SetColor(color);
-        }
-
-        /// <summary>
-        ///     Updates the View and Projection matrices. Should be called whenever the camera is updated.
-        /// </summary>
-        /// <param name="camera">The View matrix of a camera.</param>
-        /// <param name="projection">The Projection matrix of a camera or a viewport.</param>
-        public void UpdateViewProjection(Matrix view, Matrix projection)
-        {
-            Renderer.UpdateMatrices(view, projection);
+            var instancesByType = DrawInstances[type];
+            instancesByType.TryAdd(color, new List<Matrix>());
+            instancesByType[color].Add(world * ViewProjection);
         }
 
         /// <summary>
@@ -78,9 +106,9 @@ namespace TGC.MonoGame.Samples.Viewer
         /// </summary>
         /// <param name="origin">The origin of the line.</param>
         /// <param name="destination">The final point of the line.</param>
-        public void DrawLine(Vector3 origin, Vector3 direction)
+        public void DrawLine(Vector3 origin, Vector3 destination)
         {
-            Renderer.DrawLine(origin, direction);
+            DrawLine(origin, destination, BaseColor);
         }
 
         /// <summary>
@@ -89,11 +117,11 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="origin">The origin of the line.</param>
         /// <param name="destination">The final point of the line.</param>
         /// <param name="color">The color of the line.</param>
-        public void DrawLine(Vector3 origin, Vector3 direction, Color color)
+        public void DrawLine(Vector3 origin, Vector3 destination, Color color)
         {
-            Renderer.DrawLine(origin, direction, color);
+            var world = LineSegmentGizmoGeometry.CalculateWorld(origin, destination);
+            AddDrawInstance(LineSegment, BaseColor, world);
         }
-
 
         /// <summary>
         ///     Draws a wire cube with an origin and size using the Gizmos color.
@@ -102,7 +130,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="size">The size of the cube.</param>
         public void DrawCube(Vector3 origin, Vector3 size)
         {
-            Renderer.DrawCube(origin, size);
+            DrawCube(origin, size, BaseColor);
         }
 
 
@@ -112,7 +140,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="world">The World matrix of the cube.</param>
         public void DrawCube(Matrix world)
         {
-            Renderer.DrawCube(world);
+            DrawCube(world, BaseColor);
         }
 
         /// <summary>
@@ -122,7 +150,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="color">The color of the cube.</param>
         public void DrawCube(Matrix world, Color color)
         {
-            Renderer.DrawCube(world, color);
+            AddDrawInstance(Cube, color, world);
         }
 
 
@@ -134,7 +162,8 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="color">The color of the cube.</param>
         public void DrawCube(Vector3 origin, Vector3 size, Color color)
         {
-            Renderer.DrawCube(origin, size, color);
+            var world = CubeGizmoGeometry.CalculateWorld(origin, size);
+            AddDrawInstance(Cube, color, world);
         }
 
         /// <summary>
@@ -144,7 +173,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="size">The size of the sphere.</param>
         public void DrawSphere(Vector3 origin, Vector3 size)
         {
-            Renderer.DrawSphere(origin, size);
+            DrawSphere(origin, size, BaseColor);
         }
 
         /// <summary>
@@ -155,8 +184,10 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="color">The color of the sphere.</param>
         public void DrawSphere(Vector3 origin, Vector3 size, Color color)
         {
-            Renderer.DrawSphere(origin, size, color);
+            var world = SphereGizmoGeometry.CalculateWorld(origin, size);
+            AddDrawInstance(Sphere, color, world);
         }
+
 
         /// <summary>
         ///     Draws a contiguous line joining the given points and using the Gizmos color.
@@ -164,8 +195,9 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="points">The positions of the poly-line points in world space.</param>
         public void DrawPolyLine(Vector3[] points)
         {
-            Renderer.DrawPolyLine(points);
+            DrawPolyLine(points);
         }
+
 
         /// <summary>
         ///     Draws a contiguous line joining the given points and using the specified color.
@@ -174,7 +206,8 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="color">The color of the poly-line.</param>
         public void DrawPolyLine(Vector3[] points, Color color)
         {
-            Renderer.DrawPolyLine(points, color);
+            PolyLinesToDraw.TryAdd(color, new List<Vector3[]>());
+            PolyLinesToDraw[color].Add(points);
         }
 
         /// <summary>
@@ -183,7 +216,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="viewProjection">The ViewProjection matrix of a virtual camera to draw its frustum.</param>
         public void DrawFrustum(Matrix viewProjection)
         {
-            Renderer.DrawFrustum(viewProjection);
+            DrawFrustum(viewProjection, BaseColor);
         }
 
         /// <summary>
@@ -193,7 +226,8 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="color">The color of the frustum.</param>
         public void DrawFrustum(Matrix viewProjection, Color color)
         {
-            Renderer.DrawFrustum(viewProjection, color);
+            var world = CubeGizmoGeometry.CalculateFrustumWorld(viewProjection);
+            AddDrawInstance(Cube, color, world);
         }
 
         /// <summary>
@@ -204,7 +238,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="radius">The radius of the disk in units.</param>
         public void DrawDisk(Vector3 origin, Vector3 normal, float radius)
         {
-            Renderer.DrawDisk(origin, normal, radius);
+            DrawDisk(origin, normal, radius, BaseColor);
         }
 
         /// <summary>
@@ -216,7 +250,8 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="color">The color of the disk.</param>
         public void DrawDisk(Vector3 origin, Vector3 normal, float radius, Color color)
         {
-            Renderer.DrawDisk(origin, normal, radius, color);
+            var world = DiskGizmoGeometry.CalculateWorld(origin, normal, radius);
+            AddDrawInstance(Disk, color, world);
         }
 
         /// <summary>
@@ -227,7 +262,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="size">The size of the cylinder.</param>
         public void DrawCylinder(Vector3 origin, Matrix rotation, Vector3 size)
         {
-            Renderer.DrawCylinder(origin, rotation, size);
+            DrawCylinder(origin, rotation, size, BaseColor);
         }
 
         /// <summary>
@@ -239,7 +274,8 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="color">The color of the cylinder.</param>
         public void DrawCylinder(Vector3 origin, Matrix rotation, Vector3 size, Color color)
         {
-            Renderer.DrawCylinder(origin, rotation, size, color);
+            var world = CylinderGizmoGeometry.CalculateWorld(origin, rotation, size);
+            AddDrawInstance(Cylinder, color, world);
         }
 
         /// <summary>
@@ -249,7 +285,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="color">The color of the cylinder.</param>
         public void DrawCylinder(Matrix world)
         {
-            Renderer.DrawCylinder(world);
+            DrawCylinder(world, BaseColor);
         }
 
         /// <summary>
@@ -259,29 +295,141 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="color">The color of the cylinder.</param>
         public void DrawCylinder(Matrix world, Color color)
         {
-            Renderer.DrawCylinder(world, color);
+            AddDrawInstance(Cylinder, color, world);
         }
 
 
         /// <summary>
-        ///     [WARNING] This method should not be used in any sample, and must be called at the end of a frame.
+        ///     Sets the Gizmos color. All Gizmos drawn after are going to use this color if they do not specify one.
         /// </summary>
-        /// <remarks>
-        ///      Effectively draws the geometry using the parameters from past draw calls. Should be used after calling the other draw methods.
-        /// </remarks>
-        internal void Draw()
+        /// <param name="color">The Gizmos color to set.</param>
+        public void SetColor(Color color)
         {
-            Renderer.Draw();
+            BaseColor = color;
         }
 
+        /// <summary>
+        ///     Updates the View and Projection matrices. Should be called on an Update loop after the camera is updated.
+        /// </summary>
+        /// <param name="camera">The View matrix of a camera.</param>
+        /// <param name="projection">The Projection matrix of a camera or a viewport.</param>
+        public void UpdateViewProjection(Matrix view, Matrix projection)
+        {
+            View = view;
+            Projection = projection;
+            ViewProjection = View * Projection;
+            AxisLines.SetMatrices(view, projection);
+        }
+
+        /// <summary>
+        ///     Effectively draws the geometry using the parameters from past draw calls. Should be used after calling the other draw methods.
+        /// </summary>
+        public void Draw()
+        {
+            if (!Enabled)
+                return;
+
+            // Save our depth state, then use ours
+            var depth = GraphicsDevice.DepthStencilState;
+            GraphicsDevice.DepthStencilState = NoDepth;
+
+            DrawBaseGizmosGeometries(BackgroundPass);
+            DrawPolyLines(BackgroundPass);
+
+            // Restore our depth
+            GraphicsDevice.DepthStencilState = depth;
+
+            // Draw our foreground geometry
+            DrawBaseGizmosGeometries(ForegroundPass);
+            DrawPolyLines(ForegroundPass);
+
+            AxisLines.Draw();
+
+            CleanDrawinstances();
+        }
+
+
+        /// <summary>
+        ///     Draws all Gizmos that are sub-classes of GizmoGeometry.
+        /// </summary>
+        /// <param name="pass">The pass from an effect to draw the geometry with.</param>
+        private void DrawBaseGizmosGeometries(EffectPass pass)
+        {
+            var count = 0;
+            List<Matrix> matrices;
+            foreach (var drawInstance in DrawInstances)
+            {
+                var geometry = drawInstance.Key;
+                geometry.Bind();
+
+                foreach (var colorEntry in drawInstance.Value)
+                {
+                    ColorParameter.SetValue(colorEntry.Key.ToVector3());
+
+                    matrices = colorEntry.Value;
+                    count = matrices.Count;
+
+                    for (int index = 0; index < count; index++)
+                    {
+                        WorldViewProjectionParameter.SetValue(matrices[index]);
+                        pass.Apply();
+                        geometry.Draw();
+                    }
+                }
+            }
+        }
+
+
+        /// <summary>
+        ///     Draws all Gizmos that are poly-lines.
+        /// </summary>
+        /// <param name="pass">The pass from an effect to draw the geometry with.</param>
+        private void DrawPolyLines(EffectPass pass)
+        {
+            var count = 0;
+            List<Vector3[]> positions;
+            WorldViewProjectionParameter.SetValue(Matrix.Identity);
+            foreach (var polyLineInstance in PolyLinesToDraw)
+            {
+                ColorParameter.SetValue(polyLineInstance.Key.ToVector3());
+
+                positions = polyLineInstance.Value;
+                count = positions.Count;
+                for (int index = 0; index < count; index++)
+                {
+                    pass.Apply();
+                    PolyLine.Draw(positions[index]);
+                }
+            }
+        }
+
+
+        /// <summary>
+        ///    Clears all the draw instances, so we don't draw the same as the past frame.
+        /// </summary>
+        private void CleanDrawinstances()
+        {
+            PolyLinesToDraw.Clear();
+
+            DrawInstances[LineSegment].Clear();
+            DrawInstances[Sphere].Clear();
+            DrawInstances[Cube].Clear();
+            DrawInstances[Disk].Clear();
+            DrawInstances[Cylinder].Clear();
+        }
 
         /// <summary>
         ///    Disposes the used resources (geometries and content).
         /// </summary>
         public void Dispose()
         {
-            GizmosRenderer.Dispose();
+            LineSegment.Dispose();
+            Sphere.Dispose();
+            Cube.Dispose();
+            Disk.Dispose();
+            Cylinder.Dispose();
+            Effect.Dispose();
+            Content.Dispose();
         }
-
     }
 }
