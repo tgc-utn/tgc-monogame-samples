@@ -13,18 +13,20 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Samples\NewFolder\**" />
+    <EmbeddedResource Remove="Samples\NewFolder\**" />
+    <None Remove="Samples\NewFolder\**" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="Icon.ico" />
     <None Remove="Icon.bmp" />
-    <None Remove="Samples\Collisions\**" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Icon.ico" />
     <EmbeddedResource Include="Icon.bmp" />
-    <EmbeddedResource Remove="Samples\Collisions\**" />
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="Content\Content.mgcb" />
-    <MonoGameContentReference Remove="Samples\Collisions\**" />
   </ItemGroup>
   <ItemGroup>
     <TrimmerRootAssembly Include="Microsoft.Xna.Framework.Content.ContentTypeReader" Visible="false" />
@@ -38,8 +40,5 @@
   <ItemGroup>
     <Folder Include="Models\" />
     <Folder Include="Samples\CompleteSolutions" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="Samples\Collisions\**" />
   </ItemGroup>
 </Project>
