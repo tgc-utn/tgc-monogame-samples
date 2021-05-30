@@ -76,7 +76,6 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             Indices = new IndexBuffer(GraphicsDevice, IndexElementSize.SixteenBits, 3, BufferUsage.None);
             Indices.SetData(triangleIndices);
 
-
             Game.Gizmos.Enabled = false;
 
             base.Initialize();
