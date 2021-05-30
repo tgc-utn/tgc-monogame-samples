@@ -19,44 +19,17 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         private event Action<MonoGameColor> OnChange;
 
         /// <summary>
-        ///     Creates a Color Modifier with a given name.
-        /// </summary>
-        /// <param name="name">The name of the modifier that will show on the GUI</param>
-        private ColorModifier(string name)
-        {
-            Name = name;
-        }
-
-        /// <summary>
-        ///     Creates a Color Modifier with a given name and an action on change.
-        /// </summary>
-        /// <param name="name">The name of the modifier that will show on the GUI</param>
-        /// <param name="baseOnChange">An action to be called when the Color changes</param>
-        public ColorModifier(string name, Action<MonoGameColor> baseOnChange) : this(name)
-        {
-            OnChange += baseOnChange;
-        }
-
-        /// <summary>
         ///     Creates a Color Modifier with a given name, action on change and a default Color.
         /// </summary>
         /// <param name="name">The name of the modifier that will show on the GUI</param>
         /// <param name="baseOnChange">An action to be called when the Color changes</param>
         /// <param name="defaultColor">The Color that the Color Modifier starts with</param>
-        public ColorModifier(string name, Action<MonoGameColor> baseOnChange, MonoGameColor defaultColor) : this(name, baseOnChange)
+        public ColorModifier(string name, Action<MonoGameColor> baseOnChange, MonoGameColor defaultColor)
         {
+            Name = name;
+            OnChange += baseOnChange;
             ColorValue = Convert(defaultColor);
             baseOnChange.Invoke(defaultColor);
-        }
-
-        /// <summary>
-        ///     Creates a Color Modifier with a given name and an <see cref="EffectParameter"/>.
-        /// </summary>
-        /// <param name="name">The name of the modifier that will show on the GUI</param>
-        /// <param name="effectParameter">An <see cref="EffectParameter"/> that will recieve the Color as value</param>
-        public ColorModifier(string name, EffectParameter effectParameter) : this(name)
-        {
-            OnChange += (x) => effectParameter.SetValue(x.ToVector3());
         }
 
         /// <summary>
@@ -65,10 +38,10 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <param name="name">The name of the modifier that will show on the GUI</param>
         /// <param name="effectParameter">An <see cref="EffectParameter"/> that will recieve the Color as value</param>
         /// <param name="defaultColor">The Color that the Color Modifier starts with</param>
-        public ColorModifier(string name, EffectParameter effectParameter, MonoGameColor defaultColor) : this(name, effectParameter)
+        public ColorModifier(string name, EffectParameter effectParameter, MonoGameColor defaultColor) : 
+            this(name, (x) => effectParameter.SetValue(x.ToVector3()), defaultColor)
         {
-            ColorValue = Convert(defaultColor);
-            effectParameter.SetValue(defaultColor.ToVector3());
+
         }
 
         /// <summary>

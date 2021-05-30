@@ -23,21 +23,11 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <param name="text">The text to display in the button</param>
         /// <param name="onPress">The action to execute when the button is pressed</param>
         /// <param name="enabled">If the button is enabled</param>
-        public ButtonModifier(string text, Action onPress, bool enabled)
+        public ButtonModifier(string text, Action onPress, bool enabled = true)
         {
             Name = text;
             OnPress = onPress;
             Enabled = enabled;
-        }
-
-        /// <summary>
-        ///     Creates a Button Modifier, enabled by default.
-        /// </summary>
-        /// <param name="text">The text to display in the button</param>
-        /// <param name="onPress">The action to execute when the button is pressed</param>
-        public ButtonModifier(string name, Action onPress) : this(name, onPress, true)
-        {
-
         }
 
         /// <summary>

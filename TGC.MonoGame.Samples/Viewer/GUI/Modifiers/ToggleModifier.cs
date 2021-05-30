@@ -18,18 +18,6 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
 
 
         /// <summary>
-        ///     Creates a Toggle Modifier with a given name and action
-        /// </summary>
-        /// <param name="name">The name of the Toggle Modifier</param>
-        /// <param name="onChange">An action to be called when the value of the modifier changes</param>
-        public ToggleModifier(string name, Action<bool> onChange)
-        {
-            Name = name;
-            OnChange = onChange;
-        }
-
-
-        /// <summary>
         ///     Creates a Toggle Modifier with a given name, action and default value
         /// </summary>
         /// <param name="name">The name of the Toggle Modifier</param>
