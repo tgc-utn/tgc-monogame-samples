@@ -129,7 +129,6 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         /// <param name="sampleName">The name of the sample to load.</param>
         public void LoadSample(string sampleName)
         {
-            Game.Gizmos.Enabled = true;
             if (ActiveSample != null)
             {
                 ActiveSample.UnloadSampleContent();
@@ -141,6 +140,9 @@ namespace TGC.MonoGame.Samples.Viewer.Models
             newSample.Visible = true;
             newSample.Enabled = true;
             ActiveSample = newSample;
+
+
+            newSample.Prepare();
 
             if (!Game.Components.Contains(newSample))
             {

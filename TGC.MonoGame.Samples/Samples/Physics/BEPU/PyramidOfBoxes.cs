@@ -11,9 +11,8 @@ using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Physics.Bepu;
 using TGC.MonoGame.Samples.Viewer;
 using NumericVector3 = System.Numerics.Vector3;
-using NumericQuaternion = System.Numerics.Quaternion;
 
-namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
+namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
 {
     /// <summary>
     ///     Pyramid Of Boxes:
