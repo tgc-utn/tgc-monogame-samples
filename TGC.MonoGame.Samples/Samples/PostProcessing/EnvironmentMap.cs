@@ -5,14 +5,13 @@ using Microsoft.Xna.Framework.Input;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
+using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
 namespace TGC.MonoGame.Samples.Samples.PostProcessing
 {
     public class EnvironmentMap : TGCSample
     {
         private const int EnvironmentmapSize = 2048;
-
-        private Matrix QuadWorld;
 
         /// <inheritdoc />
         public EnvironmentMap(TGCViewer game) : base(game)
@@ -36,10 +35,6 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
         private BasicEffect BasicEffect { get; set; }
 
-        private Effect DebugTextureEffect { get; set; }
-
-        private FullScreenQuad FullScreenQuad { get; set; }
-
         private RenderTargetCube EnvironmentMapRenderTarget { get; set; }
 
         private bool EffectOn { get; set; } = true;
@@ -47,8 +42,6 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         private Vector3 RobotPosition { get; } = Vector3.UnitX * -500f;
 
         private Vector3 SpherePosition { get; } = Vector3.UnitX * -500f + Vector3.UnitZ * -500f;
-
-        private bool PastKeyPressed { get; set; }
 
         /// <inheritdoc />
         public override void Initialize()
@@ -59,7 +52,29 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             CubeMapCamera = new StaticCamera(1f, RobotPosition, Vector3.UnitX, Vector3.Up);
             CubeMapCamera.BuildProjection(1f, 1f, 3000f, MathHelper.PiOver2);
 
+
+            Modifiers = new IModifier[]
+            {
+                new ToggleModifier("Effect On", OnEffectEnable),
+            };
+
             base.Initialize();
+        }
+
+        /// <summary>
+        ///     Processes the toggling of the Effect
+        /// </summary>
+        /// <param name="enabled">A boolean indicating if the Effect is on</param>
+        private void OnEffectEnable(bool enabled)
+        {
+            if (enabled)
+                foreach (var modelMesh in Robot.Meshes)
+                    foreach (var part in modelMesh.MeshParts)
+                        part.Effect = Effect;
+            else
+                foreach (var modelMesh in Robot.Meshes)
+                    foreach (var part in modelMesh.MeshParts)
+                        part.Effect = BasicEffect;
         }
 
         /// <inheritdoc />
@@ -84,14 +99,6 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             foreach (var part in modelMesh.MeshParts)
                 part.Effect = Effect;
 
-            DebugTextureEffect = Game.Content.Load<Effect>(ContentFolderEffects + "DebugTexture");
-            DebugTextureEffect.CurrentTechnique = DebugTextureEffect.Techniques["DebugCubeMap"];
-
-            // Create a full screen quad to debug the environment map
-            FullScreenQuad = new FullScreenQuad(GraphicsDevice);
-
-            QuadWorld = Matrix.CreateScale(new Vector3(0.9f, 0.2f, 0f)) * Matrix.CreateTranslation(Vector3.Down * 0.7f);
-
             // Create a render target for the scene
             EnvironmentMapRenderTarget = new RenderTargetCube(GraphicsDevice, EnvironmentmapSize, false,
                 SurfaceFormat.Color, DepthFormat.Depth24, 0, RenderTargetUsage.DiscardContents);
@@ -107,23 +114,6 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             Camera.Update(gameTime);
 
             CubeMapCamera.Position = RobotPosition;
-
-            // Turn the effect on or off depending on the keyboard state
-            var currentKeyPressed = Keyboard.GetState().IsKeyDown(Keys.J);
-            if (!currentKeyPressed && PastKeyPressed)
-            {
-                EffectOn = !EffectOn;
-                if (EffectOn)
-                    foreach (var modelMesh in Robot.Meshes)
-                    foreach (var part in modelMesh.MeshParts)
-                        part.Effect = Effect;
-                else
-                    foreach (var modelMesh in Robot.Meshes)
-                    foreach (var part in modelMesh.MeshParts)
-                        part.Effect = BasicEffect;
-            }
-
-            PastKeyPressed = currentKeyPressed;
 
             Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
 
@@ -238,13 +228,6 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             #endregion
 
-
-            // Debug our cubemap!
-            // Show a quad
-            DebugTextureEffect.Parameters["World"].SetValue(QuadWorld);
-            DebugTextureEffect.Parameters["cubeMapTexture"]?.SetValue(EnvironmentMapRenderTarget);
-            FullScreenQuad.Draw(DebugTextureEffect);
-
             #endregion
         }
 
@@ -292,7 +275,6 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         protected override void UnloadContent()
         {
             base.UnloadContent();
-            FullScreenQuad.Dispose();
             EnvironmentMapRenderTarget.Dispose();
         }
     }
