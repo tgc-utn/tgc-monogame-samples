@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
+using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
 namespace TGC.MonoGame.Samples.Samples.Shaders
 {
@@ -26,6 +27,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         private Matrix LightBoxWorld { get; set; } = Matrix.Identity;
         private float Timer { get; set; }
 
+
         /// <inheritdoc />
         public override void Initialize()
         {
@@ -36,7 +38,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 
             base.Initialize();
         }
-
+        
         /// <inheritdoc />
         protected override void LoadContent()
         {
@@ -68,6 +70,17 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             Effect.Parameters["shininess"].SetValue(16.0f);
 
             lightBox = new CubePrimitive(GraphicsDevice, 25, Color.Blue);
+
+            Modifiers = new IModifier[]
+            {
+                new FloatModifier("KA", Effect.Parameters["KAmbient"], 0.2f, 0f, 1f),
+                new FloatModifier("KD", Effect.Parameters["KDiffuse"], 0.7f, 0f, 1f),
+                new FloatModifier("KS", Effect.Parameters["KSpecular"], 0.4f, 0f, 1f),
+                new FloatModifier("Shininess", Effect.Parameters["shininess"], 4.0f, 1f, 64f),
+                new ColorModifier("Ambient Color", Effect.Parameters["ambientColor"], new Color(0.25f, 0f, 0f)),
+                new ColorModifier("Diffuse Color", Effect.Parameters["diffuseColor"], new Color(0.1f, 0.1f, 0.6f)),
+                new ColorModifier("Specular Color", Effect.Parameters["specularColor"], Color.White)
+            };
 
             base.LoadContent();
         }

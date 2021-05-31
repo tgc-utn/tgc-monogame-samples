@@ -5,9 +5,17 @@ using System.Collections.Generic;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
+using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
 namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 {
+    struct Arrowz
+    {
+        public Vector3 Position;
+        public Vector3 Target;
+        public Color Color;
+    }
+
     public class BackFaceCulling : TGCSample
     {
         private Camera Camera { get; set; }
@@ -22,9 +30,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
         private Matrix BaseScale { get; set; }
 
-        private List<Arrow> Arrows { get; set; }
-
-        private SpriteFont SpriteFont { get; set; }
+        private List<Arrowz> Arrows { get; set; }
 
         private bool ShowWireframe { get; set; }
 
@@ -32,17 +38,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
         private bool BackFace { get; set; } = true;
 
-        private bool PastWireframePressed { get; set; }
-
-        private bool PastArrowsPressed { get; set; }
-
-        private bool PastBackFacePressed { get; set; }
-
-        private Effect DebugTextureEffect { get; set; }
-
         private Effect DrawDepthEffect { get; set; }
-
-        private FullScreenQuad FullScreenQuad { get; set; }
 
         private RenderTarget2D DepthRenderTarget { get; set; }
 
@@ -61,7 +57,8 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             
             BaseScale = Matrix.CreateScale(BaseScaleScalar);
 
-            Arrows = new List<Arrow>();
+            Arrows = new List<Arrowz>();
+
 
             base.Initialize();
         }
@@ -72,27 +69,24 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             // We load the sphere meshe into a model
             Primitive = new SpherePrimitive(GraphicsDevice, 1f, 6);
 
-            SpriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "Arial");
-
             LoadArrows(Primitive);
 
             // Load the effect
             Effect = Game.Content.Load<Effect>(ContentFolderEffects + "BackFace");
 
-            // Load the debug texture effect to visualize the shadow map
-            DebugTextureEffect = Game.Content.Load<Effect>(ContentFolderEffects + "DebugTexture");
-            // Assign the near and far plane distances of the light camera to debug depth
-            DebugTextureEffect.Parameters["nearPlaneDistance"].SetValue(Camera.DefaultNearPlaneDistance);
-            DebugTextureEffect.Parameters["farPlaneDistance"].SetValue(Camera.DefaultFarPlaneDistance);
-            DebugTextureEffect.CurrentTechnique = DebugTextureEffect.Techniques["DebugDepth"];
-
             DrawDepthEffect = Game.Content.Load<Effect>(ContentFolderEffects + "ShadowMap");
-            
-            FullScreenQuad = new FullScreenQuad(GraphicsDevice);
             
             // Create a depth render target. It stores depth from the camera
             DepthRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, false,
                 SurfaceFormat.Single, DepthFormat.Depth24, 0, RenderTargetUsage.PlatformContents);
+
+            Modifiers = new IModifier[]
+            {
+                new ToggleModifier("Show Wireframe", (enabled) => ShowWireframe = enabled, false),
+                new ToggleModifier("Show Triangle Normals", (enabled) => ShowArrows = enabled, false),
+                new ToggleModifier("Enable Back-Face Culling", (enabled) => BackFace = enabled, true),
+                new TextureModifier("Depth", DepthRenderTarget),
+            };
 
             base.LoadContent();
         }
@@ -154,15 +148,12 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
         private void AddArrow(Vector3 position, Vector3 normal, Color color)
         {
-            Arrow outerArrow = new Arrow(GraphicsDevice);
-            outerArrow.Thickness = 0.005f;
-            outerArrow.HeadSize = new Vector2(0.03f, 0.1f);
-            outerArrow.FromPosition = position;
-            outerArrow.ToPosition = position + normal * 0.5f;
-            outerArrow.BodyColor = color;
-            outerArrow.HeadColor = Color.White;
-            outerArrow.UpdateValues();
-            Arrows.Add(outerArrow);
+            Arrows.Add(new Arrowz()
+            {
+                Position = position,
+                Target = position + normal * 0.75f,
+                Color = color
+            });
         }
 
         private bool InsideCylinder(Vector3 position)
@@ -177,34 +168,6 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             Camera.Update(gameTime);
 
             Effect.Parameters["cameraPosition"]?.SetValue(Camera.Position);
-
-            var keyboardState = Keyboard.GetState();
-            if (keyboardState.IsKeyDown(Keys.J))
-            {
-                if (!PastWireframePressed)
-                    ShowWireframe = !ShowWireframe;
-                PastWireframePressed = true;
-            }
-            else
-                PastWireframePressed = false;
-
-            if (keyboardState.IsKeyDown(Keys.K))
-            {
-                if (!PastArrowsPressed)
-                    ShowArrows = !ShowArrows;
-                PastArrowsPressed = true;
-            }
-            else
-                PastArrowsPressed = false;
-            
-            if (keyboardState.IsKeyDown(Keys.L))
-            {
-                if (!PastBackFacePressed)
-                    BackFace = !BackFace;
-                PastBackFacePressed = true;
-            }
-            else
-                PastBackFacePressed = false;
 
             Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
 
@@ -236,23 +199,15 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             GraphicsDevice.RasterizerState = rasterizerState;
 
             if (ShowArrows)
-                Arrows.ForEach(arrow => arrow.Draw(Matrix.Identity, Camera.View, Camera.Projection));
+            {
+                Arrowz arr;
+                for (int index = 0; index < Arrows.Count; index++)
+                {
+                    arr = Arrows[index];
+                    Game.Gizmos.DrawLine(arr.Position, arr.Target, arr.Color);
+                }
+            } 
             
-            // Debug our shadowmap!
-            // Show a simple quad with the texture
-            DebugTextureEffect.Parameters["World"].SetValue(Matrix.CreateScale(0.2f) * Matrix.CreateTranslation(new Vector3(-0.75f, -0.75f, 0f)));
-            DebugTextureEffect.Parameters["baseTexture"].SetValue(DepthRenderTarget);
-            FullScreenQuad.Draw(DebugTextureEffect);
-
-            Game.SpriteBatch.Begin();
-            Game.SpriteBatch.DrawString(SpriteFont, "Con la tecla 'J' se prende y apaga el modo Wireframe.", 
-                new Vector2(GraphicsDevice.Viewport.Width - 700, 50), Color.Yellow);
-            Game.SpriteBatch.DrawString(SpriteFont, "Con la tecla 'K' se prenden y apagan las flechas.",
-                new Vector2(GraphicsDevice.Viewport.Width - 700, 80), Color.LightYellow);
-            Game.SpriteBatch.DrawString(SpriteFont, "Con la tecla 'L' se habilita y deshabilita el back-face culling.",
-                new Vector2(GraphicsDevice.Viewport.Width - 700, 110), Color.LightGreen);
-            Game.SpriteBatch.End();
-
             
             base.Draw(gameTime);
         }
@@ -300,12 +255,9 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         protected override void UnloadContent()
         {
             Primitive.Dispose();
-            Arrows.ForEach(arrow => arrow.Dispose());
             Arrows.Clear();
             Primitive.Dispose();
-            FullScreenQuad.Dispose();
             Effect.Dispose();
-            DebugTextureEffect.Dispose();
             base.UnloadContent();
         }
     }
