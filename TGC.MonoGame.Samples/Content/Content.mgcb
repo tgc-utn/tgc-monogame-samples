@@ -208,6 +208,12 @@
 /processorParam:DebugMode=Auto
 /build:Effects/Bloom.fx
 
+#begin Effects/ChromaticAberration.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/ChromaticAberration.fx
+
 #begin Effects/ComboRata.fx
 /importer:EffectImporter
 /processor:EffectProcessor
