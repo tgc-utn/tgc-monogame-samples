@@ -244,6 +244,12 @@
 /processorParam:DebugMode=Auto
 /build:Effects/PBR.fx
 
+#begin Effects/PrisonersDilemma.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/PrisonersDilemma.fx
+
 #begin Effects/ShaderVisualizer.fx
 /importer:EffectImporter
 /processor:EffectProcessor
@@ -273,6 +279,12 @@
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:Effects/TextureMerge.fx
+
+#begin Effects/TexturePingPong.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/TexturePingPong.fx
 
 #begin Effects/TextureTiling.fx
 /importer:EffectImporter
