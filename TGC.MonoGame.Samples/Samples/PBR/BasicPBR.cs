@@ -48,17 +48,14 @@ namespace TGC.MonoGame.Samples.Samples.PBR
             size.Y /= 2;
             Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 40, 200), size);
 
-            Modifiers = new IModifier[]
+            ModifierController.AddOptions("Material", new string[]
             {
-                new OptionsModifier("Material", new string[]
-                {
-                    "RustedMetal",
-                    "Grass",
-                    "Gold",
-                    "Marble",
-                    "Metal"
-                }, 0, OnMaterialChange)
-            };
+                "RustedMetal",
+                "Grass",
+                "Gold",
+                "Marble",
+                "Metal"
+            }, 0, OnMaterialChange);
 
             base.Initialize();
         }

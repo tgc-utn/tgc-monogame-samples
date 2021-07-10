@@ -25,6 +25,7 @@ namespace TGC.MonoGame.Samples.Samples
         public TGCSample(TGCViewer game) : base(game)
         {
             Game = game;
+            ModifierController = new ModifierController();
         }
 
         /// <summary>
@@ -49,9 +50,9 @@ namespace TGC.MonoGame.Samples.Samples
 
 
         /// <summary>
-        ///     Array of modifiers to be rendered and used by each sample.
+        ///     Modifier controller for each sample.
         /// </summary>
-        public IModifier[] Modifiers { get; protected set; }
+        public ModifierController ModifierController { get; private set; }
 
         /// <summary>
         ///     Initialize the game settings here.
@@ -66,6 +67,7 @@ namespace TGC.MonoGame.Samples.Samples
         /// </summary>
         public void ReloadContent()
         {
+            ModifierController.Clear();
             LoadContent();
         }
 

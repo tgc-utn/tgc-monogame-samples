@@ -71,16 +71,13 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 
             lightBox = new CubePrimitive(GraphicsDevice, 25, Color.Blue);
 
-            Modifiers = new IModifier[]
-            {
-                new FloatModifier("KA", Effect.Parameters["KAmbient"], 0.2f, 0f, 1f),
-                new FloatModifier("KD", Effect.Parameters["KDiffuse"], 0.7f, 0f, 1f),
-                new FloatModifier("KS", Effect.Parameters["KSpecular"], 0.4f, 0f, 1f),
-                new FloatModifier("Shininess", Effect.Parameters["shininess"], 4.0f, 1f, 64f),
-                new ColorModifier("Ambient Color", Effect.Parameters["ambientColor"], new Color(0.25f, 0f, 0f)),
-                new ColorModifier("Diffuse Color", Effect.Parameters["diffuseColor"], new Color(0.1f, 0.1f, 0.6f)),
-                new ColorModifier("Specular Color", Effect.Parameters["specularColor"], Color.White)
-            };
+            ModifierController.AddFloat("KA", Effect.Parameters["KAmbient"], 0.2f, 0f, 1f);
+            ModifierController.AddFloat("KD", Effect.Parameters["KDiffuse"], 0.7f, 0f, 1f);
+            ModifierController.AddFloat("KS", Effect.Parameters["KSpecular"], 0.4f, 0f, 1f);
+            ModifierController.AddFloat("Shininess", Effect.Parameters["shininess"], 4.0f, 1f, 64f);
+            ModifierController.AddColor("Ambient Color", Effect.Parameters["ambientColor"], new Color(0.25f, 0f, 0f));
+            ModifierController.AddColor("Diffuse Color", Effect.Parameters["diffuseColor"], new Color(0.1f, 0.1f, 0.6f));
+            ModifierController.AddColor("Specular Color", Effect.Parameters["specularColor"], Color.White);
 
             base.LoadContent();
         }
