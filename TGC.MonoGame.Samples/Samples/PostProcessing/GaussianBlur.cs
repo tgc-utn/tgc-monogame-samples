@@ -38,43 +38,10 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         {
             var screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
             Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(-400, 50, 400), screenSize);
-
-            Modifiers = new IModifier[]
-            {
-                new OptionsModifier("Blur Type", new string[]
-                {
-                    "Two Pass Separated Blur",
-                    "Single Pass Blur",
-                    "None"
-                }, 0, OnBlurTypeChange),
-
-            };
-
+                        
             CurrentBlurType = BlurType.SEPARATED_PASSES;
 
             base.Initialize();
-        }
-
-        /// <summary>
-        ///     Processes a change in the Blur Type
-        /// </summary>
-        /// <param name="index">The index of the Blur selected option</param>
-        /// <param name="value">The name of the Blur type</param>
-        private void OnBlurTypeChange(int index, string value)
-        {
-            switch(index)
-            {
-                default:
-                case 0:
-                    CurrentBlurType = BlurType.SEPARATED_PASSES;
-                    break;
-                case 1:
-                    CurrentBlurType = BlurType.SIMPLE;
-                    break;
-                case 2:
-                    CurrentBlurType = BlurType.NONE;
-                    break;
-            }
         }
 
         /// <inheritdoc />
@@ -103,8 +70,37 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
                 .SetValue(new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height));
 
             CurrentBlurType = BlurType.SEPARATED_PASSES;
+           
+            ModifierController.AddOptions("Blur Type", new string[]
+            {
+                "Two Pass Separated Blur",
+                "Single Pass Blur",
+                "None"
+            }, 0, OnBlurTypeChange);
 
             base.LoadContent();
+        }
+
+        /// <summary>
+        ///     Processes a change in the Blur Type
+        /// </summary>
+        /// <param name="index">The index of the Blur selected option</param>
+        /// <param name="value">The name of the Blur type</param>
+        private void OnBlurTypeChange(int index, string value)
+        {
+            switch (index)
+            {
+                default:
+                case 0:
+                    CurrentBlurType = BlurType.SEPARATED_PASSES;
+                    break;
+                case 1:
+                    CurrentBlurType = BlurType.SIMPLE;
+                    break;
+                case 2:
+                    CurrentBlurType = BlurType.NONE;
+                    break;
+            }
         }
 
         /// <inheritdoc />

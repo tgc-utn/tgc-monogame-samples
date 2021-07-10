@@ -65,7 +65,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// </summary>
         public void Draw()
         {
-            bool valueChanged = ImGui.DragFloat3(Name, ref VectorValue);
+            bool valueChanged = ImGui.DragFloat2(Name, ref VectorValue);
             if (valueChanged)
                 OnChange.Invoke(Convert(VectorValue));
         }

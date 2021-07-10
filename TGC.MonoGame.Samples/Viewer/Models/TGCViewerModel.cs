@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Samples;
 using TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET;
@@ -133,7 +134,7 @@ namespace TGC.MonoGame.Samples.Viewer.Models
             if (ActiveSample != null)
             {
                 // Unbind any Texture modifiers from ImGUI
-                UnbindTextureModifiers(ActiveSample);
+                UnbindModifiers();
                 ActiveSample.UnloadSampleContent();
                 ActiveSample.Enabled = false;
                 ActiveSample.Visible = false;
@@ -156,44 +157,25 @@ namespace TGC.MonoGame.Samples.Viewer.Models
                 newSample.Initialize();
                 newSample.ReloadContent();
             }
+
             // Bind the new Texture modifiers if any
-            BindTextureModifiers(ActiveSample);
+            BindModifiers();
         }
 
         /// <summary>
-        ///     Binds the Texture Modifiers in this sample to be used by ImGUI.
+        ///     Binds the Modifiers from the current sample to be used by ImGUI.
         /// </summary>
-        /// <param name="sample">The sample to bind its modifiers</param>
-        private void BindTextureModifiers(TGCSample sample)
+        private void BindModifiers()
         {
-            var modifiers = sample.Modifiers;
-            if (modifiers != null)
-            {
-                for (int index = 0; index < modifiers.Length; index++)
-                {
-                    var modifier = modifiers[index] as TextureModifier;
-                    if (modifier != null)
-                        modifier.Bind(ImGuiRenderer);
-                }
-            }
+            ActiveSample.ModifierController.Bind(ImGuiRenderer);
         }
 
         /// <summary>
-        ///     Releases the Texture Modifier bindings in this sample.
+        ///     Releases the Modifier bindings from the current sample.
         /// </summary>
-        /// <param name="sample">The sample to unbind its modifiers</param>
-        private void UnbindTextureModifiers(TGCSample sample)
+        private void UnbindModifiers()
         {
-            var modifiers = sample.Modifiers;
-            if (modifiers != null)
-            {
-                for (int index = 0; index < modifiers.Length; index++)
-                {
-                    var modifier = modifiers[index] as TextureModifier;
-                    if (modifier != null)
-                        modifier.Unbind(ImGuiRenderer);
-                }
-            }
+            ActiveSample.ModifierController.Unbind(ImGuiRenderer);
         }
 
         /// <summary>
@@ -347,13 +329,7 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         /// </summary>
         private void DrawModifiers()
         {
-            var modifiers = ActiveSample.Modifiers;
-
-            ImGui.Spacing();
-            
-            if (modifiers != null && ImGui.CollapsingHeader("Modifiers", ImGuiTreeNodeFlags.DefaultOpen))
-                foreach (var modifier in modifiers)
-                    modifier.Draw();
+            ActiveSample.ModifierController.Draw();
         }
 
         /// <summary>

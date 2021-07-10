@@ -27,21 +27,11 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
         private bool PastKeyPressed;
 
-        private Matrix QuadShadowsWorld;
-
         private RenderTarget2D ShadowMapRenderTarget;
 
         private SpriteFont SpriteFont;
 
         private float Timer;
-
-        /// <inheritdoc />
-        public ShadowMap(TGCViewer game) : base(game)
-        {
-            Category = TGCSampleCategory.PostProcessing;
-            Name = "Shadow Map";
-            Description = "Projecting shadows in a scene";
-        }
 
         private FreeCamera Camera { get; set; }
 
@@ -53,7 +43,14 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
         private BasicEffect BasicEffect { get; set; }
 
-        private Effect DebugTextureEffect { get; set; }
+
+        /// <inheritdoc />
+        public ShadowMap(TGCViewer game) : base(game)
+        {
+            Category = TGCSampleCategory.PostProcessing;
+            Name = "Shadow Map";
+            Description = "Projecting shadows in a scene";
+        }
 
         /// <inheritdoc />
         public override void Initialize()
@@ -80,16 +77,6 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             BasicEffect = (BasicEffect)Model.Meshes.FirstOrDefault()?.Effects.FirstOrDefault();
 
-            // Load the debug texture effect to visualize the shadow map
-            DebugTextureEffect = Game.Content.Load<Effect>(ContentFolderEffects + "DebugTexture");
-            // Assign the near and far plane distances of the light camera to debug depth
-            DebugTextureEffect.Parameters["nearPlaneDistance"].SetValue(LightCameraNearPlaneDistance);
-            DebugTextureEffect.Parameters["farPlaneDistance"].SetValue(LightCameraFarPlaneDistance);
-            DebugTextureEffect.CurrentTechnique = DebugTextureEffect.Techniques["DebugDepth"];
-
-            // Transform the quad to be in a smaller part of the screen
-            QuadShadowsWorld = Matrix.CreateScale(0.2f) * Matrix.CreateTranslation(new Vector3(-0.75f, -0.75f, 0f));
-
             // Create a full screen quad to post-process
             FullScreenQuad = new FullScreenQuad(GraphicsDevice);
 
@@ -102,6 +89,12 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             SpriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "Arial");
 
             GraphicsDevice.BlendState = BlendState.Opaque;
+
+
+
+            ModifierController.AddToggle("Effect Active", (toggle) => EffectOn = toggle, true);
+            ModifierController.AddTexture("Shadow Map", ShadowMapRenderTarget);
+
 
 
             base.LoadContent();
@@ -238,12 +231,6 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             LightBox.Draw(Matrix.CreateTranslation(LightPosition), Camera.View, Camera.Projection);
 
             #endregion
-
-            // Debug our shadowmap!
-            // Show a simple quad with the texture
-            DebugTextureEffect.Parameters["World"].SetValue(QuadShadowsWorld);
-            DebugTextureEffect.Parameters["baseTexture"].SetValue(ShadowMapRenderTarget);
-            FullScreenQuad.Draw(DebugTextureEffect);
         }
 
 
