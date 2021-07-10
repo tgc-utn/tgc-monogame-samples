@@ -1,9 +1,7 @@
 ﻿using ImGuiNET;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
 using System.Numerics;
-using System.Text;
 using TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET;
 
 namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
@@ -11,16 +9,8 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     /// <summary>
     ///     A Texture Modifier that displays a bound texture
     /// </summary>
-    class TextureModifier : IModifier
+    internal class TextureModifier : IModifier
     {
-        private static Vector4 BorderColor = new Vector4(0.3f, 0.3f, 0.3f, 0.7f);
-
-        private Texture2D Texture;
-
-        private IntPtr TextureReference;
-
-        private string Name;
-
         /// <summary>
         ///     Creates a Texture Modifier using a name and a texture to bind.
         /// </summary>
@@ -30,6 +20,31 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         {
             Name = name;
             Texture = texture;
+        }
+
+        private static Vector4 BorderColor { get; set; } = new Vector4(0.3f, 0.3f, 0.3f, 0.7f);
+
+        private Texture2D Texture { get; set; }
+
+        private IntPtr TextureReference { get; set; }
+
+        private string Name { get; }
+
+        /// <summary>
+        ///     Draws the Texture Modifier with a border
+        /// </summary>
+        public void Draw()
+        {
+            ImGui.Spacing();
+            if (ImGui.CollapsingHeader(Name, ImGuiTreeNodeFlags.DefaultOpen))
+                ImGui.Image(TextureReference,
+                    // Size
+                    new Vector2(ImGui.CalcItemWidth(), ImGui.CalcItemWidth()),
+                    Vector2.Zero,
+                    Vector2.One,
+                    Vector4.One,
+                    // Border Color
+                    BorderColor);
         }
 
         /// <summary>
@@ -48,23 +63,6 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         public void Unbind(ImGuiRenderer renderer)
         {
             renderer.UnbindTexture(TextureReference);
-        }
-
-        /// <summary>
-        ///     Draws the Texture Modifier with a border
-        /// </summary>
-        public void Draw()
-        {
-            ImGui.Spacing();
-            if(ImGui.CollapsingHeader(Name, ImGuiTreeNodeFlags.DefaultOpen))
-                ImGui.Image(TextureReference, 
-                    // Size
-                    new Vector2(ImGui.CalcItemWidth(), ImGui.CalcItemWidth()), 
-                    Vector2.Zero,
-                    Vector2.One, 
-                    Vector4.One, 
-                    // Border Color
-                    BorderColor);
         }
     }
 }

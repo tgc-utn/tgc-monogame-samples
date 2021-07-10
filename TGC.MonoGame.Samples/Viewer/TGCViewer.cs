@@ -32,7 +32,7 @@ namespace TGC.MonoGame.Samples.Viewer
             Content.RootDirectory = ContentFolder;
             IsMouseVisible = true;
 
-            Gizmos = new Gizmos();
+            Gizmos = new Gizmos.Gizmos();
 
             Model = new TGCViewerModel(this);
             Model.LoadTreeSamples();
@@ -66,7 +66,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <summary>
         ///     Gizmos are used to debug and visualize boundaries and vectors
         /// </summary>
-        public Gizmos Gizmos { get; }
+        public Gizmos.Gizmos Gizmos { get; }
 
         /// <summary>
         ///     Enables a group of sprites to be drawn using the same settings.

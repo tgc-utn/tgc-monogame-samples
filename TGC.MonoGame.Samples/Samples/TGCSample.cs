@@ -1,7 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
 using TGC.MonoGame.Samples.Viewer;
-using TGC.MonoGame.Samples.Viewer.GUI;
 using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
 namespace TGC.MonoGame.Samples.Samples
@@ -77,6 +75,15 @@ namespace TGC.MonoGame.Samples.Samples
         protected override void LoadContent()
         {
             base.LoadContent();
+        }
+
+
+        /// <summary>
+        ///     Prepares the Sample to be displayed.
+        /// </summary>
+        public void Prepare()
+        {
+            Game.Gizmos.Enabled = true;
         }
 
         /// <summary>

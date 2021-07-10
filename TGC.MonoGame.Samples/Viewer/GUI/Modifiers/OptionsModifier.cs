@@ -1,23 +1,15 @@
 ﻿using ImGuiNET;
-using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
 {
     /// <summary>
     ///     An Options Modifier that allows for selecting a value from a list
     /// </summary>
-    class OptionsModifier : IModifier
+    internal class OptionsModifier : IModifier
     {
-        private string Name;
-
-        private string[] Options;
-
-        private int CurrentOption;
-
-        private Action<int, string> OnChange;
+        private int _currentOption;
 
         /// <summary>
         ///     Creates an Options Modifier with a given name, options, default option and an action.
@@ -26,9 +18,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <param name="options">A list of options to be displayed and selected</param>
         /// <param name="defaultOption">The index of the option that is selected by default</param>
         /// <param name="onChange">An action to be called when the selected option changes</param>
-        public OptionsModifier(string name, List<string> options, int defaultOption, Action<int, string> onChange) : this(name, options.ToArray(), defaultOption, onChange)
+        public OptionsModifier(string name, List<string> options, int defaultOption, Action<int, string> onChange) :
+            this(name, options.ToArray(), defaultOption, onChange)
         {
-
         }
 
         /// <summary>
@@ -42,18 +34,23 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         {
             Name = name;
             Options = options;
-            CurrentOption = defaultOption;
+            _currentOption = defaultOption;
             OnChange = onChange;
         }
 
+        private string Name { get; }
+
+        private string[] Options { get; set; }
 
         /// <summary>
         ///     Draws the Options Modifier
         /// </summary>
         public void Draw()
         {
-            if (ImGui.Combo(Name, ref CurrentOption, Options, Options.Length))
-                OnChange.Invoke(CurrentOption, Options[CurrentOption]);
+            if (ImGui.Combo(Name, ref _currentOption, Options, Options.Length))
+                OnChange.Invoke(_currentOption, Options[_currentOption]);
         }
+
+        private event Action<int, string> OnChange;
     }
 }

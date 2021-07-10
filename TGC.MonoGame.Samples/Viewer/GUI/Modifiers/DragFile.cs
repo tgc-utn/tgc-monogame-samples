@@ -1,15 +1,13 @@
 ﻿using ImGuiNET;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
-using System.Text;
 
 namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
 {
     public class DragFile : IModifier
     {
-        const int ModalFlags = 0;
+        private const int ModalFlags = 0;
 
         private string Title;
 
@@ -21,14 +19,10 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
 
         private bool currentPathIsDir;
 
-
         public string P;
-
-
 
         private string[] ItemsInScope;
         private int FirstFileIndex;
-
 
         public DragFile(string title)
         {
@@ -64,9 +58,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
                     //ImGui::OpenPopup(m_title);
                     ImGui.OpenPopup(Title);
                 }
-
             }
-
 
             bool isOpen = true;
             if (ImGui.BeginPopupModal(Title, ref isOpen, ImGuiWindowFlags.Modal))
@@ -82,9 +74,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
                     {
                         PopulateItems();
                     }
-
                 }
-
 
                 //Auto resize text wrap to popup width.
                 ImGui.PushItemWidth(-1f);
@@ -117,11 +107,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
                         outPath = currentPath;
                         result = true;
                     }
-
                 }
 
                 ImGui.EndPopup();
-
             }
             return result;
         }
@@ -137,13 +125,11 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
             Array.Copy(files, 0, ItemsInScope, directories.Length, files.Length);
             FirstFileIndex = directories.Length;
         }
-
     }
 
-
-    struct File
+    internal struct File
     {
-        string alias;
-        string path;
+        private string alias;
+        private string path;
     }
 }

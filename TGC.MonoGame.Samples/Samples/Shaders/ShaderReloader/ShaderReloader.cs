@@ -1,11 +1,10 @@
-﻿
-using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using Microsoft.Xna.Framework.Graphics;
 
-namespace TGC.MonoGame.Samples.Samples.Shaders
+namespace TGC.MonoGame.Samples.Samples.Shaders.ShaderReloader
 {
     class ShaderReloader
     {

@@ -9,21 +9,13 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     /// </summary>
     public class ButtonModifier : IModifier
     {
-        private static Vector4 DisabledColor = new Vector4(0.2f);
-
-        private string Name;
-
-        private Action OnPress;
-
-        private bool Enabled = true;
-
         /// <summary>
         ///     Creates a Button Modifier.
         /// </summary>
         /// <param name="text">The text to display in the button</param>
         /// <param name="onPress">The action to execute when the button is pressed</param>
         /// <param name="enabled">If the button is enabled</param>
-        public ButtonModifier(string text, Action onPress, bool enabled = true)
+        public ButtonModifier(string text, Action onPress, bool enabled)
         {
             Name = text;
             OnPress = onPress;
@@ -31,13 +23,21 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         }
 
         /// <summary>
-        ///     Sets the enabled state of the button
+        ///     Creates a Button Modifier, enabled by default.
         /// </summary>
-        /// <param name="enabled">A boolean indicating if the button is enabled or not</param>
-        public void SetEnabled(bool enabled)
+        /// <param name="text">The text to display in the button</param>
+        /// <param name="onPress">The action to execute when the button is pressed</param>
+        public ButtonModifier(string text, Action onPress) : this(text, onPress, true)
         {
-            Enabled = enabled;
         }
+
+        private static Vector4 DisabledColor { get; set; } = new Vector4(0.2f);
+
+        private string Name { get; }
+
+        private Action OnPress { get; set; }
+
+        private bool Enabled { get; set; }
 
         /// <summary>
         ///     Draws the Button Modifier
@@ -60,6 +60,15 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
                 ImGui.PopStyleColor();
                 ImGui.PopStyleColor();
             }
+        }
+
+        /// <summary>
+        ///     Sets the enabled state of the button
+        /// </summary>
+        /// <param name="enabled">A boolean indicating if the button is enabled or not</param>
+        public void SetEnabled(bool enabled)
+        {
+            Enabled = enabled;
         }
     }
 }

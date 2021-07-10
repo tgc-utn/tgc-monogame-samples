@@ -10,7 +10,6 @@ using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Collisions;
 using TGC.MonoGame.Samples.Geometries.Textures;
 using TGC.MonoGame.Samples.Viewer;
-using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
 namespace TGC.MonoGame.Samples.Samples.Collisions
 {
@@ -46,7 +45,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         private Vector3 RobotVelocity { get; set; }
         private Vector3 RobotAcceleration { get; set; }
         private Vector3 RobotFrontDirection { get; set; }
-
+        
         // A boolean indicating if the Robot is on the ground
         private bool OnGround { get; set; }
 
@@ -64,7 +63,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         private Texture2D WoodenTexture { get; set; }
         private Texture2D CobbleTexture { get; set; }
 
-
+        
         // Effects
 
         // Tiling Effect for the floor
@@ -73,8 +72,8 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         // Effect for the stairs and boxes
         private BasicEffect BoxesEffect { get; set; }
 
-
-
+        
+        
         // Colliders
 
         // Bounding Boxes representing our colliders (floor, stairs, boxes)
@@ -153,10 +152,6 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             // Initialize the Velocity as zero
             RobotVelocity = Vector3.Zero;
 
-            Modifiers = new[]
-            {
-                new ToggleModifier("Show Gizmos", (value) => ShowGizmos = value, true),
-            };
 
             base.Initialize();
         }
@@ -170,7 +165,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             // Enable default lighting for the Robot
             foreach (var mesh in Robot.Meshes)
                 ((BasicEffect)mesh.Effects.FirstOrDefault())?.EnableDefaultLighting();
-
+            
             // Create a BasicEffect to draw the Box
             BoxesEffect = new BasicEffect(GraphicsDevice);
             BoxesEffect.TextureEnabled = true;
@@ -186,7 +181,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
             // Create our Quad (to draw the Floor)
             Quad = new QuadPrimitive(GraphicsDevice);
-
+            
             // Create our Box Model
             BoxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, WoodenTexture);
 
@@ -287,7 +282,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
             // Solve the Vertical Movement first (could be done in other order)
             SolveVerticalMovement(scaledVelocity);
-
+            
             // Take only the horizontal components of the velocity
             scaledVelocity = new Vector3(scaledVelocity.X, 0f, scaledVelocity.Z);
 
@@ -337,7 +332,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             {
                 if (!RobotCylinder.Intersects(Colliders[index]).Equals(BoxCylinderIntersection.Intersecting))
                     continue;
-
+                
                 // If we collided with something, set our velocity in Y to zero to reset acceleration
                 RobotVelocity = new Vector3(RobotVelocity.X, 0f, RobotVelocity.Z);
 
@@ -387,7 +382,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
                     break;
                 }
             }
-
+            
         }
 
         /// <summary>
@@ -399,7 +394,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             // Has horizontal movement?
             if (Vector3.Dot(scaledVelocity, new Vector3(1f, 0f, 1f)) == 0f)
                 return;
-
+            
             // Start by moving the Cylinder horizontally
             RobotCylinder.Center += new Vector3(scaledVelocity.X, 0f, scaledVelocity.Z);
 
@@ -442,7 +437,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
                 // Normalize our Normal Vector using its length first
                 RobotCylinder.Center += (normalVector / normalVectorLength * penetration);
             }
-
+            
         }
 
         /// <summary>
@@ -500,7 +495,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             Robot.Draw(RobotWorld, Camera.View, Camera.Projection);
 
             // Floor drawing
-
+            
             // Set the Technique inside the TilingEffect to "BaseTiling", we want to control the tiling on the floor
             // Using its original Texture Coordinates
             TilingEffect.CurrentTechnique = TilingEffect.Techniques["BaseTiling"];
@@ -544,19 +539,17 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             BoxesEffect.Texture = WoodenTexture;
             BoxPrimitive.Draw(BoxesEffect);
 
-            if (ShowGizmos)
-            {
-                // Gizmos Drawing
-                for (int index = 0; index < Colliders.Length; index++)
-                {
-                    var box = Colliders[index];
-                    var center = BoundingVolumesExtensions.GetCenter(box);
-                    var extents = BoundingVolumesExtensions.GetExtents(box);
-                    Game.Gizmos.DrawCube(center, extents * 2f, Color.Red);
-                }
 
-                Game.Gizmos.DrawCylinder(RobotCylinder.Transform, Color.Yellow);
+            // Gizmos Drawing
+            for (int index = 0; index < Colliders.Length; index++)
+            {
+                var box = Colliders[index];
+                var center = BoundingVolumesExtensions.GetCenter(box);
+                var extents = BoundingVolumesExtensions.GetExtents(box);
+                Game.Gizmos.DrawCube(center, extents * 2f, Color.Red);
             }
+
+            Game.Gizmos.DrawCylinder(RobotCylinder.Transform, Color.Yellow);
 
             base.Draw(gameTime);
         }

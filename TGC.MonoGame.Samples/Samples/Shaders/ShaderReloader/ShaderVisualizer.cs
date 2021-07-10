@@ -1,13 +1,12 @@
-﻿
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
 
-namespace TGC.MonoGame.Samples.Samples.Shaders
+namespace TGC.MonoGame.Samples.Samples.Shaders.ShaderReloader
 {
     /// <summary>
     ///     Shader Visualizer
@@ -36,6 +35,15 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         }
 
         /// <inheritdoc />
+
+        public override void Initialize()
+        {
+            Game.Gizmos.Enabled = false;
+            base.Initialize();
+        }
+
+
+        /// <inheritdoc />
         protected override void LoadContent()
         {
             Quad = new FullScreenQuad(GraphicsDevice);
@@ -49,8 +57,6 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             // Make the window squared
             Game.Graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 100;
             Game.Graphics.ApplyChanges();
-
-            Game.Gizmos.Enabled = false;
 
             base.LoadContent();
         }
