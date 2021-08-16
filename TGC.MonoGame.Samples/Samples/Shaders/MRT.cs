@@ -5,6 +5,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Viewer;
+using TGC.MonoGame.Samples.Viewer.GUI;
+using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
 namespace TGC.MonoGame.Samples.Samples.Shaders
 {
@@ -20,8 +22,8 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         public MRT(TGCViewer game) : base(game)
         {
             Category = TGCSampleCategory.Shaders;
-            Name = "MRT";
-            Description = "Multiple Render Targets Sample. Color, Inverse Color, Normal, and Filter target at the same time.";
+            Name = "Multiple Render Target";
+            Description = "Draw to up to 4 render targets at the same time";
         }
         private float time;
 
@@ -37,17 +39,21 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         private RenderTarget2D ColorTarget;
         private RenderTarget2D InverseColorTarget;
         private RenderTarget2D NormalTarget;
-        private RenderTarget2D FilterTarget;
+        private RenderTarget2D AnimatedTarget;
         private SpriteBatch SpriteBatch;
-        private SpriteFont SpriteFont;
+        private int ShowTarget;
+
         /// <inheritdoc />
         public override void Initialize()
         {
-            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0f, 50f, 400f));
+            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0f, 0f, 300f));
             time = 0;
+
+            
             base.Initialize();
         }
-
+        
+        
         /// <inheritdoc />
         protected override void LoadContent()
         {
@@ -81,20 +87,36 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             NormalTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
                 GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0,
                 RenderTargetUsage.DiscardContents);
-            FilterTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
+            AnimatedTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
                 GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0,
                 RenderTargetUsage.DiscardContents);
 
-            // To easily draw render targets and text
+            // To easily draw render targets
             SpriteBatch = new SpriteBatch(GraphicsDevice);
-            SpriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "Arial");
+            
+            Modifiers = new IModifier[]
+            {
+                new OptionsModifier("Choose Target", new string[]
+                            {
+                                "All targets",
+                                "Color",
+                                "Inverted Color",
+                                "Normals",
+                                "Animated Color",
+                            }, 0, OnTargetSwitch)
+                ,
+                new TextureModifier("Base Color Target", ColorTarget)
+            };
+
 
             base.LoadContent();
 
 
         }
-
-        private int ShowTarget;
+        private void OnTargetSwitch(int index, string name)
+        {
+            ShowTarget = index;
+        }
         public override void Update(GameTime gameTime)
         {
             Camera.Update(gameTime);
@@ -102,20 +124,8 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
 
             base.Update(gameTime);
-
-            //Keyboard input
-            var keyboardState = Keyboard.GetState();
-            if (keyboardState.IsKeyDown(Keys.D1))
-                ShowTarget = 1;
-            else if (keyboardState.IsKeyDown(Keys.D2))
-                ShowTarget = 2;
-            else if (keyboardState.IsKeyDown(Keys.D3))
-                ShowTarget = 3;
-            else if (keyboardState.IsKeyDown(Keys.D4))
-                ShowTarget = 4;
-            else
-                ShowTarget = 0;
         }
+
         public override void Draw(GameTime gameTime)
         {
             // Set Time value in effect
@@ -125,7 +135,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             // Set the render targets we are going to be drawing to, in the correct order
-            GraphicsDevice.SetRenderTargets(ColorTarget, InverseColorTarget, NormalTarget, FilterTarget);
+            GraphicsDevice.SetRenderTargets(ColorTarget, InverseColorTarget, NormalTarget, AnimatedTarget);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1f, 0);
            
             // Draw our model or models, keep in mind that all of them must have MRT effect assigned
@@ -144,55 +154,42 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             GraphicsDevice.SetRenderTarget(null);
             GraphicsDevice.Clear(Color.Black);
             
-            SpriteBatch.Begin();
-
-            String targetSelected = "";
             var width = GraphicsDevice.Viewport.Width;
             var height = GraphicsDevice.Viewport.Height;
 
+            var topLeft = Vector2.Zero;
+            var topRight = Vector2.UnitX * width / 2;
+            var bottomLeft = Vector2.UnitY * height / 2;
+            var bottomRight = new Vector2(width / 2, height / 2);
+
+            var scale = 0.5f;
+
+            SpriteBatch.Begin(); 
+            // Verify default begin options in your project (RasterizerState, DepthStencil...)
             // Draw selected target
             if (ShowTarget == 0) 
             {
-                SpriteBatch.Draw(ColorTarget,
-                    new Vector2(0, 0), null, Color.White, 0f, Vector2.Zero, 0.5f, SpriteEffects.None, 0);
-                SpriteBatch.Draw(InverseColorTarget,
-                    new Vector2(width / 2, 0), null, Color.White, 0f, Vector2.Zero, 0.5f, SpriteEffects.None, 0);
-                SpriteBatch.Draw(NormalTarget,
-                    new Vector2(0, height / 2), null, Color.White, 0f, Vector2.Zero, 0.5f, SpriteEffects.None, 0);
-                SpriteBatch.Draw(FilterTarget,
-                    new Vector2(width / 2, height / 2), null, Color.White, 0f, Vector2.Zero, 0.5f, SpriteEffects.None, 0);
-
-                targetSelected = "Todos";
+                SpriteBatch.Draw(ColorTarget, topLeft, 
+                    null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
+                SpriteBatch.Draw(InverseColorTarget, topRight, 
+                    null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
+                SpriteBatch.Draw(NormalTarget, bottomLeft, 
+                    null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
+                SpriteBatch.Draw(AnimatedTarget, bottomRight, 
+                    null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
             }
             else if (ShowTarget == 1)
-            {
-                SpriteBatch.Draw(ColorTarget, Vector2.Zero, Color.White);
-                targetSelected = "Color de textura";
-            }
+                SpriteBatch.Draw(ColorTarget, topLeft, Color.White);
+            
             else if (ShowTarget == 2)
-            {
-                SpriteBatch.Draw(InverseColorTarget, Vector2.Zero, Color.White);
-                targetSelected = "Color invertido de textura";
-            }
+                SpriteBatch.Draw(InverseColorTarget, topLeft, Color.White);
+            
             else if (ShowTarget == 3)
-            {
-                SpriteBatch.Draw(NormalTarget, Vector2.Zero, Color.White);
-                targetSelected = "Normales";
-            }
-            if (ShowTarget == 4)
-            {
-                SpriteBatch.Draw(FilterTarget, Vector2.Zero, Color.White);
-                targetSelected = "Filtro de colores";
-            }
-            // Draw text
-            SpriteBatch.DrawString(SpriteFont, 
-                "Multiple Render Targets: Se utiliza para dibujar hasta 4 render targets al mismo tiempo", 
-                new Vector2(GraphicsDevice.Viewport.Width / 3, 0), Color.White);
-
-            SpriteBatch.DrawString(SpriteFont, 
-                "Mostrando "+targetSelected+ ", para cambiar usar numeros 1,2,3,4", 
-                new Vector2(GraphicsDevice.Viewport.Width / 3, 40), Color.White);
-
+                SpriteBatch.Draw(NormalTarget, topLeft, Color.White);
+            
+            else if (ShowTarget == 4)
+                SpriteBatch.Draw(AnimatedTarget, topLeft, Color.White);
+                        
             SpriteBatch.End();
             
             base.Draw(gameTime);

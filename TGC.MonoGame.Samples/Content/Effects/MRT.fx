@@ -23,6 +23,7 @@ struct VertexShaderOutput
     float4 Position : SV_POSITION;
     float4 Normal : TEXCOORD0;
     float2 TextureCoordinates : TEXCOORD1;
+    //float4 ScreenPos : TEXCOORD2;
 };
 // One color for each render target
 struct PixelShaderOutput
@@ -30,7 +31,7 @@ struct PixelShaderOutput
     float4 Color : COLOR0;
     float4 Inverse : COLOR1;
     float4 Normal : COLOR2;
-    float4 Filter : COLOR3;
+    float4 Animation : COLOR3;
 };
 
 texture ModelTexture;
@@ -53,6 +54,7 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
     input.Position.z = z * cos(Time) + y * sin(Time);
     
     output.Position = mul(input.Position, WorldViewProjection);
+    //output.ScreenPos = output.Position;
     output.Normal = mul(input.Normal, World);
     output.TextureCoordinates = input.TextureCoordinates;
 	
@@ -65,7 +67,23 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 PixelShaderOutput MainPS(VertexShaderOutput input)
 {
     PixelShaderOutput output = (PixelShaderOutput) 0;
+    /*
+    PixelShaderOutput border;
+    border.Color = float4(1, 1, 1, 1);
+    border.Inverse = float4(1, 1, 1, 1);
+    border.Normal = float4(1, 1, 1, 1);
+    border.Filter = float4(1, 1, 1, 1);
     
+    float2 pos = input.ScreenPos;
+    if (step(0.2, pos.x))
+        return border;
+    else if (step(pos.x, 0.8))
+        return border;
+    else if (step(0.2, pos.y))
+        return border;
+    else if (step(pos.y, 0.8))
+        return border;
+*/    
     float3 color = tex2D(textureSampler, input.TextureCoordinates).rgb;
     
     output.Color = float4(color, 1);
@@ -77,7 +95,7 @@ PixelShaderOutput MainPS(VertexShaderOutput input)
     float r = color.r * abs(sin(Time));
     float g = color.g * abs(cos(Time));
     
-    output.Filter = float4(r, g, color.b, 1);
+    output.Animation = float4(r, g, color.b, 1);
     
     return output;
 }
