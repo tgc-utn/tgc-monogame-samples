@@ -152,30 +152,32 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 
             // Now we can draw any target, or send them as textures to another shader
             GraphicsDevice.SetRenderTarget(null);
-            GraphicsDevice.Clear(Color.Black);
+            GraphicsDevice.Clear(Color.White);
             
-            var width = GraphicsDevice.Viewport.Width;
-            var height = GraphicsDevice.Viewport.Height;
+            int width = GraphicsDevice.Viewport.Width;
+            int height = GraphicsDevice.Viewport.Height;
+            int halfWidth = width / 2;
+            int halfHeight = height / 2;
 
-            var topLeft = Vector2.Zero;
-            var topRight = Vector2.UnitX * width / 2;
-            var bottomLeft = Vector2.UnitY * height / 2;
-            var bottomRight = new Vector2(width / 2, height / 2);
+            Vector2 topLeft = Vector2.Zero;
+            Vector2 topRight = Vector2.UnitX * halfWidth;
+            Vector2 bottomLeft = Vector2.UnitY * halfHeight;
+            Vector2 bottomRight = new Vector2(halfWidth, halfHeight);
 
-            var scale = 0.5f;
+            float scale = 0.5f;
 
-            SpriteBatch.Begin(); 
+            SpriteBatch.Begin();
             // Verify default begin options in your project (RasterizerState, DepthStencil...)
             // Draw selected target
             if (ShowTarget == 0) 
             {
-                SpriteBatch.Draw(ColorTarget, topLeft, 
+                SpriteBatch.Draw(ColorTarget, topLeft,
                     null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
-                SpriteBatch.Draw(InverseColorTarget, topRight, 
+                SpriteBatch.Draw(InverseColorTarget, topRight,
                     null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
-                SpriteBatch.Draw(NormalTarget, bottomLeft, 
+                SpriteBatch.Draw(NormalTarget, bottomLeft,
                     null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
-                SpriteBatch.Draw(AnimatedTarget, bottomRight, 
+                SpriteBatch.Draw(AnimatedTarget, bottomRight,
                     null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
             }
             else if (ShowTarget == 1)

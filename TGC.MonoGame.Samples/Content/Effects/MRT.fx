@@ -23,7 +23,6 @@ struct VertexShaderOutput
     float4 Position : SV_POSITION;
     float4 Normal : TEXCOORD0;
     float2 TextureCoordinates : TEXCOORD1;
-    //float4 ScreenPos : TEXCOORD2;
 };
 // One color for each render target
 struct PixelShaderOutput
@@ -53,13 +52,14 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
     input.Position.y = y * cos(Time) - z * sin(Time);
     input.Position.z = z * cos(Time) + y * sin(Time);
     
-    output.Position = mul(input.Position, WorldViewProjection);
-    //output.ScreenPos = output.Position;
+    float4 pos = mul(input.Position, WorldViewProjection);
+    output.Position = pos;
     output.Normal = mul(input.Normal, World);
     output.TextureCoordinates = input.TextureCoordinates;
 	
     return output;
 }
+
 // Instead of just a float4, we output a struct with up to 4 float4 in our PS
 // if transparency is not required, its possible to use the alpha value to 
 // output more data
@@ -67,23 +67,7 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 PixelShaderOutput MainPS(VertexShaderOutput input)
 {
     PixelShaderOutput output = (PixelShaderOutput) 0;
-    /*
-    PixelShaderOutput border;
-    border.Color = float4(1, 1, 1, 1);
-    border.Inverse = float4(1, 1, 1, 1);
-    border.Normal = float4(1, 1, 1, 1);
-    border.Filter = float4(1, 1, 1, 1);
     
-    float2 pos = input.ScreenPos;
-    if (step(0.2, pos.x))
-        return border;
-    else if (step(pos.x, 0.8))
-        return border;
-    else if (step(0.2, pos.y))
-        return border;
-    else if (step(pos.y, 0.8))
-        return border;
-*/    
     float3 color = tex2D(textureSampler, input.TextureCoordinates).rgb;
     
     output.Color = float4(color, 1);
