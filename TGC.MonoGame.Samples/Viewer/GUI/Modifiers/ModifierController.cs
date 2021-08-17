@@ -10,9 +10,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
 {
     public class ModifierController
     {
-        private List<IModifier> Modifiers;
+        private List<IModifier> Modifiers { get; set; }
 
-        private List<TextureModifier> TextureModifiers;
+        private List<TextureModifier> TextureModifiers  { get; set; }
 
 
         /// <summary>

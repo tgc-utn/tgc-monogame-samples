@@ -10,11 +10,11 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     /// </summary>
     public class Vector3Modifier : IModifier
     {
-        private string Name;
+        private string Name { get; set; }
 
-        private Vector3 VectorValue;
+        private Vector3 VectorValue { get; set; }
 
-        private event Action<MonoGameVector3> OnChange;
+        private event Action<MonoGameVector3> OnChange { get; set; }
 
         /// <summary>
         ///     Creates a Vector3 Modifier with a given name and action.
@@ -65,7 +65,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// </summary>
         public void Draw()
         {
-            bool valueChanged = ImGui.DragFloat3(Name, ref VectorValue);
+            var valueChanged = ImGui.DragFloat3(Name, ref VectorValue);
             if (valueChanged)
                 OnChange.Invoke(Convert(VectorValue));
         }
