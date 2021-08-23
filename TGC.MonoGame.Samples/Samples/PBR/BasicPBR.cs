@@ -55,7 +55,7 @@ namespace TGC.MonoGame.Samples.Samples.PBR
                 "Gold",
                 "Marble",
                 "Metal"
-            }, 0, OnMaterialChange);
+            }, Material.RustedMetal, OnMaterialChange);
 
             base.Initialize();
         }
@@ -65,9 +65,9 @@ namespace TGC.MonoGame.Samples.Samples.PBR
         /// </summary>
         /// <param name="index">The index of the new selected Material</param>
         /// <param name="name">The name of the new selected Material</param>
-        private void OnMaterialChange(int index, string name)
+        private void OnMaterialChange(Material material)
         {
-            Current = (Material)index;
+            Current = material;
             SwitchMaterial();
         }
         

@@ -70,36 +70,25 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             CurrentBlurType = BlurType.SEPARATED_PASSES;
            
-            ModifierController.AddOptions("Blur Type", new string[]
+            ModifierController.AddOptions("Blur Type",new string[]
             {
-                "Two Pass Separated Blur",
+                "None",
                 "Single Pass Blur",
-                "None"
-            }, 0, OnBlurTypeChange);
+                "Two Pass Separated Blur",
+            }, BlurType.SEPARATED_PASSES, OnBlurTypeChange);
 
             base.LoadContent();
         }
+
 
         /// <summary>
         ///     Processes a change in the Blur Type
         /// </summary>
         /// <param name="index">The index of the Blur selected option</param>
         /// <param name="value">The name of the Blur type</param>
-        private void OnBlurTypeChange(int index, string value)
+        private void OnBlurTypeChange(BlurType type)
         {
-            switch (index)
-            {
-                default:
-                case 0:
-                    CurrentBlurType = BlurType.SEPARATED_PASSES;
-                    break;
-                case 1:
-                    CurrentBlurType = BlurType.SIMPLE;
-                    break;
-                case 2:
-                    CurrentBlurType = BlurType.NONE;
-                    break;
-            }
+            CurrentBlurType = type;
         }
 
         /// <inheritdoc />
