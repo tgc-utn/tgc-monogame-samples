@@ -106,6 +106,25 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         }
 
 
+
+        public void AddOptions<EnumType>(string name, Action<EnumType> onChange) where EnumType : Enum
+        {
+            Modifiers.Add(new OptionsModifier<EnumType>(name, onChange));
+        }
+
+        public void AddOptions<EnumType>(string name, EnumType defaultValue, Action<EnumType> onChange) where EnumType : Enum
+        {
+            Modifiers.Add(new OptionsModifier<EnumType>(name, defaultValue, onChange));
+        }
+
+        public void AddOptions<EnumType>(string name, string[] optionNames, EnumType defaultValue, Action<EnumType> onChange) where EnumType : Enum
+        {
+            Modifiers.Add(new OptionsModifier<EnumType>(name, optionNames, defaultValue, onChange));
+        }
+
+
+        /*
+
         /// <summary>
         ///     Adds an Options Modifier with a given name, options, default option and an action.
         /// </summary>
@@ -129,7 +148,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         {
             Modifiers.Add(new OptionsModifier(name, options, defaultOption, onChange));
         }
-
+        */
 
 
         /// <summary>
