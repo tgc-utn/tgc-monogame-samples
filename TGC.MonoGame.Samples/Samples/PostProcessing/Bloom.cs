@@ -80,13 +80,10 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             SecondPassBloomRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
                 GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.None, 0,
                 RenderTargetUsage.DiscardContents);
-            
-            Modifiers = new IModifier[]
-            {
-                new ToggleModifier("Effect Active", (toggle) => EffectOn = toggle, true),
-                new TextureModifier("Scene Render Target", MainSceneRenderTarget),
-                new TextureModifier("Bloom Render Target", SecondPassBloomRenderTarget),
-            };
+
+            ModifierController.AddToggle("Effect Active", (toggle) => EffectOn = toggle, true);
+            ModifierController.AddTexture("Scene Render Target", MainSceneRenderTarget);
+            ModifierController.AddTexture("Bloom Render Target", SecondPassBloomRenderTarget);
 
             base.LoadContent();
         }
