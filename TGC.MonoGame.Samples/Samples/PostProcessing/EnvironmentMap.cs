@@ -97,18 +97,10 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         /// <param name="enabled">A boolean indicating if the Effect is on</param>
         private void OnEffectEnable(bool enabled)
         {
-            if (enabled)
-            {
-                foreach (var modelMesh in Robot.Meshes)
-                    foreach (var part in modelMesh.MeshParts)
-                        part.Effect = Effect;
-            }
-            else
-            {
-                foreach (var modelMesh in Robot.Meshes)
-                    foreach (var part in modelMesh.MeshParts)
-                        part.Effect = BasicEffect;
-            }
+            var effectToAssign = enabled ? Effect : BasicEffect;            
+            foreach (var modelMesh in Robot.Meshes)
+                foreach (var part in modelMesh.MeshParts)
+                    part.Effect = effectToAssign;
             EffectOn = enabled;
         }
 
