@@ -11,6 +11,14 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     {
         private float _floatValue;
 
+        private string Name { get; set; }
+
+        private bool HasBounds { get; set; }
+
+        private float Min { get; set; }
+
+        private float Max { get; set; }
+
         /// <summary>
         ///     Creates a Float Modifier with a given name.
         /// </summary>
@@ -100,13 +108,6 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
             Max = max;
         }
 
-        private string Name { get; }
-
-        private bool HasBounds { get; set; }
-
-        private float Min { get; set; }
-
-        private float Max { get; set; }
 
         /// <summary>
         ///     Draws the Float Modifier.

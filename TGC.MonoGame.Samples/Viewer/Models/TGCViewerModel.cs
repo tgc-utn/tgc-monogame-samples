@@ -167,7 +167,7 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         /// </summary>
         private void BindModifiers()
         {
-            ActiveSample.ModifierController.Bind(ImGuiRenderer);
+            ActiveSample.BindModifiers(ImGuiRenderer);
         }
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         /// </summary>
         private void UnbindModifiers()
         {
-            ActiveSample.ModifierController.Unbind(ImGuiRenderer);
+            ActiveSample.UnbindModifiers(ImGuiRenderer);
         }
 
         /// <summary>

@@ -10,9 +10,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
 {
     public class ModifierController
     {
-        private List<IModifier> Modifiers;
+        private List<IModifier> Modifiers { get; set; }
 
-        private List<TextureModifier> TextureModifiers;
+        private List<TextureModifier> TextureModifiers { get; set; }
 
 
         /// <summary>
@@ -107,48 +107,41 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
 
 
 
+        /// <summary>
+        ///     Adds an Options Modifiers with a name and option change listener.
+        ///     This way to construct an Options Modifier uses the enum names as option names.
+        ///     The default option is the first one on the enum type.
+        /// </summary>
+        /// <param name="name">The name of the modifier that will show on the GUI</param>
+        /// <param name="onChange">An action to be called when the option value changes</param>
         public void AddOptions<EnumType>(string name, Action<EnumType> onChange) where EnumType : Enum
         {
             Modifiers.Add(new OptionsModifier<EnumType>(name, onChange));
         }
 
+        /// <summary>
+        ///     Adds an Options Modifiers with a name, default option value and option change listener.
+        ///     This way to construct an Options Modifier uses the enum names as option names.
+        /// </summary>
+        /// <param name="name">The name of the modifier that will show on the GUI</param>
+        /// <param name="defaultValue">The default option value</param>
+        /// <param name="onChange">An action to be called when the option value changes</param>
         public void AddOptions<EnumType>(string name, EnumType defaultValue, Action<EnumType> onChange) where EnumType : Enum
         {
             Modifiers.Add(new OptionsModifier<EnumType>(name, defaultValue, onChange));
         }
 
+        /// <summary>
+        ///     Adds an Options Modifiers with a name, option names, default option value and option change listener.
+        /// </summary>
+        /// <param name="name">The name of the modifier that will show on the GUI</param>
+        /// <param name="optionNames">The sorted option names array</param>
+        /// <param name="defaultValue">The default option value</param>
+        /// <param name="onChange">An action to be called when the option value changes</param>
         public void AddOptions<EnumType>(string name, string[] optionNames, EnumType defaultValue, Action<EnumType> onChange) where EnumType : Enum
         {
             Modifiers.Add(new OptionsModifier<EnumType>(name, optionNames, defaultValue, onChange));
         }
-
-
-        /*
-
-        /// <summary>
-        ///     Adds an Options Modifier with a given name, options, default option and an action.
-        /// </summary>
-        /// <param name="name">The name of the modifier that will show on the GUI</param>
-        /// <param name="options">A list of options to be displayed and selected</param>
-        /// <param name="defaultOption">The index of the option that is selected by default</param>
-        /// <param name="onChange">An action to be called when the selected option changes</param>
-        public void AddOptions(string name, List<string> options, int defaultOption, Action<int, string> onChange)
-        {
-            Modifiers.Add(new OptionsModifier(name, options, defaultOption, onChange));
-        }
-
-        /// <summary>
-        ///     Adds an Options Modifier with a given name, options, default option and an action.
-        /// </summary>
-        /// <param name="name">The name of the modifier that will show on the GUI</param>
-        /// <param name="options">An array of options to be displayed and selected</param>
-        /// <param name="defaultOption">The index of the option that is selected by default</param>
-        /// <param name="onChange">An action to be called when the selected option changes</param>
-        public void AddOptions(string name, string[] options, int defaultOption, Action<int, string> onChange)
-        {
-            Modifiers.Add(new OptionsModifier(name, options, defaultOption, onChange));
-        }
-        */
 
 
         /// <summary>

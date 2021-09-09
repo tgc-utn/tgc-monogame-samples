@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using TGC.MonoGame.Samples.Viewer;
+using TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET;
 using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
 namespace TGC.MonoGame.Samples.Samples
@@ -113,6 +114,24 @@ namespace TGC.MonoGame.Samples.Samples
         public void UnloadSampleContent()
         {
             UnloadContent();
+        }
+
+        /// <summary>
+        ///     Binds the Modifier Controller to the ImGuiRenderer.
+        /// </summary>
+        /// <param name="renderer">The ImGuiRenderer to bind the Modifier Controller to</param>
+        public void BindModifiers(ImGuiRenderer renderer)
+        {
+            ModifierController.Bind(renderer);
+        }
+
+        /// <summary>
+        ///     Unbinds the Modifier Controller to the ImGuiRenderer.
+        /// </summary>
+        /// <param name="renderer">The ImGuiRenderer to unbind the Modifier Controller</param>
+        public void UnbindModifiers(ImGuiRenderer renderer)
+        {
+            ModifierController.Unbind(renderer);
         }
 
         /// <summary>
