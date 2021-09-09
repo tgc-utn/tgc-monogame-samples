@@ -41,7 +41,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         private RenderTarget2D NormalTarget;
         private RenderTarget2D AnimatedTarget;
         private SpriteBatch SpriteBatch;
-        private int ShowTarget;
+        private RenderTargetType RenderTargetToShow;
 
         /// <inheritdoc />
         public override void Initialize()
@@ -94,29 +94,25 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             // To easily draw render targets
             SpriteBatch = new SpriteBatch(GraphicsDevice);
             
-            Modifiers = new IModifier[]
+            ModifierController.AddOptions<RenderTargetType>("Choose Target", new []
             {
-                new OptionsModifier("Choose Target", new string[]
-                            {
-                                "All targets",
-                                "Color",
-                                "Inverted Color",
-                                "Normals",
-                                "Animated Color",
-                            }, 0, OnTargetSwitch)
-                ,
-                new TextureModifier("Base Color Target", ColorTarget)
-            };
+                "All targets",
+                "Color",
+                "Inverted Color",
+                "Normals",
+                "Animated Color",
+            }, RenderTargetType.AllTargets, OnTargetSwitch);
 
+            ModifierController.AddTexture("Base Color Target", ColorTarget);
 
             base.LoadContent();
-
-
         }
-        private void OnTargetSwitch(int index, string name)
+
+        private void OnTargetSwitch(RenderTargetType renderTargetToShow)
         {
-            ShowTarget = index;
+            RenderTargetToShow = renderTargetToShow;
         }
+
         public override void Update(GameTime gameTime)
         {
             Camera.Update(gameTime);
@@ -167,34 +163,50 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             float scale = 0.5f;
 
             SpriteBatch.Begin();
+
+
             // Verify default begin options in your project (RasterizerState, DepthStencil...)
             // Draw selected target
-            if (ShowTarget == 0) 
+            switch (RenderTargetToShow)
             {
-                SpriteBatch.Draw(ColorTarget, topLeft,
-                    null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
-                SpriteBatch.Draw(InverseColorTarget, topRight,
-                    null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
-                SpriteBatch.Draw(NormalTarget, bottomLeft,
-                    null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
-                SpriteBatch.Draw(AnimatedTarget, bottomRight,
-                    null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
+                default:
+                case RenderTargetType.AllTargets:
+                    SpriteBatch.Draw(ColorTarget, topLeft,
+                        null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
+                    SpriteBatch.Draw(InverseColorTarget, topRight,
+                        null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
+                    SpriteBatch.Draw(NormalTarget, bottomLeft,
+                        null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
+                    SpriteBatch.Draw(AnimatedTarget, bottomRight,
+                        null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
+                    break;
+                case RenderTargetType.Color:
+                    SpriteBatch.Draw(ColorTarget, topLeft, Color.White);
+                    break;
+                case RenderTargetType.InvertedColor:
+                    SpriteBatch.Draw(InverseColorTarget, topLeft, Color.White);
+                    break;
+                case RenderTargetType.Normals:
+                    SpriteBatch.Draw(NormalTarget, topLeft, Color.White);
+                    break;
+                case RenderTargetType.AnimatedColor:
+                    SpriteBatch.Draw(AnimatedTarget, topLeft, Color.White);
+                    break;
             }
-            else if (ShowTarget == 1)
-                SpriteBatch.Draw(ColorTarget, topLeft, Color.White);
-            
-            else if (ShowTarget == 2)
-                SpriteBatch.Draw(InverseColorTarget, topLeft, Color.White);
-            
-            else if (ShowTarget == 3)
-                SpriteBatch.Draw(NormalTarget, topLeft, Color.White);
-            
-            else if (ShowTarget == 4)
-                SpriteBatch.Draw(AnimatedTarget, topLeft, Color.White);
-                        
+
             SpriteBatch.End();
             
             base.Draw(gameTime);
         }
+        private enum RenderTargetType
+        {
+            AllTargets,
+            Color,
+            InvertedColor,
+            Normals,
+            AnimatedColor,
+        }
     }
+
+
 }
