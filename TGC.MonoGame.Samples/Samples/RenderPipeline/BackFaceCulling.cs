@@ -79,14 +79,11 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             // Create a depth render target. It stores depth from the camera
             DepthRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, false,
                 SurfaceFormat.Single, DepthFormat.Depth24, 0, RenderTargetUsage.PlatformContents);
-
-            Modifiers = new IModifier[]
-            {
-                new ToggleModifier("Show Wireframe", (enabled) => ShowWireframe = enabled, false),
-                new ToggleModifier("Show Triangle Normals", (enabled) => ShowArrows = enabled, false),
-                new ToggleModifier("Enable Back-Face Culling", (enabled) => BackFace = enabled, true),
-                new TextureModifier("Depth", DepthRenderTarget),
-            };
+                        
+            ModifierController.AddToggle("Show Wireframe", (enabled) => ShowWireframe = enabled, false);
+            ModifierController.AddToggle("Show Triangle Normals", (enabled) => ShowArrows = enabled, false);
+            ModifierController.AddToggle("Enable Back-Face Culling", (enabled) => BackFace = enabled, true);
+            ModifierController.AddTexture("Depth", DepthRenderTarget);
 
             base.LoadContent();
         }
