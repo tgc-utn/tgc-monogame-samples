@@ -12,6 +12,10 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     internal class ColorModifier : IModifier
     {
         private Vector4 _colorValue;
+        private string Name { get; set; }
+
+        private Action<MonoGameColor> OnChange { get; set; }
+
 
         /// <summary>
         ///     Creates a Color Modifier with a given name.
@@ -68,8 +72,6 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
             effectParameter.SetValue(defaultColor.ToVector3());
         }
 
-        private string Name { get; }
-
         /// <summary>
         ///     Draws the Color Modifier
         /// </summary>
@@ -78,8 +80,6 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
             if (ImGui.ColorEdit4(Name, ref _colorValue))
                 OnChange.Invoke(Convert(_colorValue));
         }
-
-        private event Action<MonoGameColor> OnChange;
 
         /// <summary>
         ///     Converts a Color from the MonoGame namespace to a System Vector4.

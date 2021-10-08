@@ -9,6 +9,15 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     /// </summary>
     public class ButtonModifier : IModifier
     {
+        private static Vector4 DisabledColor { get; } = new Vector4(0.2f);
+
+        private string Name { get; set; }
+
+        private Action OnPress { get; set; }
+
+        private bool Enabled { get; set; }
+
+
         /// <summary>
         ///     Creates a Button Modifier.
         /// </summary>
@@ -30,14 +39,6 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         public ButtonModifier(string text, Action onPress) : this(text, onPress, true)
         {
         }
-
-        private static Vector4 DisabledColor { get; set; } = new Vector4(0.2f);
-
-        private string Name { get; }
-
-        private Action OnPress { get; set; }
-
-        private bool Enabled { get; set; }
 
         /// <summary>
         ///     Draws the Button Modifier

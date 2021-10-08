@@ -53,29 +53,9 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             CubeMapCamera.BuildProjection(1f, 1f, 3000f, MathHelper.PiOver2);
 
 
-            Modifiers = new IModifier[]
-            {
-                new ToggleModifier("Effect On", OnEffectEnable),
-            };
-
             base.Initialize();
         }
 
-        /// <summary>
-        ///     Processes the toggling of the Effect
-        /// </summary>
-        /// <param name="enabled">A boolean indicating if the Effect is on</param>
-        private void OnEffectEnable(bool enabled)
-        {
-            if (enabled)
-                foreach (var modelMesh in Robot.Meshes)
-                    foreach (var part in modelMesh.MeshParts)
-                        part.Effect = Effect;
-            else
-                foreach (var modelMesh in Robot.Meshes)
-                    foreach (var part in modelMesh.MeshParts)
-                        part.Effect = BasicEffect;
-        }
 
         /// <inheritdoc />
         protected override void LoadContent()
@@ -93,6 +73,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             Effect = Game.Content.Load<Effect>(ContentFolderEffects + "EnvironmentMap");
 
             BasicEffect = (BasicEffect) Robot.Meshes.FirstOrDefault().Effects[0];
+            BasicEffect.LightingEnabled = false;
+            Sphere.Effect.LightingEnabled = false;
 
             // Assign the Environment map effect to our robot
             foreach (var modelMesh in Robot.Meshes)
@@ -104,9 +86,25 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
                 SurfaceFormat.Color, DepthFormat.Depth24, 0, RenderTargetUsage.DiscardContents);
             GraphicsDevice.BlendState = BlendState.Opaque;
 
+            ModifierController.AddToggle("Effect On", OnEffectEnable, true);
+
             base.LoadContent();
         }
-        
+
+        /// <summary>
+        ///     Processes the toggling of the Effect
+        /// </summary>
+        /// <param name="enabled">A boolean indicating if the Effect is on</param>
+        private void OnEffectEnable(bool enabled)
+        {
+            var effectToAssign = enabled ? Effect : BasicEffect;            
+            foreach (var modelMesh in Robot.Meshes)
+                foreach (var part in modelMesh.MeshParts)
+                    part.Effect = effectToAssign;
+            EffectOn = enabled;
+        }
+
+
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
@@ -144,6 +142,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
 
             Scene.Draw(Matrix.Identity, Camera.View, Camera.Projection);
+
+            Sphere.Draw(Matrix.CreateTranslation(SpherePosition), Camera.View, Camera.Projection);
 
             Robot.Draw(Matrix.CreateTranslation(RobotPosition), Camera.View, Camera.Projection);
         }
