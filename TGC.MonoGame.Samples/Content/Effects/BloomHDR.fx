@@ -307,19 +307,11 @@ float4 UpsampleCombinePS(VertexShaderOutput input) : COLOR
     return float4(result, 1.0);
 }
 
-
-float3 reinhard(float3 v)
-{
-    return v / (1.0 + v);
-}
-
 float4 UpsampleCombineTonemappingPS(VertexShaderOutput input) : COLOR
 {
     float3 result = UpsampleTent(input.TextureCoordinates);
     
     result += tex2D(bloomTextureSampler, input.TextureCoordinates).rgb;
-    
-    result.xyz = reinhard(result.xyz);
     
     return float4(result.xyz, 1.0);
 }
