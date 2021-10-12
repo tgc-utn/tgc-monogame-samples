@@ -66,7 +66,7 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
 
             Effect.Parameters["Projection"].SetValue(projectionMatrix);
             Effect.Parameters["ModelTexture"].SetValue(Texture);
-            font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "Arial");
+            font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
             spriteBatch = new SpriteBatch(GraphicsDevice);
             Effect.CurrentTechnique = Effect.Techniques["ColorDrawing"];
             base.LoadContent();

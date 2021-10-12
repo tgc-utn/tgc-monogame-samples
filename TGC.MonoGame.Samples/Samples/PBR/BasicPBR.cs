@@ -80,7 +80,7 @@ namespace TGC.MonoGame.Samples.Samples.PBR
             InitializeSphere();
             InitializeLightBox();
 
-            SpriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "Arial");
+            SpriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
 
 
             base.LoadContent();

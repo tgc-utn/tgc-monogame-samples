@@ -304,12 +304,25 @@
 /processorParam:Quality=Best
 /build:Sounds/campanadas horas.wav
 
-#begin SpriteFonts/Arial.spritefont
+#begin SpriteFonts/CascadiaCode/CascadiaCodePL.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
-/build:SpriteFonts/Arial.spritefont
+/build:SpriteFonts/CascadiaCode/CascadiaCodePL.spritefont
+
+#begin SpriteFonts/CascadiaCode/CascadiaCodePL.ttf
+/copy:SpriteFonts/CascadiaCode/CascadiaCodePL.ttf
+
+#begin SpriteFonts/CascadiaCode/CascadiaMonoPL.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:SpriteFonts/CascadiaCode/CascadiaMonoPL.spritefont
+
+#begin SpriteFonts/CascadiaCode/CascadiaMonoPL.ttf
+/copy:SpriteFonts/CascadiaCode/CascadiaMonoPL.ttf
 
 #begin Textures/floor/adoquin.jpg
 /importer:TextureImporter
