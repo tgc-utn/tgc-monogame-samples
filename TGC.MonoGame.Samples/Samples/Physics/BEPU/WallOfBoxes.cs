@@ -83,7 +83,7 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
         {
             Random = new Random(5);
 
-            SpriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "Arial");
+            SpriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
             
             //The buffer pool is a source of raw memory blobs for the engine to use.
             BufferPool = new BufferPool();

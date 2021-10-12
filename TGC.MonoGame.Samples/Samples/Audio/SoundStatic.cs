@@ -44,7 +44,7 @@ namespace TGC.MonoGame.Samples.Samples.Audio
         /// <inheritdoc />
         protected override void LoadContent()
         {
-            Font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "Arial");
+            Font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
             InstructionsSize = Font.MeasureString(Instructions);
             SoundName = "a2-8bit";
             Sound = Game.Content.Load<SoundEffect>(ContentFolderSounds + SoundName);

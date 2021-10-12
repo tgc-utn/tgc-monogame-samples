@@ -99,7 +99,7 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
 
         protected override void LoadContent()
         {
-            SpriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "Arial");
+            SpriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
             
             Simulation = Simulation.Create(BufferPool, new NarrowPhaseCallbacks(),
                 new PoseIntegratorCallbacks(new NumericVector3(0, -10, 0)), new PositionFirstTimestepper());
