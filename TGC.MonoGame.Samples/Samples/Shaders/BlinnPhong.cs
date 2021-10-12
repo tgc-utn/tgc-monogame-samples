@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
+using TGC.MonoGame.Samples.Models;
 using TGC.MonoGame.Samples.Viewer;
 using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
@@ -27,6 +28,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         private Matrix LightBoxWorld { get; set; } = Matrix.Identity;
         private float Timer { get; set; }
 
+        private ModelDrawer ModelDrawer { get; set; }
 
         /// <inheritdoc />
         public override void Initialize()
@@ -34,30 +36,30 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             var size = GraphicsDevice.Viewport.Bounds.Size;
             size.X /= 2;
             size.Y /= 2;
-            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 50, 1000), size);
+            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 50, 100f), size);
+            Camera.FarPlane = 100000.0f;
+            Camera.BuildProjection(GraphicsDevice.Viewport.AspectRatio, 1f, Camera.FarPlane, Camera.DefaultFieldOfViewDegrees);
 
             base.Initialize();
         }
-        
+
+
         /// <inheritdoc />
         protected override void LoadContent()
         {
             // We load the city meshes into a model
-            Model = Game.Content.Load<Model>(ContentFolder3D + "scene/city");
-
-            // We get the mesh texture. All mesh parts use the same texture so we are fine
-            var texture = ((BasicEffect) Model.Meshes.FirstOrDefault()?.MeshParts.FirstOrDefault()?.Effect)?.Texture;
+            Model = Game.Content.Load<Model>(ContentFolder3D + "sponza/Sponza");
+            ModelDrawer = new ModelDrawer(Model, GraphicsDevice);
 
             // We load the effect in the .fx file
             Effect = Game.Content.Load<Effect>(ContentFolderEffects + "BlinnPhong");
-
-            // We assign the effect to each one of the models
-            foreach (var modelMesh in Model.Meshes)
-            foreach (var meshPart in modelMesh.MeshParts)
-                meshPart.Effect = Effect;
-
-            // Set the texture. This won't change on this effect so we can assign it here
-            Effect.Parameters["baseTexture"].SetValue(texture);
+            
+            ModelDrawer.SetEffect(Effect);
+            ModelDrawer.WorldViewProjectionMatrixParameter = Effect.Parameters["WorldViewProjection"];
+            ModelDrawer.WorldMatrixParameter = Effect.Parameters["World"];
+            ModelDrawer.NormalMatrixParameter = Effect.Parameters["InverseTransposeWorld"];
+            ModelDrawer.TextureParameter = Effect.Parameters["baseTexture"];
+            
 
             // Set uniforms
             Effect.Parameters["ambientColor"].SetValue(new Vector3(0.25f, 0.0f, 0.0f));
@@ -78,6 +80,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             ModifierController.AddColor("Ambient Color", Effect.Parameters["ambientColor"], new Color(0.25f, 0f, 0f));
             ModifierController.AddColor("Diffuse Color", Effect.Parameters["diffuseColor"], new Color(0.1f, 0.1f, 0.6f));
             ModifierController.AddColor("Specular Color", Effect.Parameters["specularColor"], Color.White);
+
 
             base.LoadContent();
         }
@@ -108,28 +111,12 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         public override void Draw(GameTime gameTime)
         {
             // Set the background color to black, and use the default depth configuration
-            Game.Background = Color.Black;
+            Game.Background = Color.CornflowerBlue;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.BlendState = BlendState.Opaque;
 
-            
-
-            // We get the base transform for each mesh
-            var modelMeshesBaseTransforms = new Matrix[Model.Bones.Count];
-            Model.CopyAbsoluteBoneTransformsTo(modelMeshesBaseTransforms);
-            foreach (var modelMesh in Model.Meshes)
-            {
-                // We set the main matrices for each mesh to draw
-                var worldMatrix = modelMeshesBaseTransforms[modelMesh.ParentBone.Index];
-                // World is used to transform from model space to world space
-                Effect.Parameters["World"].SetValue(worldMatrix);
-                // InverseTransposeWorld is used to rotate normals
-                Effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(worldMatrix)));
-                // WorldViewProjection is used to transform from model space to clip space
-                Effect.Parameters["WorldViewProjection"].SetValue(worldMatrix * Camera.View * Camera.Projection);
-
-                // Once we set these matrices we draw
-                modelMesh.Draw();
-            }
+            ModelDrawer.Draw(Matrix.CreateScale(0.01f), Camera.View * Camera.Projection);
+            //Model.Draw(Matrix.CreateScale(0.01f), Camera.View, Camera.Projection);
 
             lightBox.Draw(LightBoxWorld, Camera.View, Camera.Projection);
 

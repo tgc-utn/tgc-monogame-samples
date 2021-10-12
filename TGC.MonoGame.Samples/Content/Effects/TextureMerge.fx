@@ -53,15 +53,32 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
     return output;
 }
 
+uniform float2 InverseScreenSize;
+
+uniform float Displacement;
+
 float4 MergePS(VertexShaderOutput input) : COLOR
 {
     float4 baseColor = tex2D(textureSampler, input.TextureCoordinates);
-	float4 overlayColor = tex2D(overlayTextureSampler, input.TextureCoordinates);
     
-	float timeFactor = sin(time * 2.0) * 0.5 + 0.5;
-	float4 finalColor = float4(lerp(baseColor.rgb, overlayColor.rgb, overlayColor.a * timeFactor), 1.0);
     
-    return finalColor;
+    // 0 - 1
+    // 0 - 1
+    
+    float factor = distance(input.TextureCoordinates, float2(0.5, 0.5));
+    
+    float displacement = Displacement * factor * 4.0;
+    
+    float4 rightFragmentColor = tex2D(textureSampler,
+        input.TextureCoordinates + InverseScreenSize.x * displacement);
+    
+    float4 leftFragmentColor = tex2D(textureSampler,
+        input.TextureCoordinates - InverseScreenSize.x * displacement);
+    
+    baseColor.b = rightFragmentColor.b;
+    baseColor.r = leftFragmentColor.r;
+    
+    return baseColor;
 }
 
 technique Merge

@@ -75,7 +75,8 @@ float4 EnvironmentMapPS(VertexShaderOutput input) : COLOR
     
 	//Obtener texel de CubeMap
 	float3 view = normalize(eyePosition.xyz - input.WorldPosition.xyz);
-	float3 reflection = reflect(view, normal);
+	
+    float3 reflection = reflect(view, normal);
 	float3 reflectionColor = texCUBE(environmentMapSampler, reflection).rgb;
 
     float fresnel = saturate((1.0 - dot(normal, view)));

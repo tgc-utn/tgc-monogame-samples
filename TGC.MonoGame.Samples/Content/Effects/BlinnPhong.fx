@@ -27,8 +27,8 @@ sampler2D textureSampler = sampler_state
     Texture = (baseTexture);
     MagFilter = Linear;
     MinFilter = Linear;
-    AddressU = Clamp;
-    AddressV = Clamp;
+    AddressU = Wrap;
+    AddressV = Wrap;
 };
 
 struct VertexShaderInput
@@ -60,13 +60,20 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 
 float4 MainPS(VertexShaderOutput input) : COLOR
 {
+	// Get the texture texel
+    float4 texelColor = tex2D(textureSampler, input.TextureCoordinates);
+    
+    // Alpha cutout, not necessary but can be used for sponza leaves
+    if (texelColor.a < 0.5)
+        discard;
+    
     // Base vectors
     float3 lightDirection = normalize(lightPosition - input.WorldPosition.xyz);
     float3 viewDirection = normalize(eyePosition - input.WorldPosition.xyz);
     float3 halfVector = normalize(lightDirection + viewDirection);
 
-	// Get the texture texel
-    float4 texelColor = tex2D(textureSampler, input.TextureCoordinates);
+    input.Normal.xyz = normalize(input.Normal.xyz);
+    
     
 	// Calculate the diffuse light
     float NdotL = saturate(dot(input.Normal.xyz, lightDirection));
@@ -77,7 +84,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
     float3 specularLight = sign(NdotL) * KSpecular * specularColor * pow(saturate(NdotH), shininess);
     
     // Final calculation
-    float4 finalColor = float4(saturate(ambientColor * KAmbient + diffuseLight) * texelColor.rgb + specularLight, texelColor.a);
+    float4 finalColor = float4(saturate(ambientColor * KAmbient + diffuseLight) * texelColor.rgb + specularLight, 1.0);
     return finalColor;
 
 }

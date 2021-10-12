@@ -25,6 +25,9 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
         private RenderTarget2D SecondPassBloomRenderTarget;
 
+
+
+
         /// <inheritdoc />
         public Bloom(TGCViewer game) : base(game)
         {

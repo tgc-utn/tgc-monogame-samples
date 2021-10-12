@@ -77,7 +77,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// </summary>
         public void Draw()
         {
-            if (ImGui.ColorEdit4(Name, ref _colorValue))
+            if (ImGui.ColorEdit4(Name, ref _colorValue, ImGuiColorEditFlags.HDR))
                 OnChange.Invoke(Convert(_colorValue));
         }
 

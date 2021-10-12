@@ -50,7 +50,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             // Load the shadowmap effect
             Effect = Game.Content.Load<Effect>(ContentFolderEffects + "TextureMerge");
-            Effect.Parameters["overlayTexture"].SetValue(Overlay);
+            //Effect.Parameters["overlayTexture"].SetValue(Overlay);
 
             // Create a full screen quad to post-process
             FullScreenQuad = new FullScreenQuad(GraphicsDevice);
@@ -59,6 +59,16 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             SceneRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
                 GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.Depth24, 0,
                 RenderTargetUsage.DiscardContents);
+
+            ModifierController.AddTexture("Scene Render Target", SceneRenderTarget);
+
+
+
+
+            Effect.Parameters["Displacement"].SetValue(5f);
+
+
+            Effect.Parameters["InverseScreenSize"].SetValue(new Vector2(1f / GraphicsDevice.Viewport.Width, 1f / GraphicsDevice.Viewport.Height));
 
             GraphicsDevice.BlendState = BlendState.Opaque;
 
@@ -72,7 +82,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             Camera.Update(gameTime);
 
             Time += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            Effect.Parameters["time"].SetValue(Time);
+            //Effect.Parameters["time"].SetValue(Time);
 
             Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
 
