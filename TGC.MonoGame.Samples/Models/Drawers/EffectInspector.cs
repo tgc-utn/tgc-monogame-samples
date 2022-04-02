@@ -23,8 +23,8 @@ namespace TGC.MonoGame.Samples.Models.Drawers
             if (inspection.Equals(EffectInspectionType.NONE))
                 return;
 
-            var hasMultipleGeometry = !drawer.SingleWorldMatrix;
-            var hasSingleTexture = drawer.SingleTexture;
+            var hasMultipleGeometry = !drawer.HasSingleWorldMatrix;
+            var hasSingleTexture = drawer.HasSingleTexture;
 
             AddMatricesActions(drawer, hasMultipleGeometry, inspection);
             AddTextureActions(drawer, hasSingleTexture, inspection);

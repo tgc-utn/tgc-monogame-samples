@@ -16,6 +16,9 @@ namespace TGC.MonoGame.Samples.Models.Drawers
 
         protected List<GeometryData> _geometryData;
 
+        private Dictionary<string, GeometryDrawer> _drawerDictionary;
+        private Dictionary<string, GeometryData> _geometryDataDictionary;
+
         public Effect Effect { get; private set; }
         public List<GeometryDrawer> GeometryDrawers { get; private set; }
         public List<GeometryData> GeometryData { get => _geometryData; }
@@ -25,15 +28,14 @@ namespace TGC.MonoGame.Samples.Models.Drawers
         public Matrix ViewProjection { get => _modelData.ViewProjection; set => _modelData.ViewProjection = value; }
         public List<Texture> Textures { get => _modelData.Textures; }
        
-        private Dictionary<string, int> _indices;
 
 
-        public bool SingleWorldMatrix 
+        public bool HasSingleWorldMatrix 
         {
             get => _geometryData == null || _geometryData.All(geometry => geometry.Matrices.Count == 0);
         }
 
-        public bool SingleTexture 
+        public bool HasSingleTexture 
         {
             get => _geometryData == null || _geometryData.All(geometry => geometry.Textures.Count == 0);
         }
@@ -45,10 +47,9 @@ namespace TGC.MonoGame.Samples.Models.Drawers
             _modelData = new ModelData();
             _geometryData = new List<GeometryData>();
             GeometryDrawers = new List<GeometryDrawer>();
-            _indices = new Dictionary<string, int>();
+            _drawerDictionary = new Dictionary<string, GeometryDrawer>();
+            _geometryDataDictionary = new Dictionary<string, GeometryData>();
         }
-
-
 
         internal ModelDrawer(List<GeometryDrawer> drawers, ModelData data, List<GeometryData> geometryData)
         {
@@ -57,7 +58,8 @@ namespace TGC.MonoGame.Samples.Models.Drawers
             _modelData = data;
             _geometryData = geometryData;
             GeometryDrawers = drawers;
-            _indices = new Dictionary<string, int>();
+            _drawerDictionary = new Dictionary<string, GeometryDrawer>();
+            _geometryDataDictionary = new Dictionary<string, GeometryData>();
         }
 
         internal ModelDrawer(Dictionary<string, GeometryDrawer> drawers, ModelData data, List<GeometryData> geometryData)
@@ -135,15 +137,64 @@ namespace TGC.MonoGame.Samples.Models.Drawers
 
         }
 
-
-        public GeometryDrawer FindDrawer(string name)
+        public GeometryDrawer GetGeometryDrawer(string name)
         {
-            return GeometryDrawers[_indices[name]];
+            return _drawerDictionary[name];
         }
 
-        public GeometryData FindData(string name)
+        public GeometryData GetGeometryData(string name)
         {
-            return GeometryData[_indices[name]];
+            return _geometryDataDictionary[name];
+        }
+        public GeometryDrawer GetDrawer(int index)
+        {
+            return GeometryDrawers[index];
+        }
+
+        public GeometryData GetData(int index)
+        {
+            return _geometryData[index];
+        }
+
+        public void AddDrawer(GeometryDrawer drawer)
+        {
+            GeometryDrawers.Add(drawer);
+            _geometryData.Add(new GeometryData(null));
+        }
+
+        public void AddDrawer(string name, GeometryDrawer drawer)
+        {
+            GeometryDrawers.Add(drawer);
+            _drawerDictionary.Add(name, drawer);
+
+            var data = new GeometryData(null);
+            _geometryData.Add(data);
+            _geometryDataDictionary.Add(name, data);
+        }
+
+        public ModelDrawer Split(List<string> names)
+        {
+            var geometries = new Dictionary<string, GeometryDrawer>();
+            var geometryData = new List<GeometryData>();
+
+            string name;
+            for(var index = 0; index < names.Count; index++)
+            {
+                name = names[index];
+                var drawer = GetGeometryDrawer(name);
+                geometries.Add(name, drawer);
+
+                // Slow, but keeping indices is pain
+                GeometryDrawers.Remove(drawer);
+
+                var data = GetGeometryData(name);
+                geometryData.Add(data);
+
+                // Slow, but keeping indices is pain
+                _geometryData.Remove(data);
+            }
+
+            return new ModelDrawer(geometries, _modelData.Clone(), geometryData);
         }
 
 
@@ -172,15 +223,16 @@ namespace TGC.MonoGame.Samples.Models.Drawers
 
         private void CreateIndexDictionary(Dictionary<string, GeometryDrawer> drawers)
         {
+            _drawerDictionary = drawers;
+            _geometryDataDictionary = new Dictionary<string, GeometryData>();
             var index = 0;
-            _indices = drawers.Keys
-                .Select(key =>
-                {
-                    var keyValue = new KeyValuePair<string, int>(key, index);
-                    index++;
-                    return keyValue;
-                })
-                .ToDictionary(t => t.Key, t => t.Value);
+            foreach(var entry in drawers)
+            {
+                if (_geometryData.Count == index)
+                    break;
+                _geometryDataDictionary.Add(entry.Key, _geometryData[index]);
+                index++;
+            }
         }
 
         private void SetDefaultPasses()

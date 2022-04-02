@@ -184,7 +184,7 @@ namespace TGC.MonoGame.Samples.Collisions
 
         public static BoundingBox CreateAABBFrom(ModelDrawer modelDrawer)
         {
-            if (modelDrawer.SingleWorldMatrix)
+            if (modelDrawer.HasSingleWorldMatrix)
                 return CreateAABBFrom(modelDrawer.GeometryDrawers.FirstOrDefault(), modelDrawer.World);
             else
                 return CreateAABBFrom(modelDrawer.GeometryDrawers, 
@@ -342,7 +342,7 @@ namespace TGC.MonoGame.Samples.Collisions
 
         public static BoundingSphere CreateSphereFrom(ModelDrawer modelDrawer)
         {
-            if (modelDrawer.SingleWorldMatrix)
+            if (modelDrawer.HasSingleWorldMatrix)
                 return CreateSphereFrom(modelDrawer.GeometryDrawers.FirstOrDefault(), modelDrawer.World);
             else
                 return CreateSphereFrom(modelDrawer.GeometryDrawers,
