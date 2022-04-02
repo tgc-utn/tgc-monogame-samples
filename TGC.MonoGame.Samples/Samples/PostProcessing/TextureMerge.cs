@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
+using TGC.MonoGame.Samples.Models.Drawers;
 using TGC.MonoGame.Samples.Viewer;
 
 namespace TGC.MonoGame.Samples.Samples.PostProcessing
@@ -18,11 +19,12 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
         private FreeCamera Camera { get; set; }
 
-        private Model Model { get; set; }
+        private ModelDrawer ModelDrawer { get; set; }
 
         private Texture2D Overlay { get; set; }
 
         private Effect Effect { get; set; }
+        private Effect DiffuseEffect { get; set; }
 
         private FullScreenQuad FullScreenQuad { get; set; }
 
@@ -42,15 +44,20 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         /// <inheritdoc />
         protected override void LoadContent()
         {
+            var model = Game.Content.Load<Model>(ContentFolder3D + "scene/city");
+
+            DiffuseEffect = Game.Content.Load<Effect>(ContentFolderEffects + "DiffuseTexture");
+
             // We load the city meshes into a model
-            Model = Game.Content.Load<Model>(ContentFolder3D + "scene/city");
+            ModelDrawer = ModelInspector.CreateDrawerFrom(model, DiffuseEffect, EffectInspectionType.ALL);
 
             // Load the texture overlay to merge
             Overlay = Game.Content.Load<Texture2D>(ContentFolderTextures + "overlay");
 
-            // Load the shadowmap effect
+            // Load the merge effect
             Effect = Game.Content.Load<Effect>(ContentFolderEffects + "TextureMerge");
             Effect.Parameters["overlayTexture"].SetValue(Overlay);
+
 
             // Create a full screen quad to post-process
             FullScreenQuad = new FullScreenQuad(GraphicsDevice);
@@ -89,7 +96,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             GraphicsDevice.SetRenderTarget(SceneRenderTarget);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1f, 0);
 
-            Model.Draw(Matrix.Identity, Camera.View, Camera.Projection);
+            ModelDrawer.ViewProjection = Camera.View * Camera.Projection;
+            ModelDrawer.Draw();
 
             #endregion
             

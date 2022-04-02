@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Input;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Geometries.Textures;
+using TGC.MonoGame.Samples.Models.Drawers;
 using TGC.MonoGame.Samples.Viewer;
 using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
@@ -20,9 +21,10 @@ namespace TGC.MonoGame.Samples.Samples.PBR
         private Model Sphere;
         private string TexturePath;
         private Effect SphereEffect;
+        private Effect DebugDiffuseColorEffect;
         private List<Light> Lights;
 
-        private CubePrimitive LightBox;
+        private ModelDrawer LightBox;
         private Texture2D albedo, ao, metalness, roughness, normals;
 
         private Matrix SphereWorld;
@@ -82,7 +84,6 @@ namespace TGC.MonoGame.Samples.Samples.PBR
 
             SpriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
 
-
             base.LoadContent();
         }
 
@@ -102,8 +103,6 @@ namespace TGC.MonoGame.Samples.Samples.PBR
             Game.Background = Color.Black;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-
-
             var worldView = SphereWorld * Camera.View;
             SphereEffect.Parameters["matWorld"].SetValue(SphereWorld);
             SphereEffect.Parameters["matWorldViewProj"].SetValue(worldView * Camera.Projection);
@@ -113,8 +112,10 @@ namespace TGC.MonoGame.Samples.Samples.PBR
 
             for (int index = 0; index < Lights.Count; index++)
             {
-                LightBox.Effect.DiffuseColor = Lights[index].ShowColor;
-                LightBox.Draw(Matrix.CreateTranslation(Lights[index].Position), Camera.View, Camera.Projection);
+                DebugDiffuseColorEffect.Parameters["DiffuseColor"].SetValue(Lights[index].ShowColor);
+                LightBox.World = Matrix.CreateTranslation(Lights[index].Position);
+                LightBox.ViewProjection = Camera.View * Camera.Projection;
+                LightBox.Draw();
             }
 
 
@@ -129,6 +130,8 @@ namespace TGC.MonoGame.Samples.Samples.PBR
 
             base.UnloadContent();
         }
+
+        private Model m;
         
         private void InitializeSphere()
         {
@@ -155,12 +158,15 @@ namespace TGC.MonoGame.Samples.Samples.PBR
                 positions[index].SetValue(light.Position);
                 colors[index].SetValue(light.Color);
             }
+
+            DebugDiffuseColorEffect = Game.Content.Load<Effect>(ContentFolderEffects + "DiffuseColor");
+
         }
 
         private void InitializeLightBox()
         {
-            LightBox = new CubePrimitive(GraphicsDevice, 10, Color.White);
-            LightBox.Effect.LightingEnabled = false;
+            LightBox = new CubePrimitive(GraphicsDevice);
+            LightBox.SetEffect(DebugDiffuseColorEffect, EffectInspectionType.ALL);
         }
 
         private void InitializeLights()
@@ -207,6 +213,8 @@ namespace TGC.MonoGame.Samples.Samples.PBR
             roughness = Game.Content.Load<Texture2D>(TexturePath + "roughness");
             albedo = Game.Content.Load<Texture2D>(TexturePath + "color");
 
+            if (SphereEffect == null)
+                return;
             SphereEffect.Parameters["albedoTexture"]?.SetValue(albedo);
             SphereEffect.Parameters["normalTexture"]?.SetValue(normals);
             SphereEffect.Parameters["metallicTexture"]?.SetValue(metalness);

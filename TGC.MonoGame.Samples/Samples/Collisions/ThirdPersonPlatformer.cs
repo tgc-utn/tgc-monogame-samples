@@ -8,7 +8,9 @@ using System.Linq;
 using System.Text;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Collisions;
+using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Geometries.Textures;
+using TGC.MonoGame.Samples.Models.Drawers;
 using TGC.MonoGame.Samples.Viewer;
 
 namespace TGC.MonoGame.Samples.Samples.Collisions
@@ -32,8 +34,10 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
 
         // Geometries
-        private Model Robot { get; set; }
-        private BoxPrimitive BoxPrimitive { get; set; }
+        private ModelDrawer Robot { get; set; }
+        private CubePrimitive Stairs { get; set; }
+
+        private ModelDrawer Box { get; set; }
         private QuadPrimitive Quad { get; set; }
 
 
@@ -45,7 +49,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         private Vector3 RobotVelocity { get; set; }
         private Vector3 RobotAcceleration { get; set; }
         private Vector3 RobotFrontDirection { get; set; }
-        
+
         // A boolean indicating if the Robot is on the ground
         private bool OnGround { get; set; }
 
@@ -63,14 +67,14 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         private Texture2D WoodenTexture { get; set; }
         private Texture2D CobbleTexture { get; set; }
 
-        
+
         // Effects
 
         // Tiling Effect for the floor
         private Effect TilingEffect { get; set; }
-
-        // Effect for the stairs and boxes
-        private BasicEffect BoxesEffect { get; set; }
+    
+        // Effect for the Robot
+        private Effect DiffuseEffect { get; set; }
 
         
         
@@ -160,19 +164,15 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         protected override void LoadContent()
         {
             // Load the models
-            Robot = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
-
-            // Enable default lighting for the Robot
-            foreach (var mesh in Robot.Meshes)
-                ((BasicEffect)mesh.Effects.FirstOrDefault())?.EnableDefaultLighting();
-            
-            // Create a BasicEffect to draw the Box
-            BoxesEffect = new BasicEffect(GraphicsDevice);
-            BoxesEffect.TextureEnabled = true;
+            var robotModel = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
 
             // Load our Tiling Effect
             TilingEffect = Game.Content.Load<Effect>(ContentFolderEffects + "TextureTiling");
-            TilingEffect.Parameters["Tiling"].SetValue(new Vector2(10f, 10f));
+            DiffuseEffect = Game.Content.Load<Effect>(ContentFolderEffects + "DiffuseTexture");
+
+            Robot = ModelInspector.CreateDrawerFrom(robotModel, DiffuseEffect, EffectInspectionType.ALL);
+
+            var tilingParameter = TilingEffect.Parameters["Tiling"];
 
             // Load Textures
             StonesTexture = Game.Content.Load<Texture2D>(ContentFolderTextures + "stones");
@@ -181,10 +181,26 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
             // Create our Quad (to draw the Floor)
             Quad = new QuadPrimitive(GraphicsDevice);
-            
-            // Create our Box Model
-            BoxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, WoodenTexture);
+            Quad.World = FloorWorld;
+            Quad.Textures.Add(StonesTexture);
+            Quad.SetEffect(TilingEffect, TilingEffect.Techniques["BaseTiling"], Models.Drawers.EffectInspectionType.ALL);
+            Quad.ModelActionCollection.Add(data => tilingParameter.SetValue(Vector2.One * 10f));
 
+
+
+            // Create our Box Model
+            Stairs = new CubePrimitive(GraphicsDevice);
+            Stairs.SetEffect(TilingEffect, TilingEffect.Techniques["WorldTiling"], EffectInspectionType.ALL);
+            Box = Stairs.Clone();
+
+
+            Box.SetEffect(TilingEffect, TilingEffect.Techniques["BaseTiling"], EffectInspectionType.ALL);
+            Box.World = BoxWorld;
+            Box.Textures.Add(WoodenTexture);
+            Box.ModelActionCollection.Add(data => tilingParameter.SetValue(Vector2.One));
+
+            Stairs.Textures.Add(CobbleTexture);
+            Stairs.ModelActionCollection.Add(data => tilingParameter.SetValue(Vector2.One * 0.1f)); 
 
             // Calculate the height of the Model of the Robot
             // Create a Bounding Box from it, then subtract the max and min Y to get the height
@@ -491,54 +507,32 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             // Calculate the ViewProjection matrix
             var viewProjection = Camera.View * Camera.Projection;
 
+            GraphicsDevice.BlendState = BlendState.Opaque;
+
             // Robot drawing
-            Robot.Draw(RobotWorld, Camera.View, Camera.Projection);
+            Robot.World = RobotWorld;
+            Robot.ViewProjection = viewProjection;
+            Robot.Draw();
 
             // Floor drawing
-            
-            // Set the Technique inside the TilingEffect to "BaseTiling", we want to control the tiling on the floor
-            // Using its original Texture Coordinates
-            TilingEffect.CurrentTechnique = TilingEffect.Techniques["BaseTiling"];
-            // Set the Tiling value
-            TilingEffect.Parameters["Tiling"].SetValue(new Vector2(10f, 10f));
-            // Set the WorldViewProjection matrix
-            TilingEffect.Parameters["WorldViewProjection"].SetValue(FloorWorld * viewProjection);
-            // Set the Texture that the Floor will use
-            TilingEffect.Parameters["Texture"].SetValue(StonesTexture);
-            Quad.Draw(TilingEffect);
+            Quad.ViewProjection = viewProjection;
+            Quad.Draw();
 
-
-            // Steps drawing
-
-            // Set the Technique inside the TilingEffect to "WorldTiling"
-            // We want to use the world position of the steps to define how to sample the Texture
-            TilingEffect.CurrentTechnique = TilingEffect.Techniques["WorldTiling"];
-            // Set the Texture that the Steps will use
-            TilingEffect.Parameters["Texture"].SetValue(CobbleTexture);
-            // Set the Tiling value
-            TilingEffect.Parameters["Tiling"].SetValue(Vector2.One * 0.05f);
 
             // Draw every Step
+            Stairs.ViewProjection = viewProjection;
             for (int index = 0; index < StairsWorld.Length; index++)
             {
                 // Get the World Matrix
                 var matrix = StairsWorld[index];
-                // Set the World Matrix
-                TilingEffect.Parameters["World"].SetValue(matrix);
-                // Set the WorldViewProjection Matrix
-                TilingEffect.Parameters["WorldViewProjection"].SetValue(matrix * viewProjection);
-                BoxPrimitive.Draw(TilingEffect);
+                Stairs.World = matrix;
+                Stairs.Draw();
             }
 
 
             // Draw the Box, setting every matrix and its Texture
-            BoxesEffect.World = BoxWorld;
-            BoxesEffect.View = Camera.View;
-            BoxesEffect.Projection = Camera.Projection;
-
-            BoxesEffect.Texture = WoodenTexture;
-            BoxPrimitive.Draw(BoxesEffect);
-
+            Box.ViewProjection = viewProjection;
+            Box.Draw();
 
             // Gizmos Drawing
             for (int index = 0; index < Colliders.Length; index++)

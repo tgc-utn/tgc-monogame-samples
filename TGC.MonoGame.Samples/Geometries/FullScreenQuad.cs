@@ -1,23 +1,22 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TGC.MonoGame.Samples.Models.Drawers;
 
 namespace TGC.MonoGame.Samples.Geometries
 {
-    public class FullScreenQuad
+    public class FullScreenQuad : GeometryDrawer
     {
-        private readonly GraphicsDevice device;
-        private IndexBuffer indexBuffer;
-        private VertexBuffer vertexBuffer;
-
         /// <summary>
         ///     Create a quad used in clip space
         /// </summary>
         /// <param name="device">Used to initialize and control the presentation of the graphics device.</param>
-        public FullScreenQuad(GraphicsDevice device)
+        public FullScreenQuad(GraphicsDevice device) : base(device)
         {
-            this.device = device;
             CreateVertexBuffer();
             CreateIndexBuffer();
+            _primitiveCount = 2;
+            _startIndex = 0;
+            _vertexOffset = 0;
         }
 
         private void CreateVertexBuffer()
@@ -32,9 +31,9 @@ namespace TGC.MonoGame.Samples.Geometries
             vertices[3].Position = new Vector3(1f, 1f, 0f);
             vertices[3].TextureCoordinate = new Vector2(1f, 0f);
 
-            vertexBuffer = new VertexBuffer(device, VertexPositionTexture.VertexDeclaration, 4,
-                BufferUsage.WriteOnly);
-            vertexBuffer.SetData(vertices);
+            VertexBuffer = new VertexBuffer(_device, VertexPositionTexture.VertexDeclaration, 4,
+                BufferUsage.None);
+            VertexBuffer.SetData(vertices);
         }
 
         private void CreateIndexBuffer()
@@ -48,27 +47,17 @@ namespace TGC.MonoGame.Samples.Geometries
             indices[4] = 3;
             indices[5] = 2;
 
-            indexBuffer = new IndexBuffer(device, IndexElementSize.SixteenBits, 6, BufferUsage.WriteOnly);
-            indexBuffer.SetData(indices);
+            IndexBuffer = new IndexBuffer(_device, IndexElementSize.SixteenBits, 6, BufferUsage.None);
+            IndexBuffer.SetData(indices);
         }
 
 
         public void Draw(Effect effect)
         {
-            device.SetVertexBuffer(vertexBuffer);
-            device.Indices = indexBuffer;
-
-            foreach (var pass in effect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-                device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 2);
-            }
+            var passes = EffectInspector.GetDefaultPasses(effect.CurrentTechnique);
+            Draw(passes);
         }
 
-        public void Dispose()
-        {
-            vertexBuffer.Dispose();
-            indexBuffer.Dispose();
-        }
+
     }
 }

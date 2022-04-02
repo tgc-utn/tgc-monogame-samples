@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TGC.MonoGame.Samples.Geometries;
+using TGC.MonoGame.Samples.Models.Drawers;
 using TGC.MonoGame.Samples.Viewer;
 
 namespace TGC.MonoGame.Samples.Samples.Shaders.SkyBox
@@ -32,7 +34,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.SkyBox
         private Matrix View { get; set; }
         private Vector3 ViewVector { get; set; }
         private Matrix Projection { get; set; }
-        private SkyBox SkyBox { get; set; }
+        private ModelDrawer SkyBox { get; set; }
 
         /// <inheritdoc />
         public override void Initialize()
@@ -50,12 +52,22 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.SkyBox
         /// <inheritdoc />
         protected override void LoadContent()
         {
-            var skyBox = Game.Content.Load<Model>(ContentFolder3D + "skybox/cube");
             //var skyBoxTexture = Game.Content.Load<TextureCube>(ContentFolderTextures + "/skyboxes/sunset/sunset");
             //var skyBoxTexture = Game.Content.Load<TextureCube>(ContentFolderTextures + "/skyboxes/islands/islands");
             var skyBoxTexture = Game.Content.Load<TextureCube>(ContentFolderTextures + "/skyboxes/skybox/skybox");
             var skyBoxEffect = Game.Content.Load<Effect>(ContentFolderEffects + "SkyBox");
-            SkyBox = new SkyBox(skyBox, skyBoxTexture, skyBoxEffect);
+
+            SkyBox = new CubePrimitive(GraphicsDevice, 50f, Color.White);
+            SkyBox.Textures.Add(skyBoxTexture);
+            SkyBox.SetEffect(skyBoxEffect, EffectInspectionType.ALL);
+
+            var cameraPositionParameter = skyBoxEffect.Parameters["CameraPosition"];
+            var viewParameter = skyBoxEffect.Parameters["View"];
+            var projectionParameter = skyBoxEffect.Parameters["Projection"];
+
+            SkyBox.ModelActionCollection.Add(data => cameraPositionParameter.SetValue(CameraPosition));
+            SkyBox.ModelActionCollection.Add(data => viewParameter.SetValue(View));
+            SkyBox.ModelActionCollection.Add(data => projectionParameter.SetValue(Projection));
 
             base.LoadContent();
         }
@@ -69,7 +81,6 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.SkyBox
 
             Angle += 0.002f;
             View = Matrix.CreateLookAt(CameraPosition, CameraTarget, Vector3.UnitY);
-
 
             Game.Gizmos.UpdateViewProjection(View, Projection);
 
@@ -88,7 +99,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.SkyBox
             Game.Graphics.GraphicsDevice.RasterizerState = rasterizerState;
 
             //TODO why I have to set 1 in the alpha channel in the fx file?
-            SkyBox.Draw(View, Projection, CameraPosition);
+            SkyBox.Draw();
 
             GraphicsDevice.RasterizerState = originalRasterizerState;
 

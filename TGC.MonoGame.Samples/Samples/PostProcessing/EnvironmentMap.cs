@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
+using TGC.MonoGame.Samples.Models.Drawers;
 using TGC.MonoGame.Samples.Viewer;
 using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
@@ -25,15 +26,14 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
         private StaticCamera CubeMapCamera { get; set; }
 
-        private Model Scene { get; set; }
+        private ModelDrawer Scene { get; set; }
 
-        private Model Robot { get; set; }
+        private ModelDrawer Robot { get; set; }
 
         private SpherePrimitive Sphere { get; set; }
 
         private Effect Effect { get; set; }
-
-        private BasicEffect BasicEffect { get; set; }
+        private Effect DiffuseEffect { get; set; }
 
         private RenderTargetCube EnvironmentMapRenderTarget { get; set; }
 
@@ -50,7 +50,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(-250, 100, 700), screenSize);
 
             CubeMapCamera = new StaticCamera(1f, RobotPosition, Vector3.UnitX, Vector3.Up);
-            CubeMapCamera.BuildProjection(1f, 1f, 3000f, MathHelper.PiOver2);
+            CubeMapCamera.BuildProjection(1f, 0.1f, 30000f, MathHelper.PiOver2);
 
 
             base.Initialize();
@@ -61,25 +61,22 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         protected override void LoadContent()
         {
             // We load the city meshes into a model
-            Scene = Game.Content.Load<Model>(ContentFolder3D + "scene/city");
+            var sceneModel = Game.Content.Load<Model>(ContentFolder3D + "scene/city");
+            var robotModel = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
+            
 
-            Sphere = new SpherePrimitive(GraphicsDevice, 100f, 16, Color.White);
-
-            // Load the tank which will contain reflections
-            Robot = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
-
-
-            // Load the shadowmap effect
+            // Load the Environment Map effect
             Effect = Game.Content.Load<Effect>(ContentFolderEffects + "EnvironmentMap");
 
-            BasicEffect = (BasicEffect) Robot.Meshes.FirstOrDefault().Effects[0];
-            BasicEffect.LightingEnabled = false;
-            Sphere.Effect.LightingEnabled = false;
+            // Load the diffuse effect
+            DiffuseEffect = Game.Content.Load<Effect>(ContentFolderEffects + "DiffuseTexture");
 
-            // Assign the Environment map effect to our robot
-            foreach (var modelMesh in Robot.Meshes)
-            foreach (var part in modelMesh.MeshParts)
-                part.Effect = Effect;
+            Scene = ModelInspector.CreateDrawerFrom(sceneModel, DiffuseEffect, EffectInspectionType.ALL);
+            Robot = ModelInspector.CreateDrawerFrom(robotModel, Effect, Effect.Techniques["EnvironmentMap"], EffectInspectionType.ALL);
+
+            Sphere = new SpherePrimitive(GraphicsDevice, 100f, 16, Color.White);
+            Sphere.SetEffect(Effect, Effect.Techniques["EnvironmentMapSphere"], EffectInspectionType.MATRICES);
+            Sphere.World = Matrix.CreateTranslation(SpherePosition);
 
             // Create a render target for the scene
             EnvironmentMapRenderTarget = new RenderTargetCube(GraphicsDevice, EnvironmentmapSize, false,
@@ -97,10 +94,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         /// <param name="enabled">A boolean indicating if the Effect is on</param>
         private void OnEffectEnable(bool enabled)
         {
-            var effectToAssign = enabled ? Effect : BasicEffect;            
-            foreach (var modelMesh in Robot.Meshes)
-                foreach (var part in modelMesh.MeshParts)
-                    part.Effect = effectToAssign;
+            var effectToAssign = enabled ? Effect : DiffuseEffect;
+            Robot.SetEffect(effectToAssign, EffectInspectionType.ALL);
             EffectOn = enabled;
         }
 
@@ -140,12 +135,13 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             Game.Background = Color.CornflowerBlue;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
+            var viewProjection = Camera.View * Camera.Projection;
+            Scene.ViewProjection = viewProjection;
+            Scene.Draw();
 
-            Scene.Draw(Matrix.Identity, Camera.View, Camera.Projection);
-
-            Sphere.Draw(Matrix.CreateTranslation(SpherePosition), Camera.View, Camera.Projection);
-
-            Robot.Draw(Matrix.CreateTranslation(RobotPosition), Camera.View, Camera.Projection);
+            Robot.World = Matrix.CreateTranslation(RobotPosition);
+            Robot.ViewProjection = viewProjection;
+            Robot.Draw();
         }
 
         /// <summary>
@@ -166,9 +162,10 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
                 SetCubemapCameraForOrientation(face);
                 CubeMapCamera.BuildView();
 
-                // Draw our scene. Do not draw our tank as it would be occluded by itself 
+                // Draw our scene
                 // (if it has backface culling on)
-                Scene.Draw(Matrix.Identity, CubeMapCamera.View, CubeMapCamera.Projection);
+                Scene.ViewProjection = CubeMapCamera.View * CubeMapCamera.Projection;
+                Scene.Draw();
             }
 
             #endregion
@@ -179,52 +176,29 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             GraphicsDevice.SetRenderTarget(null);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1f, 0);
 
+            Scene.ViewProjection = Camera.View * Camera.Projection;
 
             // Draw our scene with the default effect and default camera
-            Scene.Draw(Matrix.Identity, Camera.View, Camera.Projection);
+            Scene.Draw();
 
             // Draw our sphere
 
             #region Draw Sphere
 
-            Effect.CurrentTechnique = Effect.Techniques["EnvironmentMapSphere"];
             Effect.Parameters["environmentMap"].SetValue(EnvironmentMapRenderTarget);
             Effect.Parameters["eyePosition"].SetValue(Camera.Position);
 
-            var sphereWorld = Matrix.CreateTranslation(SpherePosition);
-
-            // World is used to transform from model space to world space
-            Effect.Parameters["World"].SetValue(sphereWorld);
-            // InverseTransposeWorld is used to rotate normals
-            Effect.Parameters["InverseTransposeWorld"]?.SetValue(Matrix.Transpose(Matrix.Invert(sphereWorld)));
-            // WorldViewProjection is used to transform from model space to clip space
-            Effect.Parameters["WorldViewProjection"].SetValue(sphereWorld * Camera.View * Camera.Projection);
-
-            Sphere.Draw(Effect);
+            Sphere.ViewProjection = Camera.View * Camera.Projection;
+            Sphere.Draw();
 
             #endregion
 
 
             #region Draw Robot
 
-            // Set up our Effect to draw the robot
-            Effect.CurrentTechnique = Effect.Techniques["EnvironmentMap"];
-            Effect.Parameters["baseTexture"].SetValue(BasicEffect.Texture);
-
-            // We get the base transform for each mesh
-            var modelMeshesBaseTransforms = new Matrix[Robot.Bones.Count];
-            Robot.CopyAbsoluteBoneTransformsTo(modelMeshesBaseTransforms);
-
-            var worldMatrix = Matrix.CreateTranslation(RobotPosition);
-            // World is used to transform from model space to world space
-            Effect.Parameters["World"].SetValue(worldMatrix);
-            // InverseTransposeWorld is used to rotate normals
-            Effect.Parameters["InverseTransposeWorld"]?.SetValue(Matrix.Transpose(Matrix.Invert(worldMatrix)));
-
-            // WorldViewProjection is used to transform from model space to clip space
-            Effect.Parameters["WorldViewProjection"].SetValue(worldMatrix * Camera.View * Camera.Projection);
-
-            Robot.Meshes.FirstOrDefault().Draw();
+            Robot.World = Matrix.CreateTranslation(RobotPosition);
+            Robot.ViewProjection = Camera.View * Camera.Projection;
+            Robot.Draw();
 
             #endregion
 

@@ -15,6 +15,7 @@ using System;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TGC.MonoGame.Samples.Models;
 
 #endregion Using Statements
 
@@ -227,6 +228,8 @@ namespace TGC.MonoGame.Samples.Geometries
             new Vector3(-0.375f, -0.31125f, -0.21f)
         };
 
+        private GeometryBuilder<VertexPositionColorNormal> _builder;
+
         /// <summary>
         ///     Constructs a new teapot primitive, with the specified size and tessellation level.
         /// </summary>
@@ -234,6 +237,8 @@ namespace TGC.MonoGame.Samples.Geometries
         {
             if (tessellation < 1)
                 throw new ArgumentOutOfRangeException(nameof(tessellation));
+
+            _builder = new GeometryBuilder<VertexPositionColorNormal>();
 
             foreach (var patch in TeapotPatches)
             {
@@ -251,7 +256,9 @@ namespace TGC.MonoGame.Samples.Geometries
                 }
             }
 
-            InitializePrimitive(graphicsDevice);
+            GeometryDrawers.Add(_builder.Build(graphicsDevice));
+
+            _builder = null;
         }
 
         /// <summary>
@@ -272,8 +279,8 @@ namespace TGC.MonoGame.Samples.Geometries
             var isMirrored = Math.Sign(scale.X) != Math.Sign(scale.Z);
 
             // Create the index and vertex data.
-            CreatePatchIndices(tessellation, isMirrored);
-            CreatePatchVertices(controlPoints, tessellation, isMirrored);
+            CreatePatchIndices(_builder, tessellation, isMirrored);
+            CreatePatchVertices(_builder, controlPoints, tessellation, isMirrored);
         }
 
         /// <summary>

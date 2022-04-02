@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Cameras;
+using TGC.MonoGame.Samples.Models.Drawers;
 using TGC.MonoGame.Samples.Viewer;
 
 namespace TGC.MonoGame.Samples.Samples
@@ -22,7 +23,10 @@ namespace TGC.MonoGame.Samples.Samples
         }
 
         private Camera Camera { get; set; }
-        private Model Model { get; set; }
+        private ModelDrawer ModelDrawer { get; set; }
+
+        private Effect Effect { get; set; }
+
         private Matrix ModelWorld { get; set; }
         private float ModelRotation { get; set; }
 
@@ -38,11 +42,22 @@ namespace TGC.MonoGame.Samples.Samples
         protected override void LoadContent()
         {
             // Load mesh.
-            Model = Game.Content.Load<Model>(ContentFolder3D + "tgc-logo/tgc-logo");
-            var modelEffect = (BasicEffect) Model.Meshes[0].Effects[0];
-            modelEffect.DiffuseColor = Color.DarkBlue.ToVector3();
-            modelEffect.EnableDefaultLighting();
-            ModelWorld = Matrix.CreateRotationY(MathHelper.Pi);
+            var model = Game.Content.Load<Model>(ContentFolder3D + "tgc-logo/tgc-logo");
+
+            Effect = Game.Content.Load<Effect>(ContentFolderEffects + "BlinnPhong");
+            ModelDrawer = ModelInspector.CreateDrawerFrom(model, Effect, Effect.Techniques["BaseColor"], EffectInspectionType.MATRICES);
+
+            Effect.Parameters["baseColor"].SetValue(Color.DarkBlue.ToVector3()); 
+            Effect.Parameters["ambientColor"].SetValue(Vector3.One);
+            Effect.Parameters["diffuseColor"].SetValue(Vector3.One);
+            Effect.Parameters["specularColor"].SetValue(Vector3.One);
+
+            Effect.Parameters["KAmbient"].SetValue(0.3f);
+            Effect.Parameters["KDiffuse"].SetValue(0.8f);
+            Effect.Parameters["KSpecular"].SetValue(1.0f);
+            Effect.Parameters["shininess"].SetValue(16f);
+            Effect.Parameters["eyePosition"].SetValue(Camera.Position);
+            Effect.Parameters["lightPosition"].SetValue(Vector3.One * 10f);
 
             base.LoadContent();
         }
@@ -54,6 +69,9 @@ namespace TGC.MonoGame.Samples.Samples
 
             Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
 
+            ModelDrawer.World = Matrix.CreateRotationY(ModelRotation);
+            ModelDrawer.ViewProjection = Camera.View * Camera.Projection;
+
             base.Update(gameTime);
         }
 
@@ -62,10 +80,16 @@ namespace TGC.MonoGame.Samples.Samples
         {
             Game.Background = Color.Black;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-
-            Model.Draw(ModelWorld * Matrix.CreateRotationY(ModelRotation), Camera.View, Camera.Projection);
+            
+            ModelDrawer.Draw();
 
             base.Draw(gameTime);
+        }
+
+        protected override void UnloadContent()
+        {
+            ModelDrawer.Dispose();
+            base.UnloadContent();
         }
     }
 }

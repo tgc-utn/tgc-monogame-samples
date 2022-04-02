@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
+using TGC.MonoGame.Samples.Models.Drawers;
 using TGC.MonoGame.Samples.Viewer;
 
 namespace TGC.MonoGame.Samples.Samples.Tutorials
@@ -45,11 +46,11 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             Camera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 20, 60), Vector3.Zero);
 
             Box = new CubePrimitive(GraphicsDevice, 10, Color.DarkCyan, Color.DarkMagenta, Color.DarkGreen,
-                Color.MonoGameOrange, Color.Black, Color.DarkGray);
+                Color.MonoGameOrange, Color.Black, Color.DarkGray, Color.Yellow, Color.Red);
             BoxPosition = Vector3.Zero;
             Cylinder = new CylinderPrimitive(GraphicsDevice, 20, 10, 16);
             CylinderPosition = new Vector3(-20, 0, 0);
-            Sphere = new SpherePrimitive(GraphicsDevice, 10);
+            Sphere = new SpherePrimitive(GraphicsDevice, 10, 16, Color.DarkBlue);
             SpherePosition = new Vector3(0, -15, 0);
             Teapot = new TeapotPrimitive(GraphicsDevice, 10);
             TeapotPosition = new Vector3(20, 0, 0);
@@ -59,6 +60,21 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
                 new Vector3(10f, 10f, 0f), Color.Black, Color.Cyan, Color.Magenta);
 
             base.Initialize();
+        }
+
+        protected override void LoadContent()
+        {
+            base.LoadContent();
+
+
+            var effect = Game.Content.Load<Effect>(ContentFolderEffects + "VertexColor");
+            Box.SetEffect(effect, EffectInspectionType.MATRICES);
+            Cylinder.SetEffect(effect, EffectInspectionType.MATRICES);
+            Sphere.SetEffect(effect, EffectInspectionType.MATRICES);
+            Teapot.SetEffect(effect, EffectInspectionType.MATRICES);
+            Torus.SetEffect(effect, EffectInspectionType.MATRICES);
+            Triangle.SetEffect(effect, EffectInspectionType.MATRICES);
+
         }
 
         /// <inheritdoc />
@@ -86,12 +102,9 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             DrawGeometry(Teapot, TeapotPosition, Yaw, -Pitch, Roll);
             DrawGeometry(Torus, TorusPosition, Yaw, Pitch, -Roll);
 
-            var triangleEffect = Triangle.Effect;
-            triangleEffect.World = Matrix.Identity;
-            triangleEffect.View = Camera.View;
-            triangleEffect.Projection = Camera.Projection;
-            triangleEffect.LightingEnabled = false;
-            Triangle.Draw(triangleEffect);
+            Triangle.World = Matrix.Identity;
+            Triangle.ViewProjection = Camera.View * Camera.Projection;
+            Triangle.Draw();
 
             base.Draw(gameTime);
         }
@@ -104,15 +117,12 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         /// <param name="yaw">Vertical axis (yaw).</param>
         /// <param name="pitch">Transverse axis (pitch).</param>
         /// <param name="roll">Longitudinal axis (roll).</param>
-        private void DrawGeometry(GeometricPrimitive geometry, Vector3 position, float yaw, float pitch, float roll)
+        private void DrawGeometry(ModelDrawer drawer, Vector3 position, float yaw, float pitch, float roll)
         {
-            var effect = geometry.Effect;
+            drawer.World = Matrix.CreateFromYawPitchRoll(yaw, pitch, roll) * Matrix.CreateTranslation(position);
+            drawer.ViewProjection = Camera.View * Camera.Projection;
 
-            effect.World = Matrix.CreateFromYawPitchRoll(yaw, pitch, roll) * Matrix.CreateTranslation(position);
-            effect.View = Camera.View;
-            effect.Projection = Camera.Projection;
-
-            geometry.Draw(effect);
+            drawer.Draw();
         }
     }
 }

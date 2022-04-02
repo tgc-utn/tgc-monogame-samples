@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Cameras;
+using TGC.MonoGame.Samples.Models.Drawers;
 using TGC.MonoGame.Samples.Viewer;
 
 namespace TGC.MonoGame.Samples.Samples.Shaders
@@ -28,7 +29,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 
         private Camera Camera { get; set; }
         private Effect Effect { get; set; }
-        private Model Model { get; set; }
+        private ModelDrawer ModelDrawer { get; set; }
         private Texture2D Texture { get; set; }
 
         /// <inheritdoc />
@@ -42,9 +43,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         /// <inheritdoc />
         protected override void LoadContent()
         {
-            Model = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
-            // From the effect of the model I keep the texture.
-            Texture = ((BasicEffect) Model.Meshes.FirstOrDefault()?.MeshParts.FirstOrDefault()?.Effect)?.Texture;
+            var model = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
 
             // Load a shader in runtime, outside the Content pipeline.
             // First you must run "mgfxc <SourceFile> <OutputFile> [/Debug] [/Profile:<DirectX_11,OpenGL>]"
@@ -54,6 +53,14 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 
             // Load a shader using Content pipeline.
             Effect = Game.Content.Load<Effect>(ContentFolderEffects + "BasicShader");
+
+            ModelDrawer = ModelInspector.CreateDrawerFrom(model, Effect, EffectInspectionType.ALL);
+
+            var viewParameter = Effect.Parameters["View"];
+            var projectionParameter = Effect.Parameters["Projection"];
+
+            ModelDrawer.ModelActionCollection.Add(data => viewParameter.SetValue(Camera.View));
+            ModelDrawer.ModelActionCollection.Add(data => projectionParameter.SetValue(Camera.Projection));
 
             base.LoadContent();
         }
@@ -75,27 +82,10 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            
-
             time += Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
 
-            var mesh = Model.Meshes.FirstOrDefault();
-
-            if (mesh != null)
-            {
-                foreach (var part in mesh.MeshParts)
-                {
-                    part.Effect = Effect;
-                    Effect.Parameters["World"].SetValue(mesh.ParentBone.Transform);
-                    Effect.Parameters["View"].SetValue(Camera.View);
-                    Effect.Parameters["Projection"].SetValue(Camera.Projection);
-                    //Effect.Parameters["WorldViewProjection"].SetValue(Camera.WorldMatrix * Camera.View * Camera.Projection);
-                    Effect.Parameters["ModelTexture"].SetValue(Texture);
-                    Effect.Parameters["Time"].SetValue(time);
-                }
-
-                mesh.Draw();
-            }
+            Effect.Parameters["Time"].SetValue(time);
+            ModelDrawer.Draw();
 
             base.Draw(gameTime);
         }

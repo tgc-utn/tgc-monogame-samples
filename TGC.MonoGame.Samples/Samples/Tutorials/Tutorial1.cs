@@ -33,9 +33,9 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         private IndexBuffer Indices { get; set; }
 
         /// <summary>
-        ///     Built-in effect that supports optional texturing, vertex coloring, fog, and lighting.
+        ///     Built-in effect that supports vertex color.
         /// </summary>
-        private BasicEffect Effect { get; set; }
+        private Effect Effect { get; set; }
 
         /// <inheritdoc />
         public override void Initialize()
@@ -47,13 +47,8 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
                 Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 1, 1000);
 
             // Setup our basic effect
-            Effect = new BasicEffect(GraphicsDevice)
-            {
-                World = worldMatrix,
-                View = viewMatrix,
-                Projection = projectionMatrix,
-                VertexColorEnabled = true
-            };
+            Effect = Game.Content.Load<Effect>(ContentFolderEffects + "VertexColor");
+            Effect.Parameters["WorldViewProjection"].SetValue(worldMatrix * viewMatrix * projectionMatrix);
 
             // Array of vertex positions and colors.
             var triangleVertices = new[]

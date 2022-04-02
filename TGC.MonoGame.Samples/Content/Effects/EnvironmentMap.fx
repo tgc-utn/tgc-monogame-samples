@@ -92,11 +92,22 @@ VertexShaderOutput SphereVS(in VertexShaderInput input)
     output.Position = mul(input.Position, WorldViewProjection);
     output.WorldPosition = mul(input.Position, World);
     output.Normal = mul(float4(normalize(input.Position.xyz), 1.0), InverseTransposeWorld);
-    output.TextureCoordinates = input.TextureCoordinates;
 	
     return output;
 }
 
+float4 EnvironmentMapSpherePS(VertexShaderOutput input) : COLOR
+{
+	//Normalizar vectores
+    float3 normal = normalize(input.Normal.xyz);
+	
+	//Obtener texel de CubeMap
+    float3 view = normalize(eyePosition.xyz - input.WorldPosition.xyz);
+    float3 reflection = reflect(view, normal);
+    float3 reflectionColor = texCUBE(environmentMapSampler, reflection).rgb;
+
+    return float4(reflectionColor, 1);
+}
 
 technique EnvironmentMap
 {
@@ -114,6 +125,6 @@ technique EnvironmentMapSphere
     pass Pass0
     {
         VertexShader = compile VS_SHADERMODEL SphereVS();
-        PixelShader = compile PS_SHADERMODEL EnvironmentMapPS();
+        PixelShader = compile PS_SHADERMODEL EnvironmentMapSpherePS();
     }
 };

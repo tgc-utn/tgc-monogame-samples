@@ -1,12 +1,14 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TGC.MonoGame.Samples.Models;
+using TGC.MonoGame.Samples.Models.Drawers;
 
 namespace TGC.MonoGame.Samples.Geometries
 {
     /// <summary>
     ///     Triangle in a 3D world.
     /// </summary>
-    public class TrianglePrimitive : GeometricPrimitive
+    public class TrianglePrimitive : ModelDrawer
     {
         /// <summary>
         ///     Create a triangle based on the vertices and colored white.
@@ -46,18 +48,20 @@ namespace TGC.MonoGame.Samples.Geometries
         public TrianglePrimitive(GraphicsDevice graphicsDevice, Vector3 vertex1, Vector3 vertex2, Vector3 vertex3,
             Color vertexColor1, Color vertexColor2, Color vertexColor3)
         {
-            AddIndex(CurrentVertex + 0);
-            AddIndex(CurrentVertex + 1);
-            AddIndex(CurrentVertex + 2);
+            var builder = new GeometryBuilder<VertexPositionNormalColorTexture>();
+
+            builder.AddIndex(0);
+            builder.AddIndex(1);
+            builder.AddIndex(2);
 
             var normal = Vector3.Cross(vertex2 - vertex1, vertex3 - vertex2);
             normal.Normalize();
 
-            AddVertex(vertex1, vertexColor1, normal);
-            AddVertex(vertex2, vertexColor2, normal);
-            AddVertex(vertex3, vertexColor3, normal);
+            builder.AddVertex(new VertexPositionNormalColorTexture(vertex1, normal, vertexColor1, Vector2.Zero));
+            builder.AddVertex(new VertexPositionNormalColorTexture(vertex2, normal, vertexColor2, Vector2.UnitX));
+            builder.AddVertex(new VertexPositionNormalColorTexture(vertex3, normal, vertexColor3, new Vector2(0.5f, 1f)));
 
-            InitializePrimitive(graphicsDevice);
+            GeometryDrawers.Add(builder.Build(graphicsDevice));
         }
     }
 }

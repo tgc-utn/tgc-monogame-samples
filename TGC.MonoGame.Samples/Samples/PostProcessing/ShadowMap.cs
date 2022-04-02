@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
+using TGC.MonoGame.Samples.Models.Drawers;
 using TGC.MonoGame.Samples.Viewer;
 
 namespace TGC.MonoGame.Samples.Samples.PostProcessing
@@ -33,11 +34,14 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
         private TargetCamera TargetLightCamera { get; set; }
 
-        private Model Model { get; set; }
+        private ModelDrawer ModelDrawer { get; set; }
+        private ModelDrawer ModelDrawerDepth { get; set; }
+
+        private ModelDrawer ModelDrawerReceiveShadows { get; set; }
 
         private Effect Effect { get; set; }
-
-        private BasicEffect BasicEffect { get; set; }
+        private Effect DiffuseEffect { get; set; }
+        private Effect VertexColorEffect { get; set; }
 
 
         /// <inheritdoc />
@@ -57,7 +61,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             TargetLightCamera = new TargetCamera(1f, LightPosition, Vector3.Zero);
             TargetLightCamera.BuildProjection(1f, LightCameraNearPlaneDistance, LightCameraFarPlaneDistance,
-                MathHelper.PiOver2);
+                MathHelper.Pi * 2f / 3f);
 
             base.Initialize();
         }
@@ -66,12 +70,19 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         protected override void LoadContent()
         {
             // We load the city meshes into a model
-            Model = Game.Content.Load<Model>(ContentFolder3D + "scene/city");
+            var model = Game.Content.Load<Model>(ContentFolder3D + "scene/city");
+
 
             // Load the shadowmap effect
             Effect = Game.Content.Load<Effect>(ContentFolderEffects + "ShadowMap");
 
-            BasicEffect = (BasicEffect)Model.Meshes.FirstOrDefault()?.Effects.FirstOrDefault();
+            DiffuseEffect = Game.Content.Load<Effect>(ContentFolderEffects + "DiffuseTexture");
+
+            VertexColorEffect = Game.Content.Load<Effect>(ContentFolderEffects + "VertexColor");
+
+
+
+
 
             // Create a full screen quad to post-process
             FullScreenQuad = new FullScreenQuad(GraphicsDevice);
@@ -80,7 +91,16 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             ShadowMapRenderTarget = new RenderTarget2D(GraphicsDevice, ShadowmapSize, ShadowmapSize, false,
                 SurfaceFormat.Single, DepthFormat.Depth24, 0, RenderTargetUsage.PlatformContents);
 
+            ModelDrawer = ModelInspector.CreateDrawerFrom(model, DiffuseEffect, EffectInspectionType.ALL);
+
+            ModelDrawerDepth = ModelDrawer.Clone(false, true);
+            ModelDrawerDepth.SetEffect(Effect, Effect.Techniques["DepthPass"], EffectInspectionType.MATRICES);
+
+            ModelDrawerReceiveShadows = ModelDrawer.Clone(false, true);
+            ModelDrawerReceiveShadows.SetEffect(Effect, Effect.Techniques["DrawShadowedPCF"], EffectInspectionType.ALL);
+
             LightBox = new CubePrimitive(GraphicsDevice, 5, Color.White);
+            LightBox.SetEffect(VertexColorEffect, EffectInspectionType.MATRICES);
 
             GraphicsDevice.BlendState = BlendState.Opaque;
 
@@ -135,11 +155,9 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             Game.Background = Color.CornflowerBlue;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            foreach (var modelMesh in Model.Meshes)
-                foreach (var part in modelMesh.MeshParts)
-                    part.Effect = BasicEffect;
-
-            Model.Draw(Matrix.Identity, Camera.View, Camera.Projection);
+            var viewProjection = Camera.View * Camera.Projection;
+            ModelDrawer.ViewProjection = viewProjection;
+            ModelDrawer.Draw();
         }
 
 
@@ -155,59 +173,34 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             GraphicsDevice.SetRenderTarget(ShadowMapRenderTarget);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1f, 0);
 
-            Effect.CurrentTechnique = Effect.Techniques["DepthPass"];
+            var lightViewProjection = TargetLightCamera.View * TargetLightCamera.Projection;
 
-            // We get the base transform for each mesh
-            var modelMeshesBaseTransforms = new Matrix[Model.Bones.Count];
-            Model.CopyAbsoluteBoneTransformsTo(modelMeshesBaseTransforms);
-            foreach (var modelMesh in Model.Meshes)
-            {
-                foreach (var part in modelMesh.MeshParts)
-                    part.Effect = Effect;
-
-                // We set the main matrices for each mesh to draw
-                var worldMatrix = modelMeshesBaseTransforms[modelMesh.ParentBone.Index];
-
-                // WorldViewProjection is used to transform from model space to clip space
-                Effect.Parameters["WorldViewProjection"]
-                    .SetValue(worldMatrix * TargetLightCamera.View * TargetLightCamera.Projection);
-
-                // Once we set these matrices we draw
-                modelMesh.Draw();
-            }
+            ModelDrawerDepth.ViewProjection = lightViewProjection;
+            ModelDrawerDepth.Draw();
 
             #endregion
 
             #region Pass 2
+            
+            var viewProjection = Camera.View * Camera.Projection;
 
             // Set the render target as null, we are drawing on the screen!
             GraphicsDevice.SetRenderTarget(null);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1f, 0);
 
             Effect.CurrentTechnique = Effect.Techniques["DrawShadowedPCF"];
-            Effect.Parameters["baseTexture"].SetValue(BasicEffect.Texture);
             Effect.Parameters["shadowMap"].SetValue(ShadowMapRenderTarget);
             Effect.Parameters["lightPosition"].SetValue(LightPosition);
             Effect.Parameters["shadowMapSize"].SetValue(Vector2.One * ShadowmapSize);
-            Effect.Parameters["LightViewProjection"].SetValue(TargetLightCamera.View * TargetLightCamera.Projection);
-            foreach (var modelMesh in Model.Meshes)
-            {
-                foreach (var part in modelMesh.MeshParts)
-                    part.Effect = Effect;
+            Effect.Parameters["LightViewProjection"].SetValue(lightViewProjection);
 
-                // We set the main matrices for each mesh to draw
-                var worldMatrix = modelMeshesBaseTransforms[modelMesh.ParentBone.Index];
+            ModelDrawerReceiveShadows.ViewProjection = viewProjection;
+            ModelDrawerReceiveShadows.Draw();
 
-                // WorldViewProjection is used to transform from model space to clip space
-                Effect.Parameters["WorldViewProjection"].SetValue(worldMatrix * Camera.View * Camera.Projection);
-                Effect.Parameters["World"].SetValue(worldMatrix);
-                Effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(worldMatrix)));
 
-                // Once we set these matrices we draw
-                modelMesh.Draw();
-            }
-
-            LightBox.Draw(Matrix.CreateTranslation(LightPosition), Camera.View, Camera.Projection);
+            LightBox.ViewProjection = Camera.View * Camera.Projection;
+            LightBox.World = Matrix.CreateTranslation(LightPosition);
+            LightBox.Draw();
 
             #endregion
         }

@@ -13,6 +13,9 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
+using TGC.MonoGame.Samples.Models;
+using TGC.MonoGame.Samples.Models.Drawers;
 
 #endregion Using Statements
 
@@ -21,73 +24,82 @@ namespace TGC.MonoGame.Samples.Geometries
     /// <summary>
     ///     Geometric primitive class for drawing cubes.
     /// </summary>
-    public class CubePrimitive : GeometricPrimitive
+    public class CubePrimitive : ModelDrawer
     {
-        public CubePrimitive(GraphicsDevice graphicsDevice) : this(graphicsDevice, 1, Color.White, Color.White,
-            Color.White, Color.White, Color.White, Color.White)
+
+
+        public CubePrimitive(GraphicsDevice graphicsDevice) : this(graphicsDevice, 1f, Color.White)
         {
         }
 
-        public CubePrimitive(GraphicsDevice graphicsDevice, float size, Color color) : this(graphicsDevice, size, color,
-            color, color, color, color, color)
+        public CubePrimitive(GraphicsDevice graphicsDevice, float size, Color color) : this(graphicsDevice, size, 
+            color, color, color, color, color, color, color, color)
         {
+
         }
 
         /// <summary>
         ///     Constructs a new cube primitive, with the specified size.
         /// </summary>
         public CubePrimitive(GraphicsDevice graphicsDevice, float size, Color color1, Color color2, Color color3,
-            Color color4, Color color5, Color color6)
+            Color color4, Color color5, Color color6, Color color7, Color color8) : base()
         {
-            // A cube has six faces, each one pointing in a different direction.
-            Vector3[] normals =
+            var builder = new GeometryBuilder<VertexPositionNormalColorTexture>();
+
+            var vertices = new VertexPositionNormalColorTexture[24]
             {
-                // front normal
-                Vector3.UnitZ,
-                // back normal
-                -Vector3.UnitZ,
-                // right normal
-                Vector3.UnitX,
-                // left normal
-                -Vector3.UnitX,
-                // top normal
-                Vector3.UnitY,
-                // bottom normal
-                -Vector3.UnitZ
+                new VertexPositionNormalColorTexture(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0, 0, 1), color1, new Vector2(1, 0)),
+                new VertexPositionNormalColorTexture(new Vector3(-0.5f, 0.5f, 0.5f), new Vector3(0, 0, 1), color2, new Vector2(0, 0)),
+                new VertexPositionNormalColorTexture(new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(0, 0, 1), color3, new Vector2(0, 1)),
+                new VertexPositionNormalColorTexture(new Vector3(0.5f, -0.5f, 0.5f), new Vector3(0, 0, 1), color4, new Vector2(1, 1)),
+                new VertexPositionNormalColorTexture(new Vector3(0.5f, -0.5f, -0.5f), new Vector3(0, -1, 0), color5, new Vector2(1, 1)),
+                new VertexPositionNormalColorTexture(new Vector3(0.5f, -0.5f, 0.5f), new Vector3(0, -1, 0), color4, new Vector2(1, 0)),
+                new VertexPositionNormalColorTexture(new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(0, -1, 0), color3, new Vector2(0, 0)),
+                new VertexPositionNormalColorTexture(new Vector3(-0.5f, -0.5f, -0.5f), new Vector3(0, -1, 0), color6, new Vector2(0, 1)),
+                new VertexPositionNormalColorTexture(new Vector3(-0.5f, -0.5f, -0.5f), new Vector3(-1, 0, 0), color6, new Vector2(0, 1)),
+                new VertexPositionNormalColorTexture(new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(-1, 0, 0), color3, new Vector2(0, 0)),
+                new VertexPositionNormalColorTexture(new Vector3(-0.5f, 0.5f, 0.5f), new Vector3(-1, 0, 0), color2, new Vector2(1, 0)),
+                new VertexPositionNormalColorTexture(new Vector3(-0.5f, 0.5f, -0.5f), new Vector3(-1, 0, 0), color7, new Vector2(1, 1)),
+                new VertexPositionNormalColorTexture(new Vector3(-0.5f, 0.5f, -0.5f), new Vector3(0, 0, -1), color7, new Vector2(0, 0)),
+                new VertexPositionNormalColorTexture(new Vector3(0.5f, 0.5f, -0.5f), new Vector3(0, 0, -1), color8, new Vector2(1, 0)),
+                new VertexPositionNormalColorTexture(new Vector3(0.5f, -0.5f, -0.5f), new Vector3(0, 0, -1), color5, new Vector2(1, 1)),
+                new VertexPositionNormalColorTexture(new Vector3(-0.5f, -0.5f, -0.5f), new Vector3(0, 0, -1), color6, new Vector2(0, 1)),
+                new VertexPositionNormalColorTexture(new Vector3(0.5f, 0.5f, -0.5f), new Vector3(1, 0, 0), color8, new Vector2(1, 1)),
+                new VertexPositionNormalColorTexture(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(1, 0, 0), color1, new Vector2(1, 0)),
+                new VertexPositionNormalColorTexture(new Vector3(0.5f, -0.5f, 0.5f), new Vector3(1, 0, 0), color4, new Vector2(0, 0)),
+                new VertexPositionNormalColorTexture(new Vector3(0.5f, -0.5f, -0.5f), new Vector3(1, 0, 0), color5, new Vector2(0, 1)),
+                new VertexPositionNormalColorTexture(new Vector3(-0.5f, 0.5f, -0.5f), new Vector3(0, 1, 0), color7, new Vector2(0, 1)),
+                new VertexPositionNormalColorTexture(new Vector3(-0.5f, 0.5f, 0.5f), new Vector3(0, 1, 0), color2, new Vector2(0, 0)),
+                new VertexPositionNormalColorTexture(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0, 1, 0), color1, new Vector2(1, 0)),
+                new VertexPositionNormalColorTexture(new Vector3(0.5f, 0.5f, -0.5f), new Vector3(0, 1, 0), color8, new Vector2(1, 1)),
+            };
+         
+            var indices = new ushort[36]
+            {
+                3, 1, 0,
+                3, 2, 1,
+                7, 5, 4,
+                7, 6, 5,
+                11, 9, 8,
+                11, 10, 9,
+                15, 13, 12,
+                15, 14, 13,
+                19, 17, 16,
+                19, 18, 17,
+                23, 21, 20,
+                23, 22, 21,
             };
 
-            Color[] colors =
+            for (var index = 0; index < vertices.Length; index++)
             {
-                color1, color2, color3, color4, color5, color6
-            };
-
-            var i = 0;
-            // Create each face in turn.
-            foreach (var normal in normals)
-            {
-                // Get two vectors perpendicular to the face normal and to each other.
-                var side1 = new Vector3(normal.Y, normal.Z, normal.X);
-                var side2 = Vector3.Cross(normal, side1);
-
-                // Six indices (two triangles) per face.
-                AddIndex(CurrentVertex + 0);
-                AddIndex(CurrentVertex + 1);
-                AddIndex(CurrentVertex + 2);
-
-                AddIndex(CurrentVertex + 0);
-                AddIndex(CurrentVertex + 2);
-                AddIndex(CurrentVertex + 3);
-
-                // Four vertices per face.
-                AddVertex((normal - side1 - side2) * size / 2, colors[i], normal);
-                AddVertex((normal - side1 + side2) * size / 2, colors[i], normal);
-                AddVertex((normal + side1 + side2) * size / 2, colors[i], normal);
-                AddVertex((normal + side1 - side2) * size / 2, colors[i], normal);
-
-                i++;
+                vertices[index].Position *= size;
+                builder.AddVertex(vertices[index]);
             }
 
-            InitializePrimitive(graphicsDevice);
+            for (var index = 0; index < indices.Length; index++)
+                builder.AddIndex(indices[index]);
+
+            GeometryDrawers.Add(builder.Build(graphicsDevice));
         }
     }
 }

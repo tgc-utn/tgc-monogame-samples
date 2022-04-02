@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Input;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Geometries.Textures;
+using TGC.MonoGame.Samples.Models.Drawers;
 using TGC.MonoGame.Samples.Physics.Bepu;
 using TGC.MonoGame.Samples.Viewer;
 using NumericVector3 = System.Numerics.Vector3;
@@ -31,8 +32,7 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
         }
 
         private QuadPrimitive Floor { get; set; }
-        private Matrix FloorWorld { get; set; }
-        private BoxPrimitive Box { get; set; }
+        private CubePrimitive Box { get; set; }
 
         /// <summary>
         ///     We'll randomize the size of bullets.
@@ -84,17 +84,13 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
             Random = new Random(5);
 
             SpriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
-            
+
             //The buffer pool is a source of raw memory blobs for the engine to use.
             BufferPool = new BufferPool();
 
             Radii = new List<float>();
             Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(40, 60, 150), 55, 0.4f);
 
-            var boxTexture = Game.Content.Load<Texture2D>(ContentFolderTextures + "wood/caja-madera-3");
-            Box = new BoxPrimitive(GraphicsDevice, Vector3.One * 10, boxTexture);
-
-            Sphere = new SpherePrimitive(GraphicsDevice);
 
             SphereHandles = new List<BodyHandle>();
             BoxHandles = new List<BodyHandle>();
@@ -115,10 +111,26 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
             Floor = new QuadPrimitive(GraphicsDevice);
 
             TilingEffect = Game.Content.Load<Effect>(ContentFolderEffects + "TextureTiling");
-            TilingEffect.Parameters["Texture"].SetValue(floorTexture);
-            TilingEffect.Parameters["Tiling"].SetValue(Vector2.One * 50f);
 
-            FloorWorld = Matrix.CreateScale(400f) * Matrix.CreateTranslation(new Vector3(75,0, -150));
+            var parameter = TilingEffect.Parameters["Tiling"];
+
+            Floor.World = Matrix.CreateScale(400f) * Matrix.CreateTranslation(new Vector3(75, 0, -150));
+            Floor.Textures.Add(floorTexture);
+            Floor.SetEffect(TilingEffect, EffectInspectionType.ALL);
+            Floor.ModelActionCollection.Add(data => parameter.SetValue(Vector2.One * 10f));
+
+
+            Box = new CubePrimitive(GraphicsDevice, 10f, Color.White);
+            var boxTexture = Game.Content.Load<Texture2D>(ContentFolderTextures + "wood/caja-madera-3");
+            Box.Textures.Add(boxTexture);
+            Box.SetEffect(TilingEffect, EffectInspectionType.ALL);
+            Box.ModelActionCollection.Add(data => parameter.SetValue(Vector2.One));
+
+
+
+            Sphere = new SpherePrimitive(GraphicsDevice);
+            Sphere.SetEffect(TilingEffect, EffectInspectionType.MATRICES);
+
             Simulation.Statics.Add(new StaticDescription(new NumericVector3(0, -0.5f, 0),
                 new CollidableDescription(Simulation.Shapes.Add(new Box(2000, 1, 2000)), 0.1f)));
 
@@ -128,20 +140,20 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
             // Single Box
             var radius = 10;
             for (var j = 0; j < 5; j++)
-            for (var i = 0; i < 20; i++)
-            {
-                var boxShape = new Box(radius, radius, radius);
-                boxShape.ComputeInertia(0.4f, out var boxInertia);
-                var boxIndex = Simulation.Shapes.Add(boxShape);
-                var position = new NumericVector3(-30 + i * 10 + 1, j * 10 + 1, -40);
+                for (var i = 0; i < 20; i++)
+                {
+                    var boxShape = new Box(radius, radius, radius);
+                    boxShape.ComputeInertia(0.4f, out var boxInertia);
+                    var boxIndex = Simulation.Shapes.Add(boxShape);
+                    var position = new NumericVector3(-30 + i * 10 + 1, j * 10 + 1, -40);
 
-                var bodyDescription = BodyDescription.CreateDynamic(position, boxInertia,
-                    new CollidableDescription(boxIndex, 0.1f), new BodyActivityDescription(0.01f));
+                    var bodyDescription = BodyDescription.CreateDynamic(position, boxInertia,
+                        new CollidableDescription(boxIndex, 0.1f), new BodyActivityDescription(0.01f));
 
-                var bodyHandle = Simulation.Bodies.Add(bodyDescription);
+                    var bodyHandle = Simulation.Bodies.Add(bodyDescription);
 
-                BoxHandles.Add(bodyHandle);
-            }
+                    BoxHandles.Add(bodyHandle);
+                }
 
             base.LoadContent();
         }
@@ -230,10 +242,24 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
             Game.Background = Color.Black;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            TilingEffect.Parameters["WorldViewProjection"].SetValue(FloorWorld * Camera.View * Camera.Projection);
-            Floor.Draw(TilingEffect);
-            BoxesWorld.ForEach(boxWorld => Box.Draw(boxWorld, Camera.View, Camera.Projection));
-            SpheresWorld.ForEach(sphereWorld => Sphere.Draw(sphereWorld, Camera.View, Camera.Projection));
+            var viewProjection = Camera.View * Camera.Projection;
+            Floor.ViewProjection = viewProjection;
+            Floor.Draw();
+
+            Box.ViewProjection = viewProjection;
+            for(var index = 0; index < BoxesWorld.Count; index++)
+            {
+                Box.World = BoxesWorld[index];
+                Box.Draw();
+            }
+
+
+            Sphere.ViewProjection = viewProjection;
+            for (var index = 0; index < SpheresWorld.Count; index++)
+            {
+                Sphere.World = SpheresWorld[index];
+                Sphere.Draw();
+            }
 
             Game.SpriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
             Game.SpriteBatch.DrawString(SpriteFont, "Launch spheres with the 'Z' key.", new Vector2(GraphicsDevice.Viewport.Width - 400, 0), Color.White);

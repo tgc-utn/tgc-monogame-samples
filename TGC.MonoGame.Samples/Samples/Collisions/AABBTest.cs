@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Collisions;
+using TGC.MonoGame.Samples.Models.Drawers;
 using TGC.MonoGame.Samples.Viewer;
 
 namespace TGC.MonoGame.Samples.Samples.Collisions
@@ -28,7 +29,10 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         private Camera Camera { get; set; }
 
         // The Model of the Robot to draw
-        private Model Robot { get; set; }
+        private ModelDrawer Robot { get; set; }
+
+        // An effect to draw the Robots
+        private Effect DiffuseEffect { get; set; }
 
         // The World Matrix for the first Robot
         private Matrix RobotOneWorld { get; set; }
@@ -78,9 +82,11 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         protected override void LoadContent()
         {
             // Load the Robot Model and enable default lighting
-            Robot = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
-            ((BasicEffect)Robot.Meshes.FirstOrDefault()?.Effects.FirstOrDefault())?.EnableDefaultLighting();
+            var robotModel = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
 
+            DiffuseEffect = Game.Content.Load<Effect>(ContentFolderEffects + "DiffuseTexture");
+
+            Robot = ModelInspector.CreateDrawerFrom(robotModel, DiffuseEffect, EffectInspectionType.ALL);
 
             // Create AABBs
             // This gets an AABB with the bounds of the robot model
@@ -137,8 +143,12 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         public override void Draw(GameTime gameTime)
         {
             // Draw the two robots with their corresponding World matrices
-            Robot.Draw(RobotOneWorld, Camera.View, Camera.Projection);
-            Robot.Draw(RobotTwoWorld, Camera.View, Camera.Projection);
+            Robot.ViewProjection = Camera.View * Camera.Projection;
+            Robot.World = RobotOneWorld;
+            Robot.Draw();
+
+            Robot.World = RobotTwoWorld;
+            Robot.Draw();
 
             // Draw bounding boxes
             // Center is half the average between min and max

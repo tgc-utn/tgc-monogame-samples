@@ -14,6 +14,8 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TGC.MonoGame.Samples.Models;
+using TGC.MonoGame.Samples.Models.Drawers;
 
 #endregion Using Statements
 
@@ -22,7 +24,7 @@ namespace TGC.MonoGame.Samples.Geometries
     /// <summary>
     ///     Geometric primitive class for drawing toruses.
     /// </summary>
-    public class TorusPrimitive : GeometricPrimitive
+    public class TorusPrimitive : ModelDrawer
     {
         /// <summary>
         ///     Constructs a new torus primitive, with the specified size and tessellation level.
@@ -32,6 +34,8 @@ namespace TGC.MonoGame.Samples.Geometries
         {
             if (tessellation < 3)
                 throw new ArgumentOutOfRangeException(nameof(tessellation));
+
+            var builder = new GeometryBuilder<VertexPositionColorNormal>();
 
             // First we loop around the main ring of the torus.
             for (var i = 0; i < tessellation; i++)
@@ -56,23 +60,23 @@ namespace TGC.MonoGame.Samples.Geometries
                     position = Vector3.Transform(position, transform);
                     normal = Vector3.TransformNormal(normal, transform);
 
-                    AddVertex(position, Color.DarkGray, normal);
+                    builder.AddVertex(new VertexPositionColorNormal(position, Color.DarkGray, normal));
 
                     // And create indices for two triangles.
                     var nextI = (i + 1) % tessellation;
                     var nextJ = (j + 1) % tessellation;
 
-                    AddIndex(i * tessellation + j);
-                    AddIndex(i * tessellation + nextJ);
-                    AddIndex(nextI * tessellation + j);
+                    builder.AddIndex(i * tessellation + j);
+                    builder.AddIndex(i * tessellation + nextJ);
+                    builder.AddIndex(nextI * tessellation + j);
 
-                    AddIndex(i * tessellation + nextJ);
-                    AddIndex(nextI * tessellation + nextJ);
-                    AddIndex(nextI * tessellation + j);
+                    builder.AddIndex(i * tessellation + nextJ);
+                    builder.AddIndex(nextI * tessellation + nextJ);
+                    builder.AddIndex(nextI * tessellation + j);
                 }
             }
 
-            InitializePrimitive(graphicsDevice);
+            GeometryDrawers.Add(builder.Build(graphicsDevice));
         }
     }
 }

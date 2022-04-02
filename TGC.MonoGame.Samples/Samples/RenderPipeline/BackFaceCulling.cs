@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
+using TGC.MonoGame.Samples.Models.Drawers;
 using TGC.MonoGame.Samples.Viewer;
 using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
@@ -20,7 +21,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
     {
         private Camera Camera { get; set; }
 
-        private GeometricPrimitive Primitive { get; set; }
+        private ModelDrawer Primitive { get; set; }
 
         private Effect Effect { get; set; }
 
@@ -69,10 +70,12 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             // We load the sphere meshe into a model
             Primitive = new SpherePrimitive(GraphicsDevice, 1f, 6);
 
-            LoadArrows(Primitive);
+            //LoadArrows(Primitive);
 
             // Load the effect
             Effect = Game.Content.Load<Effect>(ContentFolderEffects + "BackFace");
+
+            Primitive.SetEffect(Effect);
 
             DrawDepthEffect = Game.Content.Load<Effect>(ContentFolderEffects + "ShadowMap");
             
@@ -88,6 +91,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             base.LoadContent();
         }
 
+        /*
         private void LoadArrows(GeometricPrimitive primitive)
         {
             List<ushort> indices = primitive.Indices;
@@ -141,7 +145,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
                 }
             }
-        }
+        }*/
 
         private void AddArrow(Vector3 position, Vector3 normal, Color color)
         {
@@ -222,7 +226,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
             var world = BaseScale * Matrix.CreateTranslation(Vector3.UnitX * Displacement);
             effect.Parameters["WorldViewProjection"].SetValue(world * viewProjection);
-            Primitive.Draw(effect);
+            Primitive.Draw();
 
             rasterizerState = new RasterizerState();
             rasterizerState.CullMode = CullMode.None;
@@ -232,7 +236,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
             world = BaseScale;
             effect.Parameters["WorldViewProjection"].SetValue(world * viewProjection);
-            Primitive.Draw(effect);
+            Primitive.Draw();
 
             rasterizerState = new RasterizerState();
             if (!BackFace)
@@ -245,7 +249,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
             world = BaseScale * Matrix.CreateTranslation(Vector3.UnitX * -Displacement);
             effect.Parameters["WorldViewProjection"].SetValue(world * viewProjection);
-            Primitive.Draw(effect);
+            Primitive.Draw();
         }
 
         /// <inheritdoc />
