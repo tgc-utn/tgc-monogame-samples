@@ -119,7 +119,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         public void DrawLine(Vector3 origin, Vector3 destination, Color color)
         {
             var world = LineSegmentGizmoGeometry.CalculateWorld(origin, destination);
-            AddDrawInstance(LineSegment, BaseColor, world);
+            AddDrawInstance(LineSegment, color, world);
         }
 
         /// <summary>
