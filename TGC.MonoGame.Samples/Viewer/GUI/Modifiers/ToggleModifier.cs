@@ -10,6 +10,10 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     {
         private bool _checked;
 
+        private string Name { get; set; }
+
+        private Action<bool> OnChange { get; set; }
+
         /// <summary>
         ///     Creates a Toggle Modifier with a given name and action
         /// </summary>
@@ -35,8 +39,6 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
             OnChange.Invoke(defaultValue);
         }
 
-        private string Name { get; }
-
         /// <summary>
         ///     Draws the Toggle Modifier
         /// </summary>
@@ -46,6 +48,5 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
                 OnChange.Invoke(_checked);
         }
 
-        private event Action<bool> OnChange;
     }
 }
