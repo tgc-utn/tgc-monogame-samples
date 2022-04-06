@@ -72,18 +72,11 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
             FirstTankTranslationMatrix = Matrix.CreateTranslation(FirstTankPosition);
             SecondTankTranslationMatrix = Matrix.CreateTranslation(SecondTankPosition);
 
-            var twoPI = MathF.PI * 2f;
+            var twoPI = 360f;
 
             ModifierController.AddFloat("X Axis (Pitch)", OnPitchChange, 0f, 0f, twoPI);
             ModifierController.AddFloat("Y Axis (Yaw)", OnYawChange, 0f, 0f, twoPI);
             ModifierController.AddFloat("Z Axis (Roll)", OnRollChange, 0f, 0f, twoPI);
-
-            /*Modifiers = new[]
-            {
-                new FloatModifier("X Axis (Pitch)", OnPitchChange, 0f, 0f, twoPI),
-                new FloatModifier("Y Axis (Yaw)", OnYawChange, 0f, 0f, twoPI),
-                new FloatModifier("Z Axis (Roll)", OnRollChange, 0f, 0f, twoPI),
-            };*/
 
             var firstTankBannerWorldPosition = FirstTankPosition + Vector3.Up * 10f;
             var secondTankBannerWorldPosition = SecondTankPosition + Vector3.Up * 10f;
@@ -93,8 +86,6 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
 
             SecondTankBannerScreenPosition = ToVector2(GraphicsDevice.Viewport.Project(
                 secondTankBannerWorldPosition, Camera.Projection, Camera.View, Matrix.Identity));
-
-
 
             base.Initialize();
         }
@@ -150,19 +141,32 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         }
 
         /// <summary>
+        /// Converts an angle in degrees to radians.
+        /// </summary>
+        /// <param name="angleInDegrees">The angle to convert to degrees.</param>
+        /// <returns>The converted angle in radians</returns>
+        float ToRadians(float angleInDegrees)
+        {
+            return angleInDegrees * MathF.PI / 180f;
+        }
+
+        /// <summary>
         /// Update the matrices for each type of chair
         /// </summary>
         private void UpdateMatrices()
         {
+            var yawRadians = ToRadians(Yaw);
+            var pitchRadians = ToRadians(Pitch);
+            var rollRadians = ToRadians(Roll);
 
             // Update matrices, setting the Euler version with yaw pitch roll
             // and Quaternion with Roll/Yaw/Pitch accordingly
-            EulerRotation = Matrix.CreateFromYawPitchRoll(Yaw, Pitch, Roll);
+            EulerRotation = Matrix.CreateFromYawPitchRoll(yawRadians, pitchRadians, rollRadians);
 
             QuaternionRotation = Matrix.CreateFromQuaternion(                        
-                         Quaternion.CreateFromAxisAngle(Vector3.Backward, Roll) *
-                         Quaternion.CreateFromAxisAngle(Vector3.Up, Yaw) *
-                         Quaternion.CreateFromAxisAngle(Vector3.Right, Pitch));
+                         Quaternion.CreateFromAxisAngle(Vector3.UnitZ, rollRadians) *
+                         Quaternion.CreateFromAxisAngle(Vector3.UnitY, yawRadians) *
+                         Quaternion.CreateFromAxisAngle(Vector3.UnitX, pitchRadians));
         }
 
         /// <inheritdoc />

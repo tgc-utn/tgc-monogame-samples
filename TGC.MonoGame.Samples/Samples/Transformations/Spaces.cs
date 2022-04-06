@@ -19,7 +19,21 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         private BoxPrimitive Box { get; set; }
 
         private Quaternion Quaternion { get; set; }
+        
         private Matrix BoxWorld { get; set; }
+        
+        private float AspectRatio { get; set; }
+
+        private Vector3 Position { get; set; } = Vector3.Zero;
+
+        private Vector3 Scale { get; set; } = Vector3.One;
+
+        private SpaceType Space { get; set; } = SpaceType.Local;
+
+        private float Interpolator { get; set; } = 0f;
+
+        private float FOV { get; set; } = 60f;
+
 
         /// <inheritdoc />
         public Spaces(TGCViewer game) : base(game)
@@ -29,18 +43,17 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
             Description = "Shows how a model is transformed through different spaces.";
         }
 
-        float aspectRatio = 0f;
         /// <inheritdoc />
         public override void Initialize()
         {
-            aspectRatio = Game.GraphicsDevice.Viewport.AspectRatio;
-            var camera = new FreeCamera(aspectRatio, Vector3.UnitZ);
+            AspectRatio = Game.GraphicsDevice.Viewport.AspectRatio;
+            var camera = new FreeCamera(AspectRatio, Vector3.UnitZ);
             camera.MovementSpeed = 30f;
             MainCamera = camera;
 
 
-            ViewerCamera = new StaticCamera(aspectRatio, Vector3.Left * 100f, Vector3.Backward, Vector3.Up);
-            ViewerCamera.BuildProjection(aspectRatio, 2f, 500f, MathHelper.PiOver2 * 2f / 3f);
+            ViewerCamera = new StaticCamera(AspectRatio, Vector3.Left * 100f, Vector3.Backward, Vector3.Up);
+            ViewerCamera.BuildProjection(AspectRatio, 2f, 500f, MathHelper.PiOver2 * 2f / 3f);
 
             BoxWorld = Matrix.CreateScale(Scale) *
                 Matrix.CreateFromQuaternion(Quaternion) *
@@ -54,7 +67,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
 
             ModifierController.AddVector("Scale", OnScaleChange, Vector3.One);
 
-            ModifierController.AddFloat("FOV", OnFOVChange, FOV, 0f, MathF.PI * 2F);
+            ModifierController.AddFloat("FOV", OnFOVChange, FOV, 0.01f, 180f - 0.01f);
 
             ModifierController.AddFloat("Interpolator", OnInterpolatorChange, 0f, 0f, 1f);
 
@@ -78,8 +91,10 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
 
         private void OnFOVChange(float fov)
         {
+            // Prevent FOV to reach 0 or 180
+            fov = Math.Clamp(fov, 0.01f, 180f - 0.01f);
             FOV = fov;
-            ViewerCamera.BuildProjection(aspectRatio, 2f, 500f, FOV);
+            ViewerCamera.BuildProjection(AspectRatio, 2f, 500f, ToRadians(FOV));
         }
 
         private void OnChange(SpaceType space)
@@ -94,11 +109,23 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
             UpdateWorld();
         }
 
+        /// <summary>
+        /// Converts an angle in degrees to radians.
+        /// </summary>
+        /// <param name="angleInDegrees">The angle to convert to degrees.</param>
+        /// <returns>The converted angle in radians</returns>
+        float ToRadians(float angleInDegrees)
+        {
+            return angleInDegrees * MathF.PI / 180f;
+        }
+
         private void OnRotationChange(Vector3 rotation)
         {
-            Quaternion = Quaternion.CreateFromAxisAngle(Vector3.Backward, rotation.Z) *
-                Quaternion.CreateFromAxisAngle(Vector3.Up, rotation.Y) *
-                Quaternion.CreateFromAxisAngle(Vector3.Right, rotation.X);
+            var rotationInRadians = new Vector3(ToRadians(rotation.X), ToRadians(rotation.Y), ToRadians(rotation.Z));
+
+            Quaternion = Quaternion.CreateFromAxisAngle(Vector3.Backward, rotationInRadians.Z) *
+                Quaternion.CreateFromAxisAngle(Vector3.Up, rotationInRadians.Y) *
+                Quaternion.CreateFromAxisAngle(Vector3.Right, rotationInRadians.X);
             UpdateWorld();
         }
 
@@ -123,15 +150,6 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
             base.LoadContent();
         }
 
-        private Vector3 Position = Vector3.Zero;
-
-        private Vector3 Scale = Vector3.One;
-
-        private SpaceType Space = SpaceType.Local;
-
-        private float Interpolator = 0f;
-
-        private float FOV = MathHelper.PiOver2 * 2f / 3f;
 
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
@@ -167,8 +185,6 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
 
                 case SpaceType.View:
                     interpolated = Matrix.Lerp(BoxWorld * ViewerCamera.View, BoxWorld * ViewerCamera.View * ViewerCamera.Projection, Interpolator);
-                    var v = new StaticCamera(1f, Vector3.Zero, Vector3.Forward, Vector3.Up);
-                    //Game.Gizmos.DrawFrustum(v.View * ViewerCamera.Projection, Color.White);
                     Game.Gizmos.DrawFrustum(ViewerCamera.Projection, Color.Green * (1f - Interpolator));
                     Game.Gizmos.DrawCube(new Vector3(0f, 0f, 0.5f), new Vector3(1f, 1f, 1f), Color.Purple * Interpolator);
                     break;
