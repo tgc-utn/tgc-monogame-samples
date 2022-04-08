@@ -115,7 +115,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         public void Draw()
         {
             var valueChanged = HasBounds
-                ? ImGui.DragFloat(Name, ref _floatValue, 0.01f, Min, Max)
+                ? ImGui.DragFloat(Name, ref _floatValue, 0.01f * (Max - Min), Min, Max)
                 : ImGui.DragFloat(Name, ref _floatValue);
 
             if (valueChanged)
