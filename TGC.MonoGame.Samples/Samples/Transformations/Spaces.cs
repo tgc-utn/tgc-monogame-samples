@@ -1,37 +1,75 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries.Textures;
 using TGC.MonoGame.Samples.Viewer;
 using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
+
 namespace TGC.MonoGame.Samples.Samples.Transformations
 {
+    /// <summary>
+    /// An example that shows the difference between spaces.
+    /// # Unit 2 - 3D Basics - Transformations
+    /// Transforms vertices across local space, world space, view space and NDC.
+    /// Authors: Ronan Vinitzca.
+    /// </summary>
     public class Spaces : TGCSample
     {
+        /// <summary>
+        /// A camera to draw geometry into the screen
+        /// </summary>
         private Camera MainCamera { get; set; }
 
+        /// <summary>
+        /// Simulates a camera to transform a model and show the different spaces a vertex can be in
+        /// </summary>
         private Camera ViewerCamera { get; set; }
 
+        /// <summary>
+        /// A box to be drawn in different spaces
+        /// </summary>
         private BoxPrimitive Box { get; set; }
 
+        /// <summary>
+        /// A quaternion that describes the box rotation
+        /// </summary>
         private Quaternion Quaternion { get; set; }
-        
-        private Matrix BoxWorld { get; set; }
-        
-        private float AspectRatio { get; set; }
 
+        /// <summary>
+        /// A vector containing the position of the box
+        /// </summary>
         private Vector3 Position { get; set; } = Vector3.Zero;
 
+        /// <summary>
+        /// A vector containing the scale of the box
+        /// </summary>
         private Vector3 Scale { get; set; } = Vector3.One;
 
+        /// <summary>
+        /// The world matrix of the box
+        /// </summary>
+        private Matrix BoxWorld { get; set; }
+        
+        /// <summary>
+        /// The aspect ratio of the window, needed to recalculate the projection matrix
+        /// </summary>
+        private float AspectRatio { get; set; }
+
+        /// <summary>
+        /// The current space we are drawing the box in
+        /// </summary>
         private SpaceType Space { get; set; } = SpaceType.Local;
 
+        /// <summary>
+        /// A value between zero and one to interpolate between spaces
+        /// </summary>
         private float Interpolator { get; set; } = 0f;
 
+        /// <summary>
+        /// The current field of view angle in degrees
+        /// </summary>
         private float FOV { get; set; } = 60f;
 
 
@@ -59,7 +97,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
                 Matrix.CreateFromQuaternion(Quaternion) *
                 Matrix.CreateTranslation(Position);
 
-            ModifierController.AddOptions("Space", SpaceType.Local, OnChange);
+            ModifierController.AddOptions("Space", SpaceType.Local, OnSpaceChange);
 
             ModifierController.AddVector("Position", OnPositionChange, Vector3.Zero);
 
@@ -74,35 +112,43 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
             base.Initialize();
         }
 
-
-        private enum SpaceType
-        {
-            Local = 0,
-            World = 1,
-            View = 2,
-            Projection = 3,
-        }
-
+        /// <summary>
+        /// Processes a change in the interpolation value used to blend spaces.
+        /// </summary>
+        /// <param name="interpolator">The new interpolator value, with range [0, 1]</param>
         private void OnInterpolatorChange(float interpolator)
         {
             Interpolator = interpolator;
         }
 
 
-        private void OnFOVChange(float fov)
+        /// <summary>
+        /// Processes a change in the FOV of the projection matrix.
+        /// </summary>
+        /// <param name="fieldOfView">The new FOV value in degrees</param>
+        private void OnFOVChange(float fieldOfView)
         {
             // Prevent FOV to reach 0 or 180
-            fov = Math.Clamp(fov, 0.01f, 180f - 0.01f);
-            FOV = fov;
+            fieldOfView = Math.Clamp(fieldOfView, 0.01f, 180f - 0.01f);
+            FOV = fieldOfView;
+
             ViewerCamera.BuildProjection(AspectRatio, 2f, 500f, ToRadians(FOV));
         }
 
-        private void OnChange(SpaceType space)
+        /// <summary>
+        /// Processes a change in the space of the box.
+        /// </summary>
+        /// <param name="space">The new space to draw the box in</param>
+        private void OnSpaceChange(SpaceType space)
         {
             Space = space;
             Interpolator = 0f;
         }
 
+        /// <summary>
+        /// Processes a change in the position of the box.
+        /// </summary>
+        /// <param name="position">The position o</param>
         private void OnPositionChange(Vector3 position)
         {
             Position = position;
@@ -119,6 +165,10 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
             return angleInDegrees * MathF.PI / 180f;
         }
 
+        /// <summary>
+        /// Processes a change in the rotation of the box.
+        /// </summary>
+        /// <param name="rotation">The new rotation angle in degrees for each axis</param>
         private void OnRotationChange(Vector3 rotation)
         {
             var rotationInRadians = new Vector3(ToRadians(rotation.X), ToRadians(rotation.Y), ToRadians(rotation.Z));
@@ -129,12 +179,19 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
             UpdateWorld();
         }
 
+        /// <summary>
+        /// Processes a change in the scale of the box.
+        /// </summary>
+        /// <param name="scale">The new scale for each axis</param>
         private void OnScaleChange(Vector3 scale)
         {
             Scale = scale;
             UpdateWorld();
         }
 
+        /// <summary>
+        /// Updates the world matrix, using a scale and position matrices and a rotation quaternion.
+        /// </summary>
         private void UpdateWorld()
         {
             BoxWorld = Matrix.CreateScale(Scale) *
@@ -155,7 +212,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         public override void Update(GameTime gameTime)
         {
             MainCamera.Update(gameTime);
-
+            
             Game.Gizmos.UpdateViewProjection(MainCamera.View, MainCamera.Projection);
 
             base.Update(gameTime);
@@ -169,6 +226,9 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
 
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
+            // Interpolate across spaces.
+            // Note that we are linearly interpolating between matrices
+            // Also draw frustum in world space, view space and the canonical view volume
             Matrix interpolated = Matrix.Identity;
             switch(Space)
             {
@@ -196,10 +256,12 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
             }
 
 
-
+            // Note that the MainCamera (the one we use in the example) is still used
+            // to render the Box, as we still want to visualize it.
+            // The final transformation for vertices would be vertex * interpolated * MainCamera.View * MainCamera.Projection
             Box.Draw(interpolated, MainCamera.View, MainCamera.Projection);
 
-
+            // Draw axis lines
             Game.Gizmos.DrawLine(Vector3.Zero, Vector3.UnitX * 5000f, Color.Red);
             Game.Gizmos.DrawLine(Vector3.Zero, Vector3.UnitY * 5000f, Color.Green);
             Game.Gizmos.DrawLine(Vector3.Zero, Vector3.UnitZ * 5000f, Color.Blue);
@@ -208,12 +270,18 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
             base.Draw(gameTime);
         }
 
-        /// <inheritdoc />
-        protected override void UnloadContent()
-        {
 
-            base.UnloadContent();
+        /// <summary>
+        /// Describes a space to transform models.
+        /// </summary>
+        private enum SpaceType
+        {
+            Local = 0,
+            World = 1,
+            View = 2,
+            Projection = 3,
         }
+
     }
 }
 

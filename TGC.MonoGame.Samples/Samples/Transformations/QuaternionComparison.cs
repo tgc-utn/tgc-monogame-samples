@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Viewer;
-using TGC.MonoGame.Samples.Viewer.Gizmos;
 using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
 namespace TGC.MonoGame.Samples.Samples.Transformations
@@ -17,6 +16,82 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
     /// </summary>
     public class QuaternionComparison : TGCSample
     {
+        /// <summary>
+        /// A camera to draw geometry
+        /// </summary>
+        private Camera Camera { get; set; }
+
+        /// <summary>
+        /// The euler rotation matrix for the model
+        /// </summary>
+        private Matrix EulerRotation { get; set; }
+
+        /// <summary>
+        /// The resulting quaternion rotation matrix for the model
+        /// </summary>
+        private Matrix QuaternionRotation { get; set; }
+
+        /// <summary>
+        /// The model to draw using both quaternions and euler rotations
+        /// </summary>
+        private Model Model { get; set; }
+
+        /// <summary>
+        /// The first position in world space of the model
+        /// </summary>
+        private Vector3 FirstPosition { get; set; }
+
+        /// <summary>
+        /// The second position in world space of the model
+        /// </summary>
+        private Vector3 SecondPosition { get; set; }
+
+        /// <summary>
+        /// The position in screen space of the first banner
+        /// </summary>
+        private Vector2 FirstBannerScreenPosition { get; set; }
+
+        /// <summary>
+        /// The position in screen space of the second banner
+        /// </summary>
+        private Vector2 SecondTankBannerScreenPosition { get; set; }
+
+        /// <summary>
+        /// The first translation matrix that indicates where to place the model when drawing
+        /// </summary>
+        private Matrix FirstTranslationMatrix { get; set; }
+
+        /// <summary>
+        /// The second translation matrix that indicates where to place the model when drawing
+        /// </summary>
+        private Matrix SecondTranslationMatrix { get; set; }
+
+        /// <summary>
+        /// The base scale of the model
+        /// </summary>
+        private Matrix BaseScale { get; set; }
+
+        /// <summary>
+        /// A font to draw text into the screen
+        /// </summary>
+        private SpriteFont SpriteFont { get; set; }
+
+        /// <summary>
+        /// The rotation for the X axis in degrees
+        /// </summary>
+        private float Pitch { get; set; }
+
+        /// <summary>
+        /// The rotation for the Y axis in degrees
+        /// </summary>
+        private float Yaw { get; set; }
+
+        /// <summary>
+        /// The rotation for the Z axis in degrees
+        /// </summary>
+        private float Roll { get; set; }
+
+
         /// <inheritdoc />
         public QuaternionComparison(TGCViewer game) : base(game)
         {
@@ -26,27 +101,6 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
                 "Shows the problem related to using Euler rotations vs. using Quaternions.";
         }
 
-        private Camera Camera { get; set; }
-        private Matrix EulerRotation { get; set; }
-        private Matrix QuaternionRotation { get; set; }
-        private Model Model { get; set; }
-
-        private Vector3 FirstTankPosition { get; set; }
-        private Vector3 SecondTankPosition { get; set; }
-
-        private Vector2 FirstTankBannerScreenPosition { get; set; }
-        private Vector2 SecondTankBannerScreenPosition { get; set; }
-
-        private Matrix FirstTankTranslationMatrix { get; set; }
-        private Matrix SecondTankTranslationMatrix { get; set; }
-
-        private Matrix BaseScale { get; set; }
-
-        private SpriteFont SpriteFont { get; set; }
-
-        private float Pitch { get; set; }
-        private float Roll { get; set; }
-        private float Yaw { get; set; }
 
         /// <inheritdoc />
         public override void Initialize()
@@ -66,11 +120,11 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
 
             BaseScale = Matrix.CreateScale(0.1f);
 
-            FirstTankPosition = Vector3.Left * 15f;
-            SecondTankPosition = Vector3.Right * 15f;
+            FirstPosition = Vector3.Left * 15f;
+            SecondPosition = Vector3.Right * 15f;
 
-            FirstTankTranslationMatrix = Matrix.CreateTranslation(FirstTankPosition);
-            SecondTankTranslationMatrix = Matrix.CreateTranslation(SecondTankPosition);
+            FirstTranslationMatrix = Matrix.CreateTranslation(FirstPosition);
+            SecondTranslationMatrix = Matrix.CreateTranslation(SecondPosition);
 
             var twoPI = 360f;
 
@@ -78,10 +132,10 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
             ModifierController.AddFloat("Y Axis (Yaw)", OnYawChange, 0f, 0f, twoPI);
             ModifierController.AddFloat("Z Axis (Roll)", OnRollChange, 0f, 0f, twoPI);
 
-            var firstTankBannerWorldPosition = FirstTankPosition + Vector3.Up * 10f;
-            var secondTankBannerWorldPosition = SecondTankPosition + Vector3.Up * 10f;
+            var firstTankBannerWorldPosition = FirstPosition + Vector3.Up * 10f;
+            var secondTankBannerWorldPosition = SecondPosition + Vector3.Up * 10f;
             
-            FirstTankBannerScreenPosition = ToVector2(GraphicsDevice.Viewport.Project(
+            FirstBannerScreenPosition = ToVector2(GraphicsDevice.Viewport.Project(
                 firstTankBannerWorldPosition, Camera.Projection, Camera.View, Matrix.Identity));
 
             SecondTankBannerScreenPosition = ToVector2(GraphicsDevice.Viewport.Project(
@@ -90,6 +144,11 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
             base.Initialize();
         }
 
+        /// <summary>
+        /// Returns a <see cref="Vector2"/> containing the XY components of a <see cref="Vector3"/>.
+        /// </summary>
+        /// <param name="vector">The <see cref="Vector3"/> to obtain its XY components</param>
+        /// <returns>A <see cref="Vector2"/> containing the XY components of the given vector</returns>
         private Vector2 ToVector2(Vector3 vector)
         {
             return new Vector2(vector.X, vector.Y);
@@ -163,7 +222,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
             // and Quaternion with Roll/Yaw/Pitch accordingly
             EulerRotation = Matrix.CreateFromYawPitchRoll(yawRadians, pitchRadians, rollRadians);
 
-            QuaternionRotation = Matrix.CreateFromQuaternion(                        
+            QuaternionRotation = Matrix.CreateFromQuaternion(
                          Quaternion.CreateFromAxisAngle(Vector3.UnitZ, rollRadians) *
                          Quaternion.CreateFromAxisAngle(Vector3.UnitY, yawRadians) *
                          Quaternion.CreateFromAxisAngle(Vector3.UnitX, pitchRadians));
@@ -185,22 +244,22 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         {
             // Draw the models
             // Note that they contain their own world transforms before applying the passed
-            Model.Draw(BaseScale * EulerRotation * FirstTankTranslationMatrix,
+            Model.Draw(BaseScale * EulerRotation * FirstTranslationMatrix,
                 Camera.View, Camera.Projection);
-            Model.Draw(BaseScale * QuaternionRotation * SecondTankTranslationMatrix,
+            Model.Draw(BaseScale * QuaternionRotation * SecondTranslationMatrix,
                 Camera.View, Camera.Projection);
 
             // Draw Right vectors
-            Game.Gizmos.DrawLine(FirstTankPosition, FirstTankPosition + Vector3.Right * 5f, Color.Red);
-            Game.Gizmos.DrawLine(SecondTankPosition, SecondTankPosition + Vector3.Right * 5f, Color.Red);
+            Game.Gizmos.DrawLine(FirstPosition, FirstPosition + Vector3.Right * 5f, Color.Red);
+            Game.Gizmos.DrawLine(SecondPosition, SecondPosition + Vector3.Right * 5f, Color.Red);
 
             // Draw Up vectors
-            Game.Gizmos.DrawLine(FirstTankPosition, FirstTankPosition + Vector3.Up * 5f, Color.Green);
-            Game.Gizmos.DrawLine(SecondTankPosition, SecondTankPosition + Vector3.Up * 5f, Color.Green);
+            Game.Gizmos.DrawLine(FirstPosition, FirstPosition + Vector3.Up * 5f, Color.Green);
+            Game.Gizmos.DrawLine(SecondPosition, SecondPosition + Vector3.Up * 5f, Color.Green);
 
             // Draw Left vectors
-            Game.Gizmos.DrawLine(FirstTankPosition, FirstTankPosition + Vector3.Backward * 5f, Color.Blue);
-            Game.Gizmos.DrawLine(SecondTankPosition, SecondTankPosition + Vector3.Backward * 5f, Color.Blue);
+            Game.Gizmos.DrawLine(FirstPosition, FirstPosition + Vector3.Backward * 5f, Color.Blue);
+            Game.Gizmos.DrawLine(SecondPosition, SecondPosition + Vector3.Backward * 5f, Color.Blue);
 
             // Draw labels
             Game.SpriteBatch.Begin(
@@ -210,7 +269,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
                 DepthStencilState.Default,
                 RasterizerState.CullNone);
             
-            Game.SpriteBatch.DrawString(SpriteFont, "Euler", FirstTankBannerScreenPosition, Color.White);
+            Game.SpriteBatch.DrawString(SpriteFont, "Euler", FirstBannerScreenPosition, Color.White);
             Game.SpriteBatch.DrawString(SpriteFont, "Quaternion", SecondTankBannerScreenPosition, Color.White);
 
             Game.SpriteBatch.End();
