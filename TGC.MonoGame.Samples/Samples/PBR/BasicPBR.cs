@@ -1,33 +1,28 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
-using TGC.MonoGame.Samples.Geometries.Textures;
 using TGC.MonoGame.Samples.Viewer;
-using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
 namespace TGC.MonoGame.Samples.Samples.PBR
 {
     public class BasicPBR : TGCSample
     {
+        private Texture2D albedo, ao, metalness, roughness, normals;
         private Material Current = Material.RustedMetal;
 
-        private SpriteFont SpriteFont;
-        private Model Sphere;
-        private string TexturePath;
-        private Effect SphereEffect;
-        private List<Light> Lights;
-
         private CubePrimitive LightBox;
-        private Texture2D albedo, ao, metalness, roughness, normals;
+        private List<Light> Lights;
+        private Model Sphere;
+        private Effect SphereEffect;
 
         private Matrix SphereWorld;
 
-        private Camera Camera { get; set; }
+        private SpriteFont SpriteFont;
+        private string TexturePath;
 
         /// <summary>
         ///     Default constructor.
@@ -40,6 +35,8 @@ namespace TGC.MonoGame.Samples.Samples.PBR
             Description = "Ejemplo de PBR regular.";
         }
 
+        private Camera Camera { get; set; }
+
         /// <inheritdoc />
         public override void Initialize()
         {
@@ -47,15 +44,6 @@ namespace TGC.MonoGame.Samples.Samples.PBR
             size.X /= 2;
             size.Y /= 2;
             Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 40, 200), size);
-
-            ModifierController.AddOptions("Material", new string[]
-            {
-                "RustedMetal",
-                "Grass",
-                "Gold",
-                "Marble",
-                "Metal"
-            }, Material.RustedMetal, OnMaterialChange);
 
             base.Initialize();
         }
@@ -70,7 +58,7 @@ namespace TGC.MonoGame.Samples.Samples.PBR
             Current = material;
             SwitchMaterial();
         }
-        
+
         /// <inheritdoc />
         protected override void LoadContent()
         {
@@ -82,6 +70,14 @@ namespace TGC.MonoGame.Samples.Samples.PBR
 
             SpriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
 
+            ModifierController.AddOptions("Material", new[]
+            {
+                "RustedMetal",
+                "Grass",
+                "Gold",
+                "Marble",
+                "Metal"
+            }, Material.RustedMetal, OnMaterialChange);
 
             base.LoadContent();
         }
@@ -102,8 +98,6 @@ namespace TGC.MonoGame.Samples.Samples.PBR
             Game.Background = Color.Black;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-
-
             var worldView = SphereWorld * Camera.View;
             SphereEffect.Parameters["matWorld"].SetValue(SphereWorld);
             SphereEffect.Parameters["matWorldViewProj"].SetValue(worldView * Camera.Projection);
@@ -111,12 +105,11 @@ namespace TGC.MonoGame.Samples.Samples.PBR
 
             Sphere.Meshes.FirstOrDefault().Draw();
 
-            for (int index = 0; index < Lights.Count; index++)
+            for (var index = 0; index < Lights.Count; index++)
             {
                 LightBox.Effect.DiffuseColor = Lights[index].ShowColor;
                 LightBox.Draw(Matrix.CreateTranslation(Lights[index].Position), Camera.View, Camera.Projection);
             }
-
 
             base.Draw(gameTime);
         }
@@ -129,7 +122,7 @@ namespace TGC.MonoGame.Samples.Samples.PBR
 
             base.UnloadContent();
         }
-        
+
         private void InitializeSphere()
         {
             // Got to set a texture, else the translation to mesh does not map UV
@@ -148,8 +141,7 @@ namespace TGC.MonoGame.Samples.Samples.PBR
             var positions = SphereEffect.Parameters["lightPositions"].Elements;
             var colors = SphereEffect.Parameters["lightColors"].Elements;
 
-
-            for(int index = 0; index < Lights.Count; index++)
+            for (var index = 0; index < Lights.Count; index++)
             {
                 var light = Lights[index];
                 positions[index].SetValue(light.Position);
@@ -168,7 +160,7 @@ namespace TGC.MonoGame.Samples.Samples.PBR
             Lights = new List<Light>();
             var lightOne = new Light();
 
-            float distance = 45f;
+            var distance = 45f;
 
             lightOne.Position = Vector3.One * distance;
             lightOne.Color = new Vector3(200f, 200f, 200f);
@@ -213,7 +205,7 @@ namespace TGC.MonoGame.Samples.Samples.PBR
             SphereEffect.Parameters["roughnessTexture"]?.SetValue(roughness);
             SphereEffect.Parameters["aoTexture"]?.SetValue(ao);
         }
-        
+
         private void UpdateMaterialPath()
         {
             TexturePath = ContentFolderTextures + "pbr/";
@@ -239,6 +231,7 @@ namespace TGC.MonoGame.Samples.Samples.PBR
                     TexturePath += "ground";
                     break;
             }
+
             TexturePath += "/";
         }
 
@@ -248,6 +241,5 @@ namespace TGC.MonoGame.Samples.Samples.PBR
             UpdateMaterialPath();
             LoadTextures();
         }
-
     }
 }

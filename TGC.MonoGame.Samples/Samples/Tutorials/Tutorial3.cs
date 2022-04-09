@@ -1,6 +1,6 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
@@ -79,12 +79,20 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         {
             Game.Background = Color.CornflowerBlue;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+                        
+            // Save the past RasterizerState
+            var oldRasterizerState = GraphicsDevice.RasterizerState;
+            // Use a RasterizerState which has Back-Face Culling disabled
+            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
             DrawGeometry(Box, BoxPosition, Yaw, Pitch, Roll);
             DrawGeometry(Cylinder, CylinderPosition, Yaw, Pitch, Roll);
             DrawGeometry(Sphere, SpherePosition, -Yaw, Pitch, Roll);
             DrawGeometry(Teapot, TeapotPosition, Yaw, -Pitch, Roll);
             DrawGeometry(Torus, TorusPosition, Yaw, Pitch, -Roll);
+
+            // Restore the old RasterizerState
+            GraphicsDevice.RasterizerState = oldRasterizerState;
 
             var triangleEffect = Triangle.Effect;
             triangleEffect.World = Matrix.Identity;

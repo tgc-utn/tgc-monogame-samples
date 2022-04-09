@@ -1,6 +1,6 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
@@ -26,6 +26,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
 
         // Scales of each of the celestial bodies.
         private readonly Vector3 _earthScale = new Vector3(3, 3, 3);
+
         private readonly Vector3 _moonScale = new Vector3(0.5f, 0.5f, 0.5f);
         private readonly Vector3 _sunScale = new Vector3(12, 12, 12);
 
@@ -90,8 +91,6 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         {
             Game.Background = Color.Black;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-
-            
 
             // Render the sun.
             DrawGeometry(Sun, SunTranslation);
