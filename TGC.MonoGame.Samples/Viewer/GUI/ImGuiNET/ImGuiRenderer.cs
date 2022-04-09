@@ -196,13 +196,13 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
         /// </summary>
         private Effect UpdateEffect(Texture2D texture)
         {
-            _effect = _effect ?? new BasicEffect(_graphicsDevice);
+            _effect ??= new BasicEffect(_graphicsDevice);
 
             var io = ImGui.GetIO();
 
             _effect.World = Matrix.Identity;
             _effect.View = Matrix.Identity;
-            _effect.Projection = Matrix.CreateOrthographicOffCenter(0f, io.DisplaySize.X, io.DisplaySize.Y, 0f, -1f, 1f); _effect.TextureEnabled = true;
+            _effect.Projection = Matrix.CreateOrthographicOffCenter(0f, io.DisplaySize.X, io.DisplaySize.Y, 0f, -1f, 1f);
             _effect.TextureEnabled = true;
             _effect.Texture = texture;
             _effect.VertexColorEnabled = true;
@@ -347,6 +347,11 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
                 {
                     ImDrawCmdPtr drawCmd = cmdList.CmdBuffer[cmdi];
 
+                    if (drawCmd.ElemCount == 0) 
+                    {
+                        continue;
+                    }
+
                     if (!_loadedTextures.ContainsKey(drawCmd.TextureId))
                     {
                         throw new InvalidOperationException($"Could not find a texture with id '{drawCmd.TextureId}', please check your bindings");
@@ -368,19 +373,18 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
 #pragma warning disable CS0618 // // FNA does not expose an alternative method.
                         _graphicsDevice.DrawIndexedPrimitives(
                             primitiveType: PrimitiveType.TriangleList,
-                            baseVertex: vtxOffset,
+                            baseVertex: (int)drawCmd.VtxOffset + vtxOffset,
                             minVertexIndex: 0,
                             numVertices: cmdList.VtxBuffer.Size,
-                            startIndex: idxOffset,
+                            startIndex: (int)drawCmd.IdxOffset + idxOffset,
                             primitiveCount: (int)drawCmd.ElemCount / 3
                         );
 #pragma warning restore CS0618
                     }
-
-                    idxOffset += (int)drawCmd.ElemCount;
                 }
 
                 vtxOffset += cmdList.VtxBuffer.Size;
+                idxOffset += cmdList.IdxBuffer.Size;
             }
         }
 
