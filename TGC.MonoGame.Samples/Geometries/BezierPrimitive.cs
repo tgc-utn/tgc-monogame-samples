@@ -14,6 +14,8 @@
 using System;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
+using TGC.MonoGame.Samples.Models;
+using TGC.MonoGame.Samples.Models.Drawers;
 
 #endregion Using Statements
 
@@ -23,12 +25,12 @@ namespace TGC.MonoGame.Samples.Geometries
     ///     Base class for primitives that are made out of cubic bezier patches (a type of curved surface).
     ///     This is used by the TeapotPrimitive.
     /// </summary>
-    public abstract class BezierPrimitive : GeometricPrimitive
+    public abstract class BezierPrimitive : ModelDrawer
     {
         /// <summary>
         ///     Creates indices for a patch that is tessellated at the specified level.
         /// </summary>
-        protected void CreatePatchIndices(int tessellation, bool isMirrored)
+        protected void CreatePatchIndices(GeometryBuilder<VertexPositionColorNormal> builder, int tessellation, bool isMirrored)
         {
             var stride = tessellation + 1;
 
@@ -51,14 +53,15 @@ namespace TGC.MonoGame.Samples.Geometries
                 if (isMirrored) Array.Reverse(indices);
 
                 // Create the indices.
-                foreach (var index in indices) AddIndex(CurrentVertex + index);
+                foreach (var index in indices)
+                    builder.AddCurrentIndex(index);
             }
         }
 
         /// <summary>
         ///     Creates vertices for a patch that is tessellated at the specified level.
         /// </summary>
-        protected void CreatePatchVertices(Vector3[] patch, int tessellation, bool isMirrored)
+        protected void CreatePatchVertices(GeometryBuilder<VertexPositionColorNormal> builder, Vector3[] patch, int tessellation, bool isMirrored)
         {
             Debug.Assert(patch.Length == 16);
 
@@ -118,7 +121,7 @@ namespace TGC.MonoGame.Samples.Geometries
                     }
 
                     // Create the vertex.
-                    AddVertex(position, Color.BurlyWood, normal);
+                    builder.AddVertex(new VertexPositionColorNormal(position, Color.BurlyWood, normal));
                 }
             }
         }

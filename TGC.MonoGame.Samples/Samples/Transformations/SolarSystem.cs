@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
+using TGC.MonoGame.Samples.Models.Drawers;
 using TGC.MonoGame.Samples.Viewer;
 
 namespace TGC.MonoGame.Samples.Samples.Transformations
@@ -61,6 +62,17 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
             Moon = new SpherePrimitive(GraphicsDevice, 20, 32, Color.LightSlateGray);
 
             base.Initialize();
+        }
+
+        protected override void LoadContent()
+        {
+            base.LoadContent();
+
+            var effect = Game.Content.Load<Effect>(ContentFolderEffects + "VertexColor");
+            Sun.SetEffect(effect, EffectInspectionType.MATRICES);
+            Earth.SetEffect(effect, EffectInspectionType.MATRICES);
+            Moon.SetEffect(effect, EffectInspectionType.MATRICES);
+
         }
 
         /// <inheritdoc />
@@ -138,15 +150,11 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         /// </summary>
         /// <param name="geometry">The geometry to draw.</param>
         /// <param name="transform">The transform to apply.</param>
-        private void DrawGeometry(GeometricPrimitive geometry, Matrix transform)
+        private void DrawGeometry(ModelDrawer modelDrawer, Matrix transform)
         {
-            var effect = geometry.Effect;
-
-            effect.World = transform;
-            effect.View = Camera.View;
-            effect.Projection = Camera.Projection;
-
-            geometry.Draw(effect);
+            modelDrawer.World = transform;
+            modelDrawer.ViewProjection = Camera.View * Camera.Projection;
+            modelDrawer.Draw();
         }
     }
 }

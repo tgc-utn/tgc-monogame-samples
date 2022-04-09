@@ -35,9 +35,9 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         private IndexBuffer Indices { get; set; }
 
         /// <summary>
-        ///     Built-in effect that supports optional texturing, vertex coloring, fog, and lighting.
+        ///     Built-in effect that supports vertex color.
         /// </summary>
-        private BasicEffect Effect { get; set; }
+        private Effect Effect { get; set; }
 
         private Matrix BoxWorld { get; set; } = Matrix.Identity;
 
@@ -47,8 +47,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             Game.Background = Color.CornflowerBlue;
             Camera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 20, 60), Vector3.Zero);
 
-            Effect = new BasicEffect(GraphicsDevice);
-            Effect.VertexColorEnabled = true;
+            Effect = Game.Content.Load<Effect>(ContentFolderEffects + "VertexColor");
 
             CreateVertexBuffer(Vector3.One * 25, Vector3.Zero, Color.Cyan, Color.Black, Color.Magenta, Color.Yellow,
                 Color.Green, Color.Blue, Color.Red, Color.White);
@@ -83,10 +82,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             GraphicsDevice.SetVertexBuffer(Vertices);
             GraphicsDevice.Indices = Indices;
 
-            Effect.World = BoxWorld;
-            Effect.View = Camera.View;
-            Effect.Projection = Camera.Projection;
-
+            Effect.Parameters["WorldViewProjection"].SetValue(BoxWorld * Camera.View * Camera.Projection);
             foreach (var pass in Effect.CurrentTechnique.Passes)
             {
                 pass.Apply();

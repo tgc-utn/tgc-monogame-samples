@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Cameras;
+using TGC.MonoGame.Samples.Models.Drawers;
 using TGC.MonoGame.Samples.Viewer;
 
 namespace TGC.MonoGame.Samples.Samples.Tutorials
@@ -24,8 +25,10 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         }
 
         private Camera Camera { get; set; }
-        private Model Model1 { get; set; }
-        private Model Model2 { get; set; }
+
+        private Effect Effect { get; set; }
+        private ModelDrawer ModelDrawerOne { get; set; }
+        private ModelDrawer ModelDrawerTwo { get; set; }
 
         /// <inheritdoc />
         public override void Initialize()
@@ -38,15 +41,18 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         /// <inheritdoc />
         protected override void LoadContent()
         {
-            Model1 = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
-            ((BasicEffect) Model1.Meshes.FirstOrDefault()?.Effects.FirstOrDefault())?.EnableDefaultLighting();
+            var modelOne = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
+            var modelTwo = Game.Content.Load<Model>(ContentFolder3D + "tank/tank");
 
-            Model2 = Game.Content.Load<Model>(ContentFolder3D + "tank/tank");
+            Effect = Game.Content.Load<Effect>(ContentFolderEffects + "DiffuseTexture");
 
-            foreach (var mesh in Model2.Meshes) ((BasicEffect) mesh.Effects.FirstOrDefault())?.EnableDefaultLighting();
+            ModelDrawerOne = ModelInspector.CreateDrawerFrom(modelOne, Effect, EffectInspectionType.ALL);
+            ModelDrawerTwo = ModelInspector.CreateDrawerFrom(modelTwo, Effect, EffectInspectionType.ALL);
+
 
             base.LoadContent();
         }
+
 
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
@@ -64,10 +70,15 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             Game.Background = Color.CornflowerBlue;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            Model1.Draw(Matrix.CreateScale(0.1f) * Matrix.CreateTranslation(Vector3.UnitX * -8), Camera.View,
-                Camera.Projection);
-            Model2.Draw(Matrix.CreateScale(2.8f) * Matrix.CreateTranslation(new Vector3(8, -5, 0)), Camera.View,
-                Camera.Projection);
+            var viewProjection = Camera.View * Camera.Projection;
+
+            ModelDrawerOne.World = Matrix.CreateScale(0.1f) * Matrix.CreateTranslation(Vector3.UnitX * -8);
+            ModelDrawerOne.ViewProjection = viewProjection;
+            ModelDrawerOne.Draw();
+
+            ModelDrawerTwo.World = Matrix.CreateScale(2.8f) * Matrix.CreateTranslation(new Vector3(8, -5, 0));
+            ModelDrawerTwo.ViewProjection = viewProjection;
+            ModelDrawerTwo.Draw();
 
             base.Draw(gameTime);
         }

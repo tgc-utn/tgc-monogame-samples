@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
+using TGC.MonoGame.Samples.Models.Drawers;
 using TGC.MonoGame.Samples.Physics.Bepu;
 using TGC.MonoGame.Samples.Viewer;
 using NumericVector3 = System.Numerics.Vector3;
@@ -38,8 +39,12 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
 
         private Random Random;
 
+        private Effect Effect;
+
         private List<BodyHandle> SphereHandles;
-        
+
+        private List<Vector3> Colors;
+
         private SpriteFont SpriteFont { get; set; }
 
         private SpherePrimitive spherePrimitive;
@@ -144,22 +149,22 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
 
             spherePrimitive = new SpherePrimitive(GraphicsDevice);
 
-            var count = BoxHandles.Count;
-            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            for (var index = 0; index < count; index++)
-            {
-                var bodyHandle = BoxHandles[index];
-                var bodyReference = Simulation.Bodies.GetBodyReference(bodyHandle);
-                var position = bodyReference.Pose.Position;
-                var quaternion = bodyReference.Pose.Orientation;
-                var world =
-                    Matrix.CreateFromQuaternion(new Quaternion(quaternion.X, quaternion.Y, quaternion.Z,
-                        quaternion.W)) * Matrix.CreateTranslation(new Vector3(position.X, position.Y, position.Z));
+            Effect = Game.Content.Load<Effect>(ContentFolderEffects + "DiffuseColor");
+            cubePrimitive.SetEffect(Effect, EffectInspectionType.MATRICES);
+            spherePrimitive.SetEffect(Effect, EffectInspectionType.MATRICES);
 
-                cubePrimitive.Draw(world, Camera.View, Camera.Projection);
-            }
+            GenerateRandomColors(BoxHandles.Count);
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             base.LoadContent();
+        }
+
+        private void GenerateRandomColors(int count)
+        {
+            Colors = new List<Vector3> ();
+            var random = new Random();
+            for (var index = 0; index < count; index++)
+                Colors.Add(new Vector3((float)random.NextDouble(), (float)random.NextDouble(), (float)random.NextDouble()));
         }
 
         public override void Update(GameTime gameTime)
@@ -252,12 +257,30 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
             var count = BoxHandles.Count;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            cubePrimitive.Effect.DiffuseColor = new Vector3(1f, 0f, 0f);
-            ActiveBoxesWorld.ForEach(boxWorld => cubePrimitive.Draw(boxWorld, Camera.View, Camera.Projection));
-            cubePrimitive.Effect.DiffuseColor = new Vector3(0.1f, 0.1f, 0.3f);
-            InactiveBoxesWorld.ForEach(boxWorld => cubePrimitive.Draw(boxWorld, Camera.View, Camera.Projection));
+            var viewProjection = Camera.View * Camera.Projection;
 
-            SpheresWorld.ForEach(sphereWorld => spherePrimitive.Draw(sphereWorld, Camera.View, Camera.Projection));
+            cubePrimitive.ViewProjection = viewProjection;
+            for(var index = 0; index < ActiveBoxesWorld.Count; index++)
+            {
+                cubePrimitive.World = ActiveBoxesWorld[index];
+                Effect.Parameters["DiffuseColor"].SetValue(Colors[index]);
+                cubePrimitive.Draw();
+            }
+
+            Effect.Parameters["DiffuseColor"].SetValue(Vector3.One * 0.35f);
+            for (var index = 0; index < InactiveBoxesWorld.Count; index++)
+            {
+                cubePrimitive.World = InactiveBoxesWorld[index];
+                cubePrimitive.Draw();
+            }
+
+            Effect.Parameters["DiffuseColor"].SetValue(Color.LightGray.ToVector3());
+            spherePrimitive.ViewProjection = viewProjection;
+            for (var index = 0; index < SpheresWorld.Count; index++)
+            {
+                spherePrimitive.World = SpheresWorld[index];
+                spherePrimitive.Draw();
+            }
 
             Game.SpriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
             Game.SpriteBatch.DrawString(SpriteFont, "Box handled: " + count + ".", new Vector2(GraphicsDevice.Viewport.Width - 400, 0), Color.White);

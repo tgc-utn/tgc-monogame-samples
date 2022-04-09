@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using TGC.MonoGame.Samples.Cameras;
+using TGC.MonoGame.Samples.Models.Drawers;
 using TGC.MonoGame.Samples.Viewer;
 using TGC.MonoGame.Samples.Viewer.GUI;
 using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
@@ -29,7 +30,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 
         private Camera Camera { get; set; }
         private Effect Effect { get; set; }
-        private Model Model { get; set; }
+        private ModelDrawer ModelDrawer { get; set; }
         private Texture2D Texture { get; set; }
 
         private EffectParameter EffectWorld;
@@ -57,25 +58,15 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         /// <inheritdoc />
         protected override void LoadContent()
         {
-            Model = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
-            // From the effect of the model I keep the texture.
-            Texture = ((BasicEffect) Model.Meshes.FirstOrDefault()?.MeshParts.FirstOrDefault()?.Effect)?.Texture;
+            var model = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
 
             // Load a shader using Content pipeline.
             Effect = Game.Content.Load<Effect>(ContentFolderEffects + "MRT");
 
-            // Set the texture of the model in the shader
-            Effect.Parameters["ModelTexture"].SetValue(Texture);
-            
             // For faster access in draw
-            EffectWorld = Effect.Parameters["World"];
-            EffectWorldViewProjection = Effect.Parameters["WorldViewProjection"];
             EffectTime = Effect.Parameters["Time"];
 
-            // Asign the effect to the meshes
-            foreach (var mesh in Model.Meshes)
-                foreach (var part in mesh.MeshParts)
-                    part.Effect = Effect;
+            ModelDrawer = ModelInspector.CreateDrawerFrom(model, Effect, EffectInspectionType.ALL);
 
             // Create the targets we are going to use
             ColorTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
@@ -135,16 +126,8 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1f, 0);
            
             // Draw our model or models, keep in mind that all of them must have MRT effect assigned
-
-            var mesh = Model.Meshes.FirstOrDefault();
-            if (mesh != null)
-            {
-                var world = mesh.ParentBone.Transform;
-
-                EffectWorld.SetValue(world);
-                EffectWorldViewProjection.SetValue(world * Camera.View * Camera.Projection);
-                mesh.Draw();
-            }
+            ModelDrawer.ViewProjection = Camera.View * Camera.Projection;
+            ModelDrawer.Draw();
 
             // Now we can draw any target, or send them as textures to another shader
             GraphicsDevice.SetRenderTarget(null);

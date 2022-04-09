@@ -21,6 +21,8 @@ float shininess;
 float3 lightPosition;
 float3 eyePosition; // Camera position
 
+float3 baseColor;
+
 texture baseTexture;
 sampler2D textureSampler = sampler_state
 {
@@ -82,11 +84,42 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 
 }
 
-technique BasicColorDrawing
+float4 BaseColorPS(VertexShaderOutput input) : COLOR
 {
-	pass Pass0
-	{
-		VertexShader = compile VS_SHADERMODEL MainVS();
-		PixelShader = compile PS_SHADERMODEL MainPS();
-	}
+    // Base vectors
+    float3 lightDirection = normalize(lightPosition - input.WorldPosition.xyz);
+    float3 viewDirection = normalize(eyePosition - input.WorldPosition.xyz);
+    float3 halfVector = normalize(lightDirection + viewDirection);
+
+    
+	// Calculate the diffuse light
+    float NdotL = saturate(dot(input.Normal.xyz, lightDirection));
+    float3 diffuseLight = KDiffuse * diffuseColor * NdotL;
+
+	// Calculate the specular light
+    float NdotH = dot(input.Normal.xyz, halfVector);
+    float3 specularLight = sign(NdotL) * KSpecular * specularColor * pow(saturate(NdotH), shininess);
+    
+    // Final calculation
+    float4 finalColor = float4(saturate(ambientColor * KAmbient + diffuseLight) * baseColor.rgb + specularLight, 1.0);
+    return finalColor;
+
+}
+
+technique Textured
+{
+    pass Pass0
+    {
+        VertexShader = compile VS_SHADERMODEL MainVS();
+        PixelShader = compile PS_SHADERMODEL MainPS();
+    }
+};
+
+technique BaseColor
+{
+    pass Pass0
+    {
+        VertexShader = compile VS_SHADERMODEL MainVS();
+        PixelShader = compile PS_SHADERMODEL BaseColorPS();
+    }
 };

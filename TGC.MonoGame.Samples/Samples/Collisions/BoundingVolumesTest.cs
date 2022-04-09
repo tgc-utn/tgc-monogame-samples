@@ -8,6 +8,7 @@ using System.Text;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Collisions;
 using TGC.MonoGame.Samples.Geometries;
+using TGC.MonoGame.Samples.Models.Drawers;
 using TGC.MonoGame.Samples.Viewer;
 
 namespace TGC.MonoGame.Samples.Samples.Collisions
@@ -30,10 +31,10 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         private Camera Camera { get; set; }
 
         // The Model of the Robot to draw
-        private Model Robot { get; set; }
+        private ModelDrawer Robot { get; set; }
 
         // BasicEffect to draw the Robot
-        private BasicEffect RobotEffect { get; set; }
+        private Effect Effect { get; set; }
 
         // The World Matrix for the Robot
         private Matrix RobotWorld { get; set; }
@@ -48,7 +49,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
 
         // The Model of the Chair to draw
-        private Model Chair { get; set; }
+        private ModelDrawer Chair { get; set; }
 
         // The World Matrix for the Chair
         private Matrix ChairWorld { get; set; }
@@ -71,7 +72,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
 
         // The Model of the Tank to draw
-        private Model Tank { get; set; }
+        private ModelDrawer Tank { get; set; }
 
         // The World Matrix for the Tank
         private Matrix TankWorld { get; set; }
@@ -140,20 +141,18 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         protected override void LoadContent()
         {
             // Load the models
-            Robot = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
+            var robotModel = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
+            var chairModel = Game.Content.Load<Model>(ContentFolder3D + "chair/chair");
+            var tankModel = Game.Content.Load<Model>(ContentFolder3D + "tank/tank");
 
-            Chair = Game.Content.Load<Model>(ContentFolder3D + "chair/chair");
 
-            Tank = Game.Content.Load<Model>(ContentFolder3D + "tank/tank");
+            // Load our Effect
+            Effect = Game.Content.Load<Effect>(ContentFolderEffects + "DiffuseTexture");
 
-            // Enable the default lighting for the models
-            EnableDefaultLighting(Robot);
-            EnableDefaultLighting(Tank);
-            EnableDefaultLighting(Chair);
-            
-            // Save our RobotEffect
-            RobotEffect = ((BasicEffect)Robot.Meshes.FirstOrDefault()?.Effects.FirstOrDefault());
-            
+            Robot = ModelInspector.CreateDrawerFrom(robotModel, Effect, EffectInspectionType.ALL);
+            Chair = ModelInspector.CreateDrawerFrom(chairModel, Effect, EffectInspectionType.ALL);
+            Tank = ModelInspector.CreateDrawerFrom(tankModel, Effect, EffectInspectionType.ALL);
+
 
             // Create an AABB
             // This gets an AABB with the bounds of the robot model
@@ -189,11 +188,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             base.LoadContent();
         }
 
-        private void EnableDefaultLighting(Model model)
-        {
-            foreach (var mesh in model.Meshes)
-                ((BasicEffect)mesh.Effects.FirstOrDefault())?.EnableDefaultLighting();
-        }
+
 
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
@@ -253,18 +248,23 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         public override void Draw(GameTime gameTime)
         {
             // Set the DiffuseColor to white to draw this Robot
-            RobotEffect.DiffuseColor = Color.White.ToVector3();
-            Robot.Draw(RobotWorld, Camera.View, Camera.Projection);
+            var viewProjection = Camera.View * Camera.Projection;
+            Robot.ViewProjection = viewProjection;
+            Robot.World = RobotWorld;
+            Robot.Draw();
 
-            // Set the DiffuseColor to red to draw this Robot
-            RobotEffect.DiffuseColor = Color.Red.ToVector3();
-            Robot.Draw(RobotTwoWorld, Camera.View, Camera.Projection);
+            Robot.World = RobotTwoWorld;
+            Robot.Draw();
 
             // Draw the Chair
-            Chair.Draw(ChairWorld, Camera.View, Camera.Projection);
+            Chair.ViewProjection = viewProjection;
+            Chair.World = ChairWorld;
+            Chair.Draw();
 
             // Draw the Tank
-            Tank.Draw(TankWorld, Camera.View, Camera.Projection);
+            Tank.ViewProjection = viewProjection;
+            Tank.World = TankWorld;
+            Tank.Draw();
 
             
 

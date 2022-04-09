@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
+using TGC.MonoGame.Samples.Models.Drawers;
 using TGC.MonoGame.Samples.Viewer;
 using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
@@ -20,7 +21,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         private RenderTarget2D MainRenderTarget;
 
         private FreeCamera Camera { get; set; }
-        private Model Model { get; set; }
+        private ModelDrawer Model { get; set; }
 
         private Effect Effect { get; set; }
 
@@ -46,8 +47,13 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         /// <inheritdoc />
         protected override void LoadContent()
         {
+            var model = Game.Content.Load<Model>(ContentFolder3D + "scene/city");
+
+            // Load a default diffuse effect
+            var effect = Game.Content.Load<Effect>(ContentFolderEffects + "DiffuseTexture");
+
             // We load the city meshes into a model
-            Model = Game.Content.Load<Model>(ContentFolder3D + "scene/city");
+            Model = ModelInspector.CreateDrawerFrom(model, effect, EffectInspectionType.ALL);
 
             // Load the post-processing effect
             Effect = Game.Content.Load<Effect>(ContentFolderEffects + "GaussianBlur");
@@ -124,7 +130,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             Game.Background = Color.CornflowerBlue;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            Model.Draw(Matrix.Identity, Camera.View, Camera.Projection);
+            Model.ViewProjection = Camera.View * Camera.Projection;
+            Model.Draw();
         }
 
 
@@ -144,7 +151,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             GraphicsDevice.SetRenderTarget(MainRenderTarget);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1f, 0);
 
-            Model.Draw(Matrix.Identity, Camera.View, Camera.Projection);
+            Model.ViewProjection = Camera.View * Camera.Projection;
+            Model.Draw();
 
             #endregion
 
@@ -185,7 +193,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             GraphicsDevice.SetRenderTarget(MainRenderTarget);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1f, 0);
 
-            Model.Draw(Matrix.Identity, Camera.View, Camera.Projection);
+            Model.ViewProjection = Camera.View * Camera.Projection;
+            Model.Draw();
 
             #endregion
 

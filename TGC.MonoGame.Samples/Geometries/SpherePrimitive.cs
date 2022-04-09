@@ -14,6 +14,8 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TGC.MonoGame.Samples.Models;
+using TGC.MonoGame.Samples.Models.Drawers;
 
 #endregion Using Statements
 
@@ -22,7 +24,7 @@ namespace TGC.MonoGame.Samples.Geometries
     /// <summary>
     ///     Geometric primitive class for drawing spheres.
     /// </summary>
-    public class SpherePrimitive : GeometricPrimitive
+    public class SpherePrimitive : ModelDrawer
     {
         /// <summary>
         ///     Constructs a new sphere primitive, with the specified size, tessellation level and white color.
@@ -52,8 +54,10 @@ namespace TGC.MonoGame.Samples.Geometries
 
             var radius = diameter / 2;
 
+            var builder = new GeometryBuilder<VertexPositionNormalColorTexture>();
+
             // Start with a single vertex at the bottom of the sphere.
-            AddVertex(Vector3.Down * radius, color, Vector3.Down);
+            builder.AddVertex(new VertexPositionNormalColorTexture(Vector3.Down * radius, Vector3.Down, color, Vector2.Zero));
 
             // Create rings of vertices at progressively higher latitudes.
             for (var i = 0; i < verticalSegments - 1; i++)
@@ -63,6 +67,9 @@ namespace TGC.MonoGame.Samples.Geometries
 
                 var dy = (float) Math.Sin(latitude);
                 var dxz = (float) Math.Cos(latitude);
+
+
+                var yCoordinate = i / (verticalSegments - 1f);
 
                 // Create a single ring of vertices at this latitude.
                 for (var j = 0; j < horizontalSegments; j++)
@@ -74,46 +81,48 @@ namespace TGC.MonoGame.Samples.Geometries
 
                     var normal = new Vector3(dx, dy, dz);
 
-                    AddVertex(normal * radius, color, normal);
+                    var xCoordinate = j / horizontalSegments;
+
+                    builder.AddVertex(new VertexPositionNormalColorTexture(normal * radius, normal, color, new Vector2(xCoordinate, yCoordinate)));
                 }
             }
 
             // Finish with a single vertex at the top of the sphere.
-            AddVertex(Vector3.Up * radius, color, Vector3.Up);
+            builder.AddVertex(new VertexPositionNormalColorTexture(Vector3.Up * radius, Vector3.Up, color, Vector2.UnitY));
 
             // Create a fan connecting the bottom vertex to the bottom latitude ring.
             for (var i = 0; i < horizontalSegments; i++)
             {
-                AddIndex(0);
-                AddIndex(1 + (i + 1) % horizontalSegments);
-                AddIndex(1 + i);
+                builder.AddIndex(0);
+                builder.AddIndex(1 + (i + 1) % horizontalSegments);
+                builder.AddIndex(1 + i);
             }
 
             // Fill the sphere body with triangles joining each pair of latitude rings.
             for (var i = 0; i < verticalSegments - 2; i++)
-            for (var j = 0; j < horizontalSegments; j++)
-            {
-                var nextI = i + 1;
-                var nextJ = (j + 1) % horizontalSegments;
+                for (var j = 0; j < horizontalSegments; j++)
+                {
+                    var nextI = i + 1;
+                    var nextJ = (j + 1) % horizontalSegments;
 
-                AddIndex(1 + i * horizontalSegments + j);
-                AddIndex(1 + i * horizontalSegments + nextJ);
-                AddIndex(1 + nextI * horizontalSegments + j);
+                    builder.AddIndex(1 + i * horizontalSegments + j);
+                    builder.AddIndex(1 + i * horizontalSegments + nextJ);
+                    builder.AddIndex(1 + nextI * horizontalSegments + j);
 
-                AddIndex(1 + i * horizontalSegments + nextJ);
-                AddIndex(1 + nextI * horizontalSegments + nextJ);
-                AddIndex(1 + nextI * horizontalSegments + j);
-            }
+                    builder.AddIndex(1 + i * horizontalSegments + nextJ);
+                    builder.AddIndex(1 + nextI * horizontalSegments + nextJ);
+                    builder.AddIndex(1 + nextI * horizontalSegments + j);
+                }
 
             // Create a fan connecting the top vertex to the top latitude ring.
             for (var i = 0; i < horizontalSegments; i++)
             {
-                AddIndex(CurrentVertex - 1);
-                AddIndex(CurrentVertex - 2 - (i + 1) % horizontalSegments);
-                AddIndex(CurrentVertex - 2 - i);
+                builder.AddCurrentIndex(-1);
+                builder.AddCurrentIndex(- 2 - (i + 1) % horizontalSegments);
+                builder.AddCurrentIndex(- 2 - i);
             }
 
-            InitializePrimitive(graphicsDevice);
+            GeometryDrawers.Add(builder.Build(graphicsDevice));
         }
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
+using TGC.MonoGame.Samples.Models.Drawers;
 using TGC.MonoGame.Samples.Viewer;
 using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
@@ -11,9 +12,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 {
     public class Bloom : TGCSample
     {
-        private const int PassCount = 2;
-
-        private BasicEffect BasicEffect;
+        private const int PassCount = 4;
 
         private bool EffectOn = true;
 
@@ -34,10 +33,12 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         }
 
         private FreeCamera Camera { get; set; }
-        private Model Model { get; set; }
+        private ModelDrawer RegularModelDrawer { get; set; }
+        private ModelDrawer BloomModelDrawer { get; set; }
 
-        private Effect Effect { get; set; }
+        private Effect BloomEffect { get; set; }
         private Effect BlurEffect { get; set; }
+        private Effect DiffuseEffect { get; set; }
 
         /// <inheritdoc />
         public override void Initialize()
@@ -53,11 +54,20 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         protected override void LoadContent()
         {
             // We load the city meshes into a model
-            Model = Game.Content.Load<Model>(ContentFolder3D + "scene/city");
-            BasicEffect = (BasicEffect)Model.Meshes[0].Effects[0];
+            var model = Game.Content.Load<Model>(ContentFolder3D + "scene/city");
+
+
 
             // Load the base bloom pass effect
-            Effect = Game.Content.Load<Effect>(ContentFolderEffects + "Bloom");
+            BloomEffect = Game.Content.Load<Effect>(ContentFolderEffects + "Bloom");
+
+            // Load the diffuse effect
+            DiffuseEffect = Game.Content.Load<Effect>(ContentFolderEffects + "DiffuseTexture");
+
+            RegularModelDrawer = ModelInspector.CreateDrawerFrom(model, DiffuseEffect, EffectInspectionType.ALL);
+            BloomModelDrawer = RegularModelDrawer.Clone(false, true);
+            BloomModelDrawer.SetEffect(BloomEffect, BloomEffect.Techniques["BloomPass"], EffectInspectionType.ALL);
+
 
             // Load the blur effect to blur the bloom texture
             BlurEffect = Game.Content.Load<Effect>(ContentFolderEffects + "GaussianBlur");
@@ -119,11 +129,9 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             Game.Background = Color.Black;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            foreach (var modelMesh in Model.Meshes)
-                foreach (var part in modelMesh.MeshParts)
-                    part.Effect = BasicEffect;
-
-            Model.Draw(Matrix.Identity, Camera.View, Camera.Projection);
+            var viewProjection = Camera.View * Camera.Projection;
+            RegularModelDrawer.ViewProjection = viewProjection;
+            RegularModelDrawer.Draw();
         }
 
         /// <summary>
@@ -141,11 +149,11 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             GraphicsDevice.SetRenderTarget(MainSceneRenderTarget);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1f, 0);
 
-            // Assign the basic effect and draw
-            foreach (var modelMesh in Model.Meshes)
-                foreach (var part in modelMesh.MeshParts)
-                    part.Effect = BasicEffect;
-            Model.Draw(Matrix.Identity, Camera.View, Camera.Projection);
+            // Assign the view projection and draw
+            var viewProjection = Camera.View * Camera.Projection;
+
+            RegularModelDrawer.ViewProjection = viewProjection;
+            RegularModelDrawer.Draw();
 
             #endregion
 
@@ -155,26 +163,11 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             GraphicsDevice.SetRenderTarget(FirstPassBloomRenderTarget);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1f, 0);
 
-            Effect.CurrentTechnique = Effect.Techniques["BloomPass"];
-            Effect.Parameters["baseTexture"].SetValue(BasicEffect.Texture);
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.BlendState = BlendState.Opaque;
 
-            // We get the base transform for each mesh
-            var modelMeshesBaseTransforms = new Matrix[Model.Bones.Count];
-            Model.CopyAbsoluteBoneTransformsTo(modelMeshesBaseTransforms);
-            foreach (var modelMesh in Model.Meshes)
-            {
-                foreach (var part in modelMesh.MeshParts)
-                    part.Effect = Effect;
-
-                // We set the main matrices for each mesh to draw
-                var worldMatrix = modelMeshesBaseTransforms[modelMesh.ParentBone.Index];
-
-                // WorldViewProjection is used to transform from model space to clip space
-                Effect.Parameters["WorldViewProjection"].SetValue(worldMatrix * Camera.View * Camera.Projection);
-
-                // Once we set these matrices we draw
-                modelMesh.Draw();
-            }
+            BloomModelDrawer.ViewProjection = viewProjection;
+            BloomModelDrawer.Draw();
 
             #endregion
 
@@ -222,10 +215,10 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             // Set the technique to our blur technique
             // Then draw a texture into a full-screen quad
             // using our rendertarget as texture
-            Effect.CurrentTechnique = Effect.Techniques["Integrate"];
-            Effect.Parameters["baseTexture"].SetValue(MainSceneRenderTarget);
-            Effect.Parameters["bloomTexture"].SetValue(finalBloomRenderTarget);
-            FullScreenQuad.Draw(Effect);
+            BloomEffect.CurrentTechnique = BloomEffect.Techniques["Integrate"];
+            BloomEffect.Parameters["baseTexture"].SetValue(MainSceneRenderTarget);
+            BloomEffect.Parameters["bloomTexture"].SetValue(finalBloomRenderTarget);
+            FullScreenQuad.Draw(BloomEffect);
 
             #endregion
 

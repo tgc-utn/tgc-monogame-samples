@@ -2,6 +2,9 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using TGC.MonoGame.Samples.Models.Drawers;
+using TGC.MonoGame.Samples.Utils;
 
 namespace TGC.MonoGame.Samples.Collisions
 {
@@ -177,6 +180,86 @@ namespace TGC.MonoGame.Samples.Collisions
             return new BoundingBox(minPoint, maxPoint);
         }
 
+
+
+        public static BoundingBox CreateAABBFrom(ModelDrawer modelDrawer)
+        {
+            if (modelDrawer.HasSingleWorldMatrix)
+                return CreateAABBFrom(modelDrawer.GeometryDrawers.FirstOrDefault(), modelDrawer.World);
+            else
+                return CreateAABBFrom(modelDrawer.GeometryDrawers, 
+                    modelDrawer.GeometryData.Select(data => data.Matrices.FirstOrDefault()).ToList());
+        }
+
+
+        /// <summary>
+        ///     Creates a <see cref="BoundingBox">BoundingBox</see> from a GeometryDrawer, using its vertices.
+        /// </summary>
+        /// <param name="geometries">The geometries from which to create the box</param>
+        /// <returns>The <see cref="BoundingBox">BoundingBox</see> that encloses the vertices from the model</returns>
+        public static BoundingBox CreateAABBFrom(List<GeometryDrawer> geometries)
+        {
+            var minPoint = Vector3.One * float.MaxValue;
+            var maxPoint = Vector3.One * float.MinValue;
+
+            Vector3 localMinPoint;
+            Vector3 localMaxPoint;
+
+            for (var index = 0; index < geometries.Count; index++)
+            {
+                FindMinMaxPositions(geometries[index].VertexBuffer, out localMinPoint, out localMaxPoint);
+                minPoint = Vector3.Min(minPoint, localMinPoint);
+                maxPoint = Vector3.Max(maxPoint, localMaxPoint);
+            }
+
+            return new BoundingBox(minPoint, maxPoint);
+        }
+
+        public static BoundingBox CreateAABBFrom(List<GeometryDrawer> geometries, List<Matrix> matrices)
+        {
+            var minPoint = Vector3.One * float.MaxValue;
+            var maxPoint = Vector3.One * float.MinValue;
+
+            Vector3 localMinPoint;
+            Vector3 localMaxPoint;
+
+            for (var index = 0; index < geometries.Count; index++)
+            {
+                FindMinMaxPositions(geometries[index].VertexBuffer, matrices[index], out localMinPoint, out localMaxPoint);
+                minPoint = Vector3.Min(minPoint, localMinPoint);
+                maxPoint = Vector3.Max(maxPoint, localMaxPoint);
+            }
+
+            return new BoundingBox(minPoint, maxPoint);
+        }
+
+
+
+
+        /// <summary>
+        ///     Creates a <see cref="BoundingBox">BoundingBox</see> from a GeometryDrawer, using its vertices.
+        /// </summary>
+        /// <param name="geometry">The geometry from which to create the box</param>
+        /// <returns>The <see cref="BoundingBox">BoundingBox</see> that encloses the vertices from the model</returns>
+        public static BoundingBox CreateAABBFrom(GeometryDrawer geometry)
+        {
+            Vector3 min, max;
+            FindMinMaxPositions(geometry.VertexBuffer, out min, out max);
+            return new BoundingBox(min, max);
+        }
+
+        /// <summary>
+        ///     Creates a <see cref="BoundingBox">BoundingBox</see> from a GeometryDrawer, using its vertices.
+        /// </summary>
+        /// <param name="geometry">The geometry from which to create the box</param>
+        /// <returns>The <see cref="BoundingBox">BoundingBox</see> that encloses the vertices from the model</returns>
+        public static BoundingBox CreateAABBFrom(GeometryDrawer geometry, Matrix matrix)
+        {
+            Vector3 min, max;
+            FindMinMaxPositions(geometry.VertexBuffer, matrix, out min, out max);
+            return new BoundingBox(min, max);
+        }
+
         /// <summary>
         ///     Creates a <see cref="BoundingSphere">BoundingSphere</see> from a Model, using all its sub-meshes.
         /// </summary>
@@ -186,6 +269,9 @@ namespace TGC.MonoGame.Samples.Collisions
         {
             var minPoint = Vector3.One * float.MaxValue;
             var maxPoint = Vector3.One * float.MinValue;
+
+            Vector3 localMinPoint;
+            Vector3 localMaxPoint;
 
             var transforms = new Matrix[model.Bones.Count];
             model.CopyAbsoluteBoneTransformsTo(transforms);
@@ -197,25 +283,121 @@ namespace TGC.MonoGame.Samples.Collisions
                 for (var subIndex = 0; subIndex < meshParts.Count; subIndex++)
                 {
                     var vertexBuffer = meshParts[subIndex].VertexBuffer;
-                    var declaration = vertexBuffer.VertexDeclaration;
-                    int vertexSize = declaration.VertexStride / sizeof(float);
+                    var transform = transforms[meshes[index].ParentBone.Index];
 
-                    var rawVertexBuffer = new float[vertexBuffer.VertexCount * vertexSize];
-                    vertexBuffer.GetData(rawVertexBuffer);
+                    FindMinMaxPositions(vertexBuffer, transform, out localMinPoint, out localMaxPoint);
 
-                    for (var vertexIndex = 0; vertexIndex < rawVertexBuffer.Length; vertexIndex += vertexSize)
-                    {
-                        var transform = transforms[meshes[index].ParentBone.Index];
-                        var vertex = new Vector3(rawVertexBuffer[vertexIndex], rawVertexBuffer[vertexIndex + 1], rawVertexBuffer[vertexIndex + 2]);
-                        vertex = Vector3.Transform(vertex, transform);
-                        minPoint = Vector3.Min(minPoint, vertex);
-                        maxPoint = Vector3.Max(maxPoint, vertex);
-                    }
+                    minPoint = Vector3.Min(localMinPoint, minPoint);
+                    maxPoint = Vector3.Min(localMaxPoint, maxPoint);
                 }
             }
-            var difference = (maxPoint - minPoint) * 0.5f;
-            return new BoundingSphere(difference, difference.Length());
+            return SphereFromMinMax(minPoint, maxPoint);
         }
 
+        /// <summary>
+        ///     Creates a <see cref="BoundingSphere">BoundingBox</see> from a GeometryDrawer, using its vertices.
+        /// </summary>
+        /// <param name="geometry">The geometry from which to create the sphere</param>
+        /// <returns>The <see cref="BoundingSphere">BoundingSphere</see> that encloses the vertices from the model</returns>
+        public static BoundingSphere CreateSphereFrom(GeometryDrawer geometry)
+        {
+            Vector3 min, max;
+            FindMinMaxPositions(geometry.VertexBuffer, out min, out max);
+            return SphereFromMinMax(min, max);
+        }
+
+        /// <summary>
+        ///     Creates a <see cref="BoundingSphere">BoundingBox</see> from a GeometryDrawer, using its vertices.
+        /// </summary>
+        /// <param name="geometry">The geometry from which to create the sphere</param>
+        /// <param name="world">The world matrix that will be used to transform each point</param>
+        /// <returns>The <see cref="BoundingSphere">BoundingSphere</see> that encloses the vertices from the model</returns>
+        public static BoundingSphere CreateSphereFrom(GeometryDrawer geometry, Matrix world)
+        {
+            Vector3 min, max;
+            FindMinMaxPositions(geometry.VertexBuffer, world, out min, out max);
+            return SphereFromMinMax(min, max);
+        }
+
+
+
+        public static BoundingSphere CreateSphereFrom(List<GeometryDrawer> geometries, List<Matrix> matrices)
+        {
+            var minPoint = Vector3.One * float.MaxValue;
+            var maxPoint = Vector3.One * float.MinValue;
+
+            Vector3 localMinPoint;
+            Vector3 localMaxPoint;
+
+            for (var index = 0; index < geometries.Count; index++)
+            {
+                FindMinMaxPositions(geometries[index].VertexBuffer, matrices[index], out localMinPoint, out localMaxPoint);
+                minPoint = Vector3.Min(minPoint, localMinPoint);
+                maxPoint = Vector3.Max(maxPoint, localMaxPoint);
+            }
+
+            return SphereFromMinMax(minPoint, maxPoint);
+        }
+
+
+        public static BoundingSphere CreateSphereFrom(ModelDrawer modelDrawer)
+        {
+            if (modelDrawer.HasSingleWorldMatrix)
+                return CreateSphereFrom(modelDrawer.GeometryDrawers.FirstOrDefault(), modelDrawer.World);
+            else
+                return CreateSphereFrom(modelDrawer.GeometryDrawers,
+                    modelDrawer.GeometryData.Select(data => data.Matrices.FirstOrDefault()).ToList());
+        }
+
+
+
+
+        private static BoundingSphere SphereFromMinMax(Vector3 min, Vector3 max)
+        {
+            var halfDifference = (max - min) * 0.5f;
+            var center = (max + min) * 0.5f;
+            return new BoundingSphere(center, halfDifference.Length());
+        }
+
+
+
+        private static void FindMinMaxPositions(VertexBuffer vertexBuffer, out Vector3 minPosition, out Vector3 maxPosition)
+        {
+            minPosition = Vector3.One * float.MaxValue;
+            maxPosition = Vector3.One * float.MinValue;
+
+            var declaration = vertexBuffer.VertexDeclaration;
+            var vertexSize = declaration.VertexStride / sizeof(float);
+
+            var rawVertexBuffer = new float[vertexBuffer.VertexCount * vertexSize];
+            vertexBuffer.GetData(rawVertexBuffer);
+
+            for (var vertexIndex = 0; vertexIndex < rawVertexBuffer.Length; vertexIndex += vertexSize)
+            {
+                var vertex = new Vector3(rawVertexBuffer[vertexIndex], rawVertexBuffer[vertexIndex + 1], rawVertexBuffer[vertexIndex + 2]);
+                minPosition = Vector3.Min(minPosition, vertex);
+                maxPosition = Vector3.Max(maxPosition, vertex);
+            }
+        }
+        private static void FindMinMaxPositions(VertexBuffer vertexBuffer, Matrix world, out Vector3 minPosition, out Vector3 maxPosition)
+        {
+            minPosition = Vector3.One * float.MaxValue;
+            maxPosition = Vector3.One * float.MinValue;
+
+            var declaration = vertexBuffer.VertexDeclaration;
+            var vertexSize = declaration.VertexStride / sizeof(float);
+
+            var rawVertexBuffer = new float[vertexBuffer.VertexCount * vertexSize];
+            vertexBuffer.GetData(rawVertexBuffer);
+
+            for (var vertexIndex = 0; vertexIndex < rawVertexBuffer.Length; vertexIndex += vertexSize)
+            {
+                var vertex = new Vector3(rawVertexBuffer[vertexIndex], rawVertexBuffer[vertexIndex + 1], rawVertexBuffer[vertexIndex + 2]);
+                vertex = Vector3.Transform(vertex, world);
+                minPosition = Vector3.Min(minPosition, vertex);
+                maxPosition = Vector3.Max(maxPosition, vertex);
+            }
+
+        }
     }
 }

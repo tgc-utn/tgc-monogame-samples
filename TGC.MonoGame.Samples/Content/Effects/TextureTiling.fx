@@ -9,6 +9,7 @@
 
 float4x4 World;
 float4x4 WorldViewProjection;
+float3x3 InverseTransposeWorld;
 float2 Tiling;
 
 texture Texture;
@@ -39,13 +40,14 @@ struct WorldVertexShaderInput
 {
     float4 Position : POSITION0;
     float3 Normal : NORMAL0;
+    float2 TextureCoordinate : TEXCOORD0;
 };
 
 struct WorldVertexShaderOutput
 {
     float4 Position : SV_POSITION;
     float4 WorldPosition : TEXCOORD0;
-    float3 Normal : TEXCOORD1;
+    float3 WorldNormal : TEXCOORD1;
 };
 
 
@@ -77,17 +79,16 @@ WorldVertexShaderOutput WorldTilingVS(in WorldVertexShaderInput input)
     output.WorldPosition = mul(input.Position, World);
 
     // Propagate the Normal to choose from which side the coordinates will be used
-    output.Normal = input.Normal;
-
+    output.WorldNormal = normalize(mul(input.Normal, InverseTransposeWorld));
     return output;
 }
 
 float4 WorldTilingPS(WorldVertexShaderOutput input) : COLOR
 {
     // Get how parallel the normal of this point is to the X plane
-    float xAlignment = abs(dot(input.Normal, float3(1, 0, 0)));
+    float xAlignment = abs(dot(input.WorldNormal, float3(1, 0, 0)));
     // Same for the Y plane
-    float yAlignment = abs(dot(input.Normal, float3(0, 1, 0)));
+    float yAlignment = abs(dot(input.WorldNormal, float3(0, 1, 0)));
 
     // Use the world position as texture coordinates 
     // Choose which coordinates we will use based on our normal

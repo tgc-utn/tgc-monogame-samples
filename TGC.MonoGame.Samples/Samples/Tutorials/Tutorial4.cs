@@ -2,7 +2,9 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Cameras;
+using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Geometries.Textures;
+using TGC.MonoGame.Samples.Models.Drawers;
 using TGC.MonoGame.Samples.Viewer;
 
 namespace TGC.MonoGame.Samples.Samples.Tutorials
@@ -26,9 +28,8 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
 
         private Camera Camera { get; set; }
         private QuadPrimitive Quad { get; set; }
-        private Matrix QuadWorld { get; set; }
-        private BoxPrimitive Box { get; set; }
-        private Matrix BoxWorld { get; set; }
+        private CubePrimitive Cube { get; set; }
+        private Matrix CubeWorld { get; set; }
         private float BoxRotation { get; set; }
 
         /// <inheritdoc />
@@ -42,16 +43,22 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         /// <inheritdoc />
         protected override void LoadContent()
         {
-            var texture = Game.Content.Load<Texture2D>(ContentFolderTextures + "wood/caja-madera-3");
-            Quad = new QuadPrimitive(GraphicsDevice);
-            Quad.Effect.Texture = texture;
-
-            QuadWorld = Matrix.CreateScale(10f) * Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateTranslation(Vector3.UnitX * 14);
-             
-            Box = new BoxPrimitive(GraphicsDevice, Vector3.One * 20, texture);
-            BoxWorld = Matrix.CreateTranslation(Vector3.UnitX * -14);
-
             base.LoadContent();
+
+            var texture = Game.Content.Load<Texture2D>(ContentFolderTextures + "wood/caja-madera-3");
+
+            var effect = Game.Content.Load<Effect>(ContentFolderEffects + "DiffuseTexture");
+
+            Quad = new QuadPrimitive(GraphicsDevice);
+            Quad.Textures.Add(texture);
+            Quad.World = Matrix.CreateScale(10f) * Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateTranslation(Vector3.UnitX * 14);
+            Quad.SetEffect(effect, EffectInspectionType.ALL); 
+
+            Cube = new CubePrimitive(GraphicsDevice, 10f, Color.White);
+            Cube.Textures.Add(texture);
+            CubeWorld = Matrix.CreateTranslation(Vector3.UnitX * -14);
+            Cube.SetEffect(effect, EffectInspectionType.ALL);
+
         }
 
         /// <inheritdoc />
@@ -70,10 +77,15 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         {
             Game.Background = Color.CornflowerBlue;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            
 
-            Box.Draw(Matrix.CreateRotationY(BoxRotation) * BoxWorld, Camera.View, Camera.Projection);
-            Quad.Draw(QuadWorld, Camera.View, Camera.Projection);
+            var viewProjection = Camera.View * Camera.Projection;
+
+            Cube.World = Matrix.CreateRotationY(BoxRotation) * CubeWorld;
+            Cube.ViewProjection = viewProjection;
+            Cube.Draw();
+
+            Quad.ViewProjection = viewProjection;
+            Quad.Draw();
 
             base.Draw(gameTime);
         }

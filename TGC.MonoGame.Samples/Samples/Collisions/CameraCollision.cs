@@ -8,6 +8,7 @@ using System.Text;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Collisions;
 using TGC.MonoGame.Samples.Geometries.Textures;
+using TGC.MonoGame.Samples.Models.Drawers;
 using TGC.MonoGame.Samples.Viewer;
 
 namespace TGC.MonoGame.Samples.Samples.Collisions
@@ -28,7 +29,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
 
         // The Model of the Robot to draw
-        private Model Robot { get; set; }
+        private ModelDrawer Robot { get; set; }
 
 
         // The World Matrix for the Robot
@@ -125,15 +126,12 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         /// <inheritdoc />
         protected override void LoadContent()
         {
+            var diffuseEffect = Game.Content.Load<Effect>(ContentFolderEffects + "DiffuseTexture");
+
+            var robotModel = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
+            
             // Load the models
-            Robot = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
-
-            // Enable default lighting for the Robot
-            foreach (var mesh in Robot.Meshes)
-                ((BasicEffect)mesh.Effects.FirstOrDefault())?.EnableDefaultLighting();
-
-            // Create the Quad
-            Quad = new QuadPrimitive(GraphicsDevice);
+            Robot = ModelInspector.CreateDrawerFrom(robotModel, diffuseEffect, EffectInspectionType.ALL);
 
             // Load the Floor and Wall textures
             FloorTexture = Game.Content.Load<Texture2D>(ContentFolderTextures + "stones");
@@ -143,7 +141,10 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             TilingEffect = Game.Content.Load<Effect>(ContentFolderEffects + "TextureTiling");
             TilingEffect.Parameters["Tiling"].SetValue(new Vector2(10f, 10f));
 
-            
+            // Create the Quad
+            Quad = new QuadPrimitive(GraphicsDevice);
+            Quad.SetEffect(TilingEffect, EffectInspectionType.MATRICES);
+
             // Calculate the height of the Model of the Robot
             // Create a Bounding Box from it, then subtract the max and min Y to get the height
 
@@ -328,22 +329,25 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             var viewProjection = Camera.View * Camera.Projection;
 
             // Draw the Robot
-            Robot.Draw(RobotWorld, Camera.View, Camera.Projection);
+            Robot.World = RobotWorld;
+            Robot.ViewProjection = viewProjection;
+            Robot.Draw();
 
             // Set the WorldViewProjection and Texture for the Floor and draw it
-            TilingEffect.Parameters["WorldViewProjection"].SetValue(FloorWorld * viewProjection);
             TilingEffect.Parameters["Texture"].SetValue(FloorTexture);
-            Quad.Draw(TilingEffect);
+            Quad.World = FloorWorld;
+            Quad.ViewProjection = viewProjection;
+            Quad.Draw();
 
             // Draw each Wall
             // First, set the Wall Texture
             TilingEffect.Parameters["Texture"].SetValue(WallTexture);
             for (int index = 0; index < WallWorldMatrices.Length - 1; index++)
             {
-                // Set the WorldViewProjection matrix for each Wall
-                TilingEffect.Parameters["WorldViewProjection"].SetValue(WallWorldMatrices[index] * viewProjection);
+                // Set the World matrix for each Wall
+                Quad.World = WallWorldMatrices[index];
                 // Draw the Wall
-                Quad.Draw(TilingEffect);
+                Quad.Draw();
             }
 
             // Draw the traversing Wall
@@ -355,8 +359,8 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
             // Set the WorldViewProjection matrix and draw the Wall
-            TilingEffect.Parameters["WorldViewProjection"].SetValue(WallWorldMatrices[WallWorldMatrices.Length - 1] * viewProjection);
-            Quad.Draw(TilingEffect);
+            Quad.World = WallWorldMatrices[WallWorldMatrices.Length - 1];
+            Quad.Draw();
 
             // Restore the old RasterizerState
             GraphicsDevice.RasterizerState = rasterizerState;
