@@ -91,8 +91,6 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
             Game.Background = Color.Black;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            
-
             // Render the sun.
             DrawGeometry(Sun, SunTranslation);
 
