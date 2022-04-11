@@ -44,3 +44,4 @@ dotnet run --project TGC.MonoGame.Samples
 * Unable to load DLL 'freetype6.dll' - Install [Microsoft Visual C++ Redistributable 2012](https://www.microsoft.com/en-us/download/details.aspx?id=30679)
 * Unable to load DLL 'libmojoshader_64.dll' - Install [Microsoft Visual C++ Redistributable 2013](https://aka.ms/highdpimfc2013x64enu)
 * Unable to load DLL 'FreeImage' - Install [Microsoft Visual C++ Redistributable for Visual Studio 2015, 2017 and 2019](https://aka.ms/vs/16/release/vc_redist.x64.exe)
+* Content Builder has issues with usernames having white space in the path - [Post](https://community.monogame.net/t/content-builder-not-correctly-handling-white-space-path/)
