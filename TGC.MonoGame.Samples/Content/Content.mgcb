@@ -184,6 +184,12 @@
 /processorParam:TextureFormat=Compressed
 /build:3D/tgc-logo/tgc-logo.fbx
 
+#begin Effects/AlphaBlending.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/AlphaBlending.fx
+
 #begin Effects/BackFace.fx
 /importer:EffectImporter
 /processor:EffectProcessor
