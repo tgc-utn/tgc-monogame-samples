@@ -61,9 +61,12 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
             Effect.Parameters["World"].SetValue(Matrix.Identity);
             var projectionMatrix =
                 Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 50, 50000);
+
+            Game.Gizmos.UpdateViewProjection(Matrix.Identity, projectionMatrix);
+
             Effect.Parameters["Projection"].SetValue(projectionMatrix);
             Effect.Parameters["ModelTexture"].SetValue(Texture);
-            font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "Arial");
+            font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
             spriteBatch = new SpriteBatch(GraphicsDevice);
             Effect.CurrentTechnique = Effect.Techniques["ColorDrawing"];
             base.LoadContent();
@@ -134,6 +137,7 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
                     break;
             }
 
+
             base.Update(gameTime);
         }
 
@@ -142,7 +146,7 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
         {
             Game.Background = Tunel.colision ? Color.GreenYellow : Color.Gray;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            //AxisLines.Draw(GraphicsDevice, Camera);
+            //
 
             Tunel.Draw(GraphicsDevice, Effect);
             

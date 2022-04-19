@@ -1,13 +1,12 @@
-﻿
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
 
-namespace TGC.MonoGame.Samples.Samples.Shaders
+namespace TGC.MonoGame.Samples.Samples.Shaders.ShaderReloader
 {
     /// <summary>
     ///     Shader Visualizer
@@ -34,6 +33,15 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             Name = "Shader Visualizer";
             Description = "Shader Visualizer. Reloads and compiles a shader file in runtime.";
         }
+
+        /// <inheritdoc />
+
+        public override void Initialize()
+        {
+            Game.Gizmos.Enabled = false;
+            base.Initialize();
+        }
+
 
         /// <inheritdoc />
         protected override void LoadContent()
@@ -79,6 +87,10 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         /// <inheritdoc />
         public override void Draw(GameTime gameTime)
         {
+            Game.Background = Color.Black;
+            GraphicsDevice.DepthStencilState = DepthStencilState.None;
+            GraphicsDevice.BlendState = BlendState.Opaque;
+
             Effect.Parameters["Time"]?.SetValue((float)gameTime.TotalGameTime.TotalSeconds);
             Quad.Draw(Effect);
             base.Draw(gameTime);

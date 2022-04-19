@@ -36,13 +36,15 @@ namespace TGC.MonoGame.Samples.Samples.Audio
             Instructions = "Y = Play a new instance in loop, I = Play and forget.";
             SoundName = "No sound";
 
+            Game.Gizmos.Enabled = false;
+
             base.Initialize();
         }
 
         /// <inheritdoc />
         protected override void LoadContent()
         {
-            Font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "Arial");
+            Font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
             InstructionsSize = Font.MeasureString(Instructions);
             SoundName = "a2-8bit";
             Sound = Game.Content.Load<SoundEffect>(ContentFolderSounds + SoundName);

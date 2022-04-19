@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using ImGuiNET;
+﻿using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using NumericVector2 = System.Numerics.Vector2;
 
 namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
@@ -162,7 +162,6 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
             _keys.Add(io.KeyMap[(int)ImGuiKey.Backspace] = (int)Keys.Back);
             _keys.Add(io.KeyMap[(int)ImGuiKey.Enter] = (int)Keys.Enter);
             _keys.Add(io.KeyMap[(int)ImGuiKey.Escape] = (int)Keys.Escape);
-            //https://github.com/mellinoe/ImGui.NET/pull/180/files
             _keys.Add(io.KeyMap[(int)ImGuiKey.Space] = (int)Keys.Space);
             _keys.Add(io.KeyMap[(int)ImGuiKey.A] = (int)Keys.A);
             _keys.Add(io.KeyMap[(int)ImGuiKey.C] = (int)Keys.C);
@@ -197,23 +196,13 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
         /// </summary>
         private Effect UpdateEffect(Texture2D texture)
         {
-            _effect = _effect ?? new BasicEffect(_graphicsDevice);
+            _effect ??= new BasicEffect(_graphicsDevice);
 
             var io = ImGui.GetIO();
 
-            // MonoGame-specific //////////////////////
-            //var offset = .5f;
-            // https://github.com/mellinoe/ImGui.NET/pull/152
-            var offset = _graphicsDevice.UseHalfPixelOffset ? .5f : 0f;
-            ///////////////////////////////////////////
-
-            // FNA-specific ///////////////////////////
-            //var offset = 0f;
-            ///////////////////////////////////////////
-
             _effect.World = Matrix.Identity;
             _effect.View = Matrix.Identity;
-            _effect.Projection = Matrix.CreateOrthographicOffCenter(offset, io.DisplaySize.X + offset, io.DisplaySize.Y + offset, offset, -1f, 1f);
+            _effect.Projection = Matrix.CreateOrthographicOffCenter(0f, io.DisplaySize.X, io.DisplaySize.Y, 0f, -1f, 1f);
             _effect.TextureEnabled = true;
             _effect.Texture = texture;
             _effect.VertexColorEnabled = true;
@@ -267,6 +256,8 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
             // Setup render state: alpha-blending enabled, no face culling, no depth testing, scissor enabled, vertex/texcoord/color pointers
             var lastViewport = _graphicsDevice.Viewport;
             var lastScissorBox = _graphicsDevice.ScissorRectangle;
+            var lastDepthState = _graphicsDevice.DepthStencilState;
+            var lastRasterizerState = _graphicsDevice.RasterizerState;
 
             _graphicsDevice.BlendFactor = Color.White;
             _graphicsDevice.BlendState = BlendState.NonPremultiplied;
@@ -286,6 +277,8 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
             // Restore modified state
             _graphicsDevice.Viewport = lastViewport;
             _graphicsDevice.ScissorRectangle = lastScissorBox;
+            _graphicsDevice.DepthStencilState = lastDepthState;
+            _graphicsDevice.RasterizerState = lastRasterizerState;
         }
 
         private unsafe void UpdateBuffers(ImDrawDataPtr drawData)
@@ -354,6 +347,11 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
                 {
                     ImDrawCmdPtr drawCmd = cmdList.CmdBuffer[cmdi];
 
+                    if (drawCmd.ElemCount == 0) 
+                    {
+                        continue;
+                    }
+
                     if (!_loadedTextures.ContainsKey(drawCmd.TextureId))
                     {
                         throw new InvalidOperationException($"Could not find a texture with id '{drawCmd.TextureId}', please check your bindings");
@@ -375,19 +373,18 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
 #pragma warning disable CS0618 // // FNA does not expose an alternative method.
                         _graphicsDevice.DrawIndexedPrimitives(
                             primitiveType: PrimitiveType.TriangleList,
-                            baseVertex: vtxOffset,
+                            baseVertex: (int)drawCmd.VtxOffset + vtxOffset,
                             minVertexIndex: 0,
                             numVertices: cmdList.VtxBuffer.Size,
-                            startIndex: idxOffset,
+                            startIndex: (int)drawCmd.IdxOffset + idxOffset,
                             primitiveCount: (int)drawCmd.ElemCount / 3
                         );
 #pragma warning restore CS0618
                     }
-
-                    idxOffset += (int)drawCmd.ElemCount;
                 }
 
                 vtxOffset += cmdList.VtxBuffer.Size;
+                idxOffset += cmdList.IdxBuffer.Size;
             }
         }
 

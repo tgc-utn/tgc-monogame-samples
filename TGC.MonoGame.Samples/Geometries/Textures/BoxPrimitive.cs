@@ -51,91 +51,131 @@ namespace TGC.MonoGame.Samples.Geometries.Textures
             var y = size.Y / 2;
             var z = size.Z / 2;
 
-            var vectors = new[]
+            var positions = new Vector3[]
             {
-                // Top-Left Front.
-                new Vector3(-x, y, -z),
-                // Top-Right Front.
-                new Vector3(x, y, -z),
-                // Top-Left Back.
-                new Vector3(-x, y, z),
-                // Top-Right Back.
-                new Vector3(x, y, z),
-                // Bottom-Left Front.
-                new Vector3(-x, -y, -z),
-                // Bottom-Right Front.
-                new Vector3(x, -y, -z),
-                // Bottom-Left Back.
+                // Back face
+                new Vector3(x, -y, z),
                 new Vector3(-x, -y, z),
-                // Bottom-Right Back.
-                new Vector3(x, -y, z)
+                new Vector3(x, y, z),
+                new Vector3(-x, y, z),
+                
+                // Front face
+                new Vector3(x, y, -z),
+                new Vector3(-x, y, -z),
+                new Vector3(x, -y, -z),
+                new Vector3(-x, -y, -z),
+                
+                // Top face
+                new Vector3(x, y, z),
+                new Vector3(-x, y, z),
+                new Vector3(x, y, -z),
+                new Vector3(-x, y, -z),
+                
+                // Bottom face
+                new Vector3(x, -y, -z),
+                new Vector3(x, -y, z),
+                new Vector3(-x, -y, z),
+                new Vector3(-x, -y, -z),
+                
+                // Left face
+                new Vector3(-x, -y, z),
+                new Vector3(-x, y, z),
+                new Vector3(-x, y, -z),
+                new Vector3(-x, -y, -z),
+                
+                // Right face
+                new Vector3(x, -y, -z),
+                new Vector3(x, y, -z),
+                new Vector3(x, y, z),
+                new Vector3(x, -y, z),
             };
 
-            // A box has six faces, each one pointing in a different direction.
-            var normals = new[]
+            var textureCoordinates = new Vector2[]
             {
-                // Top.
-                Vector3.UnitY,
-                // Bottom.
-                -Vector3.UnitY,
-                // Front.
-                Vector3.UnitZ,
-                // Back.
-                -Vector3.UnitZ,
-                // Left.
-                -Vector3.UnitX,
-                // Right.
-                Vector3.UnitX
-            };
-
-            var textureCoordinates = new[]
-            {
-                // Top-Left.
+                // Back face
                 Vector2.Zero,
-                // Top-Right.
                 Vector2.UnitX,
-                // Bottom-Left.
                 Vector2.UnitY,
-                // Bottom-Right.
-                Vector2.One
+                Vector2.One,
+                
+                // Front face
+                Vector2.Zero,
+                Vector2.UnitX,
+                Vector2.UnitY,
+                Vector2.One,
+                
+                // Top face
+                Vector2.UnitX,
+                Vector2.One,
+                Vector2.Zero,
+                Vector2.UnitY,
+                
+                // Bottom face
+                Vector2.Zero,
+                Vector2.UnitX,
+                Vector2.One,
+                Vector2.UnitY,
+                
+                // Left face
+                Vector2.Zero,
+                Vector2.UnitY,
+                Vector2.One,
+                Vector2.UnitX,
+                
+                // Right face
+                Vector2.Zero,
+                Vector2.UnitY,
+                Vector2.One,
+                Vector2.UnitX,
             };
 
-            var vertices = new[]
+            var normals = new Vector3[]
             {
-                // Top Face.
-                new VertexPositionNormalTexture(vectors[0], normals[0], textureCoordinates[2]),
-                new VertexPositionNormalTexture(vectors[1], normals[0], textureCoordinates[3]),
-                new VertexPositionNormalTexture(vectors[2], normals[0], textureCoordinates[0]),
-                new VertexPositionNormalTexture(vectors[3], normals[0], textureCoordinates[1]),
-                // Bottom Face.
-                new VertexPositionNormalTexture(vectors[4], normals[1], textureCoordinates[2]),
-                new VertexPositionNormalTexture(vectors[5], normals[1], textureCoordinates[3]),
-                new VertexPositionNormalTexture(vectors[6], normals[1], textureCoordinates[0]),
-                new VertexPositionNormalTexture(vectors[7], normals[1], textureCoordinates[1]),
-                // Left Face.
-                new VertexPositionNormalTexture(vectors[2], normals[4], textureCoordinates[0]),
-                new VertexPositionNormalTexture(vectors[0], normals[4], textureCoordinates[1]),
-                new VertexPositionNormalTexture(vectors[6], normals[4], textureCoordinates[2]),
-                new VertexPositionNormalTexture(vectors[4], normals[4], textureCoordinates[3]),
-                // Right Face.
-                new VertexPositionNormalTexture(vectors[3], normals[5], textureCoordinates[0]),
-                new VertexPositionNormalTexture(vectors[1], normals[5], textureCoordinates[1]),
-                new VertexPositionNormalTexture(vectors[7], normals[5], textureCoordinates[2]),
-                new VertexPositionNormalTexture(vectors[5], normals[5], textureCoordinates[3]),
-                // Back Face.
-                new VertexPositionNormalTexture(vectors[0], normals[3], textureCoordinates[0]),
-                new VertexPositionNormalTexture(vectors[1], normals[3], textureCoordinates[1]),
-                new VertexPositionNormalTexture(vectors[4], normals[3], textureCoordinates[2]),
-                new VertexPositionNormalTexture(vectors[5], normals[3], textureCoordinates[3]),
-                // Front Face.
-                new VertexPositionNormalTexture(vectors[2], normals[2], textureCoordinates[0]),
-                new VertexPositionNormalTexture(vectors[3], normals[2], textureCoordinates[1]),
-                new VertexPositionNormalTexture(vectors[6], normals[2], textureCoordinates[2]),
-                new VertexPositionNormalTexture(vectors[7], normals[2], textureCoordinates[3])
+                // Back face
+                Vector3.Backward,
+                Vector3.Backward,
+                Vector3.Backward,
+                Vector3.Backward,
+                
+                // Front face
+                Vector3.Forward,
+                Vector3.Forward,
+                Vector3.Forward,
+                Vector3.Forward,
+
+                // Top face
+                Vector3.Up,
+                Vector3.Up,
+                Vector3.Up,
+                Vector3.Up,
+                
+                // Bottom face
+                Vector3.Down,
+                Vector3.Down,
+                Vector3.Down,
+                Vector3.Down,
+                
+                // Left face
+                Vector3.Left,
+                Vector3.Left,
+                Vector3.Left,
+                Vector3.Left,
+                
+                // Right face
+                Vector3.Right,
+                Vector3.Right,
+                Vector3.Right,
+                Vector3.Right,
             };
+
+            var vertices = new VertexPositionNormalTexture[positions.Length];
+
+            for (int index = 0; index < vertices.Length; index++)
+                vertices[index] = new VertexPositionNormalTexture(positions[index], normals[index], textureCoordinates[index]);
+
 
             Vertices = new VertexBuffer(graphicsDevice, VertexPositionNormalTexture.VertexDeclaration, vertices.Length,
-                BufferUsage.WriteOnly);
+                    BufferUsage.None);
             Vertices.SetData(vertices);
         }
 
@@ -147,22 +187,35 @@ namespace TGC.MonoGame.Samples.Geometries.Textures
         {
             var indices = new ushort[]
             {
-                // Top.
-                2, 1, 0, 2, 3, 1,
-                // Back.
-                18, 17, 16, 18, 19, 17,
-                // Left.
-                10, 9, 8, 10, 11, 9,
-                // Front.
-                22, 21, 20, 22, 23, 21,
-                // Right.
-                14, 13, 12, 14, 15, 13,
-                // Bottom.
-                6, 5, 4, 6, 7, 5
+                
+                // Back face
+                1, 2, 0,
+                1, 3, 2,
+                
+                // Front face
+                5, 6, 4,
+                5, 7, 6,
+                
+                // Top face
+                9, 10, 8,
+                9, 11, 10,
+                
+                // Bottom face
+                12, 15, 13,
+                13, 15, 14,
+                
+                // Left face
+                17, 16, 19,
+                17, 19, 18,
+                
+                // Right face
+                20, 23, 21,
+                21, 23, 22,
             };
+            
 
             Indices = new IndexBuffer(graphicsDevice, IndexElementSize.SixteenBits, indices.Length,
-                BufferUsage.WriteOnly);
+                BufferUsage.None);
             Indices.SetData(indices);
         }
 

@@ -36,16 +36,16 @@ namespace TGC.MonoGame.Samples.Samples.Audio
             Game.Background = Color.CornflowerBlue;
             Instructions = "Y = Play, U = Pause, I = Resume, O = Stop.";
             SongName = "No music";
-
+            Game.Gizmos.Enabled = false;
             base.Initialize();
         }
 
         /// <inheritdoc />
         protected override void LoadContent()
         {
-            Font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "Arial");
+            Font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
             InstructionsSize = Font.MeasureString(Instructions);
-            SongName = "RetroPlatforming";
+            SongName = "retro-platforming";
             Song = Game.Content.Load<Song>(ContentFolderMusic + SongName);
 
             MediaPlayer.IsRepeating = true;
@@ -68,6 +68,9 @@ namespace TGC.MonoGame.Samples.Samples.Audio
             else if (Game.CurrentKeyboardState.IsKeyDown(Keys.O) && MediaPlayer.State == MediaState.Playing)
                 //Parar el MP3
                 MediaPlayer.Stop();
+
+            Game.Gizmos.UpdateViewProjection(Matrix.Identity, Matrix.Identity);
+
 
             base.Update(gameTime);
         }

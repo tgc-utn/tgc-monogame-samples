@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Samples;
 using TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET;
+using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 using NumericVector2 = System.Numerics.Vector2;
 
 namespace TGC.MonoGame.Samples.Viewer.Models
@@ -131,6 +133,8 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         {
             if (ActiveSample != null)
             {
+                // Unbind any Texture modifiers from ImGUI
+                UnbindModifiers();
                 ActiveSample.UnloadSampleContent();
                 ActiveSample.Enabled = false;
                 ActiveSample.Visible = false;
@@ -141,6 +145,9 @@ namespace TGC.MonoGame.Samples.Viewer.Models
             newSample.Enabled = true;
             ActiveSample = newSample;
 
+
+            newSample.Prepare();
+
             if (!Game.Components.Contains(newSample))
             {
                 Game.Components.Add(newSample);
@@ -150,6 +157,25 @@ namespace TGC.MonoGame.Samples.Viewer.Models
                 newSample.Initialize();
                 newSample.ReloadContent();
             }
+
+            // Bind the new Texture modifiers if any
+            BindModifiers();
+        }
+
+        /// <summary>
+        ///     Binds the Modifiers from the current sample to be used by ImGUI.
+        /// </summary>
+        private void BindModifiers()
+        {
+            ActiveSample.BindModifiers(ImGuiRenderer);
+        }
+
+        /// <summary>
+        ///     Releases the Modifier bindings from the current sample.
+        /// </summary>
+        private void UnbindModifiers()
+        {
+            ActiveSample.UnbindModifiers(ImGuiRenderer);
         }
 
         /// <summary>
@@ -293,7 +319,17 @@ namespace TGC.MonoGame.Samples.Viewer.Models
 
             if (AboutVisible) ShowAboutWindow();
 
+            DrawModifiers();
+
             ImGui.End();
+        }
+
+        /// <summary>
+        ///     Draws the Modifiers for the current sample
+        /// </summary>
+        private void DrawModifiers()
+        {
+            ActiveSample.ModifierController.Draw();
         }
 
         /// <summary>

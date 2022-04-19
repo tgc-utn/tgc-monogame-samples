@@ -1,9 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
+using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
 namespace TGC.MonoGame.Samples.Samples.PostProcessing
 {
@@ -21,15 +23,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
         private RenderTarget2D MainSceneRenderTarget;
 
-        private bool PastKeyPressed;
-
-        private Matrix QuadBloomWorld;
-
-        private Matrix QuadSceneWorld;
-
         private RenderTarget2D SecondPassBloomRenderTarget;
-
-        private SpriteFont SpriteFont;
 
         /// <inheritdoc />
         public Bloom(TGCViewer game) : base(game)
@@ -44,13 +38,13 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
         private Effect Effect { get; set; }
         private Effect BlurEffect { get; set; }
-        private Effect DebugTextureEffect { get; set; }
 
         /// <inheritdoc />
         public override void Initialize()
         {
             var screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
             Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(-350, 50, 400), screenSize);
+
 
             base.Initialize();
         }
@@ -70,13 +64,6 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             BlurEffect.Parameters["screenSize"]
                 .SetValue(new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height));
 
-            // Load the debug texture effect to visualize the bloom
-            DebugTextureEffect = Game.Content.Load<Effect>(ContentFolderEffects + "DebugTexture");
-            // Transform the quad to be in a smaller part of the screen
-            QuadSceneWorld = Matrix.CreateScale(0.2f) * Matrix.CreateTranslation(new Vector3(-0.75f, -0.75f, 0f));
-            // Transform the quad to be in a smaller part of the screen
-            QuadBloomWorld = Matrix.CreateScale(0.2f) * Matrix.CreateTranslation(new Vector3(-0.3f, -0.75f, 0f));
-
             // Create a full screen quad to post-process
             FullScreenQuad = new FullScreenQuad(GraphicsDevice);
 
@@ -94,7 +81,9 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
                 GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.None, 0,
                 RenderTargetUsage.DiscardContents);
 
-            SpriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "Arial");
+            ModifierController.AddToggle("Effect Active", (toggle) => EffectOn = toggle, true);
+            ModifierController.AddTexture("Scene Render Target", MainSceneRenderTarget);
+            ModifierController.AddTexture("Bloom Render Target", SecondPassBloomRenderTarget);
 
             base.LoadContent();
         }
@@ -105,11 +94,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             // Update the state of the camera
             Camera.Update(gameTime);
 
-            // Turn the effect on or off depending on the keyboard state
-            var currentKeyPressed = Keyboard.GetState().IsKeyDown(Keys.J);
-            if (!currentKeyPressed && PastKeyPressed)
-                EffectOn = !EffectOn;
-            PastKeyPressed = currentKeyPressed;
+
+            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
 
             base.Update(gameTime);
         }
@@ -121,15 +107,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
                 DrawBloom();
             else
                 DrawRegular();
-
-            Game.SpriteBatch.Begin();
-            Game.SpriteBatch.DrawString(SpriteFont, "Con la tecla 'J' se prende y apaga el efecto", new Vector2(50, 50),
-                Color.Black);
-            Game.SpriteBatch.DrawString(SpriteFont, "Efecto " + (EffectOn ? "prendido" : "apagado"),
-                new Vector2(50, 80), Color.Black);
-            Game.SpriteBatch.End();
-
-            AxisLines.Draw(Camera.View, Camera.Projection);
+            
             base.Draw(gameTime);
         }
 
@@ -251,28 +229,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             #endregion
 
-            // Debug our scene texture!
-            // Show a simple quad with the texture
-            DebugTextureEffect.Parameters["World"].SetValue(QuadSceneWorld);
-            DebugTextureEffect.Parameters["baseTexture"].SetValue(MainSceneRenderTarget);
-            FullScreenQuad.Draw(DebugTextureEffect);
-
-            // Debug our bloom texture!
-            // Show a simple quad with the texture
-            DebugTextureEffect.Parameters["World"].SetValue(QuadBloomWorld);
-            DebugTextureEffect.Parameters["baseTexture"].SetValue(finalBloomRenderTarget);
-            FullScreenQuad.Draw(DebugTextureEffect);
-
-            // Set the render targets as they were
-            // Exchange(ref SecondPassBloomRenderTarget, ref FirstPassBloomRenderTarget);
         }
 
-        private void Exchange(ref RenderTarget2D first, ref RenderTarget2D second)
-        {
-            var auxiliar = second;
-            second = first;
-            first = auxiliar;
-        }
 
         protected override void UnloadContent()
         {

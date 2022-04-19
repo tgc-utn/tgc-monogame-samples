@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using TGC.MonoGame.Samples.Viewer;
-using TGC.MonoGame.Samples.Viewer.GUI;
+using TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET;
+using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
 namespace TGC.MonoGame.Samples.Samples
 {
@@ -25,12 +26,8 @@ namespace TGC.MonoGame.Samples.Samples
         public TGCSample(TGCViewer game) : base(game)
         {
             Game = game;
+            ModifierController = new ModifierController();
         }
-
-        /// <summary>
-        ///     Helper to visualize the Cartesian axes.
-        /// </summary>
-        public AxisLines AxisLines { get; set; }
 
         /// <summary>
         ///     Category where the example belongs, this value is used to build the example tree.
@@ -52,13 +49,17 @@ namespace TGC.MonoGame.Samples.Samples
         /// </summary>
         public string Description { get; set; }
 
+
+        /// <summary>
+        ///     Modifier controller for each sample.
+        /// </summary>
+        public ModifierController ModifierController { get; private set; }
+
         /// <summary>
         ///     Initialize the game settings here.
         /// </summary>
         public override void Initialize()
         {
-            AxisLines = new AxisLines(GraphicsDevice);
-
             base.Initialize();
         }
 
@@ -67,6 +68,7 @@ namespace TGC.MonoGame.Samples.Samples
         /// </summary>
         public void ReloadContent()
         {
+            ModifierController.Clear();
             LoadContent();
         }
 
@@ -76,6 +78,15 @@ namespace TGC.MonoGame.Samples.Samples
         protected override void LoadContent()
         {
             base.LoadContent();
+        }
+
+
+        /// <summary>
+        ///     Prepares the Sample to be displayed.
+        /// </summary>
+        public void Prepare()
+        {
+            Game.Gizmos.Enabled = true;
         }
 
         /// <summary>
@@ -103,6 +114,24 @@ namespace TGC.MonoGame.Samples.Samples
         public void UnloadSampleContent()
         {
             UnloadContent();
+        }
+
+        /// <summary>
+        ///     Binds the Modifier Controller to the ImGuiRenderer.
+        /// </summary>
+        /// <param name="renderer">The ImGuiRenderer to bind the Modifier Controller to</param>
+        public void BindModifiers(ImGuiRenderer renderer)
+        {
+            ModifierController.Bind(renderer);
+        }
+
+        /// <summary>
+        ///     Unbinds the Modifier Controller to the ImGuiRenderer.
+        /// </summary>
+        /// <param name="renderer">The ImGuiRenderer to unbind the Modifier Controller</param>
+        public void UnbindModifiers(ImGuiRenderer renderer)
+        {
+            ModifierController.Unbind(renderer);
         }
 
         /// <summary>

@@ -69,6 +69,8 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
 
             if (Game.CurrentKeyboardState.IsKeyDown(Keys.Right)) BoxWorld *= Matrix.CreateRotationY(0.05f);
 
+            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+
             base.Update(gameTime);
         }
 
@@ -77,7 +79,6 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         {
             Game.Background = Color.CornflowerBlue;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            AxisLines.Draw(Camera.View, Camera.Projection);
 
             GraphicsDevice.SetVertexBuffer(Vertices);
             GraphicsDevice.Indices = Indices;

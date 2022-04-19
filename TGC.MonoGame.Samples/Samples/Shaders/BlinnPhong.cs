@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
+using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
 namespace TGC.MonoGame.Samples.Samples.Shaders
 {
@@ -26,6 +27,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         private Matrix LightBoxWorld { get; set; } = Matrix.Identity;
         private float Timer { get; set; }
 
+
         /// <inheritdoc />
         public override void Initialize()
         {
@@ -36,7 +38,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 
             base.Initialize();
         }
-
+        
         /// <inheritdoc />
         protected override void LoadContent()
         {
@@ -69,6 +71,14 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 
             lightBox = new CubePrimitive(GraphicsDevice, 25, Color.Blue);
 
+            ModifierController.AddFloat("KA", Effect.Parameters["KAmbient"], 0.2f, 0f, 1f);
+            ModifierController.AddFloat("KD", Effect.Parameters["KDiffuse"], 0.7f, 0f, 1f);
+            ModifierController.AddFloat("KS", Effect.Parameters["KSpecular"], 0.4f, 0f, 1f);
+            ModifierController.AddFloat("Shininess", Effect.Parameters["shininess"], 4.0f, 1f, 64f);
+            ModifierController.AddColor("Ambient Color", Effect.Parameters["ambientColor"], new Color(0.25f, 0f, 0f));
+            ModifierController.AddColor("Diffuse Color", Effect.Parameters["diffuseColor"], new Color(0.1f, 0.1f, 0.6f));
+            ModifierController.AddColor("Specular Color", Effect.Parameters["specularColor"], Color.White);
+
             base.LoadContent();
         }
 
@@ -89,6 +99,8 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 
             Timer += (float) gameTime.ElapsedGameTime.TotalSeconds;
 
+            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+
             base.Update(gameTime);
         }
 
@@ -99,7 +111,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             Game.Background = Color.Black;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            AxisLines.Draw(Camera.View, Camera.Projection);
+            
 
             // We get the base transform for each mesh
             var modelMeshesBaseTransforms = new Matrix[Model.Bones.Count];
