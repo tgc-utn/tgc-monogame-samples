@@ -154,9 +154,8 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
                     TilingFloorEffect.CurrentTechnique = TilingFloorEffect.Techniques["Debug"];
                     break;
 
-                // For Trilinear, use a technique with Trilinear Sampling enabled
+                // For anything else use Trilinear, using a technique with Trilinear Sampling enabled
                 default:
-                case MipMappingType.Trilinear:
                     TilingFloorEffect.Parameters["Texture"].SetValue(TextureWithMipMapping);
                     TilingFloorEffect.CurrentTechnique = TilingFloorEffect.Techniques["Trilinear"];
                     break;
