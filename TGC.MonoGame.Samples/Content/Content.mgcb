@@ -244,6 +244,12 @@
 /processorParam:DebugMode=Auto
 /build:Effects/Gizmos.fx
 
+#begin Effects/MipMapping.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/MipMapping.fx
+
 #begin Effects/MRT.fx
 /importer:EffectImporter
 /processor:EffectProcessor
