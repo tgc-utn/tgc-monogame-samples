@@ -46,10 +46,17 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
         public static Matrix CalculateWorld(Vector3 origin, Vector3 normal, float radius)
         {
             Matrix rotationAndTranslation;
-            if ((-MathF.Abs(normal.Z) + 1.0f) > float.Epsilon)
-                rotationAndTranslation = Matrix.Invert(Matrix.CreateLookAt(origin, origin + normal, Vector3.Backward));
-            else
+            // Check if +Z or -Z. In that case, no need to rotate 
+            // (also the view matrix is broken in those cases)
+            var distanceToZAxis = -MathF.Abs(normal.Z) + 1.0f;
+            if (distanceToZAxis < float.Epsilon)
+            {
                 rotationAndTranslation = Matrix.CreateTranslation(origin);
+            }
+            else
+            {
+                rotationAndTranslation = Matrix.Invert(Matrix.CreateLookAt(origin, origin + normal, Vector3.Backward));
+            }
 
             return Matrix.CreateScale(radius) * rotationAndTranslation;
         }
