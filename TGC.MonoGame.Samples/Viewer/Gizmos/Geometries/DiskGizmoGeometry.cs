@@ -28,7 +28,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
             Array.Copy(originalIndices, 0, indices, 0, subdivisionsTimesTwo);
 
             Array.Copy(positions
-                .Select(position => new VertexPosition(new Vector3(position.Y, 0f, position.X)))
+                .Select(position => new VertexPosition(new Vector3(position.Y, position.X, 0f)))
                 .ToArray(), 0, vertices, 0, subdivisions);
             
             InitializeVertices(vertices);
@@ -45,17 +45,20 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
         /// <returns>The calculated World matrix</returns>
         public static Matrix CalculateWorld(Vector3 origin, Vector3 normal, float radius)
         {
-            var rotation = Matrix.Identity;
-            if (!normal.Equals(Vector3.Up))
+            Matrix rotationAndTranslation;
+            // Check if +Z or -Z. In that case, no need to rotate 
+            // (also the view matrix is broken in those cases)
+            var distanceToZAxis = -MathF.Abs(normal.Z) + 1.0f;
+            if (distanceToZAxis < float.Epsilon)
             {
-                // Rotate our disk!
-                // Pretty sure this can be optimized
-                var axis = Vector3.Cross(Vector3.Up, normal);
-                float amplitude = Vector3.Dot(Vector3.Up, normal);
-                rotation = Matrix.CreateFromQuaternion(Quaternion.CreateFromAxisAngle(axis, amplitude));
+                rotationAndTranslation = Matrix.CreateTranslation(origin);
+            }
+            else
+            {
+                rotationAndTranslation = Matrix.Invert(Matrix.CreateLookAt(origin, origin + normal, Vector3.Backward));
             }
 
-            return Matrix.CreateScale(radius) * rotation * Matrix.CreateTranslation(origin);
+            return Matrix.CreateScale(radius) * rotationAndTranslation;
         }
     }
 }

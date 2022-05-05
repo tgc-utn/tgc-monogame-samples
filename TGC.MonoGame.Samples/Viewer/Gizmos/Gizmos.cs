@@ -311,7 +311,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
             View = view;
             Projection = projection;
             ViewProjection = View * Projection;
-            AxisLines.SetMatrices(view, projection);
+            AxisLines.SetView(view);
         }
 
         /// <summary>
