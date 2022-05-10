@@ -1,8 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Geometries.Textures;
@@ -81,10 +79,6 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         /// </summary>
         private Matrix FloorWorld { get; set; }
 
-        /// <summary>
-        /// The current blinn-phong type
-        /// </summary>
-        private BlinnPhongType EffectType { get; set; }
 
         /// <inheritdoc />
         public BlinnPhongTypes(TGCViewer game) : base(game)
@@ -136,6 +130,14 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
                 }
             }
 
+            // Add options to pick the blinn phong type
+            ModifierController.AddOptions("Blinn Phong Type", new[]
+            {
+                "Default",
+                "Gouraud",
+                "Normal Mapping"
+            }, BlinnPhongType.DEFAULT, BlinnPhongTypeChange);
+
 
             // Add mappings for modifiers to control values
             ModifierController.AddVector("Light Position", SetLightPosition, Vector3.Up * 45f);
@@ -149,14 +151,6 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             ModifierController.AddFloat("Shininess", Effect.Parameters["shininess"], 4.0f, 1f, 64f);
             
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-
-            // Add options to pick the blinn phong type
-            ModifierController.AddOptions("Blinn Phong Type", new[]
-            {
-                "Default",
-                "Gouraud",
-                "Normal Mapping"
-            }, BlinnPhongType.DEFAULT, BlinnPhongTypeChange);
 
             base.LoadContent();
         }
@@ -240,6 +234,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
                     break;
             }
         }
+
 
         /// <summary>
         /// The different types of blinn-phong illumination
