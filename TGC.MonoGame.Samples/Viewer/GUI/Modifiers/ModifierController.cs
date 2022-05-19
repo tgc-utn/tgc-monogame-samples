@@ -178,6 +178,18 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         }
 
         /// <summary>
+        ///     Adds a Vector2 Modifier with a given name and action.
+        /// </summary>
+        /// <param name="name">The name that will show in the GUI</param>
+        /// <param name="effectParameter">An <see cref="EffectParameter"/> that will recieve the Vector3 as value</param>
+        /// <param name="defaultValue">The default value that this modifier will have</param>
+        public void AddVector(string name, EffectParameter effectParameter, Vector3 defaultValue)
+        {
+            Modifiers.Add(new Vector3Modifier(name, effectParameter, defaultValue));
+        }
+
+
+        /// <summary>
         ///     Creates a Vector3 Modifier with a given name, action and default value.
         /// </summary>
         /// <param name="name">The name that will show in the GUI</param>
