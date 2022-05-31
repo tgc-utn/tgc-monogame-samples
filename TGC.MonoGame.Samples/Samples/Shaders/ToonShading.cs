@@ -168,14 +168,13 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         /// <inheritdoc />
         public override void Draw(GameTime gameTime)
         {
-            // Set the background color to black, and use the default depth configuration
+            // Set the background color to black
             Game.Background = Color.Black;
 
             var viewProjection = Camera.View * Camera.Projection;
 
             
-            // Set the camera position
-            // This changes every update so we need to set it before rendering
+            // Draw the model, pass the World, WorldViewProjection and InverseTransposeWorld matrices
             Effect.Parameters["World"].SetValue(ModelWorld);
             Effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Invert(Matrix.Transpose(ModelWorld)));
             Effect.Parameters["WorldViewProjection"].SetValue(ModelWorld * viewProjection);
@@ -185,21 +184,23 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
                 modelMesh.Draw(); 
             }
 
+            // Draw the floor, pass the World, WorldViewProjection and InverseTransposeWorld matrices
             Effect.Parameters["World"].SetValue(FloorWorld);
             Effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Invert(Matrix.Transpose(FloorWorld)));
             Effect.Parameters["WorldViewProjection"].SetValue(FloorWorld * viewProjection);
 
             Floor.Draw(Effect);
 
+            // Draw a box to show where the light is
             LightBox.Draw(LightBoxWorld, Camera.View, Camera.Projection);
 
             base.Draw(gameTime);
         }
 
         /// <summary>
-        /// Processes a change in the blinn-phong type.
+        /// Processes a change in the toon shader type.
         /// </summary>
-        /// <param name="type">The new blinn-phong type to use</param>
+        /// <param name="type">The new toon shader type to use</param>
         private void ToonShadingTypeChange(ToonShadingType type)
         {
             switch(type)

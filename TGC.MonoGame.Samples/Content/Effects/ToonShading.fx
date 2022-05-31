@@ -11,10 +11,10 @@ float4x4 WorldViewProjection;
 float4x4 World;
 float4x4 InverseTransposeWorld;
 
-float3 colorA; // Color A
-float3 colorB; // Color B
-float3 colorC; // Color C
-float3 colorD; // Color C
+float3 colorA;
+float3 colorB;
+float3 colorC;
+float3 colorD;
 
 float3 colorRange;
 
@@ -67,14 +67,13 @@ float4 MainPS(VertexShaderOutput input) : COLOR
     float NdotL = dot(normal, lightDirection);
     float diffuseLight = NdotL * 0.5 + 0.5;
     
-    // Final calculation
-    float calculation = KAmbient + diffuseLight;
+    // Add an ambient factor
+    float light = KAmbient + diffuseLight;
     
-    //float f = tex2D(textureSampler, input.WorldPosition.xz);
-    
-    float3 color = lerp(colorA, colorB, step(colorRange.x, calculation));
-    color = lerp(color, colorC, step(colorRange.y, calculation));
-    color = lerp(color, colorD, step(colorRange.z, calculation));
+    // Interpolate between colors depending on the amount of light
+    float3 color = lerp(colorA, colorB, step(colorRange.x, light));
+    color = lerp(color, colorC, step(colorRange.y, light));
+    color = lerp(color, colorD, step(colorRange.z, light));
      
     return float4(color, 1.0);
 
@@ -90,10 +89,11 @@ float4 LookUpTablePS(VertexShaderOutput input) : COLOR
     float NdotL = dot(normal, lightDirection);
     float diffuseLight = NdotL * 0.5 + 0.5;
     
-    // Final calculation
-    float calculation = KAmbient + diffuseLight;
+    // Add an ambient factor
+    float light = KAmbient + diffuseLight;
     
-    float3 color = tex1D(lookUpTableSampler, calculation).rgb;
+    // Get the final color using a look up table, using our light as 1D coordinate from 0 to 1
+    float3 color = tex1D(lookUpTableSampler, light).rgb;
      
     return float4(color, 1.0);
 }
