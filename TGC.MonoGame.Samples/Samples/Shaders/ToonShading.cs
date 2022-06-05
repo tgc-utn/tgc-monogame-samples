@@ -171,6 +171,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             // Set the background color to black
             Game.Background = Color.Black;
 
+            
             var viewProjection = Camera.View * Camera.Projection;
 
             
@@ -203,14 +204,13 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         /// <param name="type">The new toon shader type to use</param>
         private void ToonShadingTypeChange(ToonShadingType type)
         {
-            switch(type)
+            if (type.Equals(ToonShadingType.LOOKUPTABLE))
             {
-                case ToonShadingType.LOOKUPTABLE:
-                    Effect.CurrentTechnique = Effect.Techniques["LookUpTable"];
-                    break;
-                default:
-                    Effect.CurrentTechnique = Effect.Techniques["Default"];
-                    break;
+                Effect.CurrentTechnique = Effect.Techniques["LookUpTable"];
+            }
+            else
+            {
+                Effect.CurrentTechnique = Effect.Techniques["Default"];
             }
         }
 
