@@ -110,7 +110,7 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
 
 
             // Create draw instances for models that use AABBs for bounding volumes
-            BoxModels = new DrawInstanceBox[]
+            BoxModels = new []
             {
                 new DrawInstanceBox
                 {
@@ -145,7 +145,7 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
             }
 
             // Create draw instances for models that use spheres for bounding volumes
-            SphereModels = new DrawInstanceSphere[]
+            SphereModels = new []
             {
                 new DrawInstanceSphere
                 {
@@ -286,7 +286,7 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
     /// <summary>
     /// Represents a model to draw with a world matrix to place it in the world, and an AABB for visibility testing.
     /// </summary>
-    struct DrawInstanceBox
+    struct DrawInstanceBox : IEquatable<DrawInstanceBox>
     {
         /// <summary>
         /// A model to draw
@@ -318,12 +318,18 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
             BoxWorldSpace.Max = Box.Max + translation;
         }
 
+
+        /// <inheritdoc />
+        public bool Equals(DrawInstanceBox other)
+        {
+            return BoxWorldSpace.Equals(other.BoxWorldSpace) && Model.Equals(other.Model) && World.Equals(other.World);
+        }
     }
 
     /// <summary>
     /// Represents a model to draw with a world matrix to place it in the world, and a sphere for visibility testing.
     /// </summary>
-    struct DrawInstanceSphere
+    struct DrawInstanceSphere : IEquatable<DrawInstanceSphere>
     {
         /// <summary>
         /// A model to draw
@@ -340,12 +346,19 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
         /// </summary>
         public Matrix World;
 
+
         /// <summary>
         /// Updates the sphere by using the world matrix
         /// </summary>
         public void UpdateSphere()
         {
             Sphere.Center = World.Translation;
+        }
+
+        /// <inheritdoc />
+        public bool Equals(DrawInstanceSphere other)
+        {
+            return Sphere.Equals(other.Sphere) && Model.Equals(other.Model) && World.Equals(other.World);
         }
     }
 }
