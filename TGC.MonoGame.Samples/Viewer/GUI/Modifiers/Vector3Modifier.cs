@@ -1,4 +1,5 @@
 ﻿using ImGuiNET;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Numerics;
 using MonoGameVector3 = Microsoft.Xna.Framework.Vector3;
@@ -35,6 +36,19 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <param name="defaultValue">The Vector3 default value</param>
         public Vector3Modifier(string name, Action<MonoGameVector3> onChange, MonoGameVector3 defaultValue)
             : this(name, onChange)
+        {
+            _vectorValue = Convert(defaultValue);
+            OnChange.Invoke(defaultValue);
+        }
+
+        /// <summary>
+        ///     Creates a Vector3 Modifier with a given name, action and default value.
+        /// </summary>
+        /// <param name="name">The name that will show in the GUI</param>
+        /// <param name="effectParameter">An <see cref="EffectParameter" /> that will recieve the Vector3 as value</param>
+        /// <param name="defaultValue">The Vector3 default value</param>
+        public Vector3Modifier(string name, EffectParameter effectParameter, MonoGameVector3 defaultValue)
+        : this(name, (vector) => effectParameter.SetValue(vector))
         {
             _vectorValue = Convert(defaultValue);
             OnChange.Invoke(defaultValue);

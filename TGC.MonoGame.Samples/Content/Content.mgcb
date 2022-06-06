@@ -304,6 +304,12 @@
 /processorParam:DebugMode=Auto
 /build:Effects/TextureTiling.fx
 
+#begin Effects/ToonShading.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/ToonShading.fx
+
 #begin Music/retro-platforming.mp3
 /importer:Mp3Importer
 /processor:SongProcessor
@@ -953,6 +959,18 @@
 /processorParam:MakeSquare=True
 /processorParam:TextureFormat=Color
 /build:Textures/stones.jpg
+
+#begin Textures/toon/lut.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/toon/lut.png
 
 #begin Textures/tunel/level2.png
 /importer:TextureImporter
