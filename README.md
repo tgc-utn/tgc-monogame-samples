@@ -4,7 +4,9 @@
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/83dc66740f7d4b0893ad9e556a6496d6)](https://www.codacy.com/gh/tgc-utn/tgc-monogame-samples/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tgc-utn/tgc-monogame-samples&amp;utm_campaign=Badge_Grade)
 [![Join our Discord](https://img.shields.io/badge/chat%20on-discord-7289DA?logo=discord&logoColor=white)](https://discord.gg/FKZ4k39zAr)
 
-[#BuiltWithMonoGame](http://www.monogame.net) and [.NET Core](https://dotnet.microsoft.com)
+![tgc-screenshot](https://user-images.githubusercontent.com/7131403/172287114-1bc554f0-3dcd-411f-b5be-a0d994990563.png)
+
+[#BuiltWithMonoGame](http://www.monogame.net) and [.NET Core](https://dotnet.microsoft.com).
 
 ## Install
 * [.NET Core SDK](https://docs.microsoft.com/dotnet/core/install/sdk)
@@ -17,7 +19,6 @@
     * [Visual Studio](https://visualstudio.microsoft.com/es/vs) and [HLSL extension](https://marketplace.visualstudio.com/items?itemName=TimGJones.HLSLToolsforVisualStudio)
   * macOS
     * [Visual Studio for Mac](https://visualstudio.microsoft.com/es/vs/mac)
-  
 * [MGCB Editor](https://docs.monogame.net/articles/tools/mgcb_editor.html)
 * [MGFXC](https://docs.monogame.net/articles/tools/mgfxc.html)
 
