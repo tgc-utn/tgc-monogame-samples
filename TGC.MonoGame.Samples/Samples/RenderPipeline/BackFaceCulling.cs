@@ -91,7 +91,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         private void LoadArrows(GeometricPrimitive primitive)
         {
             List<ushort> indices = primitive.Indices;
-            List<VertexPositionColorNormal> vertices = primitive.Vertices;
+            List<Geometries.VertexPositionColorNormal> vertices = primitive.Vertices;
             int indexCount = indices.Count;
 
             // Load arrows

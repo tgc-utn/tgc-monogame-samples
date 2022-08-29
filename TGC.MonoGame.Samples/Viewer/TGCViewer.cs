@@ -25,15 +25,13 @@ namespace TGC.MonoGame.Samples.Viewer
         {
             Graphics = new GraphicsDeviceManager(this);
             //Graphics.IsFullScreen = true;
-            //Graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width - 100;
-            //Graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 100;
-            //Graphics.GraphicsProfile = GraphicsProfile.HiDef;
-            //Graphics.PreferMultiSampling = true;
+            Graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width - 100;
+            Graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 100;
+            Graphics.GraphicsProfile = GraphicsProfile.HiDef;
+            Graphics.PreferMultiSampling = true;
             Content.RootDirectory = ContentFolder;
             IsMouseVisible = true;
-
             Gizmos = new Gizmos.Gizmos();
-
             Model = new TGCViewerModel(this);
             Model.LoadTreeSamples();
         }
@@ -72,9 +70,7 @@ namespace TGC.MonoGame.Samples.Viewer
         ///     Enables a group of sprites to be drawn using the same settings.
         /// </summary>
         public SpriteBatch SpriteBatch { get; set; }
-
-
-
+        
         /// <summary>
         ///     This method is called after the constructor, but before the main game loop (Update/Draw).
         ///     Allows the game to perform any initialization it needs to before starting to run.
@@ -83,19 +79,9 @@ namespace TGC.MonoGame.Samples.Viewer
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-
-            // Needs here because of https://github.com/MonoGame/MonoGame/pull/7299
-            Graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width - 100;
-            Graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 100;
-            Graphics.ApplyChanges();
-
             Model.LoadImgGUI();
             Model.LoadWelcomeSample();
-
             Background = Color.CornflowerBlue;
-
-
             base.Initialize();
         }
 
@@ -105,7 +91,6 @@ namespace TGC.MonoGame.Samples.Viewer
         /// </summary>
         protected override void LoadContent()
         {
-            //TODO: use this.Content to load your game content here
             Gizmos.LoadContent(GraphicsDevice, new ContentManager(Content.ServiceProvider, ContentFolder));
 
             // Create a new SpriteBatch, which can be used to draw textures.
@@ -119,10 +104,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="gameTime">Holds the time state of a <see cref="Game" />.</param>
         protected override void Update(GameTime gameTime)
         {
-            // TODO: Add your update logic here
-
             HandleInput();
-
             base.Update(gameTime);
         }
 
@@ -133,14 +115,9 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <param name="gameTime">Holds the time state of a <see cref="Game" />.</param>
         protected override void Draw(GameTime gameTime)
         {
-            //TODO: Add your drawing code here
-
             GraphicsDevice.Clear(Background);
-
             base.Draw(gameTime);
-
             Model.DrawSampleExplorer(gameTime);
-
             Gizmos.Draw();
         }
 
@@ -160,7 +137,6 @@ namespace TGC.MonoGame.Samples.Viewer
         private void HandleInput()
         {
             CurrentKeyboardState = Keyboard.GetState();
-
             CurrentMouseState = Mouse.GetState();
 
             // Check for exit.
