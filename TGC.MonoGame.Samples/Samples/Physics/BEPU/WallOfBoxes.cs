@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using BepuPhysics;
 using BepuPhysics.Collidables;
+using BepuPhysics.Constraints;
 using BepuUtilities.Memory;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -13,7 +14,7 @@ using TGC.MonoGame.Samples.Physics.Bepu;
 using TGC.MonoGame.Samples.Viewer;
 using NumericVector3 = System.Numerics.Vector3;
 
-namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
+namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
 {
     /// <summary>
     ///     Wall Of Boxes:
@@ -107,8 +108,10 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
             // The PositionFirstTimestepper is the simplest timestepping mode, but since it integrates velocity into position at the start of the frame, directly modified velocities outside of the timestep
             // will be integrated before collision detection or the solver has a chance to intervene. That's fine in this demo. Other built-in options include the PositionLastTimestepper and the SubsteppingTimestepper.
             // Note that the timestepper also has callbacks that you can use for executing logic between processing stages, like BeforeCollisionDetection.
-            Simulation = Simulation.Create(BufferPool, new NarrowPhaseCallbacks(),
-                new PoseIntegratorCallbacks(new NumericVector3(0, -100, 0)), new PositionFirstTimestepper());
+            Simulation = Simulation.Create(BufferPool,
+                new NarrowPhaseCallbacks(new SpringSettings(30, 1)),
+                new PoseIntegratorCallbacks(new NumericVector3(0, -100, 0)),
+                new SolveDescription(8, 1));
 
             // Creates a floor
             var floorTexture = Game.Content.Load<Texture2D>(ContentFolderTextures + "floor/adoquin-2");
@@ -120,7 +123,7 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
 
             FloorWorld = Matrix.CreateScale(400f) * Matrix.CreateTranslation(new Vector3(75,0, -150));
             Simulation.Statics.Add(new StaticDescription(new NumericVector3(0, -0.5f, 0),
-                new CollidableDescription(Simulation.Shapes.Add(new Box(2000, 1, 2000)), 0.1f)));
+                Simulation.Shapes.Add(new Box(2000, 1, 2000))));
 
             BoxesWorld = new List<Matrix>();
             SpheresWorld = new List<Matrix>();
@@ -128,19 +131,21 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
             // Single Box
             var radius = 10;
             for (var j = 0; j < 5; j++)
-            for (var i = 0; i < 20; i++)
             {
-                var boxShape = new Box(radius, radius, radius);
-                boxShape.ComputeInertia(0.4f, out var boxInertia);
-                var boxIndex = Simulation.Shapes.Add(boxShape);
-                var position = new NumericVector3(-30 + i * 10 + 1, j * 10 + 1, -40);
+                for (var i = 0; i < 20; i++)
+                {
+                    var boxShape = new Box(radius, radius, radius);
+                    var boxInertia = boxShape.ComputeInertia(0.4f);
+                    var boxIndex = Simulation.Shapes.Add(boxShape);
+                    var position = new NumericVector3(-30 + i * 10 + 1, j * 10 + 1, -40);
 
-                var bodyDescription = BodyDescription.CreateDynamic(position, boxInertia,
-                    new CollidableDescription(boxIndex, 0.1f), new BodyActivityDescription(0.01f));
+                    var bodyDescription = BodyDescription.CreateDynamic(position, boxInertia, 
+                        new CollidableDescription(boxIndex, 0.1f), new BodyActivityDescription(0.01f));
 
-                var bodyHandle = Simulation.Bodies.Add(bodyDescription);
+                    var bodyHandle = Simulation.Bodies.Add(bodyDescription);
 
-                BoxHandles.Add(bodyHandle);
+                    BoxHandles.Add(bodyHandle);
+                }
             }
 
             base.LoadContent();
@@ -236,7 +241,7 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
             SpheresWorld.ForEach(sphereWorld => Sphere.Draw(sphereWorld, Camera.View, Camera.Projection));
 
             Game.SpriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
-            Game.SpriteBatch.DrawString(SpriteFont, "Launch spheres with the 'Z' key.", new Vector2(GraphicsDevice.Viewport.Width - 400, 0), Color.White);
+            Game.SpriteBatch.DrawString(SpriteFont, "Launch spheres with the 'Z' key.", new Vector2(GraphicsDevice.Viewport.Width - 500, 0), Color.White);
             Game.SpriteBatch.End();
             
             base.Draw(gameTime);

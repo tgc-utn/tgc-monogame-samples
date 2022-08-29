@@ -6,9 +6,15 @@ using BepuUtilities.Memory;
 
 namespace TGC.MonoGame.Samples.Physics.Bepu
 {
+    /// <summary>
+    /// Provides a <see cref="IThreadDispatcher"/> implementation. Not reentrant.
+    /// </summary>
     public class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
     {
         int threadCount;
+        /// <summary>
+        /// Gets the number of threads to dispatch work on.
+        /// </summary>
         public int ThreadCount => threadCount;
         struct Worker
         {
@@ -21,7 +27,12 @@ namespace TGC.MonoGame.Samples.Physics.Bepu
 
         BufferPool[] bufferPools;
 
-        public SimpleThreadDispatcher(int threadCount)
+        /// <summary>
+        /// Creates a new thread dispatcher with the given number of threads.
+        /// </summary>
+        /// <param name="threadCount">Number of threads to dispatch on each invocation.</param>
+        /// <param name="threadPoolBlockAllocationSize">Size of memory blocks to allocate for thread pools.</param>
+        public SimpleThreadDispatcher(int threadCount, int threadPoolBlockAllocationSize = 16384)
         {
             this.threadCount = threadCount;
             workers = new Worker[threadCount - 1];
@@ -29,13 +40,13 @@ namespace TGC.MonoGame.Samples.Physics.Bepu
             {
                 workers[i] = new Worker { Thread = new Thread(WorkerLoop), Signal = new AutoResetEvent(false) };
                 workers[i].Thread.IsBackground = true;
-                workers[i].Thread.Start(workers[i].Signal);
+                workers[i].Thread.Start((workers[i].Signal, i + 1));
             }
             finished = new AutoResetEvent(false);
             bufferPools = new BufferPool[threadCount];
             for (int i = 0; i < bufferPools.Length; ++i)
             {
-                bufferPools[i] = new BufferPool();
+                bufferPools[i] = new BufferPool(threadPoolBlockAllocationSize);
             }
         }
 
@@ -44,56 +55,69 @@ namespace TGC.MonoGame.Samples.Physics.Bepu
             Debug.Assert(workerBody != null);
             workerBody(workerIndex);
 
-            if (Interlocked.Increment(ref completedWorkerCounter) == threadCount)
+            if (Interlocked.Decrement(ref remainingWorkerCounter) == -1)
             {
                 finished.Set();
             }
         }
 
         volatile Action<int> workerBody;
-        int workerIndex;
-        int completedWorkerCounter;
+        int remainingWorkerCounter;
 
         void WorkerLoop(object untypedSignal)
         {
-            var signal = (AutoResetEvent)untypedSignal;
+            var (signal, workerIndex) = ((AutoResetEvent, int))untypedSignal;
             while (true)
             {
                 signal.WaitOne();
                 if (disposed)
                     return;
-                DispatchThread(Interlocked.Increment(ref workerIndex) - 1);
+                DispatchThread(workerIndex);
             }
         }
 
-        void SignalThreads()
+        void SignalThreads(int maximumWorkerCount)
         {
-            for (int i = 0; i < workers.Length; ++i)
+            //Worker 0 is not signalled; it's the executing thread.
+            //So if we want 4 total executing threads, we should signal 3 workers.
+            int maximumWorkersToSignal = maximumWorkerCount - 1;
+            var workersToSignal = maximumWorkersToSignal < workers.Length ? maximumWorkersToSignal : workers.Length;
+            remainingWorkerCounter = workersToSignal;
+            for (int i = 0; i < workersToSignal; ++i)
             {
                 workers[i].Signal.Set();
             }
         }
 
-        public void DispatchWorkers(Action<int> workerBody)
+        public void DispatchWorkers(Action<int> workerBody, int maximumWorkerCount = int.MaxValue)
         {
-            Debug.Assert(this.workerBody == null);
-            workerIndex = 1; //Just make the inline thread worker 0. While the other threads might start executing first, the user should never rely on the dispatch order.
-            completedWorkerCounter = 0;
-            this.workerBody = workerBody;
-            SignalThreads();
-            //Calling thread does work. No reason to spin up another worker and block this one!
-            DispatchThread(0);
-            finished.WaitOne();
-            this.workerBody = null;
+            if (maximumWorkerCount > 1)
+            {
+                Debug.Assert(this.workerBody == null);
+                this.workerBody = workerBody;
+                SignalThreads(maximumWorkerCount);
+                //Calling thread does work. No reason to spin up another worker and block this one!
+                DispatchThread(0);
+                finished.WaitOne();
+                this.workerBody = null;
+            }
+            else if (maximumWorkerCount == 1)
+            {
+                workerBody(0);
+            }
         }
 
         volatile bool disposed;
+
+        /// <summary>
+        /// Waits for all pending work to complete and then disposes all workers.
+        /// </summary>
         public void Dispose()
         {
             if (!disposed)
             {
                 disposed = true;
-                SignalThreads();
+                SignalThreads(threadCount);
                 for (int i = 0; i < bufferPools.Length; ++i)
                 {
                     bufferPools[i].Clear();
@@ -111,5 +135,4 @@ namespace TGC.MonoGame.Samples.Physics.Bepu
             return bufferPools[workerIndex];
         }
     }
-
 }
