@@ -48,7 +48,10 @@ public class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
 
         finished = new AutoResetEvent(false);
         bufferPools = new BufferPool[threadCount];
-        for (var i = 0; i < bufferPools.Length; ++i) bufferPools[i] = new BufferPool(threadPoolBlockAllocationSize);
+        for (var i = 0; i < bufferPools.Length; ++i)
+        {
+            bufferPools[i] = new BufferPool(threadPoolBlockAllocationSize);
+        }
     }
 
     /// <summary>
@@ -60,7 +63,11 @@ public class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
         {
             disposed = true;
             SignalThreads(ThreadCount);
-            for (var i = 0; i < bufferPools.Length; ++i) bufferPools[i].Clear();
+            foreach (var t in bufferPools)
+            {
+                t.Clear();
+            }
+
             foreach (var worker in workers)
             {
                 worker.Thread.Join();
@@ -102,7 +109,10 @@ public class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
         Debug.Assert(workerBody != null);
         workerBody(workerIndex);
 
-        if (Interlocked.Decrement(ref remainingWorkerCounter) == -1) finished.Set();
+        if (Interlocked.Decrement(ref remainingWorkerCounter) == -1)
+        {
+            finished.Set();
+        }
     }
 
     private void WorkerLoop(object untypedSignal)
@@ -112,7 +122,9 @@ public class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
         {
             signal.WaitOne();
             if (disposed)
+            {
                 return;
+            }
             DispatchThread(workerIndex);
         }
     }
@@ -124,7 +136,10 @@ public class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
         var maximumWorkersToSignal = maximumWorkerCount - 1;
         var workersToSignal = maximumWorkersToSignal < workers.Length ? maximumWorkersToSignal : workers.Length;
         remainingWorkerCounter = workersToSignal;
-        for (var i = 0; i < workersToSignal; ++i) workers[i].Signal.Set();
+        for (var i = 0; i < workersToSignal; ++i)
+        {
+            workers[i].Signal.Set();
+        }
     }
 
     private struct Worker
