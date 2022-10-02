@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
-using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
 namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 {
@@ -66,7 +65,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         /// <inheritdoc />
         protected override void LoadContent()
         {
-            // We load the sphere meshe into a model
+            // We load the sphere mesh into a model
             Primitive = new SpherePrimitive(GraphicsDevice, 1f, 6);
 
             LoadArrows(Primitive);
@@ -91,7 +90,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         private void LoadArrows(GeometricPrimitive primitive)
         {
             List<ushort> indices = primitive.Indices;
-            List<Geometries.VertexPositionColorNormal> vertices = primitive.Vertices;
+            List<VertexPositionColorNormal> vertices = primitive.Vertices;
             int indexCount = indices.Count;
 
             // Load arrows
