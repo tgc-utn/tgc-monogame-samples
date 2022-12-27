@@ -118,7 +118,7 @@ public struct PoseIntegratorCallbacks : IPoseIntegratorCallbacks
         //The types are laid out in array-of-structures-of-arrays (AOSOA) format. That's because this function is frequently called from vectorized contexts within the solver.
         //Transforming to "array of structures" (AOS) format for the callback and then back to AOSOA would involve a lot of overhead, so instead the callback works on the AOSOA representation directly.
         velocity.Linear = (velocity.Linear + GravityWideDt) * LinearDampingDt;
-        velocity.Angular = velocity.Angular * AngularDampingDt;
+        velocity.Angular *= AngularDampingDt;
     }
 }
 

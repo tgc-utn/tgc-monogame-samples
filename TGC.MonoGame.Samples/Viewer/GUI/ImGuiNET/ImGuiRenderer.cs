@@ -215,6 +215,8 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
         /// </summary>
         private void UpdateInput()
         {
+            if (!_game.IsActive) return;
+
             var io = ImGui.GetIO();
 
             var mouse = Mouse.GetState();
