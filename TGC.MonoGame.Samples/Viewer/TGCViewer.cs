@@ -28,7 +28,8 @@ namespace TGC.MonoGame.Samples.Viewer
             Graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width - 100;
             Graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 100;
             Graphics.GraphicsProfile = GraphicsProfile.HiDef;
-            Graphics.PreferMultiSampling = true;
+            // Commented because of https://github.com/MonoGame/MonoGame/issues/7914
+            //Graphics.PreferMultiSampling = true;
             Content.RootDirectory = ContentFolder;
             IsMouseVisible = true;
             Gizmos = new Gizmos.Gizmos();
