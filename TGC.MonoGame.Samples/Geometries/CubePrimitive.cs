@@ -53,7 +53,7 @@ namespace TGC.MonoGame.Samples.Geometries
                 // top normal
                 Vector3.UnitY,
                 // bottom normal
-                -Vector3.UnitZ
+                -Vector3.UnitY
             };
 
             Color[] colors =
