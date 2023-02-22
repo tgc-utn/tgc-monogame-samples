@@ -8,8 +8,9 @@
 
 [#BuiltWithMonoGame](http://www.monogame.net) and [.NET Core](https://dotnet.microsoft.com).
 
-## [Install](docs/install/install.md)
-Since MonoGame is cross platform follow the document for your operating system.
+## Install
+
+Since MonoGame is cross platform follow the [document](docs/install/install.md) for your operating system.
 
 ### Known issues
 
