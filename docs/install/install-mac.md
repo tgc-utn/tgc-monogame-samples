@@ -8,13 +8,13 @@ Outside of Windows you need [Wine's](https://www.winehq.org) help for Effects(HL
 
 ## Install Homebrew
 
-* [Homebrew](https://brew.sh)
+* [Homebrew](https://brew.sh).
 
 ## Set up MonoGame
 
 ```bash
 brew install dotnet@6
-echo 'export PATH="/usr/local/opt/dotnet@6/bin:$PATH"' >> ~/.zshrc
+echo 'export PATH="/opt/homebrew/opt/dotnet@6/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 # To check the version installed.
 dotnet --info
@@ -48,11 +48,6 @@ wget -qO- https://raw.githubusercontent.com/MonoGame/MonoGame/develop/Tools/Mono
 You can use Visual Studio Code or Rider. The official documentation only explains it for Visual Studio but it is up to
 you which one you are more comfortable with.
 
-## Set up Visual Studio Code
-
-Go to the official page to download and
-install [Visual Studio 2022 for Mac](https://visualstudio.microsoft.com/es/vs/mac/).
-
 ### Visual Studio Code
 
 ```bash
@@ -69,6 +64,11 @@ code --install-extension timgjones.hlsltools
 brew install --cask rider
 ```
 
+## Visual Studio
+
+Go to the official page to download and
+install [Visual Studio 2022 for Mac](https://visualstudio.microsoft.com/es/vs/mac/).
+
 ## Set up tgc-monogame-samples
 
 ```bash
@@ -83,4 +83,5 @@ dotnet run --project TGC.MonoGame.Samples
 
 ### Known issues
 
-WIP
+* Assimp.AssimpException: Error loading unmanaged library from path: libassimp.dylib - WIP
+* System.DllNotFoundException: Unable to load shared library 'freetype6' or one of its dependencies. - WIP

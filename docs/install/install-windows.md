@@ -6,8 +6,8 @@ The offical [documentation](https://docs.monogame.net/articles/getting_started/1
 
 ## Install Terminal and WinGet CLI on Windows 10 (on Windows 11 is already install)
 
-* [Windows Terminal](https://aka.ms/terminal)
-* [WinGet CLI](https://aka.ms/winget-cli)
+* [Windows Terminal](https://aka.ms/terminal).
+* [WinGet CLI](https://aka.ms/winget-cli).
 
 ## Set up MonoGame
 
@@ -79,6 +79,6 @@ dotnet run --project TGC.MonoGame.Samples
 
 ### Known issues
 
-* Unable to load DLL 'freetype6.dll' - Install [Microsoft Visual C++ Redistributable 2012](https://www.microsoft.com/en-us/download/details.aspx?id=30679)
-* Unable to load DLL 'libmojoshader_64.dll' - Install [Microsoft Visual C++ Redistributable 2013](https://aka.ms/highdpimfc2013x64enu)
-* Unable to load DLL 'FreeImage' - Install [Microsoft Visual C++ Redistributable for Visual Studio 2015, 2017 and 2019](https://aka.ms/vs/16/release/vc_redist.x64.exe)
+* Unable to load DLL 'freetype6.dll' - Install [Microsoft Visual C++ Redistributable 2012](https://www.microsoft.com/en-us/download/details.aspx?id=30679).
+* Unable to load DLL 'libmojoshader_64.dll' - Install [Microsoft Visual C++ Redistributable 2013](https://aka.ms/highdpimfc2013x64enu).
+* Unable to load DLL 'FreeImage' - Install [Microsoft Visual C++ Redistributable for Visual Studio 2015, 2017 and 2019](https://aka.ms/vs/16/release/vc_redist.x64.exe).

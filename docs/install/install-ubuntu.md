@@ -2,7 +2,7 @@
 
 Tested on Ubuntu 22.04 LTS.
 
-The offical [documentation](https://docs.monogame.net/articles/getting_started/1_setting_up_your_development_environment_ubuntu.html)
+The offical [documentation](https://docs.monogame.net/articles/getting_started/1_setting_up_your_development_environment_ubuntu.html).
 
 Outside of Windows you need [Wine's](https://www.winehq.org) help for Effects(HLSL), at least for [now](https://github.com/MonoGame/MonoGame/issues/2167).
 
