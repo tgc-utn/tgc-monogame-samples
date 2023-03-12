@@ -27,7 +27,7 @@ Read more about [.NET Core CLI Tools telemetry](https://aka.ms/dotnet-cli-teleme
 
 ## Setting up your development environment
 
-* [Install on Ubuntu](install-ubuntu.md).
+* [~~Install on Ubuntu~~](install-ubuntu.md).
 * [Install on macOS](install-mac.md).
 * [Install on Windows](install-windows.md).
 

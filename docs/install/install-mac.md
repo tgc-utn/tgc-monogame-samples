@@ -35,6 +35,7 @@ For now it does not work on ARM chips (M1 and M2).
 
 ```bash
 brew install p7zip wget wine-stable xquartz
+wine64 --version
 ```
 
 You will need to open Wine manually first. Otherwise, you will get an error that Apple couldn't verify it.
@@ -76,6 +77,8 @@ brew install git git-lfs
 git lfs install
 git clone https://github.com/tgc-utn/tgc-monogame-samples.git
 cd tgc-monogame-samples
+# MonoGame Effects Compiler (MGFXC)
+dotnet tool install -g dotnet-mgfxc
 dotnet restore
 dotnet build
 dotnet run --project TGC.MonoGame.Samples

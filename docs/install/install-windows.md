@@ -72,6 +72,8 @@ Open other terminal ([Issue 222](https://github.com/microsoft/winget-cli/issues/
 ```bash
 git clone https://github.com/tgc-utn/tgc-monogame-samples.git
 cd tgc-monogame-samples
+# MonoGame Effects Compiler (MGFXC)
+dotnet tool install -g dotnet-mgfxc
 dotnet restore
 dotnet build
 dotnet run --project TGC.MonoGame.Samples
