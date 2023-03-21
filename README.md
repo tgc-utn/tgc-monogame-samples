@@ -10,7 +10,8 @@
 
 ## Install
 
-Since MonoGame is cross platform follow the [document](docs/install/install.md) for your operating system.
+Since MonoGame is cross platform follow the [document](docs/install/install.md)
+for your operating system.
 
 ### Known issues
 
