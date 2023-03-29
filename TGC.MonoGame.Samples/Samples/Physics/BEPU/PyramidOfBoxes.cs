@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using BepuPhysics;
 using BepuPhysics.Collidables;
+using BepuPhysics.Constraints;
 using BepuUtilities.Memory;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -12,7 +13,7 @@ using TGC.MonoGame.Samples.Physics.Bepu;
 using TGC.MonoGame.Samples.Viewer;
 using NumericVector3 = System.Numerics.Vector3;
 
-namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
+namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
 {
     /// <summary>
     ///     Pyramid Of Boxes:
@@ -92,7 +93,7 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
             var size = GraphicsDevice.Viewport.Bounds.Size;
             size.X /= 2;
             size.Y /= 2;
-            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 40, 200), size);
+            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 25, 160), size);
 
             base.Initialize();
         }
@@ -101,8 +102,8 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
         {
             SpriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
             
-            Simulation = Simulation.Create(BufferPool, new NarrowPhaseCallbacks(),
-                new PoseIntegratorCallbacks(new NumericVector3(0, -10, 0)), new PositionFirstTimestepper());
+            Simulation = Simulation.Create(BufferPool, new NarrowPhaseCallbacks(new SpringSettings(30, 1)),
+                new PoseIntegratorCallbacks(new NumericVector3(0, -10, 0)), new SolveDescription(8, 1));
 
             SphereHandles = new List<BodyHandle>();
             ActiveBoxesWorld = new List<Matrix>();
@@ -113,7 +114,7 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
             Radii = new List<float>();
 
             var boxShape = new Box(1, 1, 1);
-            boxShape.ComputeInertia(1, out var boxInertia);
+            var boxInertia = boxShape.ComputeInertia(1);
             var boxIndex = Simulation.Shapes.Add(boxShape);
             const int pyramidCount = 40;
             for (var pyramidIndex = 0; pyramidIndex < pyramidCount; ++pyramidIndex)
@@ -138,7 +139,7 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
 
             //Prevent the boxes from falling into the void.
             Simulation.Statics.Add(new StaticDescription(new NumericVector3(0, -0.5f, 0),
-                new CollidableDescription(Simulation.Shapes.Add(new Box(2500, 1, 2500)), 0.1f)));
+                Simulation.Shapes.Add(new Box(2500, 1, 2500))));
 
             cubePrimitive = new CubePrimitive(GraphicsDevice, 1f, Color.White);
 
@@ -260,8 +261,8 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
             SpheresWorld.ForEach(sphereWorld => spherePrimitive.Draw(sphereWorld, Camera.View, Camera.Projection));
 
             Game.SpriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
-            Game.SpriteBatch.DrawString(SpriteFont, "Box handled: " + count + ".", new Vector2(GraphicsDevice.Viewport.Width - 400, 0), Color.White);
-            Game.SpriteBatch.DrawString(SpriteFont, "Launch spheres with the 'Z' key.", new Vector2(GraphicsDevice.Viewport.Width - 400, 25), Color.White);
+            Game.SpriteBatch.DrawString(SpriteFont, "Box handled: " + count + ".", new Vector2(GraphicsDevice.Viewport.Width - 500, 0), Color.White);
+            Game.SpriteBatch.DrawString(SpriteFont, "Launch spheres with the 'Z' key.", new Vector2(GraphicsDevice.Viewport.Width - 500, 25), Color.White);
             Game.SpriteBatch.End();
             
             base.Draw(gameTime);
@@ -269,6 +270,7 @@ namespace TGC.MonoGame.Samples.Samples.Physics.BEPU
 
         protected override void UnloadContent()
         {
+            // TODO check why Simulation.Dispose method sometimes fails
             Simulation.Dispose();
 
             BufferPool.Clear();

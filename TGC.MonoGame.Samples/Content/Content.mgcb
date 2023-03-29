@@ -208,6 +208,12 @@
 /processorParam:DebugMode=Auto
 /build:Effects/BlinnPhong.fx
 
+#begin Effects/BlinnPhongTypes.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/BlinnPhongTypes.fx
+
 #begin Effects/Bloom.fx
 /importer:EffectImporter
 /processor:EffectProcessor
@@ -243,6 +249,12 @@
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:Effects/Gizmos.fx
+
+#begin Effects/MipMapping.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/MipMapping.fx
 
 #begin Effects/MRT.fx
 /importer:EffectImporter
@@ -291,6 +303,12 @@
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:Effects/TextureTiling.fx
+
+#begin Effects/ToonShading.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/ToonShading.fx
 
 #begin Music/retro-platforming.mp3
 /importer:Mp3Importer
@@ -365,6 +383,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/floor/tierra.jpg
+
+#begin Textures/floor/tiling-base.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=True
+/processorParam:TextureFormat=Color
+/build:Textures/floor/tiling-base.png
+
+#begin Textures/floor/tiling-normal.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=True
+/processorParam:TextureFormat=Color
+/build:Textures/floor/tiling-normal.png
 
 #begin Textures/grass.png
 /importer:TextureImporter
@@ -917,6 +959,18 @@
 /processorParam:MakeSquare=True
 /processorParam:TextureFormat=Color
 /build:Textures/stones.jpg
+
+#begin Textures/toon/lut.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/toon/lut.png
 
 #begin Textures/tunel/level2.png
 /importer:TextureImporter

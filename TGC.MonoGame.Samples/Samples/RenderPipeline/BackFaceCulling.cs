@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
-using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
 namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 {
@@ -66,7 +65,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         /// <inheritdoc />
         protected override void LoadContent()
         {
-            // We load the sphere meshe into a model
+            // We load the sphere mesh into a model
             Primitive = new SpherePrimitive(GraphicsDevice, 1f, 6);
 
             LoadArrows(Primitive);
