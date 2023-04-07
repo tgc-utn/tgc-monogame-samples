@@ -42,7 +42,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
 
         private int _horizontalScrollWheelValue;
         private readonly float WHEEL_DELTA = 120;
-        private Keys[] _allKeys = Enum.GetValues<Keys>();
+        private readonly Keys[] _allKeys = Enum.GetValues<Keys>();
 
         public ImGuiRenderer(Game game)
         {
