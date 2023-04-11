@@ -4,8 +4,9 @@ Test on Windows 10/11.
 
 The offical [documentation](https://docs.monogame.net/articles/getting_started/1_setting_up_your_development_environment_windows.html).
 
-## Install Terminal and WinGet CLI on Windows 10 (on Windows 11 is already install)
+## Install PowerShell, Terminal and WinGet CLI on Windows 10 (on Windows 11 is already install)
 
+* [PowerShell](https://aka.ms/powershell).
 * [Windows Terminal](https://aka.ms/terminal).
 * [WinGet CLI](https://aka.ms/winget-cli).
 
@@ -21,7 +22,6 @@ Open other terminal ([Issue 222](https://github.com/microsoft/winget-cli/issues/
 
 ```bash
 dotnet new --install MonoGame.Templates.CSharp
-dotnet tool install -g dotnet-mgfxc
 
 # Create a basic project to test if MonoGame is working.
 dotnet new mgdesktopgl -o MyGame
