@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TGC.MonoGame.Samples.Collisions
 {
@@ -302,16 +303,189 @@ namespace TGC.MonoGame.Samples.Collisions
             return true;
         }
 
-
         /// <summary>
         ///     Tests if this OBB intersects with another AABB.
         /// </summary>
-        /// <param name="box">The other AABB to test</param>
+        /// <param name="aabb">The other AABB to test</param>
         /// <returns>True if the two boxes intersect</returns>
-        public bool Intersects(BoundingBox box)
+        public bool Intersects(in BoundingBox aabb) 
         {
-            return Intersects(FromAABB(box));
+            Vector3[] test = new Vector3[15];
+
+            test[0] = new Vector3(1, 0, 0);
+            test[1] = new Vector3(0, 1, 0);
+            test[2] = new Vector3(0, 0, 1);
+            test[3] = Orientation.Right;
+            test[4] = Orientation.Up;
+            test[5] = Orientation.Forward;
+
+            for (int i = 0; i < 3; ++i) 
+            { 
+                // Fill out rest of axis
+                test[6 + i * 3 + 0] = Vector3.Cross(test[i], test[0]);
+                test[6 + i * 3 + 1] = Vector3.Cross(test[i], test[1]);
+                test[6 + i * 3 + 2] = Vector3.Cross(test[i], test[2]);
+            }
+
+            for (int i = 0; i < 15; ++i)
+            {
+                if (!OverlapOnAxis(aabb, test[i])) 
+                    // Separating axis found
+                    return false; 
+            }
+
+            return true;
         }
+
+        /// <summary>
+        ///     Tests if this OBB intersects with another AABB.
+        ///     Informs about the normal (pointing out from the OBB) and penetration distance between the two volumes.
+        /// </summary>
+        /// <param name="aabb">The other AABB to test</param>
+        /// <param name="normal">The normal vector of the intersection coming out from the OBB</param>
+        /// <param name="penetration">The penetration distance between two vectors</param>
+        /// <returns>True if the two boxes intersect</returns>
+        public bool Intersects(in BoundingBox aabb, out Vector3 normal, out float penetration) 
+        {
+            Vector3[] test = new Vector3[15];
+
+            test[0] = new Vector3(1, 0, 0);
+            test[1] = new Vector3(0, 1, 0);
+            test[2] = new Vector3(0, 0, 1);
+            test[3] = Orientation.Right;
+            test[4] = Orientation.Up;
+            test[5] = Orientation.Forward;
+
+            for (int i = 0; i < 3; ++i) 
+            { 
+                // Fill out rest of axis
+                test[6 + i * 3 + 0] = Vector3.Cross(test[i], test[0]);
+                test[6 + i * 3 + 1] = Vector3.Cross(test[i], test[1]);
+                test[6 + i * 3 + 2] = Vector3.Cross(test[i], test[2]);
+            }
+
+            penetration = float.MaxValue;
+            normal = Vector3.Zero;
+            
+            for (int i = 0; i < 15; ++i)
+            {
+                if (!OverlapOnAxis(aabb, test[i], out bool shouldFlip, out float currentPenetration)) 
+                    return false; 
+
+                if (currentPenetration > 0f && currentPenetration < penetration) 
+                {
+                    penetration = currentPenetration;
+                    normal = test[i] * (shouldFlip ? -1f : 1f);
+                }
+            }
+
+            return true;
+        }
+
+        bool OverlapOnAxis(in BoundingBox aabb, Vector3 axis) 
+        {
+            Interval a = GetInterval(aabb, axis);
+            Interval b = GetInterval(axis);
+            
+            return ((b.Min <= a.Max) && (a.Min <= b.Max));
+        }
+
+        bool OverlapOnAxis(in BoundingBox aabb, Vector3 axis, out bool outShouldFlip, out float penetration) 
+        {
+            Interval a = GetInterval(aabb, axis);
+            Interval b = GetInterval(axis);
+
+            if (!((b.Min <= a.Max) && (a.Min <= b.Max)))
+            {
+                outShouldFlip = false;
+                penetration = 0f;
+                return false;
+            }
+            
+            float len1 = a.Max - a.Min;
+            float len2 = b.Max - b.Min;
+            float min = MathF.Min(a.Min, b.Min);
+            float max = MathF.Max(a.Max, b.Max);
+            float length = max - min;
+
+            outShouldFlip = (b.Min < a.Min);
+            
+            penetration = (len1 + len2) - length;
+            
+            return true;
+        }
+        
+        Interval GetInterval(Vector3 axis) 
+        {
+            var vertex = new Vector3[8];
+
+            Vector3 C = Center;	// OBB Center
+            Vector3 E = Extents;		// OBB Extents
+            
+            Vector3[] A = 
+            {			// OBB Axis
+                Orientation.Right,
+                Orientation.Up,
+                Orientation.Forward,
+            };
+
+            vertex[0] = C + A[0] * E.X + A[1] * E.Y + A[2] * E.Z;
+            vertex[1] = C - A[0] * E.X + A[1] * E.Y + A[2] * E.Z;
+            vertex[2] = C + A[0] * E.X - A[1] * E.Y + A[2] * E.Z;
+            vertex[3] = C + A[0] * E.X + A[1] * E.Y - A[2] * E.Z;
+            vertex[4] = C - A[0] * E.X - A[1] * E.Y - A[2] * E.Z;
+            vertex[5] = C + A[0] * E.X - A[1] * E.Y - A[2] * E.Z;
+            vertex[6] = C - A[0] * E.X + A[1] * E.Y - A[2] * E.Z;
+            vertex[7] = C - A[0] * E.X - A[1] * E.Y + A[2] * E.Z;
+
+            Interval result;
+            result.Min = result.Max = Vector3.Dot(axis, vertex[0]);
+
+            for (int i = 1; i < 8; ++i) 
+            {
+                float projection = Vector3.Dot(axis, vertex[i]);
+                result.Min = (projection < result.Min) ? projection : result.Min;
+                result.Max = (projection > result.Max) ? projection : result.Max;
+            }
+
+            return result;
+        }
+
+        Interval GetInterval(in BoundingBox aabb, Vector3 axis)
+        {
+            Vector3 i = aabb.Min;
+            Vector3 a = aabb.Max;
+
+            Vector3[] vertex = 
+            {
+                new Vector3(i.X, a.Y, a.Z),
+                new Vector3(i.X, a.Y, i.Z),
+                new Vector3(i.X, i.Y, a.Z),
+                new Vector3(i.X, i.Y, i.Z),
+                new Vector3(a.X, a.Y, a.Z),
+                new Vector3(a.X, a.Y, i.Z),
+                new Vector3(a.X, i.Y, a.Z),
+                new Vector3(a.X, i.Y, i.Z)
+            };
+
+            Interval result;
+            result.Min = result.Max = Vector3.Dot(axis, vertex[0]);
+
+            for (int ij = 1; ij < 8; ++ij)
+            {
+                float projection = Vector3.Dot(axis, vertex[ij]);
+                result.Min = (projection < result.Min) ? projection : result.Min;
+                result.Max = (projection > result.Max) ? projection : result.Max;
+            }
+
+            return result;
+        }
+        
+        struct Interval
+        {
+            public float Min;
+            public float Max;
+        } 
 
         /// <summary>
         ///     Tests if this OBB intersects with a Ray.
