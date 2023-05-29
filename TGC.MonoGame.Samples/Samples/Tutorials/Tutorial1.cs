@@ -8,7 +8,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
     ///     Tutorial 1:
     ///     Shows how to create a triangle and display it on the screen.
     ///     The classic hello world in graphics.
-    ///     Author: René Juan Rico Mendoza.
+    ///     Author: Rene Juan Rico Mendoza.
     /// </summary>
     public class Tutorial1 : TGCSample
     {

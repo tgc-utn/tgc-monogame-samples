@@ -61,6 +61,11 @@ winget install JetBrains.Rider
 winget install Microsoft.VisualStudio.2022.Community
 ```
 
+#### Extensions
+
+* [HLSL Tools](https://marketplace.visualstudio.com/items?itemName=TimGJones.HLSLToolsforVisualStudio)
+* [MonoGame](https://marketplace.visualstudio.com/items?itemName=MonoGame.MonoGame-Templates-VSExtension)
+
 ## Set up tgc-monogame-samples
 
 ```bash

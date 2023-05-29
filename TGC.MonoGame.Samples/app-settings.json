@@ -1,0 +1,9 @@
+{
+  "BinFolder": "bin/",
+  "ObjFolder": "obj/",
+  "ContentExtension": ".xnb",
+  "ContentFolder": "Content/",
+  "FbxExtension": ".fbx",
+  "FbxImporterName": "FbxImporter",
+  "ProcessorName": "Animation Processor"
+}

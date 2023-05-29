@@ -5,6 +5,7 @@
     /// </summary>
     public static class TGCSampleCategory
     {
+        public const string Animations = "Animations";
         public const string Audio = "Audio";
         public const string Collisions = "Collisions";
         public const string CompleteSolutions = "Complete Solutions";

@@ -19,7 +19,7 @@ namespace TGC.MonoGame.Samples.Samples.Audio
         public SoundStatic(TGCViewer game) : base(game)
         {
             Category = TGCSampleCategory.Audio;
-            Name = "Sound effect";
+            Name = "Sound Effect";
             Description = "Shows how to play a sound file. Audio from https://www.fesliyanstudios.com";
         }
 
