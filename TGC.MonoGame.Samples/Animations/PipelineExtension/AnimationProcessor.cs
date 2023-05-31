@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
@@ -54,7 +55,7 @@ public class AnimationProcessor : ModelProcessor
     {
         // Skeleton Support.
         // Process the skeleton for skinned character animation.
-        var skeleton = ProcessSkeleton(input);
+        ProcessSkeleton(input);
 
         // Skinned Support.
         SwapSkinnedMaterial(input);
@@ -63,7 +64,7 @@ public class AnimationProcessor : ModelProcessor
         _model = base.Process(input, context);
 
         // Animation Support.
-        ProcessAnimations(_model, input, context);
+        ProcessAnimations(_model, input);
 
         // Add the extra content to the model.
         _model.Tag = _modelExtra;
@@ -74,14 +75,14 @@ public class AnimationProcessor : ModelProcessor
     /// <summary>
     ///     Process the skeleton in support of skeletal animation.
     /// </summary>
-    private BoneContent ProcessSkeleton(NodeContent input)
+    private void ProcessSkeleton(NodeContent input)
     {
         // Find the skeleton.
         var skeleton = MeshHelper.FindSkeleton(input);
 
         if (skeleton == null)
         {
-            return null;
+            return;
         }
 
         // We don't want to have to worry about different parts of the model being in different local coordinate systems, so let's just bake everything.
@@ -106,8 +107,6 @@ public class AnimationProcessor : ModelProcessor
         {
             _modelExtra.Skeleton.Add(nodeToIndex[bone]);
         }
-
-        return skeleton;
     }
 
     /// <summary>
@@ -210,7 +209,7 @@ public class AnimationProcessor : ModelProcessor
     {
         // It has to be a MeshContent node.
         if (node is MeshContent mesh)
-            // In the geometry we have to find a vertex channel that has a bone weight collection.
+        // In the geometry we have to find a vertex channel that has a bone weight collection.
         {
             foreach (var geometry in mesh.Geometry)
             {
@@ -235,7 +234,7 @@ public class AnimationProcessor : ModelProcessor
     {
         // It has to be a MeshContent node.
         if (node is MeshContent mesh)
-            // In the geometry we have to find a vertex channel that has a bone weight collection.
+        // In the geometry we have to find a vertex channel that has a bone weight collection.
         {
             foreach (var geometry in mesh.Geometry)
             {
@@ -289,7 +288,7 @@ public class AnimationProcessor : ModelProcessor
     /// <summary>
     ///     Entry point for animation processing.
     /// </summary>
-    private void ProcessAnimations(ModelContent model, NodeContent input, ContentProcessorContext context)
+    private void ProcessAnimations(ModelContent model, NodeContent input)
     {
         // First build a lookup table so we can determine the index into the list of bones from a bone name.
         for (var i = 0; i < model.Bones.Count; i++)
@@ -438,7 +437,9 @@ public class AnimationProcessor : ModelProcessor
             return;
         }
 
-        for (var node = keyframes.First.Next;;)
+        var node = keyframes.First.Next;
+
+        while (node != null)
         {
             var next = node.Next;
             if (next == null)
@@ -451,8 +452,7 @@ public class AnimationProcessor : ModelProcessor
             var b = node.Value;
             var c = next.Value;
 
-            var t = (float)((node.Value.Time - node.Previous.Value.Time) /
-                            (next.Value.Time - node.Previous.Value.Time));
+            var t = (float)((node.Value.Time - a.Time) / (next.Value.Time - a.Time));
 
             var translation = Vector3.Lerp(a.Translation, c.Translation, t);
             var rotation = Quaternion.Slerp(a.Rotation, c.Rotation, t);

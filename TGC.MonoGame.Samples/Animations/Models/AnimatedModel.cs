@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -126,6 +127,9 @@ public class AnimatedModel
                         skinnedEffect.PreferPerPixelLighting = true;
                         skinnedEffect.SetBoneTransforms(skeleton);
                         break;
+
+                    default:
+                        throw new InvalidOperationException("Unexpected Effect type = " + effect.GetType().FullName);
                 }
             }
 
