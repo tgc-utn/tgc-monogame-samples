@@ -15,13 +15,13 @@ namespace TGC.MonoGame.Samples.Animations.PipelineExtension;
 /// </summary>
 public class CustomPipelineManager : PipelineManager
 {
+    private readonly IConfigurationRoot _configuration;
+
     public CustomPipelineManager(string projectDir, string outputDir, string intermediateDir,
         IConfigurationRoot configuration) : base(projectDir, outputDir, intermediateDir)
     {
-        Configuration = configuration;
+        _configuration = configuration;
     }
-
-    private IConfigurationRoot Configuration { get; }
 
     /// <summary>
     ///     Provides methods for writing compiled binary format.
@@ -35,7 +35,8 @@ public class CustomPipelineManager : PipelineManager
         var contentFolder = configuration["ContentFolder"];
 
         // This code is from MonoGame.Content.Builder.BuildContent.Build(out int successCount, out int errorCount).
-        var projectDirectory = PathHelper.Normalize(Directory.GetCurrentDirectory());
+        // TODO the folder logic can be load in the game a save in the configuration, to avoid this folder logic.
+        var projectDirectory = PathHelper.Normalize(AppDomain.CurrentDomain.BaseDirectory);
         var projectContentDirectory =
             PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, "../../../" + contentFolder)));
         var outputPath = PathHelper.Normalize(Path.Combine(projectDirectory, contentFolder));
@@ -51,7 +52,7 @@ public class CustomPipelineManager : PipelineManager
         var importContext = new PipelineImporterContext(this);
         var importer = new FbxImporter();
         var nodeContent =
-            importer.Import(ProjectDirectory + modelFilename + Configuration["FbxExtension"], importContext);
+            importer.Import(ProjectDirectory + modelFilename + _configuration["FbxExtension"], importContext);
         var animationProcessor = new AnimationProcessor();
 
         var parameters = new OpaqueDataDictionary
@@ -76,10 +77,10 @@ public class CustomPipelineManager : PipelineManager
         var pipelineEvent = new PipelineBuildEvent
         {
             SourceFile = modelFilename,
-            DestFile = OutputDirectory + modelFilename + Configuration["ContentExtension"],
-            Importer = Configuration["FbxImporterName"],
-            Processor = Configuration["ProcessorName"],
-            Parameters = ValidateProcessorParameters(Configuration["ProcessorName"], parameters)
+            DestFile = OutputDirectory + modelFilename + _configuration["ContentExtension"],
+            Importer = _configuration["FbxImporterName"],
+            Processor = _configuration["ProcessorName"],
+            Parameters = ValidateProcessorParameters(_configuration["ProcessorName"], parameters)
         };
 
         var processContext = new PipelineProcessorContext(this, pipelineEvent);

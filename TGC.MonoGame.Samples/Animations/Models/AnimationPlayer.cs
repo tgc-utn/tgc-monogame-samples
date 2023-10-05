@@ -10,6 +10,17 @@ namespace TGC.MonoGame.Samples.Animations.Models;
 public class AnimationPlayer
 {
     /// <summary>
+    ///     We maintain a BoneInfo class for each bone.
+    ///     This class does most of the work in playing the animation.
+    /// </summary>
+    private readonly BoneInfo[] _boneInfo;
+
+    /// <summary>
+    ///     The Clip we are playing.
+    /// </summary>
+    private readonly AnimationClip _clip;
+
+    /// <summary>
     ///     Current position in time in the clip.
     /// </summary>
     private float _position;
@@ -20,46 +31,23 @@ public class AnimationPlayer
     /// </summary>
     public AnimationPlayer(AnimationClip clip, AnimatedModel model)
     {
-        Clip = clip;
-        Model = model;
+        _clip = clip;
 
         // Create the bone information classes.
-        BonesCount = clip.Bones.Count;
-        BonesInfo = new BoneInfo[BonesCount];
+        var boneCount = clip.Bones.Count;
+        _boneInfo = new BoneInfo[boneCount];
 
-        for (var b = 0; b < BonesInfo.Length; b++)
+        for (var b = 0; b < _boneInfo.Length; b++)
         {
             // Create it.
-            BonesInfo[b] = new BoneInfo(clip.Bones[b]);
+            _boneInfo[b] = new BoneInfo(clip.Bones[b]);
 
             // Assign it to a Model bone.
-            BonesInfo[b].SetModel(model);
+            _boneInfo[b].SetModel(model);
         }
 
         Rewind();
     }
-
-    /// <summary>
-    ///     The number of bones.
-    /// </summary>
-    private int BonesCount { get; }
-
-    /// <summary>
-    ///     We maintain a BoneInfo class for each bone.
-    ///     This class does most of the work in playing the animation.
-    /// </summary>
-    private BoneInfo[] BonesInfo { get; }
-
-    /// <summary>
-    ///     The Clip we are playing.
-    /// </summary>
-    private AnimationClip Clip { get; }
-
-    /// <summary>
-    ///     A Model this animation is assigned to.
-    ///     It will play on that Model.
-    /// </summary>
-    private AnimatedModel Model { get; }
 
     /// <summary>
     ///     The Looping option.
@@ -81,7 +69,7 @@ public class AnimationPlayer
             }
 
             _position = value;
-            foreach (var bone in BonesInfo)
+            foreach (var bone in _boneInfo)
             {
                 bone.SetPosition(_position);
             }
@@ -91,7 +79,7 @@ public class AnimationPlayer
     /// <summary>
     ///     The Clip duration.
     /// </summary>
-    public float Duration => (float)Clip.Duration;
+    public float Duration => (float)_clip.Duration;
 
     /// <summary>
     ///     Reset back to time zero.

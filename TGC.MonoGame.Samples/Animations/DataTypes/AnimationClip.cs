@@ -10,7 +10,7 @@ public class AnimationClip
     /// <summary>
     ///     The bones for this animation clip with their keyframes.
     /// </summary>
-    public List<Bone> Bones { get; set; } = new();
+    public List<AnimationBone> Bones { get; set; } = new();
 
     /// <summary>
     ///     Duration of the animation clip.

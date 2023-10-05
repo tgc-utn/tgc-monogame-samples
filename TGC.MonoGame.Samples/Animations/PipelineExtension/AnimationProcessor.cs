@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
@@ -209,7 +208,7 @@ public class AnimationProcessor : ModelProcessor
     {
         // It has to be a MeshContent node.
         if (node is MeshContent mesh)
-        // In the geometry we have to find a vertex channel that has a bone weight collection.
+            // In the geometry we have to find a vertex channel that has a bone weight collection.
         {
             foreach (var geometry in mesh.Geometry)
             {
@@ -234,7 +233,7 @@ public class AnimationProcessor : ModelProcessor
     {
         // It has to be a MeshContent node.
         if (node is MeshContent mesh)
-        // In the geometry we have to find a vertex channel that has a bone weight collection.
+            // In the geometry we have to find a vertex channel that has a bone weight collection.
         {
             foreach (var geometry in mesh.Geometry)
             {
@@ -317,7 +316,7 @@ public class AnimationProcessor : ModelProcessor
             clip.Name = clipName;
             foreach (var bone in model.Bones)
             {
-                var clipBone = new Bone();
+                var clipBone = new AnimationBone();
                 clipBone.Name = bone.Name;
 
                 clip.Bones.Add(clipBone);
@@ -370,7 +369,7 @@ public class AnimationProcessor : ModelProcessor
                 clip.Name = clipName;
                 foreach (var bone in _model.Bones)
                 {
-                    var clipBone = new Bone();
+                    var clipBone = new AnimationBone();
                     clipBone.Name = bone.Name;
 
                     clip.Bones.Add(clipBone);

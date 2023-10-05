@@ -19,6 +19,42 @@ namespace TGC.MonoGame.Samples.Animations.Models;
 public class Bone
 {
     /// <summary>
+    ///     The bind scaling component extracted from the bind transform.
+    /// </summary>
+    private readonly Vector3 _bindScale;
+
+    /// <summary>
+    ///     The bind transform is the transform for this bone as loaded from the original model. It's the base pose.
+    ///     I do remove any scaling, though.
+    /// </summary>
+    private readonly Matrix _bindTransform;
+
+    /// <summary>
+    ///     The Children of this bone.
+    /// </summary>
+    private readonly List<Bone> _children = new();
+
+    /// <summary>
+    ///     The Parent bone or null for the root bone.
+    /// </summary>
+    private readonly Bone _parent;
+
+    /// <summary>
+    ///     Any scaling applied to the bone.
+    /// </summary>
+    private readonly Vector3 _scale = Vector3.One;
+
+    /// <summary>
+    ///     Any Rotation applied to the bone.
+    /// </summary>
+    private Quaternion _rotation = Quaternion.Identity;
+
+    /// <summary>
+    ///     Any Translation applied to the bone.
+    /// </summary>
+    private Vector3 _translation = Vector3.Zero;
+
+    /// <summary>
     ///     Constructor for a bone object.
     /// </summary>
     /// <param name="name">The name of the bone.</param>
@@ -27,44 +63,23 @@ public class Bone
     public Bone(string name, Matrix bindTransform, Bone parent)
     {
         Name = name;
-        Parent = parent;
-        parent?.Children.Add(this);
+        _parent = parent;
+        parent?._children.Add(this);
 
         // I am not supporting scaling in animation in this example, so I extract the bind scaling from the bind transform and save it.
-        BindScale = new Vector3(bindTransform.Right.Length(), bindTransform.Up.Length(),
+        _bindScale = new Vector3(bindTransform.Right.Length(), bindTransform.Up.Length(),
             bindTransform.Backward.Length());
 
-        bindTransform.Right /= BindScale.X;
-        bindTransform.Up /= BindScale.Y;
-        bindTransform.Backward /= BindScale.Y;
-        BindTransform = bindTransform;
+        bindTransform.Right /= _bindScale.X;
+        bindTransform.Up /= _bindScale.Y;
+        bindTransform.Backward /= _bindScale.Y;
+        _bindTransform = bindTransform;
 
         // Set the skinning bind transform.
         // That is the inverse of the absolute transform in the bind pose.
         ComputeAbsoluteTransform();
         SkinTransform = Matrix.Invert(AbsoluteTransform);
     }
-
-    /// <summary>
-    ///     The bind scaling component extracted from the bind transform.
-    /// </summary>
-    private Vector3 BindScale { get; }
-
-    /// <summary>
-    ///     The bind transform is the transform for this bone as loaded from the original model. It's the base pose.
-    ///     I do remove any scaling, though.
-    /// </summary>
-    private Matrix BindTransform { get; }
-
-    /// <summary>
-    ///     The Children of this bone.
-    /// </summary>
-    private List<Bone> Children { get; } = new();
-
-    /// <summary>
-    ///     The Parent bone or null for the root bone.
-    /// </summary>
-    private Bone Parent { get; }
 
     /// <summary>
     ///     The bone absolute transform.
@@ -77,21 +92,6 @@ public class Bone
     public string Name { get; set; }
 
     /// <summary>
-    ///     Any Rotation applied to the bone.
-    /// </summary>
-    private Quaternion Rotation { get; set; } = Quaternion.Identity;
-
-    /// <summary>
-    ///     Any scaling applied to the bone.
-    /// </summary>
-    private Vector3 Scale { get; } = Vector3.One;
-
-    /// <summary>
-    ///     Any Translation applied to the bone.
-    /// </summary>
-    private Vector3 Translation { get; set; } = Vector3.Zero;
-
-    /// <summary>
     ///     Inverse of absolute bind transform for skinning.
     /// </summary>
     public Matrix SkinTransform { get; set; }
@@ -101,13 +101,13 @@ public class Bone
     /// </summary>
     public void ComputeAbsoluteTransform()
     {
-        var transform = Matrix.CreateScale(Scale * BindScale) * Matrix.CreateFromQuaternion(Rotation) *
-                        Matrix.CreateTranslation(Translation) * BindTransform;
+        var transform = Matrix.CreateScale(_scale * _bindScale) * Matrix.CreateFromQuaternion(_rotation) *
+                        Matrix.CreateTranslation(_translation) * _bindTransform;
 
-        if (Parent != null)
+        if (_parent != null)
             // This bone has a Parent bone.
         {
-            AbsoluteTransform = transform * Parent.AbsoluteTransform;
+            AbsoluteTransform = transform * _parent.AbsoluteTransform;
         }
         else
             // The root bone.
@@ -123,9 +123,9 @@ public class Bone
     /// <param name="m">A matrix include Translation and Rotation</param>
     public void SetCompleteTransform(Matrix m)
     {
-        var setTo = m * Matrix.Invert(BindTransform);
+        var setTo = m * Matrix.Invert(_bindTransform);
 
-        Translation = setTo.Translation;
-        Rotation = Quaternion.CreateFromRotationMatrix(setTo);
+        _translation = setTo.Translation;
+        _rotation = Quaternion.CreateFromRotationMatrix(setTo);
     }
 }

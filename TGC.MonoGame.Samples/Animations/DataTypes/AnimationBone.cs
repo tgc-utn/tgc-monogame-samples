@@ -5,7 +5,7 @@ namespace TGC.MonoGame.Samples.Animations.DataTypes;
 /// <summary>
 ///     Keyframes are grouped per bone for an animation clip.
 /// </summary>
-public class Bone
+public class AnimationBone
 {
     /// <summary>
     ///     The keyframes for this bone.

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Animations.DataTypes;
-using TGC.MonoGame.Samples.Cameras;
 
 namespace TGC.MonoGame.Samples.Animations.Models;
 
@@ -15,43 +12,43 @@ namespace TGC.MonoGame.Samples.Animations.Models;
 public class AnimatedModel
 {
     /// <summary>
+    ///     The Model asset name.
+    /// </summary>
+    private readonly string _assetName;
+
+    /// <summary>
+    ///     The underlying Bones for the Model.
+    /// </summary>
+    private readonly List<Bone> _bones = new();
+
+    /// <summary>
+    ///     The actual underlying XNA Model.
+    /// </summary>
+    private Model _model;
+
+    /// <summary>
+    ///     Extra data associated with the XNA Model.
+    /// </summary>
+    private ModelExtra _modelExtra;
+
+    /// <summary>
+    ///     An associated animation clip Player.
+    /// </summary>
+    private AnimationPlayer _player;
+
+    /// <summary>
     ///     Creates the Model from an XNA Model.
     /// </summary>
     /// <param name="assetName">The name of the asset for this Model.</param>
     public AnimatedModel(string assetName)
     {
-        AssetName = assetName;
+        _assetName = assetName;
     }
-
-    /// <summary>
-    ///     The Model asset name.
-    /// </summary>
-    private string AssetName { get; }
-
-    /// <summary>
-    ///     The underlying Bones for the Model.
-    /// </summary>
-    private List<Bone> Bones { get; } = new();
-
-    /// <summary>
-    ///     The actual underlying XNA Model.
-    /// </summary>
-    private Model Model { get; set; }
-
-    /// <summary>
-    ///     Extra data associated with the XNA Model.
-    /// </summary>
-    private ModelExtra ModelExtra { get; set; }
-
-    /// <summary>
-    ///     An associated animation clip Player.
-    /// </summary>
-    private AnimationPlayer Player { get; set; }
 
     /// <summary>
     ///     The Model animation clips.
     /// </summary>
-    public List<AnimationClip> Clips => ModelExtra.Clips;
+    public List<AnimationClip> Clips => _modelExtra.Clips;
 
     /// <summary>
     ///     Play an animation clip.
@@ -61,8 +58,8 @@ public class AnimatedModel
     public AnimationPlayer PlayClip(AnimationClip clip)
     {
         // Create a clip Player and assign it to this Model.
-        Player = new AnimationPlayer(clip, this);
-        return Player;
+        _player = new AnimationPlayer(clip, this);
+        return _player;
     }
 
     /// <summary>
@@ -70,67 +67,48 @@ public class AnimatedModel
     /// </summary>
     public void Update(GameTime gameTime)
     {
-        Player?.Update(gameTime);
+        _player.Update(gameTime);
     }
 
     /// <summary>
     ///     Draw the Model.
     /// </summary>
-    /// <param name="camera">A camera to determine the view.</param>
     /// <param name="world">A world matrix to place the Model.</param>
-    public void Draw(Camera camera, Matrix world)
+    /// <param name="view">The view matrix, normally from the camera.</param>
+    /// <param name="projection">The projection matrix, normally from the application.</param>
+    public void Draw(Matrix world, Matrix view, Matrix projection)
     {
-        if (Model == null)
-        {
-            return;
-        }
-
         // Compute all of the bone absolute transforms.
-        var boneTransforms = new Matrix[Bones.Count];
+        var boneTransforms = new Matrix[_bones.Count];
 
-        for (var i = 0; i < Bones.Count; i++)
+        for (var i = 0; i < _bones.Count; i++)
         {
-            var bone = Bones[i];
+            var bone = _bones[i];
             bone.ComputeAbsoluteTransform();
 
             boneTransforms[i] = bone.AbsoluteTransform;
         }
 
         // Determine the skin transforms from the skeleton.
-        var skeleton = new Matrix[ModelExtra.Skeleton.Count];
-        for (var s = 0; s < ModelExtra.Skeleton.Count; s++)
+        var skeleton = new Matrix[_modelExtra.Skeleton.Count];
+        for (var s = 0; s < _modelExtra.Skeleton.Count; s++)
         {
-            var bone = Bones[ModelExtra.Skeleton[s]];
+            var bone = _bones[_modelExtra.Skeleton[s]];
             skeleton[s] = bone.SkinTransform * bone.AbsoluteTransform;
         }
 
         // Draw the Model.
-        foreach (var modelMesh in Model.Meshes)
+        foreach (var modelMesh in _model.Meshes)
         {
             foreach (var effect in modelMesh.Effects)
             {
-                switch (effect)
-                {
-                    case BasicEffect basicEffect:
-                        basicEffect.World = boneTransforms[modelMesh.ParentBone.Index] * world;
-                        basicEffect.View = camera.View;
-                        basicEffect.Projection = camera.Projection;
-                        basicEffect.EnableDefaultLighting();
-                        basicEffect.PreferPerPixelLighting = true;
-                        break;
-
-                    case SkinnedEffect skinnedEffect:
-                        skinnedEffect.World = boneTransforms[modelMesh.ParentBone.Index] * world;
-                        skinnedEffect.View = camera.View;
-                        skinnedEffect.Projection = camera.Projection;
-                        skinnedEffect.EnableDefaultLighting();
-                        skinnedEffect.PreferPerPixelLighting = true;
-                        skinnedEffect.SetBoneTransforms(skeleton);
-                        break;
-
-                    default:
-                        throw new InvalidOperationException("Unexpected Effect type = " + effect.GetType().FullName);
-                }
+                var skinnedEffect = effect as SkinnedEffect;
+                skinnedEffect.World = boneTransforms[modelMesh.ParentBone.Index] * world;
+                skinnedEffect.View = view;
+                skinnedEffect.Projection = projection;
+                skinnedEffect.EnableDefaultLighting();
+                skinnedEffect.PreferPerPixelLighting = true;
+                skinnedEffect.SetBoneTransforms(skeleton);
             }
 
             modelMesh.Draw();
@@ -142,9 +120,8 @@ public class AnimatedModel
     /// </summary>
     public void LoadContent(ContentManager content)
     {
-        Model = content.Load<Model>(AssetName);
-        ModelExtra = Model.Tag as ModelExtra;
-        Debug.Assert(ModelExtra != null);
+        _model = content.Load<Model>(_assetName);
+        _modelExtra = _model.Tag as ModelExtra;
 
         ObtainBones();
     }
@@ -155,14 +132,14 @@ public class AnimatedModel
     /// </summary>
     private void ObtainBones()
     {
-        Bones.Clear();
-        foreach (var bone in Model.Bones)
+        _bones.Clear();
+        foreach (var bone in _model.Bones)
         {
             // Create the bone object and add to the hierarchy.
-            var newBone = new Bone(bone.Name, bone.Transform, bone.Parent != null ? Bones[bone.Parent.Index] : null);
+            var newBone = new Bone(bone.Name, bone.Transform, bone.Parent != null ? _bones[bone.Parent.Index] : null);
 
             // Add to the Bones for this Model.
-            Bones.Add(newBone);
+            _bones.Add(newBone);
         }
     }
 
@@ -171,7 +148,7 @@ public class AnimatedModel
     /// </summary>
     public Bone FindBone(string name)
     {
-        foreach (var bone in Bones)
+        foreach (var bone in _bones)
         {
             if (bone.Name == name)
             {

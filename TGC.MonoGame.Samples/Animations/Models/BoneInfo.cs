@@ -10,41 +10,41 @@ namespace TGC.MonoGame.Samples.Animations.Models;
 public class BoneInfo
 {
     /// <summary>
-    ///     Constructor.
-    /// </summary>
-    public BoneInfo(DataTypes.Bone bone)
-    {
-        ClipBone = bone;
-        SetKeyframes();
-        SetPosition(0);
-    }
-
-    /// <summary>
     ///     Bone in a model that this keyframe bone is assigned to.
     /// </summary>
-    private Bone AssignedBone { get; set; }
+    private Bone _assignedBone;
 
     /// <summary>
     ///     The current keyframe. Our position is a time such that the we are greater than or equal to this keyframe's time and
     ///     less than the next keyframes time.
     /// </summary>
-    private int CurrentKeyframe { get; set; }
-
-    /// <summary>
-    ///     We are at a location between Keyframe1 and Keyframe2 such that Keyframe1's time is less than or equal to the
-    ///     current position.
-    /// </summary>
-    public Keyframe Keyframe1 { get; set; }
-
-    /// <summary>
-    ///     Second keyframe value.
-    /// </summary>
-    public Keyframe Keyframe2 { get; set; }
+    private int _currentKeyframe;
 
     /// <summary>
     ///     Current animation Rotation.
     /// </summary>
-    private Quaternion Rotation { get; set; }
+    private Quaternion _rotation;
+
+    /// <summary>
+    ///     Constructor.
+    /// </summary>
+    public BoneInfo(AnimationBone animationBone)
+    {
+        ClipAnimationBone = animationBone;
+        SetKeyframes();
+        SetPosition(0);
+    }
+
+    /// <summary>
+    ///     We are at a location between KeyframeFrom and KeyframeTo such that KeyframeFrom time is less than or equal to the
+    ///     current position.
+    /// </summary>
+    public Keyframe KeyframeFrom { get; set; }
+
+    /// <summary>
+    ///     Second keyframe value.
+    /// </summary>
+    public Keyframe KeyframeTo { get; set; }
 
     /// <summary>
     ///     Current animation Translation.
@@ -60,60 +60,60 @@ public class BoneInfo
     /// <summary>
     ///     The bone in the actual animation clip.
     /// </summary>
-    public DataTypes.Bone ClipBone { get; }
+    public AnimationBone ClipAnimationBone { get; }
 
     /// <summary>
     ///     Set the bone based on the supplied position value.
     /// </summary>
     public void SetPosition(float position)
     {
-        var keyframes = ClipBone.Keyframes;
+        var keyframes = ClipAnimationBone.Keyframes;
         if (keyframes.Count == 0)
         {
             return;
         }
 
         // If our current position is less that the first keyframe we move the position backward until we get to the right keyframe.
-        while (position < Keyframe1.Time && CurrentKeyframe > 0)
+        while (position < KeyframeFrom.Time && _currentKeyframe > 0)
         {
             // We need to move backwards in time.
-            CurrentKeyframe--;
+            _currentKeyframe--;
             SetKeyframes();
         }
 
         // If our current position is greater than the second keyframe we move the position forward until we get to the right keyframe.
-        while (position >= Keyframe2.Time && CurrentKeyframe < ClipBone.Keyframes.Count - 2)
+        while (position >= KeyframeTo.Time && _currentKeyframe < ClipAnimationBone.Keyframes.Count - 2)
         {
             // We need to move forwards in time.
-            CurrentKeyframe++;
+            _currentKeyframe++;
             SetKeyframes();
         }
 
-        if (Keyframe1 == Keyframe2)
+        if (KeyframeFrom == KeyframeTo)
         {
             // Keyframes are equal.
-            Rotation = Keyframe1.Rotation;
-            Translation = Keyframe1.Translation;
+            _rotation = KeyframeFrom.Rotation;
+            Translation = KeyframeFrom.Translation;
         }
         else
         {
             // Interpolate between keyframes.
-            var t = (float)((position - Keyframe1.Time) / (Keyframe2.Time - Keyframe1.Time));
-            Rotation = Quaternion.Slerp(Keyframe1.Rotation, Keyframe2.Rotation, t);
-            Translation = Vector3.Lerp(Keyframe1.Translation, Keyframe2.Translation, t);
+            var t = (float)((position - KeyframeFrom.Time) / (KeyframeTo.Time - KeyframeFrom.Time));
+            _rotation = Quaternion.Slerp(KeyframeFrom.Rotation, KeyframeTo.Rotation, t);
+            Translation = Vector3.Lerp(KeyframeFrom.Translation, KeyframeTo.Translation, t);
         }
 
         Valid = true;
-        if (AssignedBone == null)
+        if (_assignedBone == null)
         {
             return;
         }
 
         // Send to the model.
         // Make it a matrix first.
-        var m = Matrix.CreateFromQuaternion(Rotation);
+        var m = Matrix.CreateFromQuaternion(_rotation);
         m.Translation = Translation;
-        AssignedBone.SetCompleteTransform(m);
+        _assignedBone.SetCompleteTransform(m);
     }
 
     /// <summary>
@@ -121,18 +121,18 @@ public class BoneInfo
     /// </summary>
     private void SetKeyframes()
     {
-        if (ClipBone.Keyframes.Count > 0)
+        if (ClipAnimationBone.Keyframes.Count > 0)
         {
-            Keyframe1 = ClipBone.Keyframes[CurrentKeyframe];
-            Keyframe2 = CurrentKeyframe == ClipBone.Keyframes.Count - 1
-                ? Keyframe1
-                : ClipBone.Keyframes[CurrentKeyframe + 1];
+            KeyframeFrom = ClipAnimationBone.Keyframes[_currentKeyframe];
+            KeyframeTo = _currentKeyframe == ClipAnimationBone.Keyframes.Count - 1
+                ? KeyframeFrom
+                : ClipAnimationBone.Keyframes[_currentKeyframe + 1];
         }
         else
         {
             // If there are no keyframes, set both to null.
-            Keyframe1 = null;
-            Keyframe2 = null;
+            KeyframeFrom = null;
+            KeyframeTo = null;
         }
     }
 
@@ -142,6 +142,6 @@ public class BoneInfo
     public void SetModel(AnimatedModel model)
     {
         // Find this bone.
-        AssignedBone = model.FindBone(ClipBone.Name);
+        _assignedBone = model.FindBone(ClipAnimationBone.Name);
     }
 }

@@ -122,7 +122,7 @@ public class SkinnedAnimation : TGCSample
     {
         Game.Background = Color.CornflowerBlue;
 
-        Model.Draw(Camera, Matrix.Identity);
+        Model.Draw(Matrix.Identity, Camera.View, Camera.Projection);
 
         base.Draw(gameTime);
     }
