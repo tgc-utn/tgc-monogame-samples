@@ -8,11 +8,11 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.SkyBox
     /// <summary>
     ///     Simple SkyBox:
     ///     Units Involved:
-    ///     # Unidad 4 - Texturas e Iluminación - SkyBox.
+    ///     # Unit 4 - Textures and Lighting - SkyBox.
     ///     # Unit 8 - Video Adapters - Shaders.
     ///     Shows how to use a cube with a texture on each of its faces, which allows to achieve the effect of an enveloping
     ///     sky in the scene.
-    ///     Author: René Juan Rico Mendoza
+    ///     Author: Rene Juan Rico Mendoza
     /// </summary>
     public class SimpleSkyBox : TGCSample
     {

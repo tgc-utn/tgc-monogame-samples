@@ -9,7 +9,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
     /// <summary>
     ///     Tutorial 2:
     ///     Shows how to create a colored 3D box and display it on the screen.
-    ///     Author: René Juan Rico Mendoza.
+    ///     Author: Rene Juan Rico Mendoza.
     /// </summary>
     public class Tutorial2 : TGCSample
     {

@@ -10,7 +10,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
     /// <summary>
     ///     Tutorial 3:
     ///     This sample shows how to draw 3D geometric primitives such as cubes, spheres and cylinders.
-    ///     Author: René Juan Rico Mendoza.
+    ///     Author: Rene Juan Rico Mendoza.
     /// </summary>
     public class Tutorial3 : TGCSample
     {
