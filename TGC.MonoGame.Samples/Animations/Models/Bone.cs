@@ -66,7 +66,7 @@ public class Bone
         _parent = parent;
         parent?._children.Add(this);
 
-        // I am not supporting scaling in animation in this example, so I extract the bind scaling from the bind transform and save it.
+        // In this example, scaling in animation is not supported. The bind scaling is separated from the bind transform and saved.
         _bindScale = new Vector3(bindTransform.Right.Length(), bindTransform.Up.Length(),
             bindTransform.Backward.Length());
 

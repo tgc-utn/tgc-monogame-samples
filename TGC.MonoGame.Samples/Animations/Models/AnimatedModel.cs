@@ -37,6 +37,11 @@ public class AnimatedModel
     private AnimationPlayer _player;
 
     /// <summary>
+    ///     The Model animation clips.
+    /// </summary>
+    public List<AnimationClip> Clips => _modelExtra.Clips;
+
+    /// <summary>
     ///     Creates the Model from an XNA Model.
     /// </summary>
     /// <param name="assetName">The name of the asset for this Model.</param>
@@ -44,11 +49,6 @@ public class AnimatedModel
     {
         _assetName = assetName;
     }
-
-    /// <summary>
-    ///     The Model animation clips.
-    /// </summary>
-    public List<AnimationClip> Clips => _modelExtra.Clips;
 
     /// <summary>
     ///     Play an animation clip.
