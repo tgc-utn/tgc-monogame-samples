@@ -60,7 +60,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.ShaderReloader
         private void ReplaceShader(object sender, FileSystemEventArgs eventArgs)
         {
             // Can be triggered by temp files with suffixes
-            if (!eventArgs.Name.Equals(ShaderCodeFileName))
+            if (eventArgs.Name.Equals(ShaderCodeFileName))
             {
                 CompileShader();
                 if (!CompileError)
