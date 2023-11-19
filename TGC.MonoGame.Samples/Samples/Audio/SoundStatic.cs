@@ -4,90 +4,89 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using TGC.MonoGame.Samples.Viewer;
 
-namespace TGC.MonoGame.Samples.Samples.Audio
+namespace TGC.MonoGame.Samples.Samples.Audio;
+
+/// <summary>
+///     Static Sound:
+///     Units Involved:
+///     # Unit 3 - 3D Basics - Game Engine.
+///     Shows how to play a static sound file.
+///     Authors: Matias Leone, Leandro Barbagallo.
+/// </summary>
+public class SoundStatic : TGCSample
 {
-    /// <summary>
-    ///     Static Sound:
-    ///     Units Involved:
-    ///     # Unit 3 - 3D Basics - Game Engine.
-    ///     Shows how to play a static sound file.
-    ///     Authors: Matias Leone, Leandro Barbagallo.
-    /// </summary>
-    public class SoundStatic : TGCSample
+    private SpriteFont _font;
+    private SoundEffectInstance _instance;
+    private string _instructions;
+    private Vector2 _instructionsSize;
+    private SoundEffect _sound;
+    private string _soundName;
+
+    /// <inheritdoc />
+    public SoundStatic(TGCViewer game) : base(game)
     {
-        /// <inheritdoc />
-        public SoundStatic(TGCViewer game) : base(game)
+        Category = TGCSampleCategory.Audio;
+        Name = "Sound Effect";
+        Description = "Shows how to play a sound file. Audio from https://www.fesliyanstudios.com";
+    }
+
+    /// <inheritdoc />
+    public override void Initialize()
+    {
+        _instructions = "Y = Play a new instance in loop, I = Play and forget.";
+        _soundName = "No sound";
+
+        Game.Gizmos.Enabled = false;
+
+        base.Initialize();
+    }
+
+    /// <inheritdoc />
+    protected override void LoadContent()
+    {
+        _font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
+        _instructionsSize = _font.MeasureString(_instructions);
+        _soundName = "a2-8bit";
+        _sound = Game.Content.Load<SoundEffect>(ContentFolderSounds + _soundName);
+
+        base.LoadContent();
+    }
+
+    /// <inheritdoc />
+    public override void Update(GameTime gameTime)
+    {
+        if (Game.CurrentKeyboardState.IsKeyDown(Keys.Y))
         {
-            Category = TGCSampleCategory.Audio;
-            Name = "Sound Effect";
-            Description = "Shows how to play a sound file. Audio from https://www.fesliyanstudios.com";
+            // Play that can be manipulated after the fact.
+            _instance = _sound.CreateInstance();
+            _instance.IsLooped = true;
+            _instance.Play();
+        }
+        else if (Game.CurrentKeyboardState.IsKeyDown(Keys.I))
+        {
+            // Fire and forget play.
+            _sound.Play();
         }
 
-        private SpriteFont Font { get; set; }
-        private string Instructions { get; set; }
-        private Vector2 InstructionsSize { get; set; }
-        private SoundEffect Sound { get; set; }
-        private SoundEffectInstance Instance { get; set; }
-        private string SoundName { get; set; }
+        base.Update(gameTime);
+    }
 
-        /// <inheritdoc />
-        public override void Initialize()
-        {
-            Instructions = "Y = Play a new instance in loop, I = Play and forget.";
-            SoundName = "No sound";
+    /// <inheritdoc />
+    public override void Draw(GameTime gameTime)
+    {
+        Game.Background = Color.CornflowerBlue;
 
-            Game.Gizmos.Enabled = false;
+        Game.SpriteBatch.Begin();
 
-            base.Initialize();
-        }
+        var soundNamePosition = new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2f, 20) -
+                                _font.MeasureString(_soundName) / 2;
+        Game.SpriteBatch.DrawString(_font, "Playing: " + _soundName, soundNamePosition, Color.DarkMagenta);
+        var instructionsPosition = new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2f, 60) -
+                                   _instructionsSize / 2;
+        Game.SpriteBatch.DrawString(_font, _instructions, instructionsPosition, Color.DarkGreen);
 
-        /// <inheritdoc />
-        protected override void LoadContent()
-        {
-            Font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
-            InstructionsSize = Font.MeasureString(Instructions);
-            SoundName = "a2-8bit";
-            Sound = Game.Content.Load<SoundEffect>(ContentFolderSounds + SoundName);
+        Game.SpriteBatch.End();
 
-            base.LoadContent();
-        }
-
-        /// <inheritdoc />
-        public override void Update(GameTime gameTime)
-        {
-            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Y))
-            {
-                // Play that can be manipulated after the fact
-                Instance = Sound.CreateInstance();
-                Instance.IsLooped = true;
-                Instance.Play();
-            }
-            else if (Game.CurrentKeyboardState.IsKeyDown(Keys.I))
-            {
-                // Fire and forget play
-                Sound.Play();
-            }
-
-            base.Update(gameTime);
-        }
-
-        /// <inheritdoc />
-        public override void Draw(GameTime gameTime)
-        {
-            Game.Background = Color.CornflowerBlue;
-
-            Game.SpriteBatch.Begin();
-
-            var soundNamePosition = new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2f, 20) -
-                                    Font.MeasureString(SoundName) / 2;
-            Game.SpriteBatch.DrawString(Font, "Playing: " + SoundName, soundNamePosition, Color.DarkMagenta);
-            var instructionsPosition = new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2f, 60) -
-                                       InstructionsSize / 2;
-            Game.SpriteBatch.DrawString(Font, Instructions, instructionsPosition, Color.DarkGreen);
-
-            Game.SpriteBatch.End();
-
-            base.Draw(gameTime);
-        }
+        base.Draw(gameTime);
     }
 }

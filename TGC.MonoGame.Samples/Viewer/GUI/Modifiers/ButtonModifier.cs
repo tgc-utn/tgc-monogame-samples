@@ -1,75 +1,72 @@
-﻿using ImGuiNET;
-using System;
+﻿using System;
 using System.Numerics;
+using ImGuiNET;
 
-namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
+namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
+
+/// <summary>
+///     A Button Modifier that calls an action when is pressed
+/// </summary>
+public class ButtonModifier : IModifier
 {
+    private static readonly Vector4 DisabledColor = new(0.2f);
+    private readonly string _name;
+    private readonly Action _onPress;
+    private bool _enabled;
+
     /// <summary>
-    ///     A Button Modifier that calls an action when is pressed
+    ///     Creates a Button Modifier.
     /// </summary>
-    public class ButtonModifier : IModifier
+    /// <param name="text">The text to display in the button.</param>
+    /// <param name="onPress">The action to execute when the button is pressed.</param>
+    /// <param name="enabled">If the button is enabled.</param>
+    public ButtonModifier(string text, Action onPress, bool enabled)
     {
-        private static Vector4 DisabledColor { get; } = new Vector4(0.2f);
+        _name = text;
+        _onPress = onPress;
+        _enabled = enabled;
+    }
 
-        private string Name { get; set; }
+    /// <summary>
+    ///     Creates a Button Modifier, enabled by default.
+    /// </summary>
+    /// <param name="text">The text to display in the button.</param>
+    /// <param name="onPress">The action to execute when the button is pressed.</param>
+    public ButtonModifier(string text, Action onPress) : this(text, onPress, true)
+    {
+    }
 
-        private Action OnPress { get; set; }
-
-        private bool Enabled { get; set; }
-
-
-        /// <summary>
-        ///     Creates a Button Modifier.
-        /// </summary>
-        /// <param name="text">The text to display in the button</param>
-        /// <param name="onPress">The action to execute when the button is pressed</param>
-        /// <param name="enabled">If the button is enabled</param>
-        public ButtonModifier(string text, Action onPress, bool enabled)
+    /// <summary>
+    ///     Draws the Button Modifier
+    /// </summary>
+    public void Draw()
+    {
+        // If enabled and pressed, invoke the callback.
+        if (_enabled)
         {
-            Name = text;
-            OnPress = onPress;
-            Enabled = enabled;
-        }
-
-        /// <summary>
-        ///     Creates a Button Modifier, enabled by default.
-        /// </summary>
-        /// <param name="text">The text to display in the button</param>
-        /// <param name="onPress">The action to execute when the button is pressed</param>
-        public ButtonModifier(string text, Action onPress) : this(text, onPress, true)
-        {
-        }
-
-        /// <summary>
-        ///     Draws the Button Modifier
-        /// </summary>
-        public void Draw()
-        {
-            // If enabled and pressed, invoke the callback
-            if (Enabled)
+            if (ImGui.Button(_name, new Vector2(ImGui.CalcItemWidth(), ImGui.GetFrameHeight())))
             {
-                if (ImGui.Button(Name, new Vector2(ImGui.CalcItemWidth(), ImGui.GetFrameHeight())))
-                    OnPress.Invoke();
-            }
-            else
-            {
-                ImGui.PushStyleColor(ImGuiCol.Button, DisabledColor);
-                ImGui.PushStyleColor(ImGuiCol.ButtonActive, DisabledColor);
-                ImGui.PushStyleColor(ImGuiCol.ButtonHovered, DisabledColor);
-                ImGui.Button(Name, new Vector2(ImGui.CalcItemWidth(), ImGui.GetFrameHeight()));
-                ImGui.PopStyleColor();
-                ImGui.PopStyleColor();
-                ImGui.PopStyleColor();
+                _onPress.Invoke();
             }
         }
-
-        /// <summary>
-        ///     Sets the enabled state of the button
-        /// </summary>
-        /// <param name="enabled">A boolean indicating if the button is enabled or not</param>
-        public void SetEnabled(bool enabled)
+        else
         {
-            Enabled = enabled;
+            ImGui.PushStyleColor(ImGuiCol.Button, DisabledColor);
+            ImGui.PushStyleColor(ImGuiCol.ButtonActive, DisabledColor);
+            ImGui.PushStyleColor(ImGuiCol.ButtonHovered, DisabledColor);
+            ImGui.Button(_name, new Vector2(ImGui.CalcItemWidth(), ImGui.GetFrameHeight()));
+            ImGui.PopStyleColor();
+            ImGui.PopStyleColor();
+            ImGui.PopStyleColor();
         }
+    }
+
+    /// <summary>
+    ///     Sets the enabled state of the button.
+    /// </summary>
+    /// <param name="enabled">A boolean indicating if the button is enabled or not.</param>
+    public void SetEnabled(bool enabled)
+    {
+        _enabled = enabled;
     }
 }

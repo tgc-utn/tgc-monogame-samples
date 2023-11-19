@@ -2,136 +2,144 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace TGC.MonoGame.Samples.Cameras
+namespace TGC.MonoGame.Samples.Cameras;
+
+internal class FreeCamera : Camera
 {
-    internal class FreeCamera : Camera
+    private readonly bool _lockMouse;
+
+    private readonly Point _screenCenter;
+    private bool _changed;
+
+    private Vector2 _pastMousePosition;
+    private float _pitch;
+
+    // Angles
+    private float _yaw = -90f;
+
+    public FreeCamera(float aspectRatio, Vector3 position, Point screenCenter) : this(aspectRatio, position)
     {
-        private readonly bool lockMouse;
+        _lockMouse = true;
+        _screenCenter = screenCenter;
+    }
 
-        private readonly Point screenCenter;
-        private bool changed;
+    public FreeCamera(float aspectRatio, Vector3 position) : base(aspectRatio)
+    {
+        Position = position;
+        _pastMousePosition = Mouse.GetState().Position.ToVector2();
+        UpdateCameraVectors();
+        CalculateView();
+    }
 
-        private Vector2 pastMousePosition;
-        private float pitch;
+    public float MovementSpeed { get; set; } = 100f;
+    public float MouseSensitivity { get; set; } = 5f;
 
-        // Angles
-        private float yaw = -90f;
+    private void CalculateView()
+    {
+        View = Matrix.CreateLookAt(Position, Position + FrontDirection, UpDirection);
+    }
 
-        public FreeCamera(float aspectRatio, Vector3 position, Point screenCenter) : this(aspectRatio, position)
+    /// <inheritdoc />
+    public override void Update(GameTime gameTime)
+    {
+        var elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        _changed = false;
+        ProcessKeyboard(elapsedTime);
+        ProcessMouseMovement(elapsedTime);
+
+        if (_changed)
         {
-            lockMouse = true;
-            this.screenCenter = screenCenter;
-        }
-
-        public FreeCamera(float aspectRatio, Vector3 position) : base(aspectRatio)
-        {
-            Position = position;
-            pastMousePosition = Mouse.GetState().Position.ToVector2();
-            UpdateCameraVectors();
             CalculateView();
         }
+    }
 
-        public float MovementSpeed { get; set; } = 100f;
-        public float MouseSensitivity { get; set; } = 5f;
+    private void ProcessKeyboard(float elapsedTime)
+    {
+        var keyboardState = Keyboard.GetState();
 
-        private void CalculateView()
+        var currentMovementSpeed = MovementSpeed;
+        if (keyboardState.IsKeyDown(Keys.LeftShift))
         {
-            View = Matrix.CreateLookAt(Position, Position + FrontDirection, UpDirection);
+            currentMovementSpeed *= 5f;
         }
 
-        /// <inheritdoc />
-        public override void Update(GameTime gameTime)
+        if (keyboardState.IsKeyDown(Keys.A) || keyboardState.IsKeyDown(Keys.Left))
         {
-            var elapsedTime = (float) gameTime.ElapsedGameTime.TotalSeconds;
-            changed = false;
-            ProcessKeyboard(elapsedTime);
-            ProcessMouseMovement(elapsedTime);
-
-            if (changed)
-                CalculateView();
+            Position += -RightDirection * currentMovementSpeed * elapsedTime;
+            _changed = true;
         }
 
-        private void ProcessKeyboard(float elapsedTime)
+        if (keyboardState.IsKeyDown(Keys.D) || keyboardState.IsKeyDown(Keys.Right))
         {
-            var keyboardState = Keyboard.GetState();
+            Position += RightDirection * currentMovementSpeed * elapsedTime;
+            _changed = true;
+        }
 
-            var currentMovementSpeed = MovementSpeed;
-            if (keyboardState.IsKeyDown(Keys.LeftShift))
-                currentMovementSpeed *= 5f;
+        if (keyboardState.IsKeyDown(Keys.W) || keyboardState.IsKeyDown(Keys.Up))
+        {
+            Position += FrontDirection * currentMovementSpeed * elapsedTime;
+            _changed = true;
+        }
 
-            if (keyboardState.IsKeyDown(Keys.A) || keyboardState.IsKeyDown(Keys.Left))
+        if (keyboardState.IsKeyDown(Keys.S) || keyboardState.IsKeyDown(Keys.Down))
+        {
+            Position += -FrontDirection * currentMovementSpeed * elapsedTime;
+            _changed = true;
+        }
+    }
+
+    private void ProcessMouseMovement(float elapsedTime)
+    {
+        var mouseState = Mouse.GetState();
+
+        if (mouseState.RightButton.Equals(ButtonState.Pressed))
+        {
+            var mouseDelta = mouseState.Position.ToVector2() - _pastMousePosition;
+            mouseDelta *= MouseSensitivity * elapsedTime;
+
+            _yaw -= mouseDelta.X;
+            _pitch += mouseDelta.Y;
+
+            if (_pitch > 89.0f)
             {
-                Position += -RightDirection * currentMovementSpeed * elapsedTime;
-                changed = true;
+                _pitch = 89.0f;
             }
 
-            if (keyboardState.IsKeyDown(Keys.D) || keyboardState.IsKeyDown(Keys.Right))
+            if (_pitch < -89.0f)
             {
-                Position += RightDirection * currentMovementSpeed * elapsedTime;
-                changed = true;
+                _pitch = -89.0f;
             }
 
-            if (keyboardState.IsKeyDown(Keys.W) || keyboardState.IsKeyDown(Keys.Up))
-            {
-                Position += FrontDirection * currentMovementSpeed * elapsedTime;
-                changed = true;
-            }
+            _changed = true;
+            UpdateCameraVectors();
 
-            if (keyboardState.IsKeyDown(Keys.S) || keyboardState.IsKeyDown(Keys.Down))
+            if (_lockMouse)
             {
-                Position += -FrontDirection * currentMovementSpeed * elapsedTime;
-                changed = true;
+                Mouse.SetPosition(_screenCenter.X, _screenCenter.Y);
+                Mouse.SetCursor(MouseCursor.Crosshair);
+            }
+            else
+            {
+                Mouse.SetCursor(MouseCursor.Arrow);
             }
         }
 
-        private void ProcessMouseMovement(float elapsedTime)
-        {
-            var mouseState = Mouse.GetState();
+        _pastMousePosition = Mouse.GetState().Position.ToVector2();
+    }
 
-            if (mouseState.RightButton.Equals(ButtonState.Pressed))
-            {
-                var mouseDelta = mouseState.Position.ToVector2() - pastMousePosition;
-                mouseDelta *= MouseSensitivity * elapsedTime;
+    private void UpdateCameraVectors()
+    {
+        // Calculate the new Front vector.
+        Vector3 tempFront;
+        tempFront.X = MathF.Cos(MathHelper.ToRadians(_yaw)) * MathF.Cos(MathHelper.ToRadians(_pitch));
+        tempFront.Y = MathF.Sin(MathHelper.ToRadians(_pitch));
+        tempFront.Z = MathF.Sin(MathHelper.ToRadians(_yaw)) * MathF.Cos(MathHelper.ToRadians(_pitch));
 
-                yaw -= mouseDelta.X;
-                pitch += mouseDelta.Y;
+        FrontDirection = Vector3.Normalize(tempFront);
 
-                if (pitch > 89.0f)
-                    pitch = 89.0f;
-                if (pitch < -89.0f)
-                    pitch = -89.0f;
-
-                changed = true;
-                UpdateCameraVectors();
-
-                if (lockMouse)
-                {
-                    Mouse.SetPosition(screenCenter.X, screenCenter.Y);
-                    Mouse.SetCursor(MouseCursor.Crosshair);
-                }
-                else
-                {
-                    Mouse.SetCursor(MouseCursor.Arrow);
-                }
-            }
-
-            pastMousePosition = Mouse.GetState().Position.ToVector2();
-        }
-
-        private void UpdateCameraVectors()
-        {
-            // Calculate the new Front vector
-            Vector3 tempFront;
-            tempFront.X = MathF.Cos(MathHelper.ToRadians(yaw)) * MathF.Cos(MathHelper.ToRadians(pitch));
-            tempFront.Y = MathF.Sin(MathHelper.ToRadians(pitch));
-            tempFront.Z = MathF.Sin(MathHelper.ToRadians(yaw)) * MathF.Cos(MathHelper.ToRadians(pitch));
-
-            FrontDirection = Vector3.Normalize(tempFront);
-
-            // Also re-calculate the Right and Up vector
-            // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-            RightDirection = Vector3.Normalize(Vector3.Cross(FrontDirection, Vector3.Up));
-            UpDirection = Vector3.Normalize(Vector3.Cross(RightDirection, FrontDirection));
-        }
+        // Also re-calculate the Right and Up vector.
+        // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+        RightDirection = Vector3.Normalize(Vector3.Cross(FrontDirection, Vector3.Up));
+        UpDirection = Vector3.Normalize(Vector3.Cross(RightDirection, FrontDirection));
     }
 }
