@@ -266,12 +266,12 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
                 Keys.Subtract => ImGuiKey.KeypadSubtract,
                 Keys.Decimal => ImGuiKey.KeypadDecimal,
                 Keys.Divide => ImGuiKey.KeypadDivide,
-                >= Keys.F1 and <= Keys.F12 => ImGuiKey.F1 + (key - Keys.F1),
+                >= Keys.F1 and <= Keys.F24 => ImGuiKey.F1 + (key - Keys.F1),
                 Keys.NumLock => ImGuiKey.NumLock,
                 Keys.Scroll => ImGuiKey.ScrollLock,
-                Keys.LeftShift or Keys.RightShift => ImGuiKey.ModShift,
-                Keys.LeftControl or Keys.RightControl => ImGuiKey.ModCtrl,
-                Keys.LeftAlt or Keys.RightAlt => ImGuiKey.ModAlt,
+                Keys.LeftShift => ImGuiKey.ModShift,
+                Keys.LeftControl => ImGuiKey.ModCtrl,
+                Keys.LeftAlt => ImGuiKey.ModAlt,
                 Keys.OemSemicolon => ImGuiKey.Semicolon,
                 Keys.OemPlus => ImGuiKey.Equal,
                 Keys.OemComma => ImGuiKey.Comma,
@@ -283,6 +283,8 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
                 Keys.OemCloseBrackets => ImGuiKey.RightBracket,
                 Keys.OemPipe => ImGuiKey.Backslash,
                 Keys.OemQuotes => ImGuiKey.Apostrophe,
+                Keys.BrowserBack => ImGuiKey.AppBack,
+                Keys.BrowserForward => ImGuiKey.AppForward,
                 _ => ImGuiKey.None,
             };
 
@@ -358,7 +360,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
 
             for (int n = 0; n < drawData.CmdListsCount; n++)
             {
-                ImDrawListPtr cmdList = drawData.CmdListsRange[n];
+                ImDrawListPtr cmdList = drawData.CmdLists[n];
 
                 fixed (void* vtxDstPtr = &_vertexData[vtxOffset * DrawVertDeclaration.Size])
                 fixed (void* idxDstPtr = &_indexData[idxOffset * sizeof(ushort)])
@@ -386,7 +388,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
 
             for (int n = 0; n < drawData.CmdListsCount; n++)
             {
-                ImDrawListPtr cmdList = drawData.CmdListsRange[n];
+                ImDrawListPtr cmdList = drawData.CmdLists[n];
 
                 for (int cmdi = 0; cmdi < cmdList.CmdBuffer.Size; cmdi++)
                 {
