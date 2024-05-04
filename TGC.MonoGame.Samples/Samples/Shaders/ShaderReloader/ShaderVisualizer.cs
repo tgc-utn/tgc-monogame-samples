@@ -17,15 +17,13 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.ShaderReloader
         private static readonly string ShaderName = "ShaderVisualizer";
 
         private static readonly string ContentFolderName = "Content/";
-
-
+        
         private FullScreenQuad Quad { get; set; }
 
         private Effect Effect { get; set; }
 
         private ShaderReloader ShaderReloader { get; set; }
-
-
+        
         /// <inheritdoc />
         public ShaderVisualizer(TGCViewer game) : base(game)
         {
@@ -35,13 +33,11 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.ShaderReloader
         }
 
         /// <inheritdoc />
-
         public override void Initialize()
         {
             Game.Gizmos.Enabled = false;
             base.Initialize();
         }
-
 
         /// <inheritdoc />
         protected override void LoadContent()
@@ -50,7 +46,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.ShaderReloader
 
             Effect = Game.Content.Load<Effect>(ContentFolderEffects + ShaderName);
 
-            string projectDirectory = FindProjectDirectory() + "/";
+            var projectDirectory = FindProjectDirectory() + "/";
             ShaderReloader = new ShaderReloader(projectDirectory + ContentFolderName + ContentFolderEffects + ShaderName + ".fx", GraphicsDevice);
             ShaderReloader.OnCompile += OnShaderCompile;
 
@@ -69,8 +65,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.ShaderReloader
 
         private string FindProjectDirectory()
         {
-            string rootDirectory;
-            rootDirectory = Assembly.GetEntryAssembly()?.GetName().Name ?? Assembly.GetExecutingAssembly().GetName().Name;
+            var rootDirectory = Assembly.GetEntryAssembly()?.GetName().Name ?? Assembly.GetExecutingAssembly().GetName().Name;
 
             var environment = Environment.CurrentDirectory;
 
@@ -108,7 +103,5 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.ShaderReloader
             Game.Graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width - 100;
             Game.Graphics.ApplyChanges();
         }
-
-
     }
 }

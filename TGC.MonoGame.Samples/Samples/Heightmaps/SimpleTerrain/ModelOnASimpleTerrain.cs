@@ -52,9 +52,9 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
         {
             var terrainEffect = Game.Content.Load<Effect>(ContentFolderEffects + "Terrain");
             // alturas pp dichas
-            var terrainHeigthmap = Game.Content.Load<Texture2D>(ContentFolderTextures + "Heightmaps/heightmap");
+            var terrainHeigthmap = Game.Content.Load<Texture2D>(ContentFolderTextures + "heightmaps/heightmap");
             // color basico
-            var terrainColorMap = Game.Content.Load<Texture2D>(ContentFolderTextures + "Heightmaps/colormap");
+            var terrainColorMap = Game.Content.Load<Texture2D>(ContentFolderTextures + "heightmaps/colormap");
             // blend texture 1
             var terrainGrass = Game.Content.Load<Texture2D>(ContentFolderTextures + "grass");
             // blend texture 2
@@ -108,8 +108,7 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
             Camera.View = Matrix.CreateLookAt(Position, LookAt, new Vector3(0, 1, 0));
 
             Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
-
-
+            
             base.Update(gameTime);
         }
 
