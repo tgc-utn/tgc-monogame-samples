@@ -1,6 +1,6 @@
 # Install on macOS
 
-Tested on Mac with Intel processor and macOS Ventura.
+Tested on Mac with Intel processor and macOS Sonoma.
 
 The offical [documentation](https://docs.monogame.net/articles/getting_started/1_setting_up_your_development_environment_macos.html).
 
@@ -34,14 +34,24 @@ dotnet run
 For now it does not work on ARM chips (M1 and M2).
 
 ```bash
-brew install p7zip wget wine-stable xquartz
+brew install p7zip xquartz wget wine-stable
 wine64 --version
+
+brew install freeimage
+# To know where the library is installed.
+brew list freeimage
+sudo ln -s /opt/homebrew/Cellar/freeimage/3.18.0/lib/libfreeimage.dylib /usr/local/lib/libfreeimage
+
+brew install freetype
+# To know where the library is installed.
+brew list freetype
+sudo ln -s /opt/homebrew/Cellar/freetype/2.13.2/lib/libfreetype.6.dylib /usr/local/lib/libfreetype6.dylib
 ```
 
-You will need to open Wine manually first. Otherwise, you will get an error that Apple couldn't verify it.
+You will need to open Wine manually first. Otherwise, you will get an error that ```Apple couldn't verify it.```
 
 ```bash
-wget -qO- https://raw.githubusercontent.com/MonoGame/MonoGame/develop/Tools/MonoGame.Effect.Compiler/mgfxc_wine_setup.sh | bash
+wget -qO- https://raw.githubusercontent.com/MonoGame/MonoGame/master/Tools/MonoGame.Effect.Compiler/mgfxc_wine_setup.sh | bash
 ```
 
 ## Set up the IDE
@@ -56,6 +66,8 @@ brew install --cask visual-studio-code
 
 # Visual Studio Code extensions
 code --install-extension ms-dotnettools.csharp
+code --install-extension ms-dotnettools.csdevkit
+code --install-extension ms-dotnettools.dotnet-maui
 code --install-extension timgjones.hlsltools
 ```
 
@@ -64,11 +76,6 @@ code --install-extension timgjones.hlsltools
 ```bash
 brew install --cask rider
 ```
-
-## Visual Studio
-
-Go to the official page to download and
-install [Visual Studio 2022 for Mac](https://visualstudio.microsoft.com/es/vs/mac/).
 
 ## Set up tgc-monogame-samples
 
@@ -87,4 +94,3 @@ dotnet run --project TGC.MonoGame.Samples
 ### Known issues
 
 * Assimp.AssimpException: Error loading unmanaged library from path: libassimp.dylib - WIP
-* System.DllNotFoundException: Unable to load shared library 'freetype6' or one of its dependencies. - WIP

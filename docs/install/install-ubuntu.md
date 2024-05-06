@@ -30,6 +30,7 @@ dotnet run
 
 ```bash
 sudo apt install curl p7zip-full wget wine64
+wine --info
 sudo ln -s /usr/lib/x86_64-linux-gnu/libdl.so.2 /usr/lib/x86_64-linux-gnu/libdl.so
 sudo ln -s /usr/bin/wine /usr/bin/wine64
 sudo apt install libminizip-dev
