@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Cameras;
@@ -11,6 +11,14 @@ namespace TGC.MonoGame.Samples.Samples
     /// </summary>
     public class TGCLogoSample : TGCSample
     {
+        private Camera Camera { get; set; }
+        
+        private Model Model { get; set; }
+        
+        private Matrix World { get; set; }
+        
+        private float Angle { get; set; }
+
         /// <summary>
         ///     Default constructor.
         /// </summary>
@@ -20,12 +28,7 @@ namespace TGC.MonoGame.Samples.Samples
             Name = GetType().Name;
             Description = Description = "Time to explore the samples :)";
         }
-
-        private Camera Camera { get; set; }
-        private Model Model { get; set; }
-        private Matrix ModelWorld { get; set; }
-        private float ModelRotation { get; set; }
-
+        
         /// <inheritdoc />
         public override void Initialize()
         {
@@ -42,7 +45,7 @@ namespace TGC.MonoGame.Samples.Samples
             var modelEffect = (BasicEffect) Model.Meshes[0].Effects[0];
             modelEffect.DiffuseColor = Color.DarkBlue.ToVector3();
             modelEffect.EnableDefaultLighting();
-            ModelWorld = Matrix.CreateRotationY(MathHelper.Pi);
+            World = Matrix.Identity;
 
             base.LoadContent();
         }
@@ -50,7 +53,8 @@ namespace TGC.MonoGame.Samples.Samples
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
-            ModelRotation += Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
+            Angle += Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
+            World = Matrix.CreateRotationY(Angle);
 
             Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
 
@@ -63,7 +67,7 @@ namespace TGC.MonoGame.Samples.Samples
             Game.Background = Color.Black;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            Model.Draw(ModelWorld * Matrix.CreateRotationY(ModelRotation), Camera.View, Camera.Projection);
+            Model.Draw(World, Camera.View, Camera.Projection);
 
             base.Draw(gameTime);
         }
