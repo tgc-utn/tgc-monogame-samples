@@ -5,18 +5,19 @@
     /// </summary>
     public static class TGCSampleCategory
     {
-        public const string Audio = "Audio";
-        public const string Collisions = "Collisions";
-        public const string CompleteSolutions = "Complete Solutions";
-        public const string Heightmaps = "Heightmaps";
-        public const string Models = "Models";
-        public const string Optimizations = "Optimizations";
-        public const string PBR = "PBR";
-        public const string Physics = "Physics";
-        public const string PostProcessing = "Post Processing";
-        public const string RenderPipeline = "Render Pipeline";
-        public const string Shaders = "Shaders";
-        public const string Transformations = "Transformations";
-        public const string Tutorials = "Tutorials";
+        public static readonly string Animations = "Animations";
+        public static readonly string Audio = "Audio";
+        public static readonly string Collisions = "Collisions";
+        public static readonly string CompleteSolutions = "Complete Solutions";
+        public static readonly string Heightmaps = "Heightmaps";
+        public static readonly string Models = "Models";
+        public static readonly string Optimizations = "Optimizations";
+        public static readonly string PBR = "PBR";
+        public static readonly string Physics = "Physics";
+        public static readonly string PostProcessing = "Post Processing";
+        public static readonly string RenderPipeline = "Render Pipeline";
+        public static readonly string Shaders = "Shaders";
+        public static readonly string Transformations = "Transformations";
+        public static readonly string Tutorials = "Tutorials";
     }
 }

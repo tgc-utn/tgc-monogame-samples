@@ -45,16 +45,16 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
         /// <summary>
         ///     Renderiza el terreno
         /// </summary>
-        public void Draw(Matrix World, Matrix View, Matrix Projection)
+        public void Draw(Matrix world, Matrix view, Matrix projection)
         {
             var graphicsDevice = Effect.GraphicsDevice;
 
             Effect.Parameters["texColorMap"].SetValue(colorMapTexture);
             Effect.Parameters["texDiffuseMap"].SetValue(terrainTexture);
             Effect.Parameters["texDiffuseMap2"].SetValue(terrainTexture2);
-            Effect.Parameters["World"].SetValue(World);
-            Effect.Parameters["View"].SetValue(View);
-            Effect.Parameters["Projection"].SetValue(Projection);
+            Effect.Parameters["World"].SetValue(world);
+            Effect.Parameters["View"].SetValue(view);
+            Effect.Parameters["Projection"].SetValue(projection);
 
             graphicsDevice.SetVertexBuffer(vbTerrain);
 
