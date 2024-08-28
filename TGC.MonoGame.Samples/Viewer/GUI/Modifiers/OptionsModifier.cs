@@ -11,11 +11,11 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     {
         private int _currentOptionIndex;
 
-        private Action<EnumType> OnChange { get; set; }
+        private Action<EnumType> _onChange;
 
-        private string Name { get; set; }
+        private string _name;
 
-        private string[] Options { get; set; }
+        private string[] _options;
 
 
         /// <summary>
@@ -67,11 +67,11 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <param name="onChange">An action to be called when the option value changes</param>
         public OptionsModifier(string name, string[] optionNames, EnumType defaultValue, Action<EnumType> onChange)
         {
-            Name = name;
-            Options = optionNames;
+            _name = name;
+            _options = optionNames;
             _currentOptionIndex = Convert.ToInt32(defaultValue);
-            OnChange = onChange;
-            OnChange.Invoke(defaultValue);
+            _onChange = onChange;
+            _onChange.Invoke(defaultValue);
         }
 
 
@@ -80,8 +80,8 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// </summary>
         public void Draw()
         {
-            if (ImGui.Combo(Name, ref _currentOptionIndex, Options, Options.Length))
-                OnChange.Invoke((EnumType)Enum.ToObject(typeof(EnumType), _currentOptionIndex));
+            if (ImGui.Combo(_name, ref _currentOptionIndex, _options, _options.Length))
+                _onChange.Invoke((EnumType)Enum.ToObject(typeof(EnumType), _currentOptionIndex));
         }
 
     }

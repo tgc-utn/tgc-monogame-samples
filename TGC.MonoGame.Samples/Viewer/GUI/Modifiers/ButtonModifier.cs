@@ -9,13 +9,13 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     /// </summary>
     public class ButtonModifier : IModifier
     {
-        private static Vector4 DisabledColor { get; } = new Vector4(0.2f);
+        private static Vector4 _disabledColor = new (0.2f);
 
-        private string Name { get; set; }
+        private string _name;
 
-        private Action OnPress { get; set; }
+        private Action _onPress;
 
-        private bool Enabled { get; set; }
+        private bool _enabled;
 
 
         /// <summary>
@@ -26,9 +26,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <param name="enabled">If the button is enabled</param>
         public ButtonModifier(string text, Action onPress, bool enabled)
         {
-            Name = text;
-            OnPress = onPress;
-            Enabled = enabled;
+            _name = text;
+            _onPress = onPress;
+            _enabled = enabled;
         }
 
         /// <summary>
@@ -46,17 +46,17 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         public void Draw()
         {
             // If enabled and pressed, invoke the callback
-            if (Enabled)
+            if (_enabled)
             {
-                if (ImGui.Button(Name, new Vector2(ImGui.CalcItemWidth(), ImGui.GetFrameHeight())))
-                    OnPress.Invoke();
+                if (ImGui.Button(_name, new Vector2(ImGui.CalcItemWidth(), ImGui.GetFrameHeight())))
+                    _onPress.Invoke();
             }
             else
             {
-                ImGui.PushStyleColor(ImGuiCol.Button, DisabledColor);
-                ImGui.PushStyleColor(ImGuiCol.ButtonActive, DisabledColor);
-                ImGui.PushStyleColor(ImGuiCol.ButtonHovered, DisabledColor);
-                ImGui.Button(Name, new Vector2(ImGui.CalcItemWidth(), ImGui.GetFrameHeight()));
+                ImGui.PushStyleColor(ImGuiCol.Button, _disabledColor);
+                ImGui.PushStyleColor(ImGuiCol.ButtonActive, _disabledColor);
+                ImGui.PushStyleColor(ImGuiCol.ButtonHovered, _disabledColor);
+                ImGui.Button(_name, new Vector2(ImGui.CalcItemWidth(), ImGui.GetFrameHeight()));
                 ImGui.PopStyleColor();
                 ImGui.PopStyleColor();
                 ImGui.PopStyleColor();
@@ -69,7 +69,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <param name="enabled">A boolean indicating if the button is enabled or not</param>
         public void SetEnabled(bool enabled)
         {
-            Enabled = enabled;
+            _enabled = enabled;
         }
     }
 }

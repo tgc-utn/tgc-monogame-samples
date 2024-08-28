@@ -12,10 +12,8 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     {
         private Vector2 _vectorValue;
 
-        private string Name { get; set; }
-        private Action<MonoGameVector2> OnChange { get; set; }
-
-
+        private string _name;
+        private Action<MonoGameVector2> _onChange;
 
         /// <summary>
         ///     Creates a Vector2 Modifier with a given name and action.
@@ -24,8 +22,8 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <param name="onChange">The action that will be called when the Vector2 changes</param>
         public Vector2Modifier(string name, Action<MonoGameVector2> onChange)
         {
-            Name = name;
-            OnChange += onChange;
+            _name = name;
+            _onChange += onChange;
         }
 
         /// <summary>
@@ -38,7 +36,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
             : this(name, onChange)
         {
             _vectorValue = Convert(defaultValue);
-            OnChange.Invoke(defaultValue);
+            _onChange.Invoke(defaultValue);
         }
 
         /// <summary>
@@ -66,10 +64,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// </summary>
         public void Draw()
         {
-            var valueChanged = ImGui.DragFloat2(Name, ref _vectorValue);
+            var valueChanged = ImGui.DragFloat2(_name, ref _vectorValue);
             if (valueChanged)
-                OnChange.Invoke(Convert(_vectorValue));
+                _onChange.Invoke(Convert(_vectorValue));
         }
-
     }
 }

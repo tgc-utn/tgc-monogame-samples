@@ -29,32 +29,32 @@ namespace TGC.MonoGame.Samples.Models
         /// </summary>
         public void Load(Model model)
         {
-            tankModel = model;
+            _tankModel = model;
 
             // Look up shortcut references to the bones we are going to animate.
-            leftBackWheelBone = tankModel.Bones["l_back_wheel_geo"];
-            rightBackWheelBone = tankModel.Bones["r_back_wheel_geo"];
-            leftFrontWheelBone = tankModel.Bones["l_front_wheel_geo"];
-            rightFrontWheelBone = tankModel.Bones["r_front_wheel_geo"];
-            leftSteerBone = tankModel.Bones["l_steer_geo"];
-            rightSteerBone = tankModel.Bones["r_steer_geo"];
-            turretBone = tankModel.Bones["turret_geo"];
-            cannonBone = tankModel.Bones["canon_geo"];
-            hatchBone = tankModel.Bones["hatch_geo"];
+            _leftBackWheelBone = _tankModel.Bones["l_back_wheel_geo"];
+            _rightBackWheelBone = _tankModel.Bones["r_back_wheel_geo"];
+            _leftFrontWheelBone = _tankModel.Bones["l_front_wheel_geo"];
+            _rightFrontWheelBone = _tankModel.Bones["r_front_wheel_geo"];
+            _leftSteerBone = _tankModel.Bones["l_steer_geo"];
+            _rightSteerBone = _tankModel.Bones["r_steer_geo"];
+            _turretBone = _tankModel.Bones["turret_geo"];
+            _cannonBone = _tankModel.Bones["canon_geo"];
+            _hatchBone = _tankModel.Bones["hatch_geo"];
 
             // Store the original transform matrix for each animating bone.
-            leftBackWheelTransform = leftBackWheelBone.Transform;
-            rightBackWheelTransform = rightBackWheelBone.Transform;
-            leftFrontWheelTransform = leftFrontWheelBone.Transform;
-            rightFrontWheelTransform = rightFrontWheelBone.Transform;
-            leftSteerTransform = leftSteerBone.Transform;
-            rightSteerTransform = rightSteerBone.Transform;
-            turretTransform = turretBone.Transform;
-            cannonTransform = cannonBone.Transform;
-            hatchTransform = hatchBone.Transform;
+            _leftBackWheelTransform = _leftBackWheelBone.Transform;
+            _rightBackWheelTransform = _rightBackWheelBone.Transform;
+            _leftFrontWheelTransform = _leftFrontWheelBone.Transform;
+            _rightFrontWheelTransform = _rightFrontWheelBone.Transform;
+            _leftSteerTransform = _leftSteerBone.Transform;
+            _rightSteerTransform = _rightSteerBone.Transform;
+            _turretTransform = _turretBone.Transform;
+            _cannonTransform = _cannonBone.Transform;
+            _hatchTransform = _hatchBone.Transform;
 
             // Allocate the transform matrix array.
-            boneTransforms = new Matrix[tankModel.Bones.Count];
+            _boneTransforms = new Matrix[_tankModel.Bones.Count];
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace TGC.MonoGame.Samples.Models
         public void Draw(Matrix world, Matrix view, Matrix projection)
         {
             // Set the world matrix as the root transform of the model.
-            tankModel.Root.Transform = world;
+            _tankModel.Root.Transform = world;
 
             // Calculate matrices based on the current animation position.
             var wheelRotation = Matrix.CreateRotationX(WheelRotation);
@@ -73,25 +73,25 @@ namespace TGC.MonoGame.Samples.Models
             var hatchRotation = Matrix.CreateRotationX(HatchRotation);
 
             // Apply matrices to the relevant bones.
-            leftBackWheelBone.Transform = wheelRotation * leftBackWheelTransform;
-            rightBackWheelBone.Transform = wheelRotation * rightBackWheelTransform;
-            leftFrontWheelBone.Transform = wheelRotation * leftFrontWheelTransform;
-            rightFrontWheelBone.Transform = wheelRotation * rightFrontWheelTransform;
-            leftSteerBone.Transform = steerRotation * leftSteerTransform;
-            rightSteerBone.Transform = steerRotation * rightSteerTransform;
-            turretBone.Transform = turretRotation * turretTransform;
-            cannonBone.Transform = cannonRotation * cannonTransform;
-            hatchBone.Transform = hatchRotation * hatchTransform;
+            _leftBackWheelBone.Transform = wheelRotation * _leftBackWheelTransform;
+            _rightBackWheelBone.Transform = wheelRotation * _rightBackWheelTransform;
+            _leftFrontWheelBone.Transform = wheelRotation * _leftFrontWheelTransform;
+            _rightFrontWheelBone.Transform = wheelRotation * _rightFrontWheelTransform;
+            _leftSteerBone.Transform = steerRotation * _leftSteerTransform;
+            _rightSteerBone.Transform = steerRotation * _rightSteerTransform;
+            _turretBone.Transform = turretRotation * _turretTransform;
+            _cannonBone.Transform = cannonRotation * _cannonTransform;
+            _hatchBone.Transform = hatchRotation * _hatchTransform;
 
             // Look up combined bone matrices for the entire model.
-            tankModel.CopyAbsoluteBoneTransformsTo(boneTransforms);
+            _tankModel.CopyAbsoluteBoneTransformsTo(_boneTransforms);
 
             // Draw the model.
-            foreach (var mesh in tankModel.Meshes)
+            foreach (var mesh in _tankModel.Meshes)
             {
                 foreach (BasicEffect effect in mesh.Effects)
                 {
-                    effect.World = boneTransforms[mesh.ParentBone.Index];
+                    effect.World = _boneTransforms[mesh.ParentBone.Index];
                     effect.View = view;
                     effect.Projection = projection;
 
@@ -105,36 +105,36 @@ namespace TGC.MonoGame.Samples.Models
         #region Fields
 
         // The XNA framework Model object that we are going to display.
-        private Model tankModel;
+        private Model _tankModel;
 
         // Shortcut references to the bones that we are going to animate.
         // We could just look these up inside the Draw method, but it is more efficient to do the lookups while loading and cache the results.
-        private ModelBone leftBackWheelBone;
+        private ModelBone _leftBackWheelBone;
 
-        private ModelBone rightBackWheelBone;
-        private ModelBone leftFrontWheelBone;
-        private ModelBone rightFrontWheelBone;
-        private ModelBone leftSteerBone;
-        private ModelBone rightSteerBone;
-        private ModelBone turretBone;
-        private ModelBone cannonBone;
-        private ModelBone hatchBone;
+        private ModelBone _rightBackWheelBone;
+        private ModelBone _leftFrontWheelBone;
+        private ModelBone _rightFrontWheelBone;
+        private ModelBone _leftSteerBone;
+        private ModelBone _rightSteerBone;
+        private ModelBone _turretBone;
+        private ModelBone _cannonBone;
+        private ModelBone _hatchBone;
 
         // Store the original transform matrix for each animating bone.
-        private Matrix leftBackWheelTransform;
+        private Matrix _leftBackWheelTransform;
 
-        private Matrix rightBackWheelTransform;
-        private Matrix leftFrontWheelTransform;
-        private Matrix rightFrontWheelTransform;
-        private Matrix leftSteerTransform;
-        private Matrix rightSteerTransform;
-        private Matrix turretTransform;
-        private Matrix cannonTransform;
-        private Matrix hatchTransform;
+        private Matrix _rightBackWheelTransform;
+        private Matrix _leftFrontWheelTransform;
+        private Matrix _rightFrontWheelTransform;
+        private Matrix _leftSteerTransform;
+        private Matrix _rightSteerTransform;
+        private Matrix _turretTransform;
+        private Matrix _cannonTransform;
+        private Matrix _hatchTransform;
 
         // Array holding all the bone transform matrices for the entire model.
         // We could just allocate this locally inside the Draw method, but it is more efficient to reuse a single array, as this avoids creating unnecessary garbage.
-        private Matrix[] boneTransforms;
+        private Matrix[] _boneTransforms;
 
         // Current animation positions.
 

@@ -11,18 +11,18 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 {
     public class GaussianBlur : TGCSample
     {
-        private BlurType CurrentBlurType;
+        private BlurType _currentBlurType;
 
-        private FullScreenQuad FullScreenQuad;
+        private FullScreenQuad _fullScreenQuad;
 
-        private RenderTarget2D HorizontalRenderTarget;
+        private RenderTarget2D _horizontalRenderTarget;
 
-        private RenderTarget2D MainRenderTarget;
+        private RenderTarget2D _mainRenderTarget;
 
-        private FreeCamera Camera { get; set; }
-        private Model Model { get; set; }
+        private FreeCamera _camera;
+        private Model _model;
 
-        private Effect Effect { get; set; }
+        private Effect _effect;
 
         /// <inheritdoc />
         public GaussianBlur(TGCViewer game) : base(game)
@@ -36,9 +36,9 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         public override void Initialize()
         {
             var screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
-            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(-400, 50, 400), screenSize);
+            _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(-400, 50, 400), screenSize);
                         
-            CurrentBlurType = BlurType.SEPARATED_PASSES;
+            _currentBlurType = BlurType.SEPARATED_PASSES;
 
             base.Initialize();
         }
@@ -47,28 +47,28 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         protected override void LoadContent()
         {
             // We load the city meshes into a model
-            Model = Game.Content.Load<Model>(ContentFolder3D + "scene/city");
+            _model = Game.Content.Load<Model>(ContentFolder3D + "scene/city");
 
             // Load the post-processing effect
-            Effect = Game.Content.Load<Effect>(ContentFolderEffects + "GaussianBlur");
+            _effect = Game.Content.Load<Effect>(ContentFolderEffects + "GaussianBlur");
 
             // Create a full screen quad to post-process
-            FullScreenQuad = new FullScreenQuad(GraphicsDevice);
+            _fullScreenQuad = new FullScreenQuad(GraphicsDevice);
 
             // Create render targets. One can be used for simple gaussian blur
             // mainRenderTarget is also used as a render target in the separated filter
             // horizontalRenderTarget is used as the horizontal render target in the separated filter
-            MainRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
+            _mainRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
                 GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0,
                 RenderTargetUsage.DiscardContents);
-            HorizontalRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
+            _horizontalRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
                 GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.None, 0,
                 RenderTargetUsage.DiscardContents);
 
-            Effect.Parameters["screenSize"]
+            _effect.Parameters["screenSize"]
                 .SetValue(new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height));
 
-            CurrentBlurType = BlurType.SEPARATED_PASSES;
+            _currentBlurType = BlurType.SEPARATED_PASSES;
            
             ModifierController.AddOptions("Blur Type",new string[]
             {
@@ -80,7 +80,6 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             base.LoadContent();
         }
 
-
         /// <summary>
         ///     Processes a change in the Blur Type
         /// </summary>
@@ -88,16 +87,16 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         /// <param name="value">The name of the Blur type</param>
         private void OnBlurTypeChange(BlurType type)
         {
-            CurrentBlurType = type;
+            _currentBlurType = type;
         }
 
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
             // Update the state of the camera
-            Camera.Update(gameTime);
+            _camera.Update(gameTime);
 
-            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+            Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
 
             base.Update(gameTime);
         }
@@ -105,13 +104,12 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         /// <inheritdoc />
         public override void Draw(GameTime gameTime)
         {
-            if (CurrentBlurType.Equals(BlurType.NONE))
+            if (_currentBlurType.Equals(BlurType.NONE))
                 DrawRegular();
-            else if (CurrentBlurType.Equals(BlurType.SIMPLE))
+            else if (_currentBlurType.Equals(BlurType.SIMPLE))
                 DrawSimpleBlur();
             else
                 DrawSeparatedBlur();
-
             
             base.Draw(gameTime);
         }
@@ -124,9 +122,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             Game.Background = Color.CornflowerBlue;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            Model.Draw(Matrix.Identity, Camera.View, Camera.Projection);
+            _model.Draw(Matrix.Identity, _camera.View, _camera.Projection);
         }
-
 
         /// <summary>
         ///     Draws the scene with a simple, single-pass blur.
@@ -141,10 +138,10 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             GraphicsDevice.BlendState = BlendState.Opaque;
 
             // Set the main render target as our render target
-            GraphicsDevice.SetRenderTarget(MainRenderTarget);
+            GraphicsDevice.SetRenderTarget(_mainRenderTarget);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1f, 0);
 
-            Model.Draw(Matrix.Identity, Camera.View, Camera.Projection);
+            _model.Draw(Matrix.Identity, _camera.View, _camera.Projection);
 
             #endregion
 
@@ -161,13 +158,12 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             // Then draw a texture into a full-screen quad
             // using our rendertarget as texture
 
-            Effect.CurrentTechnique = Effect.Techniques["Blur"];
-            Effect.Parameters["baseTexture"].SetValue(MainRenderTarget);
-            FullScreenQuad.Draw(Effect);
+            _effect.CurrentTechnique = _effect.Techniques["Blur"];
+            _effect.Parameters["baseTexture"].SetValue(_mainRenderTarget);
+            _fullScreenQuad.Draw(_effect);
 
             #endregion
         }
-
 
         /// <summary>
         ///     Draws the scene with a separated blur, in a total of three passes.
@@ -182,10 +178,10 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             GraphicsDevice.BlendState = BlendState.Opaque;
 
             // Set the main render target as our render target
-            GraphicsDevice.SetRenderTarget(MainRenderTarget);
+            GraphicsDevice.SetRenderTarget(_mainRenderTarget);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1f, 0);
 
-            Model.Draw(Matrix.Identity, Camera.View, Camera.Projection);
+            _model.Draw(Matrix.Identity, _camera.View, _camera.Projection);
 
             #endregion
 
@@ -196,16 +192,16 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             // Set the render target as horizontalRenderTarget, 
             // we are drawing a horizontal blur into this texture
-            GraphicsDevice.SetRenderTarget(HorizontalRenderTarget);
+            GraphicsDevice.SetRenderTarget(_horizontalRenderTarget);
             GraphicsDevice.Clear(Color.Black);
 
             // Set the technique to our blur technique
             // Then draw a texture into a full-screen quad
             // using our rendertarget as texture
 
-            Effect.CurrentTechnique = Effect.Techniques["BlurHorizontalTechnique"];
-            Effect.Parameters["baseTexture"].SetValue(MainRenderTarget);
-            FullScreenQuad.Draw(Effect);
+            _effect.CurrentTechnique = _effect.Techniques["BlurHorizontalTechnique"];
+            _effect.Parameters["baseTexture"].SetValue(_mainRenderTarget);
+            _fullScreenQuad.Draw(_effect);
 
             #endregion
 
@@ -219,9 +215,9 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             // Then draw a texture into a full-screen quad
             // using our rendertarget as texture
 
-            Effect.CurrentTechnique = Effect.Techniques["BlurVerticalTechnique"];
-            Effect.Parameters["baseTexture"].SetValue(HorizontalRenderTarget);
-            FullScreenQuad.Draw(Effect);
+            _effect.CurrentTechnique = _effect.Techniques["BlurVerticalTechnique"];
+            _effect.Parameters["baseTexture"].SetValue(_horizontalRenderTarget);
+            _fullScreenQuad.Draw(_effect);
 
             #endregion
         }
@@ -230,9 +226,9 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         protected override void UnloadContent()
         {
             base.UnloadContent();
-            FullScreenQuad.Dispose();
-            HorizontalRenderTarget.Dispose();
-            MainRenderTarget.Dispose();
+            _fullScreenQuad.Dispose();
+            _horizontalRenderTarget.Dispose();
+            _mainRenderTarget.Dispose();
         }
 
         private enum BlurType

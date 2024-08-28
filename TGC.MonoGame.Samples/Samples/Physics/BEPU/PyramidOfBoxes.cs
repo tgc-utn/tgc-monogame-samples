@@ -23,29 +23,29 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
     /// </summary>
     public class PyramidOfBoxes : TGCSample
     {
-        private List<Matrix> ActiveBoxesWorld;
+        private List<Matrix> _activeBoxesWorld;
 
-        private List<BodyHandle> BoxHandles;
+        private List<BodyHandle> _boxHandles;
 
-        private Camera Camera;
+        private Camera _camera;
 
-        private bool CanShoot = true;
+        private bool _canShoot = true;
 
-        private CubePrimitive cubePrimitive;
+        private CubePrimitive _cubePrimitive;
 
-        private List<Matrix> InactiveBoxesWorld;
+        private List<Matrix> _inactiveBoxesWorld;
 
-        private List<float> Radii;
+        private List<float> _radii;
 
-        private Random Random;
+        private Random _random;
 
-        private List<BodyHandle> SphereHandles;
-        
-        private SpriteFont SpriteFont { get; set; }
+        private List<BodyHandle> _sphereHandles;
 
-        private SpherePrimitive spherePrimitive;
+        private SpriteFont _spriteFont;
 
-        private List<Matrix> SpheresWorld;
+        private SpherePrimitive _spherePrimitive;
+
+        private List<Matrix> _spheresWorld;
 
         public PyramidOfBoxes(TGCViewer game) : base(game)
         {
@@ -93,25 +93,25 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
             var size = GraphicsDevice.Viewport.Bounds.Size;
             size.X /= 2;
             size.Y /= 2;
-            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 25, 160), size);
+            _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 25, 160), size);
 
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
-            SpriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
+            _spriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
             
             Simulation = Simulation.Create(BufferPool, new NarrowPhaseCallbacks(new SpringSettings(30, 1)),
                 new PoseIntegratorCallbacks(new NumericVector3(0, -10, 0)), new SolveDescription(8, 1));
 
-            SphereHandles = new List<BodyHandle>();
-            ActiveBoxesWorld = new List<Matrix>();
-            InactiveBoxesWorld = new List<Matrix>();
-            SpheresWorld = new List<Matrix>();
-            Random = new Random();
-            BoxHandles = new List<BodyHandle>(800);
-            Radii = new List<float>();
+            _sphereHandles = new List<BodyHandle>();
+            _activeBoxesWorld = new List<Matrix>();
+            _inactiveBoxesWorld = new List<Matrix>();
+            _spheresWorld = new List<Matrix>();
+            _random = new Random();
+            _boxHandles = new List<BodyHandle>(800);
+            _radii = new List<float>();
 
             var boxShape = new Box(1, 1, 1);
             var boxInertia = boxShape.ComputeInertia(1);
@@ -132,7 +132,7 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
                             boxInertia,
                             new CollidableDescription(boxIndex, 0.1f),
                             new BodyActivityDescription(0.01f)));
-                        BoxHandles.Add(bh);
+                        _boxHandles.Add(bh);
                     }
                 }
             }
@@ -141,15 +141,15 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
             Simulation.Statics.Add(new StaticDescription(new NumericVector3(0, -0.5f, 0),
                 Simulation.Shapes.Add(new Box(2500, 1, 2500))));
 
-            cubePrimitive = new CubePrimitive(GraphicsDevice, 1f, Color.White);
+            _cubePrimitive = new CubePrimitive(GraphicsDevice, 1f, Color.White);
 
-            spherePrimitive = new SpherePrimitive(GraphicsDevice);
+            _spherePrimitive = new SpherePrimitive(GraphicsDevice);
 
-            var count = BoxHandles.Count;
+            var count = _boxHandles.Count;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             for (var index = 0; index < count; index++)
             {
-                var bodyHandle = BoxHandles[index];
+                var bodyHandle = _boxHandles[index];
                 var bodyReference = Simulation.Bodies.GetBodyReference(bodyHandle);
                 var position = bodyReference.Pose.Position;
                 var quaternion = bodyReference.Pose.Orientation;
@@ -157,7 +157,7 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
                     Matrix.CreateFromQuaternion(new Quaternion(quaternion.X, quaternion.Y, quaternion.Z,
                         quaternion.W)) * Matrix.CreateTranslation(new Vector3(position.X, position.Y, position.Z));
 
-                cubePrimitive.Draw(world, Camera.View, Camera.Projection);
+                _cubePrimitive.Draw(world, _camera.View, _camera.Projection);
             }
 
             base.LoadContent();
@@ -176,11 +176,11 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
             //Note that taking steps of variable length can reduce stability. Gradual or one-off changes can work reasonably well.
             Simulation.Timestep(1 / 60f, ThreadDispatcher);
 
-            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Z) && CanShoot)
+            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Z) && _canShoot)
             {
-                CanShoot = false;
+                _canShoot = false;
                 //Create the shape that we'll launch at the pyramids when the user presses a button.
-                var radius = 0.5f + 5 * (float) Random.NextDouble();
+                var radius = 0.5f + 5 * (float) _random.NextDouble();
                 var bulletShape = new Sphere(radius);
 
                 //Note that the use of radius^3 for mass can produce some pretty serious mass ratios. 
@@ -192,26 +192,26 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
                 //#2 and #3 can become very expensive. In pathological cases, it can end up slower than using a quality-focused solver for the same simulation.
                 //Unfortunately, at the moment, bepuphysics v2 does not contain any alternative solvers, so if you can't afford to brute force the the problem away,
                 //the best solution is to cheat as much as possible to avoid the corner cases.
-                var velocity = Camera.FrontDirection * 30f;
-                var position = new NumericVector3(Camera.Position.X, Camera.Position.Y, Camera.Position.Z);
+                var velocity = _camera.FrontDirection * 30f;
+                var position = new NumericVector3(_camera.Position.X, _camera.Position.Y, _camera.Position.Z);
                 var bodyDescription = BodyDescription.CreateConvexDynamic(position,
                     new BodyVelocity(new NumericVector3(velocity.X, velocity.Y, velocity.Z)),
                     bulletShape.Radius * bulletShape.Radius * bulletShape.Radius, Simulation.Shapes, bulletShape);
 
                 var bodyHandle = Simulation.Bodies.Add(bodyDescription);
 
-                Radii.Add(radius);
-                SphereHandles.Add(bodyHandle);
+                _radii.Add(radius);
+                _sphereHandles.Add(bodyHandle);
             }
 
-            if (Game.CurrentKeyboardState.IsKeyUp(Keys.Z)) CanShoot = true;
+            if (Game.CurrentKeyboardState.IsKeyUp(Keys.Z)) _canShoot = true;
 
-            ActiveBoxesWorld.Clear();
-            InactiveBoxesWorld.Clear();
-            var count = BoxHandles.Count;
+            _activeBoxesWorld.Clear();
+            _inactiveBoxesWorld.Clear();
+            var count = _boxHandles.Count;
             for (var index = 0; index < count; index++)
             {
-                var bodyHandle = BoxHandles[index];
+                var bodyHandle = _boxHandles[index];
                 var bodyReference = Simulation.Bodies.GetBodyReference(bodyHandle);
                 var position = bodyReference.Pose.Position;
                 var quaternion = bodyReference.Pose.Orientation;
@@ -220,28 +220,28 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
                         quaternion.W)) * Matrix.CreateTranslation(new Vector3(position.X, position.Y, position.Z));
 
                 if (bodyReference.Awake)
-                    ActiveBoxesWorld.Add(world);
+                    _activeBoxesWorld.Add(world);
                 else
-                    InactiveBoxesWorld.Add(world);
+                    _inactiveBoxesWorld.Add(world);
             }
 
-            SpheresWorld.Clear();
-            var sphereCount = SphereHandles.Count;
+            _spheresWorld.Clear();
+            var sphereCount = _sphereHandles.Count;
             for (var index = 0; index < sphereCount; index++)
             {
-                var bodyHandle = SphereHandles[index];
+                var bodyHandle = _sphereHandles[index];
                 var bodyReference = Simulation.Bodies.GetBodyReference(bodyHandle);
                 var position = bodyReference.Pose.Position;
                 var quaternion = bodyReference.Pose.Orientation;
                 var world =
                     Matrix.CreateFromQuaternion(new Quaternion(quaternion.X, quaternion.Y, quaternion.Z,
                         quaternion.W)) * Matrix.CreateTranslation(new Vector3(position.X, position.Y, position.Z));
-                SpheresWorld.Add(world);
+                _spheresWorld.Add(world);
             }
 
-            Camera.Update(gameTime);
+            _camera.Update(gameTime);
 
-            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+            Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
 
             base.Update(gameTime);
         }
@@ -250,19 +250,19 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
         {
             Game.Background = Color.Black;
             
-            var count = BoxHandles.Count;
+            var count = _boxHandles.Count;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            cubePrimitive.Effect.DiffuseColor = new Vector3(1f, 0f, 0f);
-            ActiveBoxesWorld.ForEach(boxWorld => cubePrimitive.Draw(boxWorld, Camera.View, Camera.Projection));
-            cubePrimitive.Effect.DiffuseColor = new Vector3(0.1f, 0.1f, 0.3f);
-            InactiveBoxesWorld.ForEach(boxWorld => cubePrimitive.Draw(boxWorld, Camera.View, Camera.Projection));
+            _cubePrimitive.Effect.DiffuseColor = new Vector3(1f, 0f, 0f);
+            _activeBoxesWorld.ForEach(boxWorld => _cubePrimitive.Draw(boxWorld, _camera.View, _camera.Projection));
+            _cubePrimitive.Effect.DiffuseColor = new Vector3(0.1f, 0.1f, 0.3f);
+            _inactiveBoxesWorld.ForEach(boxWorld => _cubePrimitive.Draw(boxWorld, _camera.View, _camera.Projection));
 
-            SpheresWorld.ForEach(sphereWorld => spherePrimitive.Draw(sphereWorld, Camera.View, Camera.Projection));
+            _spheresWorld.ForEach(sphereWorld => _spherePrimitive.Draw(sphereWorld, _camera.View, _camera.Projection));
 
             Game.SpriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
-            Game.SpriteBatch.DrawString(SpriteFont, "Box handled: " + count + ".", new Vector2(GraphicsDevice.Viewport.Width - 500, 0), Color.White);
-            Game.SpriteBatch.DrawString(SpriteFont, "Launch spheres with the 'Z' key.", new Vector2(GraphicsDevice.Viewport.Width - 500, 25), Color.White);
+            Game.SpriteBatch.DrawString(_spriteFont, "Box handled: " + count + ".", new Vector2(GraphicsDevice.Viewport.Width - 500, 0), Color.White);
+            Game.SpriteBatch.DrawString(_spriteFont, "Launch spheres with the 'Z' key.", new Vector2(GraphicsDevice.Viewport.Width - 500, 25), Color.White);
             Game.SpriteBatch.End();
             
             base.Draw(gameTime);

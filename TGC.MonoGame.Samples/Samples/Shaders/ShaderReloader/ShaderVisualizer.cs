@@ -18,13 +18,11 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.ShaderReloader
 
         private static readonly string ContentFolderName = "Content/";
 
+        private FullScreenQuad _quad;
 
-        private FullScreenQuad Quad { get; set; }
-
-        private Effect Effect { get; set; }
+        private Effect _effect;
 
         private ShaderReloader ShaderReloader { get; set; }
-
 
         /// <inheritdoc />
         public ShaderVisualizer(TGCViewer game) : base(game)
@@ -35,20 +33,18 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.ShaderReloader
         }
 
         /// <inheritdoc />
-
         public override void Initialize()
         {
             Game.Gizmos.Enabled = false;
             base.Initialize();
         }
 
-
         /// <inheritdoc />
         protected override void LoadContent()
         {
-            Quad = new FullScreenQuad(GraphicsDevice);
+            _quad = new FullScreenQuad(GraphicsDevice);
 
-            Effect = Game.Content.Load<Effect>(ContentFolderEffects + ShaderName);
+            _effect = Game.Content.Load<Effect>(ContentFolderEffects + ShaderName);
 
             string projectDirectory = FindProjectDirectory() + "/";
             ShaderReloader = new ShaderReloader(projectDirectory + ContentFolderName + ContentFolderEffects + ShaderName + ".fx", GraphicsDevice);
@@ -63,8 +59,8 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.ShaderReloader
 
         private void OnShaderCompile(Effect effect)
         {
-            Effect.Dispose();
-            Effect = effect;
+            _effect.Dispose();
+            _effect = effect;
         }
 
         private string FindProjectDirectory()
@@ -91,8 +87,8 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.ShaderReloader
             GraphicsDevice.DepthStencilState = DepthStencilState.None;
             GraphicsDevice.BlendState = BlendState.Opaque;
 
-            Effect.Parameters["Time"]?.SetValue((float)gameTime.TotalGameTime.TotalSeconds);
-            Quad.Draw(Effect);
+            _effect.Parameters["Time"]?.SetValue((float)gameTime.TotalGameTime.TotalSeconds);
+            _quad.Draw(_effect);
             base.Draw(gameTime);
         }
 
@@ -100,15 +96,13 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.ShaderReloader
         protected override void UnloadContent()
         {
             base.UnloadContent();
-            Quad.Dispose();
+            _quad.Dispose();
             ShaderReloader.Dispose();
-            Effect.Dispose();
+            _effect.Dispose();
             
             // Restore window width
             Game.Graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width - 100;
             Game.Graphics.ApplyChanges();
         }
-
-
     }
 }

@@ -31,23 +31,24 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
             Description = "Time to drop boxes!";
         }
 
-        private QuadPrimitive Floor { get; set; }
-        private Matrix FloorWorld { get; set; }
-        private BoxPrimitive Box { get; set; }
+        private QuadPrimitive _floor;
+        private Matrix _floorWorld;
+        private BoxPrimitive _box;
 
         /// <summary>
         ///     We'll randomize the size of bullets.
         /// </summary>
-        private Random Random { get; set; }
-        private SpherePrimitive Sphere { get; set; }
-        private List<float> Radii { get; set; }
-        private List<BodyHandle> SphereHandles { get; set; }
-        private List<BodyHandle> BoxHandles { get; set; }
-        private List<Matrix> BoxesWorld { get; set; }
-        private List<Matrix> SpheresWorld { get; set; }
-        private bool CanShoot { get; set; }
+        private Random _random;
 
-        private Effect TilingEffect { get; set; }
+        private SpherePrimitive _sphere;
+        private List<float> _radii;
+        private List<BodyHandle> _sphereHandles;
+        private List<BodyHandle> _boxHandles;
+        private List<Matrix> _boxesWorld;
+        private List<Matrix> _spheresWorld;
+        private bool _canShoot;
+
+        private Effect _tilingEffect;
 
         /// <summary>
         ///     Gets the buffer pool used by the demo's simulation.
@@ -55,26 +56,26 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
         ///     The simulation merely uses the pool.
         ///     Disposing the simulation will not dispose or clear the buffer pool.
         /// </summary>
-        private BufferPool BufferPool { get; set; }
+        private BufferPool _bufferPool;
 
-        private Camera Camera { get; set; }
+        private Camera _camera;
 
         /// <summary>
         ///     Gets the simulation created by the sample's Initialize call.
         /// </summary>
-        private Simulation Simulation { get; set; }
-        
-        private SpriteFont SpriteFont { get; set; }
+        private Simulation _simulation;
+
+        private SpriteFont _spriteFont;
 
         /// <summary>
         ///     Gets the thread dispatcher available for use by the simulation.
         /// </summary>
-        private SimpleThreadDispatcher ThreadDispatcher { get; set; }
+        private SimpleThreadDispatcher _threadDispatcher;
 
         /// <inheritdoc />
         public override void Initialize()
         {
-            CanShoot = true;
+            _canShoot = true;
 
             base.Initialize();
         }
@@ -82,51 +83,51 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
         /// <inheritdoc />
         protected override void LoadContent()
         {
-            Random = new Random(5);
+            _random = new Random(5);
 
-            SpriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
+            _spriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
             
             //The buffer pool is a source of raw memory blobs for the engine to use.
-            BufferPool = new BufferPool();
+            _bufferPool = new BufferPool();
 
-            Radii = new List<float>();
-            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(40, 60, 150), 55, 0.4f);
+            _radii = new List<float>();
+            _camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(40, 60, 150), 55, 0.4f);
 
             var boxTexture = Game.Content.Load<Texture2D>(ContentFolderTextures + "wood/caja-madera-3");
-            Box = new BoxPrimitive(GraphicsDevice, Vector3.One * 10, boxTexture);
+            _box = new BoxPrimitive(GraphicsDevice, Vector3.One * 10, boxTexture);
 
-            Sphere = new SpherePrimitive(GraphicsDevice);
+            _sphere = new SpherePrimitive(GraphicsDevice);
 
-            SphereHandles = new List<BodyHandle>();
-            BoxHandles = new List<BodyHandle>();
+            _sphereHandles = new List<BodyHandle>();
+            _boxHandles = new List<BodyHandle>();
 
             var targetThreadCount = Math.Max(1,
                 Environment.ProcessorCount > 4 ? Environment.ProcessorCount - 2 : Environment.ProcessorCount - 1);
-            ThreadDispatcher = new SimpleThreadDispatcher(targetThreadCount);
+            _threadDispatcher = new SimpleThreadDispatcher(targetThreadCount);
 
             // This are meshes/model/primitives collections to render
             // The PositionFirstTimestepper is the simplest timestepping mode, but since it integrates velocity into position at the start of the frame, directly modified velocities outside of the timestep
             // will be integrated before collision detection or the solver has a chance to intervene. That's fine in this demo. Other built-in options include the PositionLastTimestepper and the SubsteppingTimestepper.
             // Note that the timestepper also has callbacks that you can use for executing logic between processing stages, like BeforeCollisionDetection.
-            Simulation = Simulation.Create(BufferPool,
+            _simulation = Simulation.Create(_bufferPool,
                 new NarrowPhaseCallbacks(new SpringSettings(30, 1)),
                 new PoseIntegratorCallbacks(new NumericVector3(0, -100, 0)),
                 new SolveDescription(8, 1));
 
             // Creates a floor
             var floorTexture = Game.Content.Load<Texture2D>(ContentFolderTextures + "floor/adoquin-2");
-            Floor = new QuadPrimitive(GraphicsDevice);
+            _floor = new QuadPrimitive(GraphicsDevice);
 
-            TilingEffect = Game.Content.Load<Effect>(ContentFolderEffects + "TextureTiling");
-            TilingEffect.Parameters["Texture"].SetValue(floorTexture);
-            TilingEffect.Parameters["Tiling"].SetValue(Vector2.One * 50f);
+            _tilingEffect = Game.Content.Load<Effect>(ContentFolderEffects + "TextureTiling");
+            _tilingEffect.Parameters["Texture"].SetValue(floorTexture);
+            _tilingEffect.Parameters["Tiling"].SetValue(Vector2.One * 50f);
 
-            FloorWorld = Matrix.CreateScale(400f) * Matrix.CreateTranslation(new Vector3(75,0, -150));
-            Simulation.Statics.Add(new StaticDescription(new NumericVector3(0, -0.5f, 0),
-                Simulation.Shapes.Add(new Box(2000, 1, 2000))));
+            _floorWorld = Matrix.CreateScale(400f) * Matrix.CreateTranslation(new Vector3(75,0, -150));
+            _simulation.Statics.Add(new StaticDescription(new NumericVector3(0, -0.5f, 0),
+                _simulation.Shapes.Add(new Box(2000, 1, 2000))));
 
-            BoxesWorld = new List<Matrix>();
-            SpheresWorld = new List<Matrix>();
+            _boxesWorld = new List<Matrix>();
+            _spheresWorld = new List<Matrix>();
 
             // Single Box
             var radius = 10;
@@ -136,15 +137,15 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
                 {
                     var boxShape = new Box(radius, radius, radius);
                     var boxInertia = boxShape.ComputeInertia(0.4f);
-                    var boxIndex = Simulation.Shapes.Add(boxShape);
+                    var boxIndex = _simulation.Shapes.Add(boxShape);
                     var position = new NumericVector3(-30 + i * 10 + 1, j * 10 + 1, -40);
 
                     var bodyDescription = BodyDescription.CreateDynamic(position, boxInertia, 
                         new CollidableDescription(boxIndex, 0.1f), new BodyActivityDescription(0.01f));
 
-                    var bodyHandle = Simulation.Bodies.Add(bodyDescription);
+                    var bodyHandle = _simulation.Bodies.Add(bodyDescription);
 
-                    BoxHandles.Add(bodyHandle);
+                    _boxHandles.Add(bodyHandle);
                 }
             }
 
@@ -160,14 +161,14 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
             // fully decouple simulation and rendering rates across different threads.
             // (In either case, you'd also want to interpolate or extrapolate simulation results during rendering for smoothness.)
             // Note that taking steps of variable length can reduce stability. Gradual or one-off changes can work reasonably well.
-            Simulation.Timestep(1 / 60f, ThreadDispatcher);
-            Camera.Update(gameTime);
+            _simulation.Timestep(1 / 60f, _threadDispatcher);
+            _camera.Update(gameTime);
 
-            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Z) && CanShoot)
+            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Z) && _canShoot)
             {
-                CanShoot = false;
+                _canShoot = false;
                 // Create the shape that we'll launch at the pyramids when the user presses a button.
-                var radius = 0.5f + 5 * (float) Random.NextDouble();
+                var radius = 0.5f + 5 * (float) _random.NextDouble();
                 var bulletShape = new Sphere(radius);
 
                 // Note that the use of radius^3 for mass can produce some pretty serious mass ratios. 
@@ -179,55 +180,52 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
                 // #2 and #3 can become very expensive. In pathological cases, it can end up slower than using a quality-focused solver for the same simulation.
                 // Unfortunately, at the moment, bepuphysics v2 does not contain any alternative solvers, so if you can't afford to brute force the the problem away,
                 // the best solution is to cheat as much as possible to avoid the corner cases.
-                var position = new NumericVector3(-40 + 210 * (float) Random.NextDouble(), 130, 130);
+                var position = new NumericVector3(-40 + 210 * (float) _random.NextDouble(), 130, 130);
                 var bodyDescription = BodyDescription.CreateConvexDynamic(position,
-                    new BodyVelocity(new NumericVector3((float) Random.NextDouble(), 0, -110)),
-                    bulletShape.Radius * bulletShape.Radius * bulletShape.Radius, Simulation.Shapes, bulletShape);
+                    new BodyVelocity(new NumericVector3((float) _random.NextDouble(), 0, -110)),
+                    bulletShape.Radius * bulletShape.Radius * bulletShape.Radius, _simulation.Shapes, bulletShape);
 
-                var bodyHandle = Simulation.Bodies.Add(bodyDescription);
+                var bodyHandle = _simulation.Bodies.Add(bodyDescription);
 
-                Radii.Add(radius);
-                SphereHandles.Add(bodyHandle);
+                _radii.Add(radius);
+                _sphereHandles.Add(bodyHandle);
             }
 
             if (Game.CurrentKeyboardState.IsKeyUp(Keys.Z)) 
-                CanShoot = true;
+                _canShoot = true;
 
 
-            BoxesWorld.Clear();
-            var boxHandleCount = BoxHandles.Count;
+            _boxesWorld.Clear();
+            var boxHandleCount = _boxHandles.Count;
             for (var index = 0; index < boxHandleCount; index++)
             {
-                var pose = Simulation.Bodies.GetBodyReference(BoxHandles[index]).Pose;
+                var pose = _simulation.Bodies.GetBodyReference(_boxHandles[index]).Pose;
                 var position = pose.Position;
                 var quaternion = pose.Orientation;
                 var world =
                     Matrix.CreateFromQuaternion(new Quaternion(quaternion.X, quaternion.Y, quaternion.Z,
                         quaternion.W)) * Matrix.CreateTranslation(new Vector3(position.X, position.Y, position.Z));
-                BoxesWorld.Add(world);
+                _boxesWorld.Add(world);
             }
 
-            SpheresWorld.Clear();
-            var sphereHandleCount = SphereHandles.Count;
+            _spheresWorld.Clear();
+            var sphereHandleCount = _sphereHandles.Count;
             for (var index = 0; index < sphereHandleCount; index++)
             {
-                var pose = Simulation.Bodies.GetBodyReference(SphereHandles[index]).Pose;
+                var pose = _simulation.Bodies.GetBodyReference(_sphereHandles[index]).Pose;
                 var position = pose.Position;
                 var quaternion = pose.Orientation;
-                var world = Matrix.CreateScale(Radii[index]) *
+                var world = Matrix.CreateScale(_radii[index]) *
                             Matrix.CreateFromQuaternion(new Quaternion(quaternion.X, quaternion.Y, quaternion.Z,
                                 quaternion.W)) *
                             Matrix.CreateTranslation(new Vector3(position.X, position.Y, position.Z));
-                SpheresWorld.Add(world);
+                _spheresWorld.Add(world);
             }
 
-
-            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+            Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
 
             base.Update(gameTime);
         }
-
-
 
         /// <inheritdoc />
         public override void Draw(GameTime gameTime)
@@ -235,13 +233,13 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
             Game.Background = Color.Black;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            TilingEffect.Parameters["WorldViewProjection"].SetValue(FloorWorld * Camera.View * Camera.Projection);
-            Floor.Draw(TilingEffect);
-            BoxesWorld.ForEach(boxWorld => Box.Draw(boxWorld, Camera.View, Camera.Projection));
-            SpheresWorld.ForEach(sphereWorld => Sphere.Draw(sphereWorld, Camera.View, Camera.Projection));
+            _tilingEffect.Parameters["WorldViewProjection"].SetValue(_floorWorld * _camera.View * _camera.Projection);
+            _floor.Draw(_tilingEffect);
+            _boxesWorld.ForEach(boxWorld => _box.Draw(boxWorld, _camera.View, _camera.Projection));
+            _spheresWorld.ForEach(sphereWorld => _sphere.Draw(sphereWorld, _camera.View, _camera.Projection));
 
             Game.SpriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
-            Game.SpriteBatch.DrawString(SpriteFont, "Launch spheres with the 'Z' key.", new Vector2(GraphicsDevice.Viewport.Width - 500, 0), Color.White);
+            Game.SpriteBatch.DrawString(_spriteFont, "Launch spheres with the 'Z' key.", new Vector2(GraphicsDevice.Viewport.Width - 500, 0), Color.White);
             Game.SpriteBatch.End();
             
             base.Draw(gameTime);
@@ -253,11 +251,11 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
             // If you intend to reuse the BufferPool, disposing the simulation is a good idea- it returns all the buffers to the pool for reuse.
             // Here, we dispose it, but it's not really required; we immediately thereafter clear the BufferPool of all held memory.
             // Note that failing to dispose buffer pools can result in memory leaks.
-            Simulation.Dispose();
+            _simulation.Dispose();
 
-            BufferPool.Clear();
+            _bufferPool.Clear();
 
-            ThreadDispatcher.Dispose();
+            _threadDispatcher.Dispose();
 
             base.UnloadContent();
         }

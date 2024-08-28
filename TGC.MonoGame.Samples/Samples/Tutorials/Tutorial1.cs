@@ -24,18 +24,17 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         /// <summary>
         ///     Represents a list of 3D vertices to be streamed to the graphics device.
         /// </summary>
-        private VertexBuffer Vertices { get; set; }
-
+        private VertexBuffer _vertices;
 
         /// <summary>
         ///     A index array pointing to the vertices to conform triangles
         /// </summary>
-        private IndexBuffer Indices { get; set; }
+        private IndexBuffer _indices;
 
         /// <summary>
         ///     Built-in effect that supports optional texturing, vertex coloring, fog, and lighting.
         /// </summary>
-        private BasicEffect Effect { get; set; }
+        private BasicEffect _effect;
 
         /// <inheritdoc />
         public override void Initialize()
@@ -47,7 +46,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
                 Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 1, 1000);
 
             // Setup our basic effect
-            Effect = new BasicEffect(GraphicsDevice)
+            _effect = new BasicEffect(GraphicsDevice)
             {
                 World = worldMatrix,
                 View = viewMatrix,
@@ -63,9 +62,9 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
                 new VertexPositionColor(new Vector3(15f, -5f, 0f), Color.Green)
             };
 
-            Vertices = new VertexBuffer(GraphicsDevice, VertexPositionColor.VertexDeclaration, triangleVertices.Length,
+            _vertices = new VertexBuffer(GraphicsDevice, VertexPositionColor.VertexDeclaration, triangleVertices.Length,
                 BufferUsage.WriteOnly);
-            Vertices.SetData(triangleVertices);
+            _vertices.SetData(triangleVertices);
 
             // Array of indices
             var triangleIndices = new ushort[]
@@ -73,8 +72,8 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
                 0, 1, 2
             };
 
-            Indices = new IndexBuffer(GraphicsDevice, IndexElementSize.SixteenBits, 3, BufferUsage.None);
-            Indices.SetData(triangleIndices);
+            _indices = new IndexBuffer(GraphicsDevice, IndexElementSize.SixteenBits, 3, BufferUsage.None);
+            _indices.SetData(triangleIndices);
 
             Game.Gizmos.Enabled = false;
 
@@ -88,12 +87,12 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
 
 
             // Set our vertex buffer.
-            GraphicsDevice.SetVertexBuffer(Vertices);
+            GraphicsDevice.SetVertexBuffer(_vertices);
 
             // Set our index buffer
-            GraphicsDevice.Indices = Indices;
+            GraphicsDevice.Indices = _indices;
 
-            foreach (var pass in Effect.CurrentTechnique.Passes)
+            foreach (var pass in _effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
 

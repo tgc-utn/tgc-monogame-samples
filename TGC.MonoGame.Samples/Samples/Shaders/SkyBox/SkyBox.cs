@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace TGC.MonoGame.Samples.Samples.Shaders.SkyBox
 {
     /// <summary>
-    ///     Handles all of the aspects of working with a SkyBox.
+    ///     Handles all the aspects of working with a SkyBox.
     /// </summary>
     public class SkyBox
     {
@@ -27,32 +27,32 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.SkyBox
         /// <param name="size">The SkyBox fx to use.</param>
         public SkyBox(Model model, TextureCube texture, Effect effect, float size)
         {
-            Model = model;
-            Texture = texture;
-            Effect = effect;
-            Size = size;
+            _model = model;
+            _texture = texture;
+            _effect = effect;
+            _size = size;
         }
 
         /// <summary>
         ///     The size of the cube, used so that we can resize the box
         ///     for different sized environments.
         /// </summary>
-        private float Size { get; }
+        private float _size;
 
         /// <summary>
         ///     The effect file that the SkyBox will use to render
         /// </summary>
-        private Effect Effect { get; }
+        private Effect _effect;
 
         /// <summary>
         ///     The actual SkyBox texture
         /// </summary>
-        private TextureCube Texture { get; }
+        private TextureCube _texture;
 
         /// <summary>
         ///     The SkyBox model, which will just be a cube
         /// </summary>
-        public Model Model { get; set; }
+        private Model _model;
 
         /// <summary>
         ///     Does the actual drawing of the SkyBox with our SkyBox effect.
@@ -66,23 +66,23 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.SkyBox
         public void Draw(Matrix view, Matrix projection, Vector3 cameraPosition)
         {
             // Go through each pass in the effect, but we know there is only one...
-            foreach (var pass in Effect.CurrentTechnique.Passes)
+            foreach (var pass in _effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
 
                 // Draw all of the components of the mesh, but we know the cube really
                 // only has one mesh
-                foreach (var mesh in Model.Meshes)
+                foreach (var mesh in _model.Meshes)
                 {
                     // Assign the appropriate values to each of the parameters
                     foreach (var part in mesh.MeshParts)
                     {
-                        part.Effect = Effect;
+                        part.Effect = _effect;
                         part.Effect.Parameters["World"].SetValue(
-                            Matrix.CreateScale(Size) * Matrix.CreateTranslation(cameraPosition));
+                            Matrix.CreateScale(_size) * Matrix.CreateTranslation(cameraPosition));
                         part.Effect.Parameters["View"].SetValue(view);
                         part.Effect.Parameters["Projection"].SetValue(projection);
-                        part.Effect.Parameters["SkyBoxTexture"].SetValue(Texture);
+                        part.Effect.Parameters["SkyBoxTexture"].SetValue(_texture);
                         part.Effect.Parameters["CameraPosition"].SetValue(cameraPosition);
                     }
 

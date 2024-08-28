@@ -17,69 +17,68 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         /// <summary>
         /// A Camera to draw models in space
         /// </summary>
-        private Camera Camera { get; set; }
+        private Camera _camera;
 
         /// <summary>
         /// A model to draw in the center of the scene
         /// </summary>
-        private Model Model { get; set; }
+        private Model _model;
 
         /// <summary>
         /// Geometry to draw a floor
         /// </summary>
-        private QuadPrimitive Floor { get; set; }
+        private QuadPrimitive _floor;
 
         /// <summary>
         /// A box to draw where the light is
         /// </summary>
-        private CubePrimitive LightBox { get; set; }
+        private CubePrimitive _lightBox;
 
         /// <summary>
         /// An effect to draw using blinn-phong techniques
         /// </summary>
-        private Effect Effect { get; set; }
+        private Effect _effect;
 
         /// <summary>
         /// Floor color texture
         /// </summary>
-        private Texture2D FloorTexture { get; set; }
+        private Texture2D _floorTexture;
 
         /// <summary>
         /// Floor normal map
         /// </summary>
-        private Texture2D FloorNormalMap { get; set; }
+        private Texture2D _floorNormalMap;
 
         /// <summary>
         /// Model color texture
         /// </summary>
-        private Texture2D ModelTexture { get; set; }
+        private Texture2D _modelTexture;
 
         /// <summary>
         /// Model normal map
         /// </summary>
-        private Texture2D ModelNormal { get; set; }
+        private Texture2D _modelNormal;
 
         /// <summary>
         /// The position of the light
         /// </summary>
-        private Vector3 LightPosition { get; set; } = Vector3.Zero;
+        private Vector3 _lightPosition = Vector3.Zero;
 
         /// <summary>
         /// The world matrix for the light box
         /// </summary>
-        private Matrix LightBoxWorld { get; set; } = Matrix.Identity;
+        private Matrix _lightBoxWorld = Matrix.Identity;
 
         /// <summary>
         /// The world matrix for the model
         /// </summary>
-        private Matrix ModelWorld { get; set; }
+        private Matrix _modelWorld;
 
         /// <summary>
         /// The world matrix for the floor
         /// </summary>
-        private Matrix FloorWorld { get; set; }
-
-
+        private Matrix _floorWorld;
+        
         /// <inheritdoc />
         public BlinnPhongTypes(TGCViewer game) : base(game)
         {
@@ -88,45 +87,42 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             Description = "Applying Blinn-Phong Types to models";
         }
 
-
         /// <inheritdoc />
         public override void Initialize()
         {
             var size = GraphicsDevice.Viewport.Bounds.Size;
             size.X /= 2;
             size.Y /= 2;
-            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 50, 1000), size);
+            _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 50, 1000), size);
 
-            ModelWorld = Matrix.CreateScale(15f) * Matrix.CreateRotationX(-MathF.PI * 0.5f);
-            FloorWorld = Matrix.CreateScale(300f) * Matrix.CreateTranslation(0f, -20f, 0f);
+            _modelWorld = Matrix.CreateScale(15f) * Matrix.CreateRotationX(-MathF.PI * 0.5f);
+            _floorWorld = Matrix.CreateScale(300f) * Matrix.CreateTranslation(0f, -20f, 0f);
 
             base.Initialize();
         }
-
-
 
         /// <inheritdoc />
         protected override void LoadContent()
         {
             // We load the sphere mesh and floor, from runtime generated primitives
-            Model = Game.Content.Load<Model>(ContentFolder3D + "geometries/sphere");
-            Floor = new QuadPrimitive(GraphicsDevice);
+            _model = Game.Content.Load<Model>(ContentFolder3D + "geometries/sphere");
+            _floor = new QuadPrimitive(GraphicsDevice);
 
-            LightBox = new CubePrimitive(GraphicsDevice, 1f, Color.White);
+            _lightBox = new CubePrimitive(GraphicsDevice, 1f, Color.White);
 
-            FloorTexture = Game.Content.Load<Texture2D>(ContentFolderTextures + "floor/tiling-base");
-            FloorNormalMap = Game.Content.Load<Texture2D>(ContentFolderTextures + "floor/tiling-normal");
-            ModelTexture = Game.Content.Load<Texture2D>(ContentFolderTextures + "pbr/harsh-metal/color");
-            ModelNormal = Game.Content.Load<Texture2D>(ContentFolderTextures + "pbr/harsh-metal/normal");
+            _floorTexture = Game.Content.Load<Texture2D>(ContentFolderTextures + "floor/tiling-base");
+            _floorNormalMap = Game.Content.Load<Texture2D>(ContentFolderTextures + "floor/tiling-normal");
+            _modelTexture = Game.Content.Load<Texture2D>(ContentFolderTextures + "pbr/harsh-metal/color");
+            _modelNormal = Game.Content.Load<Texture2D>(ContentFolderTextures + "pbr/harsh-metal/normal");
 
             // We load the effect with various techniques
-            Effect = Game.Content.Load<Effect>(ContentFolderEffects + "BlinnPhongTypes");
+            _effect = Game.Content.Load<Effect>(ContentFolderEffects + "BlinnPhongTypes");
 
-            foreach (var modelMesh in Model.Meshes)
+            foreach (var modelMesh in _model.Meshes)
             {
                 foreach (var meshPart in modelMesh.MeshParts)
                 { 
-                    meshPart.Effect = Effect; 
+                    meshPart.Effect = _effect; 
                 }
             }
 
@@ -138,17 +134,16 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
                 "Normal Mapping"
             }, BlinnPhongType.DEFAULT, BlinnPhongTypeChange);
 
-
             // Add mappings for modifiers to control values
             ModifierController.AddVector("Light Position", SetLightPosition, Vector3.Up * 45f);
-            ModifierController.AddColor("Ambient Color", Effect.Parameters["ambientColor"], new Color(0f, 0f, 1f));
-            ModifierController.AddColor("Diffuse Color", Effect.Parameters["diffuseColor"], new Color(0.1f, 0.1f, 0.6f));
-            ModifierController.AddColor("Specular Color", Effect.Parameters["specularColor"], Color.White);
+            ModifierController.AddColor("Ambient Color", _effect.Parameters["ambientColor"], new Color(0f, 0f, 1f));
+            ModifierController.AddColor("Diffuse Color", _effect.Parameters["diffuseColor"], new Color(0.1f, 0.1f, 0.6f));
+            ModifierController.AddColor("Specular Color", _effect.Parameters["specularColor"], Color.White);
 
-            ModifierController.AddFloat("KA", Effect.Parameters["KAmbient"], 0.1f, 0f, 1f);
-            ModifierController.AddFloat("KD", Effect.Parameters["KDiffuse"], 0.7f, 0f, 1f);
-            ModifierController.AddFloat("KS", Effect.Parameters["KSpecular"], 0.4f, 0f, 1f);
-            ModifierController.AddFloat("Shininess", Effect.Parameters["shininess"], 4.0f, 1f, 64f);
+            ModifierController.AddFloat("KA", _effect.Parameters["KAmbient"], 0.1f, 0f, 1f);
+            ModifierController.AddFloat("KD", _effect.Parameters["KDiffuse"], 0.7f, 0f, 1f);
+            ModifierController.AddFloat("KS", _effect.Parameters["KSpecular"], 0.4f, 0f, 1f);
+            ModifierController.AddFloat("Shininess", _effect.Parameters["shininess"], 4.0f, 1f, 64f);
             
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
@@ -161,21 +156,20 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         /// <param name="position">The new light position in world space</param>
         private void SetLightPosition(Vector3 position)
         {
-            LightBoxWorld = Matrix.CreateScale(3f) *  Matrix.CreateTranslation(position);
-            Effect.Parameters["lightPosition"].SetValue(position);
+            _lightBoxWorld = Matrix.CreateScale(3f) *  Matrix.CreateTranslation(position);
+            _effect.Parameters["lightPosition"].SetValue(position);
         }
 
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
             // Update the state of the camera
-            Camera.Update(gameTime);
+            _camera.Update(gameTime);
 
-            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+            Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
 
             base.Update(gameTime);
         }
-
 
         /// <inheritdoc />
         public override void Draw(GameTime gameTime)
@@ -183,34 +177,34 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             // Set the background color to black, and use the default depth configuration
             Game.Background = Color.Black;
 
-            var viewProjection = Camera.View * Camera.Projection;
+            var viewProjection = _camera.View * _camera.Projection;
 
             // Set the camera position
             // This changes every update so we need to set it before rendering
-            Effect.Parameters["eyePosition"].SetValue(Camera.Position);
+            _effect.Parameters["eyePosition"].SetValue(_camera.Position);
 
-            Effect.Parameters["ModelTexture"].SetValue(ModelTexture);
-            Effect.Parameters["NormalTexture"].SetValue(ModelNormal);
-            Effect.Parameters["World"].SetValue(ModelWorld);
-            Effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Invert(Matrix.Transpose(ModelWorld)));
-            Effect.Parameters["WorldViewProjection"].SetValue(ModelWorld * viewProjection);
-            Effect.Parameters["Tiling"].SetValue(Vector2.One);
+            _effect.Parameters["ModelTexture"].SetValue(_modelTexture);
+            _effect.Parameters["NormalTexture"].SetValue(_modelNormal);
+            _effect.Parameters["World"].SetValue(_modelWorld);
+            _effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Invert(Matrix.Transpose(_modelWorld)));
+            _effect.Parameters["WorldViewProjection"].SetValue(_modelWorld * viewProjection);
+            _effect.Parameters["Tiling"].SetValue(Vector2.One);
 
-            foreach (var modelMesh in Model.Meshes)
+            foreach (var modelMesh in _model.Meshes)
             { 
                 modelMesh.Draw(); 
             }
 
-            Effect.Parameters["ModelTexture"].SetValue(FloorTexture);
-            Effect.Parameters["NormalTexture"].SetValue(FloorNormalMap);
-            Effect.Parameters["World"].SetValue(FloorWorld);
-            Effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Invert(Matrix.Transpose(FloorWorld)));
-            Effect.Parameters["WorldViewProjection"].SetValue(FloorWorld * viewProjection);
-            Effect.Parameters["Tiling"].SetValue(Vector2.One * 5f);
+            _effect.Parameters["ModelTexture"].SetValue(_floorTexture);
+            _effect.Parameters["NormalTexture"].SetValue(_floorNormalMap);
+            _effect.Parameters["World"].SetValue(_floorWorld);
+            _effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Invert(Matrix.Transpose(_floorWorld)));
+            _effect.Parameters["WorldViewProjection"].SetValue(_floorWorld * viewProjection);
+            _effect.Parameters["Tiling"].SetValue(Vector2.One * 5f);
 
-            Floor.Draw(Effect);
+            _floor.Draw(_effect);
 
-            LightBox.Draw(LightBoxWorld, Camera.View, Camera.Projection);
+            _lightBox.Draw(_lightBoxWorld, _camera.View, _camera.Projection);
           
             base.Draw(gameTime);
         }
@@ -224,17 +218,16 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             switch(type)
             {
                 case BlinnPhongType.GOURAUD:
-                    Effect.CurrentTechnique = Effect.Techniques["Gouraud"];
+                    _effect.CurrentTechnique = _effect.Techniques["Gouraud"];
                     break;
                 case BlinnPhongType.NORMAL_MAPPING:
-                    Effect.CurrentTechnique = Effect.Techniques["NormalMapping"];
+                    _effect.CurrentTechnique = _effect.Techniques["NormalMapping"];
                     break;
                 default:
-                    Effect.CurrentTechnique = Effect.Techniques["Default"];
+                    _effect.CurrentTechnique = _effect.Techniques["Default"];
                     break;
             }
         }
-
 
         /// <summary>
         /// The different types of blinn-phong illumination
