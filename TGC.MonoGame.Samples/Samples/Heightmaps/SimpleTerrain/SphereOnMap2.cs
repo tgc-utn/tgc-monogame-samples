@@ -10,27 +10,18 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
 {
     public class SphereOnMap2 : TGCSample
     {
-        private const float CameraFollowRadius = 100f;
-        private const float CameraUpDistance = 80f;
-        private const float RobotSideSpeed = 100f;
-        private const float RobotJumpSpeed = 150f;
-        private const float Gravity = 350f;
-        private const float RobotRotatingVelocity = 0.06f;
-        private const float EPSILON = 0.00001f;
+        private const float SphereRotatingVelocity = 0.06f;
 
-        private readonly Vector3 _sphereScale = new Vector3(2, 2, 2);
-        private const float ShereAxisRotationSpeed = 2.5f;
-        private const float AxisRotationSpeed = 0.125f;
 
         public float angle;
         public Vector3 DesiredLookAt;
         public bool hay_lookAt;
         public Vector3 LookAt;
 
-        private Model model;
         public Vector2 pos;
-        public Vector3 shipPos;
         public SimpleTerrain terrain;
+        public float offSet = 0f;
+        public Vector3 spherePos;
 
         private Matrix SphereRotation { get; set; }
 
@@ -55,7 +46,12 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
             Camera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(5000, 1300, 5000), DesiredLookAt,
                 5, 50000);
 
-            Sphere = new SpherePrimitive(GraphicsDevice, 20, 32, Color.DarkGreen);
+            float diameter = 20;
+            Sphere = new SpherePrimitive(GraphicsDevice, diameter, 32, Color.Black);
+
+            offSet = (diameter / 2) + 50;
+
+            SphereRotation = Matrix.Identity;
 
             base.Initialize();
         }
@@ -73,26 +69,67 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
             var terrainGround = Game.Content.Load<Texture2D>(ContentFolderTextures + "ground");
             terrain = new SimpleTerrain(GraphicsDevice, terrainHeigthmap, terrainColorMap, terrainGrass, terrainGround, terrainEffect);
 
-            model = Game.Content.Load<Model>("3D/tgcito-classic/tgcito-classic");
-
             base.LoadContent();
         }
 
         public override void Update(GameTime gameTime)
         {
             var da = 0.01f;
-            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Left)) angle -= da;
-            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Right)) angle += da;
+            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Left)) {
+                angle -= da;
+            }
+            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Right)) {
+                angle += da;
+            } 
 
             var dir = new Vector2(MathF.Cos(angle), MathF.Sin(angle));
-            float vel_lineal = 10;
-            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Up)) pos += dir * vel_lineal;
-            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Down)) pos -= dir * vel_lineal;
+            float vel_lineal = 5;
+            Matrix sphereRotationZ;
+            Matrix sphereRotationX;
+            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Up)) {
+                pos += dir * vel_lineal;
+                if (dir.X > 0)
+                {
+                    sphereRotationZ = Matrix.CreateRotationZ(dir.X * -SphereRotatingVelocity);
+                }
+                else {
+                    sphereRotationZ = Matrix.CreateRotationZ(dir.X * -SphereRotatingVelocity);
+                }
+                if (dir.Y > 0)
+                {
+                    sphereRotationX = Matrix.CreateRotationX(dir.Y * SphereRotatingVelocity);
+                }
+                else {
+                    sphereRotationX = Matrix.CreateRotationX(dir.Y * SphereRotatingVelocity);
+                }
+
+                SphereRotation *= sphereRotationZ * sphereRotationX;
+            }
+            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Down)) {
+                pos -= dir * vel_lineal;
+                if (dir.X > 0)
+                {
+                    sphereRotationZ = Matrix.CreateRotationZ(dir.X * SphereRotatingVelocity);
+                }
+                else {
+                    sphereRotationZ = Matrix.CreateRotationZ(dir.X * SphereRotatingVelocity);
+                }
+                if (dir.Y > 0)
+                {
+                    sphereRotationX = Matrix.CreateRotationX(dir.Y * -SphereRotatingVelocity);
+                }
+                else {
+                    sphereRotationX = Matrix.CreateRotationX(dir.Y * -SphereRotatingVelocity);
+                }
+
+                SphereRotation *= sphereRotationZ * sphereRotationX;
+            } 
 
             var X = pos.X;
             var Z = pos.Y;
 
-            DesiredLookAt = shipPos = new Vector3(X, terrain.Height(X, Z), Z);
+            spherePos = new Vector3(X, terrain.Height(X, Z) + offSet, Z);
+            DesiredLookAt = new Vector3(X, terrain.Height(X, Z) + offSet, Z);
             if (!hay_lookAt)
             {
                 LookAt = DesiredLookAt;
@@ -104,7 +141,7 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
                 LookAt = DesiredLookAt * lamda + LookAt * (1 - lamda);
             }
 
-            var pos2 = pos - dir * 800;
+            var pos2 = pos - dir * 300;
 
             // obtengo la altura maxima desde la camara hasta el auto
             float H = 0;
@@ -112,7 +149,7 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
             {
                 var t = i / 10.0f;
                 var p = pos2 * t + pos * (1 - t);
-                var Hi = terrain.Height(p.X, p.Y) + 50;
+                var Hi = terrain.Height(p.X, p.Y) + offSet + 50;
                 if (Hi > H) H = Hi;
             }
 
@@ -137,79 +174,9 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
             terrain.Draw(Matrix.Identity, Camera.View, Camera.Projection);
             GraphicsDevice.RasterizerState = oldRasterizerState;
 
-            // computo 3 puntos sobre la superficie del heighmap
-            var dir = new Vector2(MathF.Cos(angle), MathF.Sin(angle));
-            var tan = new Vector2(-MathF.Sin(angle), MathF.Cos(angle));
-            var pos_ade = pos + dir * 100;
-            var pos_der = pos + tan * 100;
-            var PosAdelante = new Vector3(pos_ade.X, terrain.Height(pos_ade.X, pos_ade.Y), pos_ade.Y);
-            var PosDerecha = new Vector3(pos_der.X, terrain.Height(pos_der.X, pos_der.Y), pos_der.Y);
-
-            var matWorld = CalcularMatrizOrientacion(10, shipPos, PosAdelante, PosDerecha);
-
-            // dibujo el mesh
-            foreach (var mesh in model.Meshes)
-            {
-                foreach (BasicEffect effect in mesh.Effects)
-                {
-                    effect.EnableDefaultLighting();
-                    effect.PreferPerPixelLighting = true;
-                    effect.World = matWorld;
-                    effect.View = Camera.View;
-                    effect.Projection = Camera.Projection;
-                }
-
-                mesh.Draw();
-            }
-
-            DrawGeometry(Sphere, CalcularMatrizOrientacion(50, shipPos, PosAdelante, PosDerecha));
+            DrawGeometry(Sphere, Matrix.CreateScale(50 * 0.1f) * SphereRotation * Matrix.CreateTranslation(spherePos));
 
             base.Draw(gameTime);
-        }
-
-        // helper, calcula una matrix de world en base a la posicion, escalado y direccion del mesh
-        public Matrix CalcularMatrizOrientacion(float scale, Vector3 p0, Vector3 p1, Vector3 p2)
-        {
-            var matWorld = Matrix.CreateScale(scale * 0.1f);
-
-            // determino la orientacion
-            var Dir = p1 - p0;
-            Dir.Normalize();
-            var Tan = p2 - p0;
-            Tan.Normalize();
-            var VUP = Vector3.Cross(Tan, Dir);
-            VUP.Normalize();
-            Tan = Vector3.Cross(VUP, Dir);
-            Tan.Normalize();
-
-            var V = VUP;
-            var U = Tan;
-
-            var Orientacion = new Matrix();
-            Orientacion.M11 = U.X;
-            Orientacion.M12 = U.Y;
-            Orientacion.M13 = U.Z;
-            Orientacion.M14 = 0;
-
-            Orientacion.M21 = V.X;
-            Orientacion.M22 = V.Y;
-            Orientacion.M23 = V.Z;
-            Orientacion.M24 = 0;
-
-            Orientacion.M31 = Dir.X;
-            Orientacion.M32 = Dir.Y;
-            Orientacion.M33 = Dir.Z;
-            Orientacion.M34 = 0;
-
-            Orientacion.M41 = 0;
-            Orientacion.M42 = 0;
-            Orientacion.M43 = 0;
-            Orientacion.M44 = 1;
-            matWorld = matWorld * Orientacion;
-
-            // traslado
-            matWorld = matWorld * Matrix.CreateTranslation(p0);
-            return matWorld;
         }
 
         private void DrawGeometry(GeometricPrimitive geometry, Matrix transform)
