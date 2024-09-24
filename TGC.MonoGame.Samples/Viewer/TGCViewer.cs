@@ -118,8 +118,8 @@ namespace TGC.MonoGame.Samples.Viewer
         {
             GraphicsDevice.Clear(Background);
             base.Draw(gameTime);
-            Model.DrawSampleExplorer(gameTime);
             Gizmos.Draw();
+            Model.DrawSampleExplorer(gameTime);
         }
 
         /// <summary>
