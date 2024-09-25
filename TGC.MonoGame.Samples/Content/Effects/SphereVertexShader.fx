@@ -1,10 +1,10 @@
 ﻿#if OPENGL
-	#define SV_POSITION POSITION
-	#define VS_SHADERMODEL vs_3_0
-	#define PS_SHADERMODEL ps_3_0
+    #define SV_POSITION POSITION
+    #define VS_SHADERMODEL vs_3_0
+    #define PS_SHADERMODEL ps_3_0
 #else
-	#define VS_SHADERMODEL vs_4_0_level_9_1
-	#define PS_SHADERMODEL ps_4_0_level_9_1
+    #define VS_SHADERMODEL vs_4_0_level_9_1
+    #define PS_SHADERMODEL ps_4_0_level_9_1
 #endif
 
 // Custom Effects - https://docs.monogame.net/articles/content/custom_effects.html
@@ -20,30 +20,30 @@ uniform float Time = 0;
 
 struct VertexShaderInput
 {
-	// Posicion en espacio local
-	float4 Position : POSITION0;
-	float3 Normal : NORMAL0;
+    // Local Space Position
+    float4 Position : POSITION0;
+    float3 Normal : NORMAL0;
 };
 
 struct VertexShaderOutput
 {
-	// Posicion en espacio de proyeccion
-	float4 Position : SV_POSITION;
+    // Projection Space Position
+    float4 Position : SV_POSITION;
 };
 
 VertexShaderOutput MainVS(in VertexShaderInput input)
 {
-	VertexShaderOutput output = (VertexShaderOutput)0;
+    VertexShaderOutput output = (VertexShaderOutput)0;
 
-	input.Position.x += 0.05 * sin(input.Position.y * 10.0 + Time * 10.0);
+    input.Position.x += 0.05 * sin(input.Position.y * 10.0 + Time * 10.0);
 
-	// Local a Mundo
+    // Local to World
     float4 worldPosition = mul(input.Position, World);
-		
-	// Mundo a Vista
+        
+    // World to View
     float4 viewPosition = mul(worldPosition, View);
 
-	// Vista a Proyeccion
+    // View to Projection 
     output.Position = mul(viewPosition, Projection);
 
     return output;
@@ -56,10 +56,10 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 
 technique BaseTechnique
 {
-	pass P0
-	{
-		VertexShader = compile VS_SHADERMODEL MainVS();
-		PixelShader = compile PS_SHADERMODEL MainPS();
-	}
+    pass P0
+    {
+        VertexShader = compile VS_SHADERMODEL MainVS();
+        PixelShader = compile PS_SHADERMODEL MainPS();
+    }
 };
 
