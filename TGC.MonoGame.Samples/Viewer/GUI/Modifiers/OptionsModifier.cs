@@ -78,7 +78,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         public void Draw()
         {
             if (ImGui.Combo(_name, ref _currentOptionIndex, _options, _options.Length))
+            {
                 _onChange.Invoke((EnumType)Enum.ToObject(typeof(EnumType), _currentOptionIndex));
+            }
         }
     }
 }

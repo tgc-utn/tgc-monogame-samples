@@ -32,7 +32,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         private CylinderGizmoGeometry _cylinder;
         private DiskGizmoGeometry _disk;
 
-        private Dictionary<GizmoGeometry, Dictionary<Color, List<Matrix>>> _drawInstances = new ();
+        private readonly Dictionary<GizmoGeometry, Dictionary<Color, List<Matrix>>> _drawInstances = new ();
 
         private Effect _effect;
         private EffectPass _foregroundPass;

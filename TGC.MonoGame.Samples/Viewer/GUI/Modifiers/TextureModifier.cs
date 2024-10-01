@@ -37,6 +37,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         {
             ImGui.Spacing();
             if (ImGui.CollapsingHeader(_name, ImGuiTreeNodeFlags.DefaultOpen))
+            {
                 ImGui.Image(_textureReference,
                     // Size
                     new Vector2(ImGui.CalcItemWidth(), ImGui.CalcItemWidth()),
@@ -45,6 +46,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
                     Vector4.One,
                     // Border Color
                     BorderColor);
+            }
         }
 
         /// <summary>

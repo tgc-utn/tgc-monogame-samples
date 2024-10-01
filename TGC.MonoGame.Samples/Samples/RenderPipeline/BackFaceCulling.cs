@@ -141,7 +141,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
         private void AddArrow(Vector3 position, Vector3 normal, Color color)
         {
-            _arrows.Add(new Arrowz()
+            _arrows.Add(new Arrowz
             {
                 Position = position,
                 Target = position + normal * 0.75f,

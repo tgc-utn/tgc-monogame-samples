@@ -16,7 +16,6 @@ namespace TGC.MonoGame.Samples.Viewer
         /// </summary>
         private const string ContentFolder = "Content";
 
-
         /// <summary>
         ///     Initializes a new instance of the <see cref="TGCViewer" /> class.
         ///     The main game constructor is used to initialize the starting variables.
@@ -60,7 +59,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <summary>
         ///     The model has the logic for the creation of the sample explorer.
         /// </summary>
-        private TGCViewerModel _model;
+        private readonly TGCViewerModel _model;
 
         /// <summary>
         ///     Gizmos are used to debug and visualize boundaries and vectors

@@ -37,9 +37,9 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
         private bool _effectOn = true;
 
-        private Vector3 _robotPosition = Vector3.UnitX * -500f;
+        private readonly Vector3 _robotPosition = Vector3.UnitX * -500f;
 
-        private Vector3 _spherePosition = Vector3.UnitX * -500f + Vector3.UnitZ * -500f;
+        private readonly Vector3 _spherePosition = Vector3.UnitX * -500f + Vector3.UnitZ * -500f;
 
         /// <inheritdoc />
         public override void Initialize()

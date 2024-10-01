@@ -12,10 +12,8 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     internal class ColorModifier : IModifier
     {
         private Vector4 _colorValue;
-        private string _name;
-
-        private Action<MonoGameColor> _onChange;
-
+        private readonly string _name;
+        private readonly Action<MonoGameColor> _onChange;
 
         /// <summary>
         ///     Creates a Color Modifier with a given name.

@@ -11,14 +11,10 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
     {
         private const float AxisScreenOffset = 20f;
         private const float AxisScreenDistance = 40f;
-
         private GraphicsDevice _graphicsDevice;
-
-        private Model _model;
-
-        private BasicEffect _effect;
-
-        private Matrix _baseScaleTranslation;
+        private readonly Model _model;
+        private readonly BasicEffect _effect;
+        private readonly Matrix _baseScaleTranslation;
 
         /// <summary>
         ///     Constructs an AxisLines drawable object.
