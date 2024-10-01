@@ -11,14 +11,13 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     /// </summary>
     internal class TextureModifier : IModifier
     {
-        private static Vector4 _borderColor = new (0.3f, 0.3f, 0.3f, 0.7f);
+        private static readonly Vector4 BorderColor = new (0.3f, 0.3f, 0.3f, 0.7f);
 
-        private string _name;
+        private readonly string _name;
 
-        private Texture2D _texture;
+        private readonly Texture2D _texture;
 
         private IntPtr _textureReference;
-
 
         /// <summary>
         ///     Creates a Texture Modifier using a name and a texture to bind.
@@ -30,7 +29,6 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
             _name = name;
             _texture = texture;
         }
-
 
         /// <summary>
         ///     Draws the Texture Modifier with a border
@@ -46,7 +44,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
                     Vector2.One,
                     Vector4.One,
                     // Border Color
-                    _borderColor);
+                    BorderColor);
         }
 
         /// <summary>

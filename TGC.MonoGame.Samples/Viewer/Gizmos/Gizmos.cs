@@ -41,9 +41,9 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
 
         private LineSegmentGizmoGeometry _lineSegment;
 
-        private DepthStencilState _noDepth;
+        private readonly DepthStencilState _noDepth;
         private PolyLineGizmoGeometry _polyLine;
-        private Dictionary<Color, List<Vector3[]>> _polyLinesToDraw = new ();
+        private readonly Dictionary<Color, List<Vector3[]>> _polyLinesToDraw = new ();
         private Matrix _projection;
         private SphereGizmoGeometry _sphere;
 

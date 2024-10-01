@@ -1,11 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using System.Collections.Generic;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
-using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
 namespace TGC.MonoGame.Samples.Samples.PostProcessing
 {
@@ -83,8 +80,6 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         /// <summary>
         ///     Processes a change in the Blur Type
         /// </summary>
-        /// <param name="index">The index of the Blur selected option</param>
-        /// <param name="value">The name of the Blur type</param>
         private void OnBlurTypeChange(BlurType type)
         {
             _currentBlurType = type;
@@ -105,12 +100,18 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         public override void Draw(GameTime gameTime)
         {
             if (_currentBlurType.Equals(BlurType.NONE))
+            {
                 DrawRegular();
+            }
             else if (_currentBlurType.Equals(BlurType.SIMPLE))
+            {
                 DrawSimpleBlur();
+            }
             else
+            {
                 DrawSeparatedBlur();
-            
+            }
+
             base.Draw(gameTime);
         }
 

@@ -5,7 +5,6 @@ using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
-using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
 namespace TGC.MonoGame.Samples.Samples.Shaders
 {
@@ -52,8 +51,12 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 
             // We assign the effect to each one of the models
             foreach (var modelMesh in _model.Meshes)
-            foreach (var meshPart in modelMesh.MeshParts)
-                meshPart.Effect = _effect;
+            {
+                foreach (var meshPart in modelMesh.MeshParts)
+                {
+                    meshPart.Effect = _effect;
+                }
+            }
 
             // Set the texture. This won't change on this effect so we can assign it here
             _effect.Parameters["baseTexture"].SetValue(texture);

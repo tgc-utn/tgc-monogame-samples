@@ -29,7 +29,7 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         /// <summary>
         ///     The viewer where the samples are going to be shown.
         /// </summary>
-        private TGCViewer _game;
+        private readonly TGCViewer _game;
 
         /// <summary>
         ///     Graphical user interface.

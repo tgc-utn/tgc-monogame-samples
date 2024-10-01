@@ -94,21 +94,21 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
                 baseScaleRotation * Matrix.CreateTranslation(-30f, 5f, 20f),
             };
 
-            _frontToBackQuadWorlds = new List<Matrix>()
+            _frontToBackQuadWorlds = new List<Matrix>
             {
                 baseScaleRotation * Matrix.CreateTranslation(0f, 5f, 20f),
                 baseScaleRotation * Matrix.CreateTranslation(0f, 5f, 10f),
                 baseScaleRotation * Matrix.CreateTranslation(0f, 5f, 0f),
             };
 
-            _depthNoneQuadWorlds = new List<Matrix>()
+            _depthNoneQuadWorlds = new List<Matrix>
             {
                 baseScaleRotation * Matrix.CreateTranslation(30f, 5f, 0f),
                 baseScaleRotation * Matrix.CreateTranslation(30f, 5f, 10f),
                 baseScaleRotation * Matrix.CreateTranslation(30f, 5f, 20f),
             };
 
-            _quadColors = new List<Color>()
+            _quadColors = new List<Color>
             {
                 Color.Yellow,
                 Color.Red,
@@ -134,7 +134,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
             _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0,20,110));
 
-            _texts = new List<string>()
+            _texts = new List<string>
             {
                 "Back to Front\nDepth Test\nDepth Write OFF",
                 "Front to Back\nDepth Test\nDepth Write OFF",

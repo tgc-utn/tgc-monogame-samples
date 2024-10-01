@@ -23,6 +23,8 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             NoMipMapping,
             Debug,
         }
+        
+        private const string Texture = "Texture";
 
         /// <summary>
         /// A camera to draw geometry
@@ -89,7 +91,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
             // Assign the main texture, then set the tiling value
             // Pass the TextureSize and MipLevelCount required for the debug technique
-            _tilingFloorEffect.Parameters["Texture"].SetValue(_textureWithMipMapping);
+            _tilingFloorEffect.Parameters[Texture].SetValue(_textureWithMipMapping);
             _tilingFloorEffect.Parameters["Tiling"].SetValue(Vector2.One * 10f);
             _tilingFloorEffect.Parameters["TextureSize"].SetValue(new Vector2(_textureWithMipMapping.Width, _textureWithMipMapping.Height));
             _tilingFloorEffect.Parameters["MipLevelCount"].SetValue((float)_textureWithMipMapping.LevelCount);
@@ -135,14 +137,14 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             {
                 // For Bilinear, use a technique with Trilinear Sampling disabled
                 case MipMappingType.Bilinear:
-                    _tilingFloorEffect.Parameters["Texture"].SetValue(_textureWithMipMapping);
+                    _tilingFloorEffect.Parameters[Texture].SetValue(_textureWithMipMapping);
                     _tilingFloorEffect.CurrentTechnique = _tilingFloorEffect.Techniques["Bilinear"];
                     break;
 
                 // For this option, just use a texture with no mip mapping
                 // Ideally, this should be an option on the GraphicsDevice SamplerState
                 case MipMappingType.NoMipMapping:
-                    _tilingFloorEffect.Parameters["Texture"].SetValue(_textureWithoutMipMapping);
+                    _tilingFloorEffect.Parameters[Texture].SetValue(_textureWithoutMipMapping);
                     _tilingFloorEffect.CurrentTechnique = _tilingFloorEffect.Techniques["Bilinear"];
                     break;
 
@@ -154,7 +156,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
                 // For anything else use Trilinear, using a technique with Trilinear Sampling enabled
                 default:
-                    _tilingFloorEffect.Parameters["Texture"].SetValue(_textureWithMipMapping);
+                    _tilingFloorEffect.Parameters[Texture].SetValue(_textureWithMipMapping);
                     _tilingFloorEffect.CurrentTechnique = _tilingFloorEffect.Techniques["Trilinear"];
                     break;
             }
@@ -186,6 +188,5 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             
             base.Draw(gameTime);
         }
-
     }
 }

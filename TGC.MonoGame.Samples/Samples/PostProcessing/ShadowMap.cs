@@ -2,7 +2,6 @@
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
@@ -115,10 +114,14 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         public override void Draw(GameTime gameTime)
         {
             if (_effectOn)
+            {
                 DrawShadows();
+            }
             else
+            {
                 DrawRegular();
-            
+            }
+
             base.Draw(gameTime);
         }
 
@@ -131,8 +134,12 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             foreach (var modelMesh in _model.Meshes)
+            {
                 foreach (var part in modelMesh.MeshParts)
+                {
                     part.Effect = _basicEffect;
+                }
+            }
 
             _model.Draw(Matrix.Identity, _camera.View, _camera.Projection);
         }

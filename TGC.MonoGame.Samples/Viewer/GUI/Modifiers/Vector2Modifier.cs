@@ -11,9 +11,8 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     public class Vector2Modifier : IModifier
     {
         private Vector2 _vectorValue;
-
-        private string _name;
-        private Action<MonoGameVector2> _onChange;
+        private readonly string _name;
+        private readonly Action<MonoGameVector2> _onChange;
 
         /// <summary>
         ///     Creates a Vector2 Modifier with a given name and action.

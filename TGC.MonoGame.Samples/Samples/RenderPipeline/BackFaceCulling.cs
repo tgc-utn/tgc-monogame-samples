@@ -208,11 +208,19 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         {
             RasterizerState rasterizerState = new RasterizerState();
             if(!_backFace)
+            {
                 rasterizerState.CullMode = CullMode.None;
+            }
             else
+            {
                 rasterizerState.CullMode = CullMode.CullClockwiseFace;
+            }
+
             if (_showWireframe)
+            {
                 rasterizerState.FillMode = FillMode.WireFrame;
+            }
+
             GraphicsDevice.RasterizerState = rasterizerState;
 
             var world = _baseScale * Matrix.CreateTranslation(Vector3.UnitX * Displacement);
@@ -222,7 +230,10 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             rasterizerState = new RasterizerState();
             rasterizerState.CullMode = CullMode.None;
             if (_showWireframe)
+            {
                 rasterizerState.FillMode = FillMode.WireFrame;
+            }
+
             GraphicsDevice.RasterizerState = rasterizerState;
 
             world = _baseScale;
@@ -231,11 +242,19 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
             rasterizerState = new RasterizerState();
             if (!_backFace)
+            {
                 rasterizerState.CullMode = CullMode.None;
+            }
             else
+            {
                 rasterizerState.CullMode = CullMode.CullCounterClockwiseFace;
+            }
+
             if (_showWireframe)
+            {
                 rasterizerState.FillMode = FillMode.WireFrame;
+            }
+
             GraphicsDevice.RasterizerState = rasterizerState;
 
             world = _baseScale * Matrix.CreateTranslation(Vector3.UnitX * -Displacement);

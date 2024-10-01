@@ -1,11 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using System.Collections.Generic;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
-using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
 namespace TGC.MonoGame.Samples.Samples.PostProcessing
 {
@@ -118,8 +115,12 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             foreach (var modelMesh in _model.Meshes)
+            {
                 foreach (var part in modelMesh.MeshParts)
+                {
                     part.Effect = _basicEffect;
+                }
+            }
 
             _model.Draw(Matrix.Identity, _camera.View, _camera.Projection);
         }

@@ -37,22 +37,22 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.SkyBox
         ///     The size of the cube, used so that we can resize the box
         ///     for different sized environments.
         /// </summary>
-        private float _size;
+        private readonly float _size;
 
         /// <summary>
         ///     The effect file that the SkyBox will use to render
         /// </summary>
-        private Effect _effect;
+        private readonly Effect _effect;
 
         /// <summary>
         ///     The actual SkyBox texture
         /// </summary>
-        private TextureCube _texture;
+        private readonly TextureCube _texture;
 
         /// <summary>
         ///     The SkyBox model, which will just be a cube
         /// </summary>
-        private Model _model;
+        private readonly Model _model;
 
         /// <summary>
         ///     Does the actual drawing of the SkyBox with our SkyBox effect.
@@ -70,7 +70,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.SkyBox
             {
                 pass.Apply();
 
-                // Draw all of the components of the mesh, but we know the cube really
+                // Draw all the components of the mesh, but we know the cube really
                 // only has one mesh
                 foreach (var mesh in _model.Meshes)
                 {

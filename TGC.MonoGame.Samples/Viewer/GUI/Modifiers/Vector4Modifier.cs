@@ -12,9 +12,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     {
         private Vector4 _vectorValue;
 
-        private string _name;
+        private readonly string _name;
 
-        private Action<MonoGameVector4> _onChange;
+        private readonly Action<MonoGameVector4> _onChange;
 
         /// <summary>
         ///     Creates a Vector4 Modifier with a given name and action.

@@ -18,9 +18,9 @@ public class ModifierController
         _textureModifiers = new List<TextureModifier>();
     }
 
-    private List<IModifier> _modifiers;
+    private readonly List<IModifier> _modifiers;
 
-    private List<TextureModifier> _textureModifiers;
+    private readonly List<TextureModifier> _textureModifiers;
 
     /// <summary>
     ///     Adds a Button Modifier.

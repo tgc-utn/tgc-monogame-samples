@@ -10,9 +10,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     {
         private bool _checked;
 
-        private string _name;
+        private readonly string _name;
 
-        private Action<bool> _onChange;
+        private readonly Action<bool> _onChange;
 
         /// <summary>
         ///     Creates a Toggle Modifier with a given name and action

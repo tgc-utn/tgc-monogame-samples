@@ -213,22 +213,20 @@ namespace TGC.MonoGame.Samples.Samples.PBR
                 case Material.RustedMetal:
                     _texturePath += "harsh-metal";
                     break;
-
                 case Material.Marble:
                     _texturePath += "marble";
                     break;
-
                 case Material.Gold:
                     _texturePath += "gold";
                     break;
-
                 case Material.Metal:
                     _texturePath += "metal";
                     break;
-
                 case Material.Grass:
                     _texturePath += "ground";
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
             _texturePath += "/";
