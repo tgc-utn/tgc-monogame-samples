@@ -25,31 +25,31 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         }
 
         // Camera to draw the scene
-        private Camera Camera { get; set; }
+        private Camera _camera;
 
         // The Model of the Robot to draw
-        private Model Robot { get; set; }
+        private Model _robot;
 
         // The World Matrix for the first Robot
-        private Matrix RobotOneWorld { get; set; }
+        private Matrix _robotOneWorld;
         
         // The World Matrix for the second Robot
-        private Matrix RobotTwoWorld { get; set; }
+        private Matrix _robotTwoWorld;
 
         // The BoundingBox for the first Robot
-        private BoundingBox RobotOneBox { get; set; }
+        private BoundingBox _robotOneBox;
         
         // The BoundingBox for the second Robot
-        private BoundingBox RobotTwoBox { get; set; }
+        private BoundingBox _robotTwoBox;
 
         // The first Robot's position
-        private Vector3 RobotOnePosition { get; set; }
+        private Vector3 _robotOnePosition;
         
         // The second Robot's position
-        private Vector3 RobotTwoPosition { get; set; }
+        private Vector3 _robotTwoPosition;
 
         // Indicates if the AABBs are touching
-        private bool AreAABBsTouching { get; set; }
+        private bool _areAabBsTouching;
 
         /// <inheritdoc />
         public override void Initialize()
@@ -57,46 +57,42 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             Game.Background = Color.CornflowerBlue;
             
             // Creates a Static Camera looking at the origin
-            Camera = new StaticCamera(GraphicsDevice.Viewport.AspectRatio, Vector3.One * 250f, -Vector3.Normalize(Vector3.One), Vector3.Up);
+            _camera = new StaticCamera(GraphicsDevice.Viewport.AspectRatio, Vector3.One * 250f, -Vector3.Normalize(Vector3.One), Vector3.Up);
 
             // Set the Robot positions
-            RobotTwoPosition = new Vector3(-60f, 0f, 0f);
-            RobotOnePosition = new Vector3(60f, 0f, 0f);
+            _robotTwoPosition = new Vector3(-60f, 0f, 0f);
+            _robotOnePosition = new Vector3(60f, 0f, 0f);
 
             // Set the World Matrices for each Robot
-            RobotOneWorld = Matrix.CreateTranslation(RobotOnePosition);           
-            RobotTwoWorld = Matrix.CreateTranslation(RobotTwoPosition);
+            _robotOneWorld = Matrix.CreateTranslation(_robotOnePosition);           
+            _robotTwoWorld = Matrix.CreateTranslation(_robotTwoPosition);
 
             // Initialize AABB touching value as false
-            AreAABBsTouching = false;
+            _areAabBsTouching = false;
 
             base.Initialize();
         }
-
 
         /// <inheritdoc />
         protected override void LoadContent()
         {
             // Load the Robot Model and enable default lighting
-            Robot = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
-            ((BasicEffect)Robot.Meshes.FirstOrDefault()?.Effects.FirstOrDefault())?.EnableDefaultLighting();
-
+            _robot = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
+            ((BasicEffect)_robot.Meshes.FirstOrDefault()?.Effects.FirstOrDefault())?.EnableDefaultLighting();
 
             // Create AABBs
             // This gets an AABB with the bounds of the robot model
-            RobotOneBox = BoundingVolumesExtensions.CreateAABBFrom(Robot);
+            _robotOneBox = BoundingVolumesExtensions.CreateAABBFrom(_robot);
             
             // This moves the min and max points to the world position of each robot (one and two)
-            RobotTwoBox = new BoundingBox(RobotOneBox.Min + RobotTwoPosition, RobotOneBox.Max + RobotTwoPosition);
-            RobotOneBox = new BoundingBox(RobotOneBox.Min + RobotOnePosition, RobotOneBox.Max + RobotOnePosition);
+            _robotTwoBox = new BoundingBox(_robotOneBox.Min + _robotTwoPosition, _robotOneBox.Max + _robotTwoPosition);
+            _robotOneBox = new BoundingBox(_robotOneBox.Min + _robotOnePosition, _robotOneBox.Max + _robotOnePosition);
 
             // Set depth to default
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             base.LoadContent();
         }
-
-        
 
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
@@ -116,10 +112,10 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
                 MoveRobot(Vector3.Forward);
 
             // Update Gizmos with the View Projection matrices
-            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+            Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
 
             // Update the boolean value depending on the intersection of the two AABBs
-            AreAABBsTouching = RobotOneBox.Intersects(RobotTwoBox);
+            _areAabBsTouching = _robotOneBox.Intersects(_robotTwoBox);
 
             base.Update(gameTime);
         }
@@ -128,32 +124,30 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         {
             // Move the RobotTwoPosition, then update (move) the Bounding Box,
             // and update its matrix
-            RobotTwoPosition += increment;
-            RobotTwoBox = new BoundingBox(RobotTwoBox.Min + increment, RobotTwoBox.Max + increment);
-            RobotTwoWorld = Matrix.CreateTranslation(RobotTwoPosition);
+            _robotTwoPosition += increment;
+            _robotTwoBox = new BoundingBox(_robotTwoBox.Min + increment, _robotTwoBox.Max + increment);
+            _robotTwoWorld = Matrix.CreateTranslation(_robotTwoPosition);
         }
 
         /// <inheritdoc />
         public override void Draw(GameTime gameTime)
         {
             // Draw the two robots with their corresponding World matrices
-            Robot.Draw(RobotOneWorld, Camera.View, Camera.Projection);
-            Robot.Draw(RobotTwoWorld, Camera.View, Camera.Projection);
+            _robot.Draw(_robotOneWorld, _camera.View, _camera.Projection);
+            _robot.Draw(_robotTwoWorld, _camera.View, _camera.Projection);
 
             // Draw bounding boxes
             // Center is half the average between min and max
             // Size is the difference between max and min
             // Also draw red if they touch
 
-            var colorOne = AreAABBsTouching ? Color.Red : Color.Yellow;
-            var colorTwo = AreAABBsTouching ? Color.Red : Color.Green;
+            var colorOne = _areAabBsTouching ? Color.Red : Color.Yellow;
+            var colorTwo = _areAabBsTouching ? Color.Red : Color.Green;
 
-            Game.Gizmos.DrawCube((RobotOneBox.Max + RobotOneBox.Min) / 2f, RobotOneBox.Max - RobotOneBox.Min, colorOne);
-            Game.Gizmos.DrawCube((RobotTwoBox.Max + RobotTwoBox.Min) / 2f, RobotTwoBox.Max - RobotTwoBox.Min, colorTwo);
+            Game.Gizmos.DrawCube((_robotOneBox.Max + _robotOneBox.Min) / 2f, _robotOneBox.Max - _robotOneBox.Min, colorOne);
+            Game.Gizmos.DrawCube((_robotTwoBox.Max + _robotTwoBox.Min) / 2f, _robotTwoBox.Max - _robotTwoBox.Min, colorTwo);
 
             base.Draw(gameTime);
         }
-
-
     }
 }

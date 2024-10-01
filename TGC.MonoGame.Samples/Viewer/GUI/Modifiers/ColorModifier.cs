@@ -12,9 +12,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     internal class ColorModifier : IModifier
     {
         private Vector4 _colorValue;
-        private string Name { get; set; }
+        private string _name;
 
-        private Action<MonoGameColor> OnChange { get; set; }
+        private Action<MonoGameColor> _onChange;
 
 
         /// <summary>
@@ -23,7 +23,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <param name="name">The name of the modifier that will show on the GUI</param>
         private ColorModifier(string name)
         {
-            Name = name;
+            _name = name;
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <param name="baseOnChange">An action to be called when the Color changes</param>
         public ColorModifier(string name, Action<MonoGameColor> baseOnChange) : this(name)
         {
-            OnChange += baseOnChange;
+            _onChange += baseOnChange;
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <param name="effectParameter">An <see cref="EffectParameter" /> that will recieve the Color as value</param>
         public ColorModifier(string name, EffectParameter effectParameter) : this(name)
         {
-            OnChange += x => effectParameter.SetValue(x.ToVector3());
+            _onChange += x => effectParameter.SetValue(x.ToVector3());
         }
 
         /// <summary>
@@ -77,8 +77,8 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// </summary>
         public void Draw()
         {
-            if (ImGui.ColorEdit4(Name, ref _colorValue))
-                OnChange.Invoke(Convert(_colorValue));
+            if (ImGui.ColorEdit4(_name, ref _colorValue))
+                _onChange.Invoke(Convert(_colorValue));
         }
 
         /// <summary>

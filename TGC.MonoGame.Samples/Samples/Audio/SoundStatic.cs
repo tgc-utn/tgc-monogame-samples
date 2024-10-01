@@ -23,18 +23,18 @@ namespace TGC.MonoGame.Samples.Samples.Audio
             Description = "Shows how to play a sound file. Audio from https://www.fesliyanstudios.com";
         }
 
-        private SpriteFont Font { get; set; }
-        private string Instructions { get; set; }
-        private Vector2 InstructionsSize { get; set; }
-        private SoundEffect Sound { get; set; }
-        private SoundEffectInstance Instance { get; set; }
-        private string SoundName { get; set; }
+        private SpriteFont _font;
+        private string _instructions;
+        private Vector2 _instructionsSize;
+        private SoundEffect _sound;
+        private SoundEffectInstance _instance;
+        private string _soundName;
 
         /// <inheritdoc />
         public override void Initialize()
         {
-            Instructions = "Y = Play a new instance in loop, I = Play and forget.";
-            SoundName = "No sound";
+            _instructions = "Y = Play a new instance in loop, I = Play and forget.";
+            _soundName = "No sound";
 
             Game.Gizmos.Enabled = false;
 
@@ -44,10 +44,10 @@ namespace TGC.MonoGame.Samples.Samples.Audio
         /// <inheritdoc />
         protected override void LoadContent()
         {
-            Font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
-            InstructionsSize = Font.MeasureString(Instructions);
-            SoundName = "a2-8bit";
-            Sound = Game.Content.Load<SoundEffect>(ContentFolderSounds + SoundName);
+            _font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
+            _instructionsSize = _font.MeasureString(_instructions);
+            _soundName = "a2-8bit";
+            _sound = Game.Content.Load<SoundEffect>(ContentFolderSounds + _soundName);
 
             base.LoadContent();
         }
@@ -57,15 +57,15 @@ namespace TGC.MonoGame.Samples.Samples.Audio
         {
             if (Game.CurrentKeyboardState.IsKeyDown(Keys.Y))
             {
-                // Play that can be manipulated after the fact
-                Instance = Sound.CreateInstance();
-                Instance.IsLooped = true;
-                Instance.Play();
+                // Play that can be manipulated after the fact.
+                _instance = _sound.CreateInstance();
+                _instance.IsLooped = true;
+                _instance.Play();
             }
             else if (Game.CurrentKeyboardState.IsKeyDown(Keys.I))
             {
-                // Fire and forget play
-                Sound.Play();
+                // Fire and forget play.
+                _sound.Play();
             }
 
             base.Update(gameTime);
@@ -79,11 +79,11 @@ namespace TGC.MonoGame.Samples.Samples.Audio
             Game.SpriteBatch.Begin();
 
             var soundNamePosition = new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2f, 20) -
-                                    Font.MeasureString(SoundName) / 2;
-            Game.SpriteBatch.DrawString(Font, "Playing: " + SoundName, soundNamePosition, Color.DarkMagenta);
+                                    _font.MeasureString(_soundName) / 2;
+            Game.SpriteBatch.DrawString(_font, "Playing: " + _soundName, soundNamePosition, Color.DarkMagenta);
             var instructionsPosition = new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2f, 60) -
-                                       InstructionsSize / 2;
-            Game.SpriteBatch.DrawString(Font, Instructions, instructionsPosition, Color.DarkGreen);
+                                       _instructionsSize / 2;
+            Game.SpriteBatch.DrawString(_font, _instructions, instructionsPosition, Color.DarkGreen);
 
             Game.SpriteBatch.End();
 

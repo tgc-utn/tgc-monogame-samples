@@ -18,81 +18,78 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
     /// </summary>
     public class MRT : TGCSample
     {
-
         public MRT(TGCViewer game) : base(game)
         {
             Category = TGCSampleCategory.Shaders;
             Name = "Multiple Render Target";
             Description = "Draw to up to 4 render targets at the same time";
         }
-        private float time;
+        private float _time;
 
-        private Camera Camera { get; set; }
-        private Effect Effect { get; set; }
-        private Model Model { get; set; }
-        private Texture2D Texture { get; set; }
+        private Camera _camera;
+        private Effect _effect;
+        private Model _model;
+        private Texture2D _texture;
 
-        private EffectParameter EffectWorld;
-        private EffectParameter EffectWorldViewProjection;
-        private EffectParameter EffectTime;
+        private EffectParameter _effectWorld;
+        private EffectParameter _effectWorldViewProjection;
+        private EffectParameter _effectTime;
 
-        private RenderTarget2D ColorTarget;
-        private RenderTarget2D InverseColorTarget;
-        private RenderTarget2D NormalTarget;
-        private RenderTarget2D AnimatedTarget;
-        private SpriteBatch SpriteBatch;
-        private RenderTargetType RenderTargetToShow;
+        private RenderTarget2D _colorTarget;
+        private RenderTarget2D _inverseColorTarget;
+        private RenderTarget2D _normalTarget;
+        private RenderTarget2D _animatedTarget;
+        private SpriteBatch _spriteBatch;
+        private RenderTargetType _renderTargetToShow;
 
         /// <inheritdoc />
         public override void Initialize()
         {
-            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0f, 0f, 300f));
-            time = 0;
-
+            _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0f, 0f, 300f));
+            _time = 0;
             
             base.Initialize();
         }
         
-        
         /// <inheritdoc />
         protected override void LoadContent()
         {
-            Model = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
+            _model = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
             // From the effect of the model I keep the texture.
-            Texture = ((BasicEffect) Model.Meshes.FirstOrDefault()?.MeshParts.FirstOrDefault()?.Effect)?.Texture;
+            _texture = ((BasicEffect) _model.Meshes.FirstOrDefault()?.MeshParts.FirstOrDefault()?.Effect)?.Texture;
 
             // Load a shader using Content pipeline.
-            Effect = Game.Content.Load<Effect>(ContentFolderEffects + "MRT");
+            _effect = Game.Content.Load<Effect>(ContentFolderEffects + "MRT");
 
             // Set the texture of the model in the shader
-            Effect.Parameters["ModelTexture"].SetValue(Texture);
+            _effect.Parameters["ModelTexture"].SetValue(_texture);
             
             // For faster access in draw
-            EffectWorld = Effect.Parameters["World"];
-            EffectWorldViewProjection = Effect.Parameters["WorldViewProjection"];
-            EffectTime = Effect.Parameters["Time"];
+            _effectWorld = _effect.Parameters["World"];
+            _effectWorldViewProjection = _effect.Parameters["WorldViewProjection"];
+            _effectTime = _effect.Parameters["Time"];
 
             // Asign the effect to the meshes
-            foreach (var mesh in Model.Meshes)
+            foreach (var mesh in _model.Meshes)
                 foreach (var part in mesh.MeshParts)
-                    part.Effect = Effect;
+                    part.Effect = _effect;
 
             // Create the targets we are going to use
-            ColorTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
+            _colorTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
                GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0,
                RenderTargetUsage.DiscardContents);
-            InverseColorTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
+            _inverseColorTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
                 GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0,
                 RenderTargetUsage.DiscardContents);
-            NormalTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
+            _normalTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
                 GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0,
                 RenderTargetUsage.DiscardContents);
-            AnimatedTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
+            _animatedTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
                 GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0,
                 RenderTargetUsage.DiscardContents);
 
             // To easily draw render targets
-            SpriteBatch = new SpriteBatch(GraphicsDevice);
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
             
             ModifierController.AddOptions<RenderTargetType>("Choose Target", new []
             {
@@ -103,21 +100,21 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
                 "Animated Color",
             }, RenderTargetType.AllTargets, OnTargetSwitch);
 
-            ModifierController.AddTexture("Base Color Target", ColorTarget);
+            ModifierController.AddTexture("Base Color Target", _colorTarget);
 
             base.LoadContent();
         }
 
         private void OnTargetSwitch(RenderTargetType renderTargetToShow)
         {
-            RenderTargetToShow = renderTargetToShow;
+            _renderTargetToShow = renderTargetToShow;
         }
 
         public override void Update(GameTime gameTime)
         {
-            Camera.Update(gameTime);
+            _camera.Update(gameTime);
 
-            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+            Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
 
             base.Update(gameTime);
         }
@@ -125,24 +122,24 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         public override void Draw(GameTime gameTime)
         {
             // Set Time value in effect
-            time += Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
-            EffectTime.SetValue(time);
+            _time += Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
+            _effectTime.SetValue(_time);
             
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             // Set the render targets we are going to be drawing to, in the correct order
-            GraphicsDevice.SetRenderTargets(ColorTarget, InverseColorTarget, NormalTarget, AnimatedTarget);
+            GraphicsDevice.SetRenderTargets(_colorTarget, _inverseColorTarget, _normalTarget, _animatedTarget);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1f, 0);
            
             // Draw our model or models, keep in mind that all of them must have MRT effect assigned
 
-            var mesh = Model.Meshes.FirstOrDefault();
+            var mesh = _model.Meshes.FirstOrDefault();
             if (mesh != null)
             {
                 var world = mesh.ParentBone.Transform;
 
-                EffectWorld.SetValue(world);
-                EffectWorldViewProjection.SetValue(world * Camera.View * Camera.Projection);
+                _effectWorld.SetValue(world);
+                _effectWorldViewProjection.SetValue(world * _camera.View * _camera.Projection);
                 mesh.Draw();
             }
 
@@ -162,39 +159,38 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 
             float scale = 0.5f;
 
-            SpriteBatch.Begin();
-
-
+            _spriteBatch.Begin();
+            
             // Verify default begin options in your project (RasterizerState, DepthStencil...)
             // Draw selected target
-            switch (RenderTargetToShow)
+            switch (_renderTargetToShow)
             {
                 default:
                 case RenderTargetType.AllTargets:
-                    SpriteBatch.Draw(ColorTarget, topLeft,
+                    _spriteBatch.Draw(_colorTarget, topLeft,
                         null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
-                    SpriteBatch.Draw(InverseColorTarget, topRight,
+                    _spriteBatch.Draw(_inverseColorTarget, topRight,
                         null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
-                    SpriteBatch.Draw(NormalTarget, bottomLeft,
+                    _spriteBatch.Draw(_normalTarget, bottomLeft,
                         null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
-                    SpriteBatch.Draw(AnimatedTarget, bottomRight,
+                    _spriteBatch.Draw(_animatedTarget, bottomRight,
                         null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
                     break;
                 case RenderTargetType.Color:
-                    SpriteBatch.Draw(ColorTarget, topLeft, Color.White);
+                    _spriteBatch.Draw(_colorTarget, topLeft, Color.White);
                     break;
                 case RenderTargetType.InvertedColor:
-                    SpriteBatch.Draw(InverseColorTarget, topLeft, Color.White);
+                    _spriteBatch.Draw(_inverseColorTarget, topLeft, Color.White);
                     break;
                 case RenderTargetType.Normals:
-                    SpriteBatch.Draw(NormalTarget, topLeft, Color.White);
+                    _spriteBatch.Draw(_normalTarget, topLeft, Color.White);
                     break;
                 case RenderTargetType.AnimatedColor:
-                    SpriteBatch.Draw(AnimatedTarget, topLeft, Color.White);
+                    _spriteBatch.Draw(_animatedTarget, topLeft, Color.White);
                     break;
             }
 
-            SpriteBatch.End();
+            _spriteBatch.End();
             
             base.Draw(gameTime);
         }
@@ -207,6 +203,4 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             AnimatedColor,
         }
     }
-
-
 }

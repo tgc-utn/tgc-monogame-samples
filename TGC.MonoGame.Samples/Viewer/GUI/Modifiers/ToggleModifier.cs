@@ -10,9 +10,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     {
         private bool _checked;
 
-        private string Name { get; set; }
+        private string _name;
 
-        private Action<bool> OnChange { get; set; }
+        private Action<bool> _onChange;
 
         /// <summary>
         ///     Creates a Toggle Modifier with a given name and action
@@ -21,8 +21,8 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <param name="onChange">An action to be called when the value of the modifier changes</param>
         public ToggleModifier(string name, Action<bool> onChange)
         {
-            Name = name;
-            OnChange = onChange;
+            _name = name;
+            _onChange = onChange;
         }
 
         /// <summary>
@@ -33,10 +33,10 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <param name="defaultValue">The default value that this modifier will have</param>
         public ToggleModifier(string name, Action<bool> onChange, bool defaultValue)
         {
-            Name = name;
-            OnChange = onChange;
+            _name = name;
+            _onChange = onChange;
             _checked = defaultValue;
-            OnChange.Invoke(defaultValue);
+            _onChange.Invoke(defaultValue);
         }
 
         /// <summary>
@@ -44,8 +44,8 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// </summary>
         public void Draw()
         {
-            if (ImGui.Checkbox(Name, ref _checked))
-                OnChange.Invoke(_checked);
+            if (ImGui.Checkbox(_name, ref _checked))
+                _onChange.Invoke(_checked);
         }
 
     }

@@ -11,13 +11,13 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     {
         private float _floatValue;
 
-        private string Name { get; set; }
+        private string _name;
 
-        private bool HasBounds { get; set; }
+        private bool _hasBounds;
 
-        private float Min { get; set; }
+        private float _min;
 
-        private float Max { get; set; }
+        private float _max;
 
         /// <summary>
         ///     Creates a Float Modifier with a given name.
@@ -25,7 +25,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <param name="name">The name of the modifier that will show on the GUI</param>
         public FloatModifier(string name)
         {
-            Name = name;
+            _name = name;
         }
 
         /// <summary>
@@ -62,9 +62,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         public FloatModifier(string name, Action<float> baseOnChange, float defaultValue, float min, float max) : this(
             name, baseOnChange, defaultValue)
         {
-            HasBounds = true;
-            Min = min;
-            Max = max;
+            _hasBounds = true;
+            _min = min;
+            _max = max;
             baseOnChange.Invoke(defaultValue);
         }
 
@@ -103,9 +103,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         public FloatModifier(string name, EffectParameter effectParameter, float defaultValue, float min, float max) :
             this(name, effectParameter, defaultValue)
         {
-            HasBounds = true;
-            Min = min;
-            Max = max;
+            _hasBounds = true;
+            _min = min;
+            _max = max;
         }
 
 
@@ -114,9 +114,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// </summary>
         public void Draw()
         {
-            var valueChanged = HasBounds
-                ? ImGui.DragFloat(Name, ref _floatValue, 0.01f * (Max - Min), Min, Max)
-                : ImGui.DragFloat(Name, ref _floatValue);
+            var valueChanged = _hasBounds
+                ? ImGui.DragFloat(_name, ref _floatValue, 0.01f * (_max - _min), _min, _max)
+                : ImGui.DragFloat(_name, ref _floatValue);
 
             if (valueChanged)
                 OnChange.Invoke(_floatValue);
