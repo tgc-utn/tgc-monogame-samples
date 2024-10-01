@@ -76,7 +76,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         public void Draw()
         {
             if (ImGui.ColorEdit4(_name, ref _colorValue))
+            {
                 _onChange.Invoke(Convert(_colorValue));
+            }
         }
 
         /// <summary>

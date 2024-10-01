@@ -49,8 +49,8 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             // Load a shader in runtime, outside the Content pipeline.
             // First you must run "mgfxc <SourceFile> <OutputFile> [/Debug] [/Profile:<DirectX_11,OpenGL>]"
             // https://docs.monogame.net/articles/tools/mgfxc.html
-            //byte[] byteCode = File.ReadAllBytes(Game.Content.RootDirectory + "/" + ContentFolderEffects + "BasicShader.fx");
-            //_effect = new Effect(GraphicsDevice, byteCode);
+            // To read the file byte[] byteCode = File.ReadAllBytes(Game.Content.RootDirectory + "/" + ContentFolderEffects + "BasicShader.fx");
+            // To create de Effect _effect = new Effect(GraphicsDevice, byteCode);
 
             // Load a shader using Content pipeline.
             _effect = Game.Content.Load<Effect>(ContentFolderEffects + "BasicShader");
@@ -87,7 +87,6 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
                     _effect.Parameters["World"].SetValue(mesh.ParentBone.Transform);
                     _effect.Parameters["View"].SetValue(_camera.View);
                     _effect.Parameters["Projection"].SetValue(_camera.Projection);
-                    //_effect.Parameters["WorldViewProjection"].SetValue(Camera.WorldMatrix * Camera.View * Camera.Projection);
                     _effect.Parameters["ModelTexture"].SetValue(_texture);
                     _effect.Parameters["Time"].SetValue(_time);
                 }

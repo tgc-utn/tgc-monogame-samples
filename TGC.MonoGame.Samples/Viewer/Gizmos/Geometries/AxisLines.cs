@@ -11,7 +11,6 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
     {
         private const float AxisScreenOffset = 20f;
         private const float AxisScreenDistance = 40f;
-        private GraphicsDevice _graphicsDevice;
         private readonly Model _model;
         private readonly BasicEffect _effect;
         private readonly Matrix _baseScaleTranslation;
@@ -23,12 +22,15 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
         /// <param name="model">The Model of the AxisLines, loaded from content.</param>
         public AxisLines(GraphicsDevice device, Model model)
         {
-            _graphicsDevice = device;
             _model = model;
 
             foreach (var mesh in _model.Meshes)
+            {
                 foreach (var part in mesh.MeshParts)
+                {
                     _effect = (BasicEffect)part.Effect;
+                }
+            }
 
             _effect.Projection = Matrix.Identity;
             _effect.View = Matrix.Identity;
