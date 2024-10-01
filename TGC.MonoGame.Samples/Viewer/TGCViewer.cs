@@ -120,6 +120,7 @@ namespace TGC.MonoGame.Samples.Viewer
             base.Draw(gameTime);
             _model.DrawSampleExplorer(gameTime);
             Gizmos.Draw();
+            _model.DrawSampleExplorer(gameTime);
         }
 
         /// <summary>
