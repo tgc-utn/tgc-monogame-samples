@@ -60,11 +60,6 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         private Texture2D _modelNormal;
 
         /// <summary>
-        /// The position of the light
-        /// </summary>
-        private Vector3 _lightPosition = Vector3.Zero;
-
-        /// <summary>
         /// The world matrix for the light box
         /// </summary>
         private Matrix _lightBoxWorld = Matrix.Identity;
@@ -132,7 +127,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
                 "Default",
                 "Gouraud",
                 "Normal Mapping"
-            }, BlinnPhongType.DEFAULT, BlinnPhongTypeChange);
+            }, BlinnPhongType.Default, BlinnPhongTypeChange);
 
             // Add mappings for modifiers to control values
             ModifierController.AddVector("Light Position", SetLightPosition, Vector3.Up * 45f);
@@ -217,10 +212,10 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         {
             switch(type)
             {
-                case BlinnPhongType.GOURAUD:
+                case BlinnPhongType.Gouraud:
                     _effect.CurrentTechnique = _effect.Techniques["Gouraud"];
                     break;
-                case BlinnPhongType.NORMAL_MAPPING:
+                case BlinnPhongType.NormalMapping:
                     _effect.CurrentTechnique = _effect.Techniques["NormalMapping"];
                     break;
                 default:
@@ -234,9 +229,9 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         /// </summary>
         private enum BlinnPhongType
         {
-            DEFAULT,
-            GOURAUD,
-            NORMAL_MAPPING
+            Default,
+            Gouraud,
+            NormalMapping
         }
     }
 }

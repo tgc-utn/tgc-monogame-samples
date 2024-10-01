@@ -1,11 +1,9 @@
 ﻿using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
-using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
 namespace TGC.MonoGame.Samples.Samples.PostProcessing
 {
@@ -75,8 +73,12 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             // Assign the Environment map effect to our robot
             foreach (var modelMesh in _robot.Meshes)
-            foreach (var part in modelMesh.MeshParts)
-                part.Effect = _effect;
+            {
+                foreach (var part in modelMesh.MeshParts)
+                {
+                    part.Effect = _effect;
+                }
+            }
 
             // Create a render target for the scene
             _environmentMapRenderTarget = new RenderTargetCube(GraphicsDevice, EnvironmentMapSize, false,
@@ -96,8 +98,13 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         {
             var effectToAssign = enabled ? _effect : _basicEffect;            
             foreach (var modelMesh in _robot.Meshes)
+            {
                 foreach (var part in modelMesh.MeshParts)
+                {
                     part.Effect = effectToAssign;
+                }
+            }
+
             _effectOn = enabled;
         }
 
@@ -118,9 +125,13 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         public override void Draw(GameTime gameTime)
         {
             if (_effectOn)
+            {
                 DrawEnvironmentMap();
+            }
             else
+            {
                 DrawRegular();
+            }
 
             GraphicsDevice.DepthStencilState = DepthStencilState.None;
             

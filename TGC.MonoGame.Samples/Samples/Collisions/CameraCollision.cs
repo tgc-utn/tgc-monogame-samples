@@ -1,10 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Collisions;
 using TGC.MonoGame.Samples.Geometries.Textures;
@@ -120,7 +117,9 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
             // Enable default lighting for the Robot
             foreach (var mesh in _robot.Meshes)
+            {
                 ((BasicEffect)mesh.Effects.FirstOrDefault())?.EnableDefaultLighting();
+            }
 
             // Create the Quad
             _quad = new QuadPrimitive(GraphicsDevice);
@@ -194,7 +193,9 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             }
             // If the Camera didn't collide with the scene
             else
+            {
                 _camera.Position = newCameraPosition;
+            }
 
             // Set our Target as the Robot, the Camera needs to be always pointing to it
             _camera.TargetPosition = _robotPosition;
@@ -219,14 +220,16 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             var cameraToPlayerRay = new Ray(cameraPosition, normalizedDifference);
 
             // Test our ray against every wall Bounding Box
-            for (var index = 0; index < _wallBoxes.Length; index++)
+            foreach (var t in _wallBoxes)
             {
                 // If there was an intersection 
                 // And this intersection happened between the Robot and the Camera (and not further away)
                 // Return the distance of collision
-                var distance = cameraToPlayerRay.Intersects(_wallBoxes[index]);
+                var distance = cameraToPlayerRay.Intersects(t);
                 if (distance.HasValue && distance < distanceToRobot)
+                {
                     return distance;
+                }
             }
             // Return null if there was no valid collision
             return null;
@@ -277,17 +280,21 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
                 _robotCylinder.Center = newPosition;
 
                 // Test against every wall. If there was a collision, move our Cylinder back to its original position
-                for (int index = 0; index < _wallBoxes.Length; index++)
-                    if (!_robotCylinder.Intersects(_wallBoxes[index]).Equals(BoxCylinderIntersection.None))
+                foreach (var t in _wallBoxes)
+                {
+                    if (!_robotCylinder.Intersects(t).Equals(BoxCylinderIntersection.None))
                     {
                         moved = false;
                         _robotCylinder.Center = _robotPosition;
                         break;
                     }
+                }
 
                 // If there was no collision, update our Robot Position value
                 if (moved)
+                {
                     _robotPosition = newPosition;
+                }
             }
 
             // If we effectively moved (with no collision) or rotated
@@ -348,9 +355,8 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
             // Draw Gizmos for Bounding Boxes and Robot Cylinder
 
-            for (int index = 0; index < _wallBoxes.Length; index++)
+            foreach (var box in _wallBoxes)
             {
-                var box = _wallBoxes[index];
                 var center = BoundingVolumesExtensions.GetCenter(box);
                 var extents = BoundingVolumesExtensions.GetExtents(box);
                 Game.Gizmos.DrawCube(center, extents * 2f, Color.Red);

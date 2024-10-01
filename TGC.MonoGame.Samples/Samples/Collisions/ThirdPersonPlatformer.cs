@@ -99,7 +99,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             _camera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, Vector3.One * 100f, Vector3.Zero);
 
             // Create World matrices for our stairs
-            _stairsWorld = new Matrix[]
+            _stairsWorld = new[]
             {
                 Matrix.CreateScale(70f, 6f, 15f) * Matrix.CreateTranslation(0f, 3f, 125f),
                 Matrix.CreateScale(70f, 6f, 15f) * Matrix.CreateTranslation(0f, 9f, 140f),
@@ -122,7 +122,9 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             // Instantiate Bounding Boxes for the stairs
             int index = 0;
             for (; index < _stairsWorld.Length; index++)
+            {
                 _colliders[index] = BoundingVolumesExtensions.FromMatrix(_stairsWorld[index]);
+            }
 
             // Instantiate a BoundingBox for the Box
             _colliders[index] = BoundingVolumesExtensions.FromMatrix(_boxWorld);
@@ -147,8 +149,10 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
             // Enable default lighting for the Robot
             foreach (var mesh in _robot.Meshes)
+            {
                 ((BasicEffect)mesh.Effects.FirstOrDefault())?.EnableDefaultLighting();
-            
+            }
+
             // Create a BasicEffect to draw the Box
             _boxesEffect = new BasicEffect(GraphicsDevice);
             _boxesEffect.TextureEnabled = true;
@@ -240,13 +244,19 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
             // Check for the Jump key press, and add velocity in Y only if the Robot is on the ground
             if (Game.CurrentKeyboardState.IsKeyDown(Keys.Space) && _onGround)
+            {
                 _robotVelocity += Vector3.Up * RobotJumpSpeed;
+            }
 
             // Check for key presses and add a velocity in the Robot's Front Direction
             if (Game.CurrentKeyboardState.IsKeyDown(Keys.Up))
+            {
                 _robotVelocity += _robotFrontDirection * RobotSideSpeed;
+            }
             else if (Game.CurrentKeyboardState.IsKeyDown(Keys.Down))
+            {
                 _robotVelocity -= _robotFrontDirection * RobotSideSpeed;
+            }
 
             // Add the Acceleration to our Velocity
             // Multiply by the deltaTime to have the Position affected by deltaTime * deltaTime
@@ -291,7 +301,9 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         {
             // If the Robot has vertical velocity
             if (scaledVelocity.Y == 0f)
+            {
                 return;
+            }
 
             // Start by moving the Cylinder
             _robotCylinder.Center += Vector3.Up * scaledVelocity.Y;
@@ -304,8 +316,10 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             for (var index = 0; index < _colliders.Length; index++)
             {
                 if (!_robotCylinder.Intersects(_colliders[index]).Equals(BoxCylinderIntersection.Intersecting))
+                {
                     continue;
-                
+                }
+
                 // If we collided with something, set our velocity in Y to zero to reset acceleration
                 _robotVelocity = new Vector3(_robotVelocity.X, 0f, _robotVelocity.Z);
 
@@ -336,7 +350,9 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
                 // If we are on bottom of the collider, push down
                 else
+                {
                     penetration = -cylinderY - _robotCylinder.HalfHeight + colliderY - extents.Y;
+                }
 
                 // Move our Cylinder so we are not colliding anymore
                 _robotCylinder.Center += Vector3.Up * penetration;
@@ -346,7 +362,9 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
                 for (var index = 0; index < _colliders.Length; index++)
                 {
                     if (!_robotCylinder.Intersects(_colliders[index]).Equals(BoxCylinderIntersection.Intersecting))
+                    {
                         continue;
+                    }
 
                     // Iterate until we don't collide with anything anymore
                     collided = true;
@@ -364,8 +382,10 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         {
             // Has horizontal movement?
             if (Vector3.Dot(scaledVelocity, new Vector3(1f, 0f, 1f)) == 0f)
+            {
                 return;
-            
+            }
+
             // Start by moving the Cylinder horizontally
             _robotCylinder.Center += new Vector3(scaledVelocity.X, 0f, scaledVelocity.Z);
 
@@ -373,7 +393,9 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             for (var index = 0; index < _colliders.Length; index++)
             {
                 if (!_robotCylinder.Intersects(_colliders[index]).Equals(BoxCylinderIntersection.Intersecting))
+                {
                     continue;
+                }
 
                 // Get the intersected collider and its center
                 var collider = _colliders[index];
@@ -386,7 +408,9 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
                 // If the Robot collided with a step and climbed it, stop here
                 // Else go on
                 if (stepClimbed)
+                {
                     return;
+                }
 
                 // Get the cylinder center at the same Y-level as the box
                 var sameLevelCenter = _robotCylinder.Center;
@@ -426,13 +450,17 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             // Is this collider a step?
             // If not, exit
             if (extents.Y >= 6f)
+            {
                 return false;
+            }
 
             // Is the base of the cylinder close to the step top?
             // If not, exit
             var distanceToTop = MathF.Abs((_robotCylinder.Center.Y - _robotCylinder.HalfHeight) - (colliderCenter.Y + extents.Y));
             if (distanceToTop >= 12f)
+            {
                 return false;
+            }
 
             // We want to climb the step
             // It is climbable if we can reposition our cylinder in a way that
@@ -440,6 +468,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             var pastPosition = _robotCylinder.Center;
             _robotCylinder.Center += Vector3.Up * distanceToTop;
             for (int index = 0; index < _colliders.Length; index++)
+            {
                 if (index != colliderIndex && _robotCylinder.Intersects(_colliders[index]).Equals(BoxCylinderIntersection.Intersecting))
                 {
                     // We found a case in which the cylinder
@@ -447,6 +476,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
                     _robotCylinder.Center = pastPosition;
                     return false;
                 }
+            }
 
             // If we got here the climb was possible
             // (And the Robot position was already updated)

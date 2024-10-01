@@ -9,7 +9,7 @@ using TGC.MonoGame.Samples.Viewer;
 
 namespace TGC.MonoGame.Samples.Samples.PBR
 {
-    public class BasicPBR : TGCSample
+    public class BasicPBR : TGCSample   
     {
         private Texture2D _albedo;
         private Texture2D _ao;

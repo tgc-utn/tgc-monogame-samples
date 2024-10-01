@@ -9,10 +9,12 @@ using TGC.MonoGame.Samples.Viewer;
 namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 {
     /// <summary>
-    /// Shows why back-to-front sorting needs to be performed when drawing alpha blended geometry
+    /// Shows why back-to-front sorting needs to be performed when drawing alpha blended geometry.
     /// </summary>
     public class AlphaBlendingSorting : TGCSample
     {
+        private const string WorldViewProjection = "WorldViewProjection";
+        
         /// <summary>
         /// A camera to draw geometry
         /// </summary>
@@ -85,7 +87,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         public override void Initialize()
         {
             var baseScaleRotation = Matrix.CreateScale(10f) * Matrix.CreateRotationX(MathF.PI / 2f);
-            _backToFrontQuadWorlds = new List<Matrix>()
+            _backToFrontQuadWorlds = new List<Matrix>
             {
                 baseScaleRotation * Matrix.CreateTranslation(-30f, 5f, 0f),
                 baseScaleRotation * Matrix.CreateTranslation(-30f, 5f, 10f),
@@ -130,7 +132,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
             _quad = new QuadPrimitive(GraphicsDevice);
 
-            _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, Vector3.One * 20f);
+            _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0,20,110));
 
             _texts = new List<string>()
             {
@@ -184,7 +186,9 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
             // Update text positions in screen space to face the camera
             for (var index = 0; index < _textScreenPositions.Count; index++)
+            {
                 UpdateTextPosition(index);
+            }
 
             base.Update(gameTime);
         }
@@ -214,7 +218,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             GraphicsDevice.BlendState = BlendState.Opaque;
             
             // Draw the floor
-            _tilingFloorEffect.Parameters["WorldViewProjection"].SetValue(Matrix.CreateScale(100f) * viewProjection);
+            _tilingFloorEffect.Parameters[WorldViewProjection].SetValue(Matrix.CreateScale(100f) * viewProjection);
             _quad.Draw(_tilingFloorEffect);
 
             // Set the blend state as alpha blend, 
@@ -230,7 +234,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             for (var index = 0; index < _backToFrontQuadWorlds.Count; index++)
             {
                 _alphaBlendingEffect.Parameters["Tint"].SetValue(_quadColors[index].ToVector3());
-                _alphaBlendingEffect.Parameters["WorldViewProjection"].SetValue(_backToFrontQuadWorlds[index] * viewProjection);
+                _alphaBlendingEffect.Parameters[WorldViewProjection].SetValue(_backToFrontQuadWorlds[index] * viewProjection);
                 _quad.Draw(_alphaBlendingEffect);
             }
 
@@ -239,7 +243,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             {
                 var colorIndex = _frontToBackQuadWorlds.Count - index - 1;
                 _alphaBlendingEffect.Parameters["Tint"].SetValue(_quadColors[colorIndex].ToVector3());
-                _alphaBlendingEffect.Parameters["WorldViewProjection"].SetValue(_frontToBackQuadWorlds[index] * viewProjection);
+                _alphaBlendingEffect.Parameters[WorldViewProjection].SetValue(_frontToBackQuadWorlds[index] * viewProjection);
                 _quad.Draw(_alphaBlendingEffect);
             }
 
@@ -249,7 +253,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             for (var index = 0; index < _depthNoneQuadWorlds.Count; index++)
             {
                 _alphaBlendingEffect.Parameters["Tint"].SetValue(_quadColors[index].ToVector3());
-                _alphaBlendingEffect.Parameters["WorldViewProjection"].SetValue(_depthNoneQuadWorlds[index] * viewProjection);
+                _alphaBlendingEffect.Parameters[WorldViewProjection].SetValue(_depthNoneQuadWorlds[index] * viewProjection);
                 _quad.Draw(_alphaBlendingEffect);
             }
             
@@ -262,7 +266,9 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
                 RasterizerState.CullNone);
 
             for (var index = 0; index < _textScreenPositions.Count; index++)
+            {
                 Game.SpriteBatch.DrawString(_spriteFont, _texts[index], _textScreenPositions[index], Color.White);
+            }
 
             Game.SpriteBatch.End();
 

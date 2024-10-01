@@ -9,14 +9,13 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     /// </summary>
     public class ButtonModifier : IModifier
     {
-        private static Vector4 _disabledColor = new (0.2f);
+        private static readonly Vector4 DisabledColor = new (0.2f);
 
-        private string _name;
+        private readonly string _name;
 
-        private Action _onPress;
+        private readonly Action _onPress;
 
         private bool _enabled;
-
 
         /// <summary>
         ///     Creates a Button Modifier.
@@ -49,13 +48,15 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
             if (_enabled)
             {
                 if (ImGui.Button(_name, new Vector2(ImGui.CalcItemWidth(), ImGui.GetFrameHeight())))
+                {
                     _onPress.Invoke();
+                }
             }
             else
             {
-                ImGui.PushStyleColor(ImGuiCol.Button, _disabledColor);
-                ImGui.PushStyleColor(ImGuiCol.ButtonActive, _disabledColor);
-                ImGui.PushStyleColor(ImGuiCol.ButtonHovered, _disabledColor);
+                ImGui.PushStyleColor(ImGuiCol.Button, DisabledColor);
+                ImGui.PushStyleColor(ImGuiCol.ButtonActive, DisabledColor);
+                ImGui.PushStyleColor(ImGuiCol.ButtonHovered, DisabledColor);
                 ImGui.Button(_name, new Vector2(ImGui.CalcItemWidth(), ImGui.GetFrameHeight()));
                 ImGui.PopStyleColor();
                 ImGui.PopStyleColor();

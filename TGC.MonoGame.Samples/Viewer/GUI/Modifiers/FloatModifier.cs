@@ -11,13 +11,13 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     {
         private float _floatValue;
 
-        private string _name;
+        private readonly string _name;
 
-        private bool _hasBounds;
+        private readonly bool _hasBounds;
 
-        private float _min;
+        private readonly float _min;
 
-        private float _max;
+        private readonly float _max;
 
         /// <summary>
         ///     Creates a Float Modifier with a given name.
@@ -72,7 +72,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         ///     Creates a Float Modifier with a given name and an <see cref="EffectParameter" />.
         /// </summary>
         /// <param name="name">The name of the modifier that will show on the GUI</param>
-        /// <param name="effectParameter">An <see cref="EffectParameter" /> that will recieve the Float as value</param>
+        /// <param name="effectParameter">An <see cref="EffectParameter" /> that will receive the Float as value</param>
         public FloatModifier(string name, EffectParameter effectParameter) : this(name)
         {
             OnChange += x => effectParameter.SetValue(x);
@@ -82,7 +82,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         ///     Creates a Float Modifier with a given name, an <see cref="EffectParameter" /> and a default value.
         /// </summary>
         /// <param name="name">The name of the modifier that will show on the GUI</param>
-        /// <param name="effectParameter">An <see cref="EffectParameter" /> that will recieve the Float as value</param>
+        /// <param name="effectParameter">An <see cref="EffectParameter" /> that will receive the Float as value</param>
         /// <param name="defaultValue">The default value for the modifier</param>
         public FloatModifier(string name, EffectParameter effectParameter, float defaultValue) : this(name,
             effectParameter)
@@ -96,7 +96,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         ///     maximum values for the float.
         /// </summary>
         /// <param name="name">The name of the modifier that will show on the GUI</param>
-        /// <param name="effectParameter">An <see cref="EffectParameter" /> that will recieve the Float as value</param>
+        /// <param name="effectParameter">An <see cref="EffectParameter" /> that will receive the Float as value</param>
         /// <param name="defaultValue">The default value for the modifier</param>
         /// <param name="min">The minimum value for the modifier</param>
         /// <param name="max">The maximum value for the modifier</param>
@@ -108,7 +108,6 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
             _max = max;
         }
 
-
         /// <summary>
         ///     Draws the Float Modifier.
         /// </summary>
@@ -119,7 +118,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
                 : ImGui.DragFloat(_name, ref _floatValue);
 
             if (valueChanged)
+            {
                 OnChange.Invoke(_floatValue);
+            }
         }
 
         private event Action<float> OnChange;

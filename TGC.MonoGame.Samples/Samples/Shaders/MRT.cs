@@ -71,8 +71,12 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 
             // Asign the effect to the meshes
             foreach (var mesh in _model.Meshes)
+            {
                 foreach (var part in mesh.MeshParts)
+                {
                     part.Effect = _effect;
+                }
+            }
 
             // Create the targets we are going to use
             _colorTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
@@ -91,7 +95,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             // To easily draw render targets
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             
-            ModifierController.AddOptions<RenderTargetType>("Choose Target", new []
+            ModifierController.AddOptions("Choose Target", new []
             {
                 "All targets",
                 "Color",
@@ -147,17 +151,17 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             GraphicsDevice.SetRenderTarget(null);
             GraphicsDevice.Clear(Color.White);
             
-            int width = GraphicsDevice.Viewport.Width;
-            int height = GraphicsDevice.Viewport.Height;
-            int halfWidth = width / 2;
-            int halfHeight = height / 2;
+            var width = GraphicsDevice.Viewport.Width;
+            var height = GraphicsDevice.Viewport.Height;
+            var halfWidth = width / 2;
+            var halfHeight = height / 2;
 
-            Vector2 topLeft = Vector2.Zero;
-            Vector2 topRight = Vector2.UnitX * halfWidth;
-            Vector2 bottomLeft = Vector2.UnitY * halfHeight;
-            Vector2 bottomRight = new Vector2(halfWidth, halfHeight);
+            var topLeft = Vector2.Zero;
+            var topRight = Vector2.UnitX * halfWidth;
+            var bottomLeft = Vector2.UnitY * halfHeight;
+            var bottomRight = new Vector2(halfWidth, halfHeight);
 
-            float scale = 0.5f;
+            var scale = 0.5f;
 
             _spriteBatch.Begin();
             
