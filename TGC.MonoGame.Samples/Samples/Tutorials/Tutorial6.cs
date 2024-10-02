@@ -26,7 +26,6 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         private Camera _camera;
         private Tank _tankModel;
         private Matrix _tankWorld;
-        private Model _tgcitoModel;
 
         /// <inheritdoc />
         public override void Initialize()
@@ -46,9 +45,6 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             _tankModel.Load(model);
 
             _tankWorld = Matrix.Identity;
-
-            // TODO tgcito animation import from de tgcito model.
-            _tgcitoModel = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
 
             base.LoadContent();
         }

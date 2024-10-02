@@ -226,7 +226,7 @@ namespace TGC.MonoGame.Samples.Samples.PBR
                     _texturePath += "ground";
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException($"Material not support {_current}");
             }
 
             _texturePath += "/";

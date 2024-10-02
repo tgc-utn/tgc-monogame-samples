@@ -126,7 +126,10 @@ public class CameraCollision : TGCSample
         _robot = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
 
         // Enable default lighting for the Robot
-        foreach (var mesh in _robot.Meshes) ((BasicEffect)mesh.Effects.FirstOrDefault())?.EnableDefaultLighting();
+        foreach (var mesh in _robot.Meshes)
+        {
+            ((BasicEffect)mesh.Effects.FirstOrDefault())?.EnableDefaultLighting();
+        }
 
         // Create the Quad
         _quad = new QuadPrimitive(GraphicsDevice);
@@ -234,7 +237,10 @@ public class CameraCollision : TGCSample
             // And this intersection happened between the Robot and the Camera (and not further away)
             // Return the distance of collision
             var distance = cameraToPlayerRay.Intersects(t);
-            if (distance.HasValue && distance < distanceToRobot) return distance;
+            if (distance.HasValue && distance < distanceToRobot)
+            {
+                return distance;
+            }
         }
 
         // Return null if there was no valid collision
@@ -287,15 +293,20 @@ public class CameraCollision : TGCSample
 
             // Test against every wall. If there was a collision, move our Cylinder back to its original position
             foreach (var t in _wallBoxes)
+            {
                 if (!_robotCylinder.Intersects(t).Equals(BoxCylinderIntersection.None))
                 {
                     moved = false;
                     _robotCylinder.Center = _robotPosition;
                     break;
                 }
+            }
 
             // If there was no collision, update our Robot Position value
-            if (moved) _robotPosition = newPosition;
+            if (moved)
+            {
+                _robotPosition = newPosition;
+            }
         }
 
         // If we effectively moved (with no collision) or rotated

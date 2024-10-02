@@ -70,7 +70,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             _quad = new QuadPrimitive(GraphicsDevice);
 
             _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, Vector3.One * 20f);
-            _camera.BuildProjection(GraphicsDevice.Viewport.AspectRatio, 0.1f, 100000f, MathF.PI / 3f);
+            _camera.BuildProjection(GraphicsDevice.Viewport.AspectRatio, 0.1f, 100_000f, MathF.PI / 3f);
 
             _floorWorld = Matrix.CreateScale(500f);
 

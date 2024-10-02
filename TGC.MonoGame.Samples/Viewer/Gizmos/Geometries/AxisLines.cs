@@ -64,7 +64,9 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
         public virtual void Draw()
         {
             foreach (var mesh in _model.Meshes)
+            {
                 mesh.Draw();
+            }
         }
     }
 }
