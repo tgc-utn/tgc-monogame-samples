@@ -1,10 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Collisions;
 using TGC.MonoGame.Samples.Viewer;
@@ -49,7 +46,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         private Vector3 _robotTwoPosition;
 
         // Indicates if the AABBs are touching
-        private bool _areAabBsTouching;
+        private bool _areAABBsTouching;
 
         /// <inheritdoc />
         public override void Initialize()
@@ -68,7 +65,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             _robotTwoWorld = Matrix.CreateTranslation(_robotTwoPosition);
 
             // Initialize AABB touching value as false
-            _areAabBsTouching = false;
+            _areAABBsTouching = false;
 
             base.Initialize();
         }
@@ -98,24 +95,31 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         public override void Update(GameTime gameTime)
         {
             // Move the robot depending on key presses
-
             if (Game.CurrentKeyboardState.IsKeyDown(Keys.Right))
+            {
                 MoveRobot(Vector3.Right);
+            }
 
             if (Game.CurrentKeyboardState.IsKeyDown(Keys.Left))
+            {
                 MoveRobot(Vector3.Left);
+            }
 
             if (Game.CurrentKeyboardState.IsKeyDown(Keys.Up))
+            {
                 MoveRobot(Vector3.Backward);
+            }
 
             if (Game.CurrentKeyboardState.IsKeyDown(Keys.Down))
+            {
                 MoveRobot(Vector3.Forward);
+            }
 
             // Update Gizmos with the View Projection matrices
             Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
 
             // Update the boolean value depending on the intersection of the two AABBs
-            _areAabBsTouching = _robotOneBox.Intersects(_robotTwoBox);
+            _areAABBsTouching = _robotOneBox.Intersects(_robotTwoBox);
 
             base.Update(gameTime);
         }
@@ -141,8 +145,8 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             // Size is the difference between max and min
             // Also draw red if they touch
 
-            var colorOne = _areAabBsTouching ? Color.Red : Color.Yellow;
-            var colorTwo = _areAabBsTouching ? Color.Red : Color.Green;
+            var colorOne = _areAABBsTouching ? Color.Red : Color.Yellow;
+            var colorTwo = _areAABBsTouching ? Color.Red : Color.Green;
 
             Game.Gizmos.DrawCube((_robotOneBox.Max + _robotOneBox.Min) / 2f, _robotOneBox.Max - _robotOneBox.Min, colorOne);
             Game.Gizmos.DrawCube((_robotTwoBox.Max + _robotTwoBox.Min) / 2f, _robotTwoBox.Max - _robotTwoBox.Min, colorTwo);
