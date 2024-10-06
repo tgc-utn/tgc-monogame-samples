@@ -16,25 +16,25 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             Description = "Merging the scene render target with a texture";
         }
 
-        private FreeCamera Camera { get; set; }
+        private FreeCamera _camera;
 
-        private Model Model { get; set; }
+        private Model _model;
 
-        private Texture2D Overlay { get; set; }
+        private Texture2D _overlay;
 
-        private Effect Effect { get; set; }
+        private Effect _effect;
 
-        private FullScreenQuad FullScreenQuad { get; set; }
+        private FullScreenQuad _fullScreenQuad;
 
-        private RenderTarget2D SceneRenderTarget { get; set; }
+        private RenderTarget2D _sceneRenderTarget;
 
-        private float Time { get; set; }
+        private float _time;
 
         /// <inheritdoc />
         public override void Initialize()
         {
             var screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
-            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(-300, 100, 0), screenSize);
+            _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(-300, 100, 0), screenSize);
 
             base.Initialize();
         }
@@ -43,20 +43,20 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         protected override void LoadContent()
         {
             // We load the city meshes into a model
-            Model = Game.Content.Load<Model>(ContentFolder3D + "scene/city");
+            _model = Game.Content.Load<Model>(ContentFolder3D + "scene/city");
 
             // Load the texture overlay to merge
-            Overlay = Game.Content.Load<Texture2D>(ContentFolderTextures + "overlay");
+            _overlay = Game.Content.Load<Texture2D>(ContentFolderTextures + "overlay");
 
             // Load the shadowmap effect
-            Effect = Game.Content.Load<Effect>(ContentFolderEffects + "TextureMerge");
-            Effect.Parameters["overlayTexture"].SetValue(Overlay);
+            _effect = Game.Content.Load<Effect>(ContentFolderEffects + "TextureMerge");
+            _effect.Parameters["overlayTexture"].SetValue(_overlay);
 
             // Create a full screen quad to post-process
-            FullScreenQuad = new FullScreenQuad(GraphicsDevice);
+            _fullScreenQuad = new FullScreenQuad(GraphicsDevice);
 
             // Create a render target for the scene
-            SceneRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
+            _sceneRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
                 GraphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.Depth24, 0,
                 RenderTargetUsage.DiscardContents);
 
@@ -69,12 +69,12 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         public override void Update(GameTime gameTime)
         {
             // Update the state of the camera
-            Camera.Update(gameTime);
+            _camera.Update(gameTime);
 
-            Time += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            Effect.Parameters["time"].SetValue(Time);
+            _time += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            _effect.Parameters["time"].SetValue(_time);
 
-            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+            Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
 
             base.Update(gameTime);
         }
@@ -86,10 +86,10 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             // Set the render target as our shadow map, we are drawing the depth into this texture
-            GraphicsDevice.SetRenderTarget(SceneRenderTarget);
+            GraphicsDevice.SetRenderTarget(_sceneRenderTarget);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1f, 0);
 
-            Model.Draw(Matrix.Identity, Camera.View, Camera.Projection);
+            _model.Draw(Matrix.Identity, _camera.View, _camera.Projection);
 
             #endregion
             
@@ -100,11 +100,10 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             // Set the render target to null, we are drawing to the screen
             GraphicsDevice.SetRenderTarget(null);
 
-            Effect.Parameters["baseTexture"].SetValue(SceneRenderTarget);
-            FullScreenQuad.Draw(Effect);
+            _effect.Parameters["baseTexture"].SetValue(_sceneRenderTarget);
+            _fullScreenQuad.Draw(_effect);
 
             #endregion
-
             
             base.Draw(gameTime);
         }
@@ -112,8 +111,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         protected override void UnloadContent()
         {
             base.UnloadContent();
-            FullScreenQuad.Dispose();
-            SceneRenderTarget.Dispose();
+            _fullScreenQuad.Dispose();
+            _sceneRenderTarget.Dispose();
         }
     }
 }

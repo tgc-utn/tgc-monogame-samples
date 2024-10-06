@@ -17,29 +17,29 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
     public class BackFaceCulling : TGCSample
     {
-        private Camera Camera { get; set; }
+        private Camera _camera;
 
-        private GeometricPrimitive Primitive { get; set; }
+        private GeometricPrimitive _primitive;
 
-        private Effect Effect { get; set; }
+        private Effect _effect;
 
-        private readonly float BaseScaleScalar = 10f;
+        private const float BaseScaleScalar = 10f;
 
-        private readonly float Displacement = 15f;
+        private const float Displacement = 15f;
 
-        private Matrix BaseScale { get; set; }
+        private Matrix _baseScale;
 
-        private List<Arrowz> Arrows { get; set; }
+        private List<Arrowz> _arrows;
 
-        private bool ShowWireframe { get; set; }
+        private bool _showWireframe;
 
-        private bool ShowArrows { get; set; }
+        private bool _showArrows;
 
-        private bool BackFace { get; set; } = true;
+        private bool _backFace = true;
 
-        private Effect DrawDepthEffect { get; set; }
+        private Effect _drawDepthEffect;
 
-        private RenderTarget2D DepthRenderTarget { get; set; }
+        private RenderTarget2D _depthRenderTarget;
 
         public BackFaceCulling(TGCViewer game) : base(game)
         {
@@ -52,13 +52,12 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         public override void Initialize()
         {
             var screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
-            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0f, 0f, 50f), screenSize);
+            _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0f, 0f, 50f), screenSize);
             
-            BaseScale = Matrix.CreateScale(BaseScaleScalar);
+            _baseScale = Matrix.CreateScale(BaseScaleScalar);
 
-            Arrows = new List<Arrowz>();
-
-
+            _arrows = new List<Arrowz>();
+            
             base.Initialize();
         }
 
@@ -66,23 +65,23 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         protected override void LoadContent()
         {
             // We load the sphere mesh into a model
-            Primitive = new SpherePrimitive(GraphicsDevice, 1f, 6);
+            _primitive = new SpherePrimitive(GraphicsDevice, 1f, 6);
 
-            LoadArrows(Primitive);
+            LoadArrows(_primitive);
 
             // Load the effect
-            Effect = Game.Content.Load<Effect>(ContentFolderEffects + "BackFace");
+            _effect = Game.Content.Load<Effect>(ContentFolderEffects + "BackFace");
 
-            DrawDepthEffect = Game.Content.Load<Effect>(ContentFolderEffects + "ShadowMap");
+            _drawDepthEffect = Game.Content.Load<Effect>(ContentFolderEffects + "ShadowMap");
             
             // Create a depth render target. It stores depth from the camera
-            DepthRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, false,
+            _depthRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, false,
                 SurfaceFormat.Single, DepthFormat.Depth24, 0, RenderTargetUsage.PlatformContents);
                         
-            ModifierController.AddToggle("Show Wireframe", (enabled) => ShowWireframe = enabled, false);
-            ModifierController.AddToggle("Show Triangle Normals", (enabled) => ShowArrows = enabled, false);
-            ModifierController.AddToggle("Enable Back-Face Culling", (enabled) => BackFace = enabled, true);
-            ModifierController.AddTexture("Depth", DepthRenderTarget);
+            ModifierController.AddToggle("Show Wireframe", (enabled) => _showWireframe = enabled, false);
+            ModifierController.AddToggle("Show Triangle Normals", (enabled) => _showArrows = enabled, false);
+            ModifierController.AddToggle("Enable Back-Face Culling", (enabled) => _backFace = enabled, true);
+            ModifierController.AddTexture("Depth", _depthRenderTarget);
 
             base.LoadContent();
         }
@@ -116,7 +115,6 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
                 if (!inside || isForward)
                 {
-
                     // Center outer arrow
                     AddArrow(average, normal, Color.Magenta);
 
@@ -137,14 +135,13 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
                     
                     // Right outer arrow
                     AddArrow(displacedAverage, -normal, Color.Yellow);
-
                 }
             }
         }
 
         private void AddArrow(Vector3 position, Vector3 normal, Color color)
         {
-            Arrows.Add(new Arrowz()
+            _arrows.Add(new Arrowz
             {
                 Position = position,
                 Target = position + normal * 0.75f,
@@ -161,11 +158,11 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         public override void Update(GameTime gameTime)
         {
             // Update the state of the camera
-            Camera.Update(gameTime);
+            _camera.Update(gameTime);
 
-            Effect.Parameters["cameraPosition"]?.SetValue(Camera.Position);
+            _effect.Parameters["cameraPosition"]?.SetValue(_camera.Position);
 
-            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+            Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
 
             base.Update(gameTime);
         }
@@ -175,35 +172,34 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         {
             Game.Background = Color.Black;
 
-            var viewProjection = Camera.View * Camera.Projection;
+            var viewProjection = _camera.View * _camera.Projection;
 
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            GraphicsDevice.SetRenderTarget(DepthRenderTarget);
+            GraphicsDevice.SetRenderTarget(_depthRenderTarget);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1f, 0);
 
-            DrawSpheres(DrawDepthEffect, viewProjection);
+            DrawSpheres(_drawDepthEffect, viewProjection);
 
             // Set the render target as null, we are drawing on the screen!
             GraphicsDevice.SetRenderTarget(null);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1f, 0);
 
-            DrawSpheres(Effect, viewProjection);
+            DrawSpheres(_effect, viewProjection);
 
             RasterizerState rasterizerState = new RasterizerState();
             rasterizerState.CullMode = CullMode.None;
             GraphicsDevice.RasterizerState = rasterizerState;
 
-            if (ShowArrows)
+            if (_showArrows)
             {
                 Arrowz arr;
-                for (int index = 0; index < Arrows.Count; index++)
+                for (int index = 0; index < _arrows.Count; index++)
                 {
-                    arr = Arrows[index];
+                    arr = _arrows[index];
                     Game.Gizmos.DrawLine(arr.Position, arr.Target, arr.Color);
                 }
             } 
-            
             
             base.Draw(gameTime);
         }
@@ -211,49 +207,68 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         private void DrawSpheres(Effect effect, Matrix viewProjection)
         {
             RasterizerState rasterizerState = new RasterizerState();
-            if(!BackFace)
+            if(!_backFace)
+            {
                 rasterizerState.CullMode = CullMode.None;
+            }
             else
+            {
                 rasterizerState.CullMode = CullMode.CullClockwiseFace;
-            if (ShowWireframe)
+            }
+
+            if (_showWireframe)
+            {
                 rasterizerState.FillMode = FillMode.WireFrame;
+            }
+
             GraphicsDevice.RasterizerState = rasterizerState;
 
-            var world = BaseScale * Matrix.CreateTranslation(Vector3.UnitX * Displacement);
+            var world = _baseScale * Matrix.CreateTranslation(Vector3.UnitX * Displacement);
             effect.Parameters["WorldViewProjection"].SetValue(world * viewProjection);
-            Primitive.Draw(effect);
+            _primitive.Draw(effect);
 
             rasterizerState = new RasterizerState();
             rasterizerState.CullMode = CullMode.None;
-            if (ShowWireframe)
+            if (_showWireframe)
+            {
                 rasterizerState.FillMode = FillMode.WireFrame;
+            }
+
             GraphicsDevice.RasterizerState = rasterizerState;
 
-            world = BaseScale;
+            world = _baseScale;
             effect.Parameters["WorldViewProjection"].SetValue(world * viewProjection);
-            Primitive.Draw(effect);
+            _primitive.Draw(effect);
 
             rasterizerState = new RasterizerState();
-            if (!BackFace)
+            if (!_backFace)
+            {
                 rasterizerState.CullMode = CullMode.None;
+            }
             else
+            {
                 rasterizerState.CullMode = CullMode.CullCounterClockwiseFace;
-            if (ShowWireframe)
+            }
+
+            if (_showWireframe)
+            {
                 rasterizerState.FillMode = FillMode.WireFrame;
+            }
+
             GraphicsDevice.RasterizerState = rasterizerState;
 
-            world = BaseScale * Matrix.CreateTranslation(Vector3.UnitX * -Displacement);
+            world = _baseScale * Matrix.CreateTranslation(Vector3.UnitX * -Displacement);
             effect.Parameters["WorldViewProjection"].SetValue(world * viewProjection);
-            Primitive.Draw(effect);
+            _primitive.Draw(effect);
         }
 
         /// <inheritdoc />
         protected override void UnloadContent()
         {
-            Primitive.Dispose();
-            Arrows.Clear();
-            Primitive.Dispose();
-            Effect.Dispose();
+            _primitive.Dispose();
+            _arrows.Clear();
+            _primitive.Dispose();
+            _effect.Dispose();
             base.UnloadContent();
         }
     }

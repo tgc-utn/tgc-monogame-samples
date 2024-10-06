@@ -23,38 +23,39 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             NoMipMapping,
             Debug,
         }
+        
+        private const string Texture = "Texture";
 
         /// <summary>
         /// A camera to draw geometry
         /// </summary>
-        private Camera Camera { get; set; }
+        private Camera _camera;
 
         /// <summary>
         /// A quad to draw the floor and transparent geometry
         /// </summary>
-        private QuadPrimitive Quad { get; set; }
+        private QuadPrimitive _quad;
 
         /// <summary>
         /// A world matrix for the floor quad
         /// </summary>
-        private Matrix FloorWorld { get; set; }
+        private Matrix _floorWorld;
 
         /// <summary>
         /// A Tiling Texture Effect to draw the floor
         /// </summary>
-        private Effect TilingFloorEffect { get; set; }
+        private Effect _tilingFloorEffect;
 
         /// <summary>
         /// A Texture with Mip-Mapping enabled
         /// </summary>
-        private Texture2D TextureWithMipMapping {get; set;}
+        private Texture2D _textureWithMipMapping;
 
         /// <summary>
         /// A Texture with Mip-Mapping disabled
         /// </summary>
-        private Texture2D TextureWithoutMipMapping { get; set; }
-
-
+        private Texture2D _textureWithoutMipMapping;
+        
         /// <inheritdoc />
         public MipMapping(TGCViewer game) : base(game)
         {
@@ -66,35 +67,34 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         /// <inheritdoc />
         public override void Initialize()
         {
-            Quad = new QuadPrimitive(GraphicsDevice);
+            _quad = new QuadPrimitive(GraphicsDevice);
 
-            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, Vector3.One * 20f);
-            Camera.BuildProjection(GraphicsDevice.Viewport.AspectRatio, 0.1f, 100000f, MathF.PI / 3f);
+            _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, Vector3.One * 20f);
+            _camera.BuildProjection(GraphicsDevice.Viewport.AspectRatio, 0.1f, 100_000f, MathF.PI / 3f);
 
-            FloorWorld = Matrix.CreateScale(500f);
+            _floorWorld = Matrix.CreateScale(500f);
 
             base.Initialize();
         }
-
 
         /// <inheritdoc />
         protected override void LoadContent()
         {
             // Load the texture for the floor
-            TextureWithMipMapping = Game.Content.Load<Texture2D>(ContentFolderTextures + "stones");
+            _textureWithMipMapping = Game.Content.Load<Texture2D>(ContentFolderTextures + "stones");
 
             // Create a texture with no mip-mapping
-            TextureWithoutMipMapping = CreateNoMipMappingTexture(TextureWithMipMapping);
+            _textureWithoutMipMapping = CreateNoMipMappingTexture(_textureWithMipMapping);
 
             // Load the floor effect and set its parameters
-            TilingFloorEffect = Game.Content.Load<Effect>(ContentFolderEffects + "MipMapping");
+            _tilingFloorEffect = Game.Content.Load<Effect>(ContentFolderEffects + "MipMapping");
 
             // Assign the main texture, then set the tiling value
             // Pass the TextureSize and MipLevelCount required for the debug technique
-            TilingFloorEffect.Parameters["Texture"].SetValue(TextureWithMipMapping);
-            TilingFloorEffect.Parameters["Tiling"].SetValue(Vector2.One * 10f);
-            TilingFloorEffect.Parameters["TextureSize"].SetValue(new Vector2(TextureWithMipMapping.Width, TextureWithMipMapping.Height));
-            TilingFloorEffect.Parameters["MipLevelCount"].SetValue((float)TextureWithMipMapping.LevelCount);
+            _tilingFloorEffect.Parameters[Texture].SetValue(_textureWithMipMapping);
+            _tilingFloorEffect.Parameters["Tiling"].SetValue(Vector2.One * 10f);
+            _tilingFloorEffect.Parameters["TextureSize"].SetValue(new Vector2(_textureWithMipMapping.Width, _textureWithMipMapping.Height));
+            _tilingFloorEffect.Parameters["MipLevelCount"].SetValue((float)_textureWithMipMapping.LevelCount);
 
             // Create a modifier to change the technique used
             ModifierController.AddOptions<MipMappingType>("Type", OnMipMappingTypeChange);
@@ -137,36 +137,35 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             {
                 // For Bilinear, use a technique with Trilinear Sampling disabled
                 case MipMappingType.Bilinear:
-                    TilingFloorEffect.Parameters["Texture"].SetValue(TextureWithMipMapping);
-                    TilingFloorEffect.CurrentTechnique = TilingFloorEffect.Techniques["Bilinear"];
+                    _tilingFloorEffect.Parameters[Texture].SetValue(_textureWithMipMapping);
+                    _tilingFloorEffect.CurrentTechnique = _tilingFloorEffect.Techniques["Bilinear"];
                     break;
 
                 // For this option, just use a texture with no mip mapping
                 // Ideally, this should be an option on the GraphicsDevice SamplerState
                 case MipMappingType.NoMipMapping:
-                    TilingFloorEffect.Parameters["Texture"].SetValue(TextureWithoutMipMapping);
-                    TilingFloorEffect.CurrentTechnique = TilingFloorEffect.Techniques["Bilinear"];
+                    _tilingFloorEffect.Parameters[Texture].SetValue(_textureWithoutMipMapping);
+                    _tilingFloorEffect.CurrentTechnique = _tilingFloorEffect.Techniques["Bilinear"];
                     break;
 
                 // Use a technique to draw the mip level used
                 // No texture is needed so there is no problem on using the previously set
                 case MipMappingType.Debug:
-                    TilingFloorEffect.CurrentTechnique = TilingFloorEffect.Techniques["Debug"];
+                    _tilingFloorEffect.CurrentTechnique = _tilingFloorEffect.Techniques["Debug"];
                     break;
 
                 // For anything else use Trilinear, using a technique with Trilinear Sampling enabled
                 default:
-                    TilingFloorEffect.Parameters["Texture"].SetValue(TextureWithMipMapping);
-                    TilingFloorEffect.CurrentTechnique = TilingFloorEffect.Techniques["Trilinear"];
+                    _tilingFloorEffect.Parameters[Texture].SetValue(_textureWithMipMapping);
+                    _tilingFloorEffect.CurrentTechnique = _tilingFloorEffect.Techniques["Trilinear"];
                     break;
             }
         }
 
-
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
-            Camera.Update(gameTime);
+            _camera.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -174,7 +173,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         /// <inheritdoc />
         public override void Draw(GameTime gameTime)
         {
-            var viewProjection = Camera.View * Camera.Projection;
+            var viewProjection = _camera.View * _camera.Projection;
 
             // Enable back-face culling
             // Enable depth testing and writing
@@ -184,12 +183,10 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             GraphicsDevice.BlendState = BlendState.Opaque;
 
             // Draw the floor
-            TilingFloorEffect.Parameters["WorldViewProjection"].SetValue(FloorWorld * viewProjection);
-            Quad.Draw(TilingFloorEffect);
-
-
+            _tilingFloorEffect.Parameters["WorldViewProjection"].SetValue(_floorWorld * viewProjection);
+            _quad.Draw(_tilingFloorEffect);
+            
             base.Draw(gameTime);
         }
-
     }
 }
