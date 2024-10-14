@@ -6,9 +6,9 @@ namespace TGC.MonoGame.Samples.Samples.PBR
 {
     public struct Light
     {
-        public Vector3 Position;
-        public Vector3 Color;
-        public Vector3 ShowColor;
+        public Vector3 Position { get; set; }
+        public Vector3 Color { get; set; }
+        public Vector3 ShowColor { get; set; }
 
         private Light(Vector3 position, Vector3 color, Vector3 showColor) 
         {

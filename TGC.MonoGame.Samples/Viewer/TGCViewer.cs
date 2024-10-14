@@ -14,8 +14,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <summary>
         ///     The folder which the game will search for content.
         /// </summary>
-        public const string ContentFolder = "Content";
-
+        private const string ContentFolder = "Content";
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="TGCViewer" /> class.
@@ -33,8 +32,8 @@ namespace TGC.MonoGame.Samples.Viewer
             Content.RootDirectory = ContentFolder;
             IsMouseVisible = true;
             Gizmos = new Gizmos.Gizmos();
-            Model = new TGCViewerModel(this);
-            Model.LoadTreeSamples();
+            _model = new TGCViewerModel(this);
+            _model.LoadTreeSamples();
         }
 
         /// <summary>
@@ -60,7 +59,7 @@ namespace TGC.MonoGame.Samples.Viewer
         /// <summary>
         ///     The model has the logic for the creation of the sample explorer.
         /// </summary>
-        private TGCViewerModel Model { get; }
+        private readonly TGCViewerModel _model;
 
         /// <summary>
         ///     Gizmos are used to debug and visualize boundaries and vectors
@@ -80,8 +79,8 @@ namespace TGC.MonoGame.Samples.Viewer
         /// </summary>
         protected override void Initialize()
         {
-            Model.LoadImgGUI();
-            Model.LoadWelcomeSample();
+            _model.LoadImgGUI();
+            _model.LoadWelcomeSample();
             Background = Color.CornflowerBlue;
             base.Initialize();
         }
@@ -118,8 +117,9 @@ namespace TGC.MonoGame.Samples.Viewer
         {
             GraphicsDevice.Clear(Background);
             base.Draw(gameTime);
+            _model.DrawSampleExplorer(gameTime);
             Gizmos.Draw();
-            Model.DrawSampleExplorer(gameTime);
+            _model.DrawSampleExplorer(gameTime);
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace TGC.MonoGame.Samples.Viewer
         protected override void UnloadContent()
         {
             Gizmos.Dispose();
-            Model.Dispose();
+            _model.Dispose();
             Content.Unload();
         }
 

@@ -22,29 +22,29 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         /// <param name="game">The game where the explorer is going to be draw.</param>
         public TGCViewerModel(TGCViewer game)
         {
-            Game = game;
-            ActiveSampleTreeNode = -1;
+            _game = game;
+            _activeSampleTreeNode = -1;
         }
 
         /// <summary>
         ///     The viewer where the samples are going to be shown.
         /// </summary>
-        private TGCViewer Game { get; }
+        private readonly TGCViewer _game;
 
         /// <summary>
         ///     Graphical user interface.
         /// </summary>
-        public ImGuiRenderer ImGuiRenderer { get; set; }
+        private ImGuiRenderer _imGuiRenderer;
 
         /// <summary>
         ///     Samples sorted by category.
         /// </summary>
-        public SortedList<string, List<TGCSample>> SamplesByCategory { get; set; }
+        private SortedList<string, List<TGCSample>> _samplesByCategory;
 
         /// <summary>
         ///     Samples available to view.
         /// </summary>
-        public Dictionary<string, TGCSample> SamplesByName { get; set; }
+        private Dictionary<string, TGCSample> _samplesByName;
 
         /// <summary>
         ///     Samples that have already been loaded.
@@ -54,30 +54,30 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         /// <summary>
         ///     The active sample.
         /// </summary>
-        private TGCSample ActiveSample { get; set; }
+        private TGCSample _activeSample;
 
         /// <summary>
         ///     The category of the selected sample in the tree.
         /// </summary>
-        private int ActiveSampleCategoryIndex { get; set; }
+        private int _activeSampleCategoryIndex;
 
         /// <summary>
         ///     The active sample in the tree.
         /// </summary>
-        private int ActiveSampleTreeNode { get; set; }
+        private int _activeSampleTreeNode;
 
         /// <summary>
         ///     If the About modal in visible or not.
         /// </summary>
-        private bool AboutVisible { get; set; }
+        private bool _aboutVisible;
 
         /// <summary>
         ///     Initialize imgui to be able to build the menu.
         /// </summary>
         public void LoadImgGUI()
         {
-            ImGuiRenderer = new ImGuiRenderer(Game);
-            ImGuiRenderer.RebuildFontAtlas();
+            _imGuiRenderer = new ImGuiRenderer(_game);
+            _imGuiRenderer.RebuildFontAtlas();
         }
 
         /// <summary>
@@ -85,8 +85,8 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         /// </summary>
         public void LoadTreeSamples()
         {
-            SamplesByCategory = new SortedList<string, List<TGCSample>>();
-            SamplesByName = new Dictionary<string, TGCSample>();
+            _samplesByCategory = new SortedList<string, List<TGCSample>>();
+            _samplesByName = new Dictionary<string, TGCSample>();
             AlreadyLoadedSamples = new Dictionary<string, TGCSample>();
 
             var baseType = typeof(TGCSample);
@@ -96,19 +96,19 @@ namespace TGC.MonoGame.Samples.Viewer.Models
                 if (type.BaseType != baseType || !type.IsClass || !type.IsPublic || type.IsAbstract) continue;
                 try
                 {
-                    var sample = (TGCSample) Activator.CreateInstance(type, Game);
+                    var sample = (TGCSample) Activator.CreateInstance(type, _game);
                     sample.Visible = false;
                     sample.Enabled = false;
 
                     if (!string.IsNullOrEmpty(sample.Category))
                     {
-                        if (SamplesByCategory.ContainsKey(sample.Category))
-                            SamplesByCategory[sample.Category].Add(sample);
+                        if (_samplesByCategory.ContainsKey(sample.Category))
+                            _samplesByCategory[sample.Category].Add(sample);
                         else
-                            SamplesByCategory.Add(sample.Category, new List<TGCSample> {sample});
+                            _samplesByCategory.Add(sample.Category, new List<TGCSample> {sample});
                     }
 
-                    SamplesByName.Add(sample.Name, sample);
+                    _samplesByName.Add(sample.Name, sample);
                 }
                 catch
                 {
@@ -131,26 +131,26 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         /// <param name="sampleName">The name of the sample to load.</param>
         public void LoadSample(string sampleName)
         {
-            if (ActiveSample != null)
+            if (_activeSample != null)
             {
                 // Unbind any Texture modifiers from ImGUI
                 UnbindModifiers();
-                ActiveSample.UnloadSampleContent();
-                ActiveSample.Enabled = false;
-                ActiveSample.Visible = false;
+                _activeSample.UnloadSampleContent();
+                _activeSample.Enabled = false;
+                _activeSample.Visible = false;
             }
 
-            var newSample = SamplesByName[sampleName];
+            var newSample = _samplesByName[sampleName];
             newSample.Visible = true;
             newSample.Enabled = true;
-            ActiveSample = newSample;
+            _activeSample = newSample;
 
 
             newSample.Prepare();
 
-            if (!Game.Components.Contains(newSample))
+            if (!_game.Components.Contains(newSample))
             {
-                Game.Components.Add(newSample);
+                _game.Components.Add(newSample);
             }
             else
             {
@@ -167,7 +167,7 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         /// </summary>
         private void BindModifiers()
         {
-            ActiveSample.BindModifiers(ImGuiRenderer);
+            _activeSample.BindModifiers(_imGuiRenderer);
         }
 
         /// <summary>
@@ -175,23 +175,23 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         /// </summary>
         private void UnbindModifiers()
         {
-            ActiveSample.UnbindModifiers(ImGuiRenderer);
+            _activeSample.UnbindModifiers(_imGuiRenderer);
         }
 
         /// <summary>
         ///     Draw the sample explorer.
         /// </summary>
-        /// <param name="gameTime">Holds the time state of a <see cref="Game" />.</param>
+        /// <param name="gameTime">Holds the time state of a <see cref="_game" />.</param>
         public void DrawSampleExplorer(GameTime gameTime)
         {
             // Call BeforeLayout first to set things up
-            ImGuiRenderer.BeforeLayout(gameTime);
+            _imGuiRenderer.BeforeLayout(gameTime);
 
             // Draw our UI
-            ImGuiLayout(SamplesByCategory);
+            ImGuiLayout(_samplesByCategory);
 
             // Call AfterLayout now to finish up and draw all the things
-            ImGuiRenderer.AfterLayout();
+            _imGuiRenderer.AfterLayout();
         }
 
         /// <summary>
@@ -211,14 +211,14 @@ namespace TGC.MonoGame.Samples.Viewer.Models
             {
                 if (ImGui.BeginMenu("File"))
                 {
-                    if (ImGui.MenuItem("Close", "Ctrl+W")) Game.Exit();
+                    if (ImGui.MenuItem("Close", "Ctrl+W")) _game.Exit();
 
                     ImGui.EndMenu();
                 }
 
                 if (ImGui.BeginMenu("View"))
                 {
-                    if (ImGui.MenuItem("Full screen")) Game.Graphics.ToggleFullScreen();
+                    if (ImGui.MenuItem("Full screen")) _game.Graphics.ToggleFullScreen();
 
                     ImGui.Separator();
                     if (ImGui.MenuItem("FPS"))
@@ -267,7 +267,7 @@ namespace TGC.MonoGame.Samples.Viewer.Models
                         /* Do stuff */
                     }
 
-                    if (ImGui.MenuItem("About")) AboutVisible = !AboutVisible;
+                    if (ImGui.MenuItem("About")) _aboutVisible = !_aboutVisible;
 
                     ImGui.EndMenu();
                 }
@@ -277,8 +277,8 @@ namespace TGC.MonoGame.Samples.Viewer.Models
 
             if (ImGui.CollapsingHeader("TGCLogoSample information", ImGuiTreeNodeFlags.DefaultOpen))
             {
-                ImGui.Text("Name: " + ActiveSample.Name);
-                ImGui.TextWrapped("Description: " + ActiveSample.Description);
+                ImGui.Text("Name: " + _activeSample.Name);
+                ImGui.TextWrapped("Description: " + _activeSample.Description);
                 ImGui.TextWrapped(
                     $"Application average {1000f / ImGui.GetIO().Framerate:F3} ms/frame ({ImGui.GetIO().Framerate:F1} FPS)");
             }
@@ -296,14 +296,14 @@ namespace TGC.MonoGame.Samples.Viewer.Models
                             var nodeFlags = ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.NoTreePushOnOpen |
                                             ImGuiTreeNodeFlags.Bullet;
 
-                            if (ActiveSampleCategoryIndex == i && ActiveSampleTreeNode == j)
+                            if (_activeSampleCategoryIndex == i && _activeSampleTreeNode == j)
                                 nodeFlags |= ImGuiTreeNodeFlags.Selected;
 
                             ImGui.TreeNodeEx(new IntPtr(j), nodeFlags, sample.Name);
                             if (ImGui.IsItemClicked())
                             {
-                                ActiveSampleCategoryIndex = i;
-                                ActiveSampleTreeNode = j;
+                                _activeSampleCategoryIndex = i;
+                                _activeSampleTreeNode = j;
                                 LoadSample(sample.Name);
                             }
 
@@ -317,7 +317,7 @@ namespace TGC.MonoGame.Samples.Viewer.Models
                 }
             }
 
-            if (AboutVisible) ShowAboutWindow();
+            if (_aboutVisible) ShowAboutWindow();
 
             DrawModifiers();
 
@@ -329,7 +329,7 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         /// </summary>
         private void DrawModifiers()
         {
-            ActiveSample.ModifierController.Draw();
+            _activeSample.ModifierController.Draw();
         }
 
         /// <summary>
@@ -343,7 +343,7 @@ namespace TGC.MonoGame.Samples.Viewer.Models
             ImGui.Text("With <3 from Argentine.");
             ImGui.Spacing();
 
-            if (ImGui.Button("Close")) AboutVisible = !AboutVisible;
+            if (ImGui.Button("Close")) _aboutVisible = !_aboutVisible;
 
             ImGui.End();
         }
@@ -353,8 +353,8 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         /// </summary>
         public void Dispose()
         {
-            foreach (var sample in SamplesByName)
-                if (Game.Components.Contains(sample.Value))
+            foreach (var sample in _samplesByName)
+                if (_game.Components.Contains(sample.Value))
                     sample.Value.Dispose();
         }
     }

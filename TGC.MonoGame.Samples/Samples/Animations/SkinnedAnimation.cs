@@ -28,26 +28,26 @@ public class SkinnedAnimation : TGCSample
     /// <summary>
     ///     The Camera we use.
     /// </summary>
-    private Camera Camera { get; set; }
+    private Camera _camera;
 
     /// <summary>
     ///     Application configuration file.
     /// </summary>
-    private IConfigurationRoot Configuration { get; set; }
+    private IConfigurationRoot _configuration;
 
-    private List<string> ModelAnimationFileNames { get; set; }
+    private List<string> _modelAnimationFileNames;
 
-    private List<string> ModelFileNames { get; set; }
+    private List<string> _modelFileNames;
 
     /// <summary>
-    ///     This Model is loaded solely for the Animation animation.
+    ///     This Model is loaded solely for the animation.
     /// </summary>
-    private AnimatedModel Animation { get; set; }
+    private AnimatedModel _animation;
 
     /// <summary>
     ///     The animated Model we are displaying.
     /// </summary>
-    private AnimatedModel Model { get; set; }
+    private AnimatedModel _model;
 
     /// <summary>
     ///     Allows the game to perform any initialization it needs to before starting to run.
@@ -58,9 +58,9 @@ public class SkinnedAnimation : TGCSample
     {
         // Configuration file.
         var configurationFileName = "app-settings.json";
-        Configuration = new ConfigurationBuilder().AddJsonFile(configurationFileName, true, true).Build();
+        _configuration = new ConfigurationBuilder().AddJsonFile(configurationFileName, true, true).Build();
 
-        Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 100, 500), 30, 0.5f);
+        _camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 100, 500), 30, 0.5f);
 
         base.Initialize();
     }
@@ -72,8 +72,8 @@ public class SkinnedAnimation : TGCSample
     {
         // File names of models and animations.
         var skeletonFolder = ContentFolder3D + "tgcito-classic/skeleton/";
-        ModelFileNames = new List<string> { skeletonFolder + "T-Pose" };
-        ModelAnimationFileNames = new List<string>
+        _modelFileNames = new List<string> { skeletonFolder + "T-Pose" };
+        _modelAnimationFileNames = new List<string>
         {
             skeletonFolder + "Idle",
             skeletonFolder + "Idle-2",
@@ -82,21 +82,21 @@ public class SkinnedAnimation : TGCSample
         };
 
         // Build content.
-        var manager = CustomPipelineManager.CreateCustomPipelineManager(Configuration);
+        var manager = CustomPipelineManager.CreateCustomPipelineManager(_configuration);
 
-        foreach (var model in ModelFileNames)
+        foreach (var model in _modelFileNames)
         {
             manager.BuildAnimationContent(model);
         }
 
-        foreach (var animation in ModelAnimationFileNames)
+        foreach (var animation in _modelAnimationFileNames)
         {
             manager.BuildAnimationContent(animation);
         }
 
         // Load the Model we will display.
-        Model = new AnimatedModel(ModelFileNames[0]);
-        Model.LoadContent(Game.Content);
+        _model = new AnimatedModel(_modelFileNames[0]);
+        _model.LoadContent(Game.Content);
 
         ModifierController.AddOptions("Animation", AnimationType.Idle, OnAnimationChange);
     }
@@ -108,8 +108,8 @@ public class SkinnedAnimation : TGCSample
     /// <param name="gameTime">Provides a snapshot of timing values.</param>
     public override void Update(GameTime gameTime)
     {
-        Model.Update(gameTime);
-        Camera.Update(gameTime);
+        _model.Update(gameTime);
+        _camera.Update(gameTime);
 
         base.Update(gameTime);
     }
@@ -122,7 +122,7 @@ public class SkinnedAnimation : TGCSample
     {
         Game.Background = Color.CornflowerBlue;
 
-        Model.Draw(Matrix.Identity, Camera.View, Camera.Projection);
+        _model.Draw(Matrix.Identity, _camera.View, _camera.Projection);
 
         base.Draw(gameTime);
     }
@@ -134,16 +134,16 @@ public class SkinnedAnimation : TGCSample
     private void OnAnimationChange(AnimationType animation)
     {
         // Load the Model that has an animation clip it in.
-        Animation = new AnimatedModel(ModelAnimationFileNames[Convert.ToInt32(animation)]);
-        Animation.LoadContent(Game.Content);
+        _animation = new AnimatedModel(_modelAnimationFileNames[Convert.ToInt32(animation)]);
+        _animation.LoadContent(Game.Content);
 
         // Obtain the clip we want to play.
         // I'm using an absolute index, because XNA 4.0 won't allow you to have more than one animation associated with a Model, anyway.
         // It would be easy to add code to look up the clip by name and to index it by name in the Model.
-        var clip = Animation.Clips[0];
+        var clip = _animation.Clips[0];
 
         // And play the clip.
-        var player = Model.PlayClip(clip);
+        var player = _model.PlayClip(clip);
         player.Looping = true;
     }
 

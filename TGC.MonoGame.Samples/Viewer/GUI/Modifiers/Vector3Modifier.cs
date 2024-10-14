@@ -13,9 +13,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     {
         private Vector3 _vectorValue;
 
-        private string Name { get; set; }
+        private readonly string _name;
 
-        private Action<MonoGameVector3> OnChange { get; set; }
+        private readonly Action<MonoGameVector3> _onChange;
 
         /// <summary>
         ///     Creates a Vector3 Modifier with a given name and action.
@@ -24,8 +24,8 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <param name="onChange">The action that will be called when the Vector3 changes</param>
         public Vector3Modifier(string name, Action<MonoGameVector3> onChange)
         {
-            Name = name;
-            OnChange += onChange;
+            _name = name;
+            _onChange += onChange;
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
             : this(name, onChange)
         {
             _vectorValue = Convert(defaultValue);
-            OnChange.Invoke(defaultValue);
+            _onChange.Invoke(defaultValue);
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         : this(name, (vector) => effectParameter.SetValue(vector))
         {
             _vectorValue = Convert(defaultValue);
-            OnChange.Invoke(defaultValue);
+            _onChange.Invoke(defaultValue);
         }
 
         /// <summary>
@@ -79,10 +79,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// </summary>
         public void Draw()
         {
-            var valueChanged = ImGui.DragFloat3(Name, ref _vectorValue);
+            var valueChanged = ImGui.DragFloat3(_name, ref _vectorValue);
             if (valueChanged)
-                OnChange.Invoke(Convert(_vectorValue));
+                _onChange.Invoke(Convert(_vectorValue));
         }
-
     }
 }
