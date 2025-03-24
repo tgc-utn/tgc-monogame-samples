@@ -43,7 +43,10 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
 
             _model2 = Game.Content.Load<Model>(ContentFolder3D + "tank/tank");
 
-            foreach (var mesh in _model2.Meshes) ((BasicEffect) mesh.Effects.FirstOrDefault())?.EnableDefaultLighting();
+            foreach (var mesh in _model2.Meshes)
+            {
+                ((BasicEffect) mesh.Effects.FirstOrDefault())?.EnableDefaultLighting();
+            }
 
             base.LoadContent();
         }

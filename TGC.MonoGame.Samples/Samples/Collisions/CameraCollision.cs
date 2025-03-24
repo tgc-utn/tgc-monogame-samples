@@ -263,7 +263,8 @@ public class CameraCollision : TGCSample
             _robotRotation *= Matrix.CreateRotationY(-RobotRotatingVelocity);
             rotated = true;
         }
-        else if (Game.CurrentKeyboardState.IsKeyDown(Keys.Left))
+        
+        if (Game.CurrentKeyboardState.IsKeyDown(Keys.Left))
         {
             _robotRotation *= Matrix.CreateRotationY(RobotRotatingVelocity);
             rotated = true;
@@ -275,7 +276,8 @@ public class CameraCollision : TGCSample
             advanceAmount = RobotVelocity;
             moved = true;
         }
-        else if (Game.CurrentKeyboardState.IsKeyDown(Keys.Down))
+        
+        if (Game.CurrentKeyboardState.IsKeyDown(Keys.Down))
         {
             advanceAmount = -RobotVelocity;
             moved = true;

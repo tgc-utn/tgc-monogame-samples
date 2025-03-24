@@ -61,13 +61,25 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         public override void Update(GameTime gameTime)
         {
             // Press Directional Keys to rotate cube
-            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Up)) _boxWorld *= Matrix.CreateRotationX(-0.05f);
+            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Up))
+            {
+                _boxWorld *= Matrix.CreateRotationX(-0.05f);
+            }
 
-            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Down)) _boxWorld *= Matrix.CreateRotationX(0.05f);
+            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Down))
+            {
+                _boxWorld *= Matrix.CreateRotationX(0.05f);
+            }
 
-            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Left)) _boxWorld *= Matrix.CreateRotationY(-0.05f);
+            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Left))
+            {
+                _boxWorld *= Matrix.CreateRotationY(-0.05f);
+            }
 
-            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Right)) _boxWorld *= Matrix.CreateRotationY(0.05f);
+            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Right))
+            {
+                _boxWorld *= Matrix.CreateRotationY(0.05f);
+            }
 
             Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
 
