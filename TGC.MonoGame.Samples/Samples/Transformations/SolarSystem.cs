@@ -38,27 +38,27 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
                 "Shows how to concatenate transformations to generate movements of planets in the solar system. You can move around the scene with a simple camera that handles asdw and arrows keys.";
         }
 
-        private float AxisRotation { get; set; }
-        private Camera Camera { get; set; }
-        private SpherePrimitive Sun { get; set; }
-        private Matrix SunTranslation { get; set; }
-        private SpherePrimitive Earth { get; set; }
-        private float EarthAxisRotation { get; set; }
-        private float EarthOrbitRotation { get; set; }
-        private Matrix EarthTranslation { get; set; }
-        private SpherePrimitive Moon { get; set; }
-        private float MoonOrbitRotation { get; set; }
-        private Matrix MoonTranslation { get; set; }
+        private float _axisRotation;
+        private Camera _camera;
+        private SpherePrimitive _sun;
+        private Matrix _sunTranslation;
+        private SpherePrimitive _earth;
+        private float _earthAxisRotation;
+        private float _earthOrbitRotation;
+        private Matrix _earthTranslation;
+        private SpherePrimitive _moon;
+        private float _moonOrbitRotation;
+        private Matrix _moonTranslation;
 
         /// <inheritdoc />
         public override void Initialize()
         {
-            Camera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 100, 1500), Vector3.Zero, 1,
+            _camera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 100, 1500), Vector3.Zero, 1,
                 3000);
 
-            Sun = new SpherePrimitive(GraphicsDevice, 20, 32, Color.MonoGameOrange);
-            Earth = new SpherePrimitive(GraphicsDevice, 20, 32, Color.LightSkyBlue);
-            Moon = new SpherePrimitive(GraphicsDevice, 20, 32, Color.LightSlateGray);
+            _sun = new SpherePrimitive(GraphicsDevice, 20, 32, Color.MonoGameOrange);
+            _earth = new SpherePrimitive(GraphicsDevice, 20, 32, Color.LightSkyBlue);
+            _moon = new SpherePrimitive(GraphicsDevice, 20, 32, Color.LightSlateGray);
 
             base.Initialize();
         }
@@ -66,21 +66,21 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
-            Camera.Update(gameTime);
+            _camera.Update(gameTime);
             // Update transformation of the sun.
-            SunTranslation = GetSunTransform();
+            _sunTranslation = GetSunTransform();
             // Update transformation of the earth.
-            EarthTranslation = GetEarthTransform();
+            _earthTranslation = GetEarthTransform();
             // Update transformation of the moon.
-            MoonTranslation = GetMoonTransform(EarthTranslation);
+            _moonTranslation = GetMoonTransform(_earthTranslation);
 
             var elapsedTime = Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
-            AxisRotation += AxisRotationSpeed * elapsedTime;
-            EarthAxisRotation += EarthAxisRotationSpeed * elapsedTime;
-            EarthOrbitRotation += EarthOrbitSpeed * elapsedTime;
-            MoonOrbitRotation += MoonOrbitSpeed * elapsedTime;
+            _axisRotation += AxisRotationSpeed * elapsedTime;
+            _earthAxisRotation += EarthAxisRotationSpeed * elapsedTime;
+            _earthOrbitRotation += EarthOrbitSpeed * elapsedTime;
+            _moonOrbitRotation += MoonOrbitSpeed * elapsedTime;
 
-            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+            Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
 
             base.Update(gameTime);
         }
@@ -92,13 +92,13 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             // Render the sun.
-            DrawGeometry(Sun, SunTranslation);
+            DrawGeometry(_sun, _sunTranslation);
 
             // Render the earth.
-            DrawGeometry(Earth, EarthTranslation);
+            DrawGeometry(_earth, _earthTranslation);
 
             // Render the moon.
-            DrawGeometry(Moon, MoonTranslation);
+            DrawGeometry(_moon, _moonTranslation);
 
             base.Draw(gameTime);
         }
@@ -106,7 +106,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         private Matrix GetSunTransform()
         {
             var scale = Matrix.CreateScale(_sunScale);
-            var yRot = Matrix.CreateRotationY(AxisRotation);
+            var yRot = Matrix.CreateRotationY(_axisRotation);
 
             return scale * yRot;
         }
@@ -114,9 +114,9 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         private Matrix GetEarthTransform()
         {
             var scale = Matrix.CreateScale(_earthScale);
-            var yRot = Matrix.CreateRotationY(EarthAxisRotation);
+            var yRot = Matrix.CreateRotationY(_earthAxisRotation);
             var sunOffset = Matrix.CreateTranslation(EarthOrbitOffset, 0, 0);
-            var earthOrbit = Matrix.CreateRotationY(EarthOrbitRotation);
+            var earthOrbit = Matrix.CreateRotationY(_earthOrbitRotation);
 
             return scale * yRot * sunOffset * earthOrbit;
         }
@@ -124,9 +124,9 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         private Matrix GetMoonTransform(Matrix earthTransform)
         {
             var scale = Matrix.CreateScale(_moonScale);
-            var yRot = Matrix.CreateRotationY(AxisRotation);
+            var yRot = Matrix.CreateRotationY(_axisRotation);
             var earthOffset = Matrix.CreateTranslation(MoonOrbitOffset, 0, 0);
-            var moonOrbit = Matrix.CreateRotationY(MoonOrbitRotation);
+            var moonOrbit = Matrix.CreateRotationY(_moonOrbitRotation);
 
             return scale * yRot * earthOffset * moonOrbit * earthTransform;
         }
@@ -141,8 +141,8 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
             var effect = geometry.Effect;
 
             effect.World = transform;
-            effect.View = Camera.View;
-            effect.Projection = Camera.Projection;
+            effect.View = _camera.View;
+            effect.Projection = _camera.Projection;
 
             geometry.Draw(effect);
         }

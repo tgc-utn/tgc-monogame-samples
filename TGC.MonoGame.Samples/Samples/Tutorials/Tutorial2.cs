@@ -22,33 +22,33 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
                 "Shows the Creation of a 3D Box with one color per vertex and can be moved using the keyboard arrows.";
         }
 
-        private Camera Camera { get; set; }
+        private Camera _camera;
 
         /// <summary>
         ///     Represents a list of 3D vertices to be streamed to the graphics device.
         /// </summary>
-        private VertexBuffer Vertices { get; set; }
+        private VertexBuffer _vertices;
 
         /// <summary>
         ///     Describes the rendering order of the vertices in a vertex buffer.
         /// </summary>
-        private IndexBuffer Indices { get; set; }
+        private IndexBuffer _indices;
 
         /// <summary>
         ///     Built-in effect that supports optional texturing, vertex coloring, fog, and lighting.
         /// </summary>
-        private BasicEffect Effect { get; set; }
+        private BasicEffect _effect;
 
-        private Matrix BoxWorld { get; set; } = Matrix.Identity;
+        private Matrix _boxWorld = Matrix.Identity;
 
         /// <inheritdoc />
         public override void Initialize()
         {
             Game.Background = Color.CornflowerBlue;
-            Camera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 20, 60), Vector3.Zero);
+            _camera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 20, 60), Vector3.Zero);
 
-            Effect = new BasicEffect(GraphicsDevice);
-            Effect.VertexColorEnabled = true;
+            _effect = new BasicEffect(GraphicsDevice);
+            _effect.VertexColorEnabled = true;
 
             CreateVertexBuffer(Vector3.One * 25, Vector3.Zero, Color.Cyan, Color.Black, Color.Magenta, Color.Yellow,
                 Color.Green, Color.Blue, Color.Red, Color.White);
@@ -61,15 +61,27 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         public override void Update(GameTime gameTime)
         {
             // Press Directional Keys to rotate cube
-            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Up)) BoxWorld *= Matrix.CreateRotationX(-0.05f);
+            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Up))
+            {
+                _boxWorld *= Matrix.CreateRotationX(-0.05f);
+            }
 
-            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Down)) BoxWorld *= Matrix.CreateRotationX(0.05f);
+            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Down))
+            {
+                _boxWorld *= Matrix.CreateRotationX(0.05f);
+            }
 
-            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Left)) BoxWorld *= Matrix.CreateRotationY(-0.05f);
+            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Left))
+            {
+                _boxWorld *= Matrix.CreateRotationY(-0.05f);
+            }
 
-            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Right)) BoxWorld *= Matrix.CreateRotationY(0.05f);
+            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Right))
+            {
+                _boxWorld *= Matrix.CreateRotationY(0.05f);
+            }
 
-            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+            Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
 
             base.Update(gameTime);
         }
@@ -80,17 +92,17 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             Game.Background = Color.CornflowerBlue;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            GraphicsDevice.SetVertexBuffer(Vertices);
-            GraphicsDevice.Indices = Indices;
+            GraphicsDevice.SetVertexBuffer(_vertices);
+            GraphicsDevice.Indices = _indices;
 
-            Effect.World = BoxWorld;
-            Effect.View = Camera.View;
-            Effect.Projection = Camera.Projection;
+            _effect.World = _boxWorld;
+            _effect.View = _camera.View;
+            _effect.Projection = _camera.Projection;
 
-            foreach (var pass in Effect.CurrentTechnique.Passes)
+            foreach (var pass in _effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, Indices.IndexCount / 3);
+                GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, _indices.IndexCount / 3);
             }
 
             base.Draw(gameTime);
@@ -136,9 +148,9 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
                 new VertexPositionColor(new Vector3(x + center.X, y + center.Y, -z + center.Z), color8)
             };
 
-            Vertices = new VertexBuffer(GraphicsDevice, VertexPositionColor.VertexDeclaration, cubeVertices.Length,
+            _vertices = new VertexBuffer(GraphicsDevice, VertexPositionColor.VertexDeclaration, cubeVertices.Length,
                 BufferUsage.WriteOnly);
-            Vertices.SetData(cubeVertices);
+            _vertices.SetData(cubeVertices);
         }
 
         /// <summary>
@@ -163,8 +175,8 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
                 2, 6, 3, 3, 6, 7
             };
 
-            Indices = new IndexBuffer(device, IndexElementSize.SixteenBits, cubeIndices.Length, BufferUsage.WriteOnly);
-            Indices.SetData(cubeIndices);
+            _indices = new IndexBuffer(device, IndexElementSize.SixteenBits, cubeIndices.Length, BufferUsage.WriteOnly);
+            _indices.SetData(cubeIndices);
         }
     }
 }

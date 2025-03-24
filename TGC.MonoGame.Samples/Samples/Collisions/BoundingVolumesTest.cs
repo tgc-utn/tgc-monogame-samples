@@ -25,82 +25,71 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             Description = "Shows how to test collision for different Bounding Volumes.";
         }
 
-
         // Camera to draw the scene
-        private Camera Camera { get; set; }
+        private Camera _camera;
 
         // The Model of the Robot to draw
-        private Model Robot { get; set; }
+        private Model _robot;
 
         // BasicEffect to draw the Robot
-        private BasicEffect RobotEffect { get; set; }
+        private BasicEffect _robotEffect;
 
         // The World Matrix for the Robot
-        private Matrix RobotWorld { get; set; }
+        private Matrix _robotWorld;
 
         // The Robot's position
-        private Vector3 RobotPosition { get; set; }
+        private Vector3 _robotPosition;
 
         // The <see cref="BoundingBox">BoundingBox</see> for the Robot
-        private BoundingBox RobotBox { get; set; }
-
-
-
+        private BoundingBox _robotBox;
 
         // The Model of the Chair to draw
-        private Model Chair { get; set; }
+        private Model _chair;
 
         // The World Matrix for the Chair
-        private Matrix ChairWorld { get; set; }
+        private Matrix _chairWorld;
 
         // The World Matrix for the Chair Oriented Bounding Box
-        private Matrix ChairOBBWorld { get; set; }
+        private Matrix _chairObbWorld;
 
         // The OrientedBoundingBox of the Chair
-        private OrientedBoundingBox ChairBox { get; set; }
+        private OrientedBoundingBox _chairBox;
         
         // The Y Angle for the Chair
-        private float ChairAngle { get; set; }
+        private float _chairAngle;
 
         // The Scale Matrix of the Chair
-        private Matrix ChairScale { get; set; }
+        private Matrix _chairScale;
         
         // The Translation Matrix of the Chair
-        private Matrix ChairTranslation { get; set; }
-
-
+        private Matrix _chairTranslation;
 
         // The Model of the Tank to draw
-        private Model Tank { get; set; }
+        private Model _tank;
 
         // The World Matrix for the Tank
-        private Matrix TankWorld { get; set; }
+        private Matrix _tankWorld;
 
         // The BoundingSphere of the Tank
         private BoundingSphere _tankSphere;
 
         // The position of the Tank
-        private Vector3 TankPosition { get; set; }
-
-
-
+        private Vector3 _tankPosition;
 
         // The World Matrix for the second Robot
-        private Matrix RobotTwoWorld { get; set; }
+        private Matrix _robotTwoWorld;
         
         // The BoundingCylinder for the second Robot
-        private BoundingCylinder RobotTwoCylinder { get; set; }
-
-
+        private BoundingCylinder _robotTwoCylinder;
 
         // Indicates if the Robot is touching the Chair
-        private bool TouchingChair { get; set; } = false;
+        private bool _touchingChair;
 
         // Indicates if the Robot is touching the Chair
-        private bool TouchingTank { get; set; } = false;
+        private bool _touchingTank;
 
         // Indicates if the Robot is touching the other Robot
-        private bool TouchingOtherRobot { get; set; } = false;
+        private bool _touchingOtherRobot;
 
         /// <inheritdoc />
         public override void Initialize()
@@ -108,30 +97,29 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             Game.Background = Color.CornflowerBlue;
 
             // Creates a Static Camera pointing to the center
-            Camera = new StaticCamera(GraphicsDevice.Viewport.AspectRatio, 
+            _camera = new StaticCamera(GraphicsDevice.Viewport.AspectRatio, 
                 Vector3.Forward * 100f + Vector3.Up * 100f, 
                 -Vector3.Normalize(Vector3.Forward + Vector3.Up), 
                 Vector3.Up);
 
             // Robot position and matrix initialization
-            RobotPosition = Vector3.Zero;
-            RobotWorld = Matrix.CreateScale(0.3f);
-
+            _robotPosition = Vector3.Zero;
+            _robotWorld = Matrix.CreateScale(0.3f);
 
             // Chair position and matrix initialization
-            ChairAngle = MathHelper.PiOver4;
-            ChairScale = Matrix.CreateScale(0.5f);
-            ChairTranslation = Matrix.CreateTranslation(Vector3.UnitX * 50f);
-            ChairWorld = ChairScale * Matrix.CreateRotationY(ChairAngle) * ChairTranslation;
+            _chairAngle = MathHelper.PiOver4;
+            _chairScale = Matrix.CreateScale(0.5f);
+            _chairTranslation = Matrix.CreateTranslation(Vector3.UnitX * 50f);
+            _chairWorld = _chairScale * Matrix.CreateRotationY(_chairAngle) * _chairTranslation;
 
             // Tank position and matrix initialization
-            TankPosition = -Vector3.UnitX * 10f + Vector3.UnitZ * 10f;
-            TankWorld = Matrix.CreateScale(3f) * Matrix.CreateTranslation(TankPosition);
+            _tankPosition = -Vector3.UnitX * 10f + Vector3.UnitZ * 10f;
+            _tankWorld = Matrix.CreateScale(3f) * Matrix.CreateTranslation(_tankPosition);
 
             // Robot two position and matrix initialization
             var robotTwoPosition = Vector3.UnitX * -50f + Vector3.UnitZ * 10f;
-            RobotTwoWorld = Matrix.CreateScale(0.25f) * Matrix.CreateRotationY(MathHelper.PiOver4 + MathHelper.PiOver2) * Matrix.CreateTranslation(robotTwoPosition);
-            RobotTwoCylinder = new BoundingCylinder(robotTwoPosition, 5f, 10f);
+            _robotTwoWorld = Matrix.CreateScale(0.25f) * Matrix.CreateRotationY(MathHelper.PiOver4 + MathHelper.PiOver2) * Matrix.CreateTranslation(robotTwoPosition);
+            _robotTwoCylinder = new BoundingCylinder(robotTwoPosition, 5f, 10f);
 
             base.Initialize();
         }
@@ -140,48 +128,42 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         protected override void LoadContent()
         {
             // Load the models
-            Robot = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
+            _robot = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
 
-            Chair = Game.Content.Load<Model>(ContentFolder3D + "chair/chair");
+            _chair = Game.Content.Load<Model>(ContentFolder3D + "chair/chair");
 
-            Tank = Game.Content.Load<Model>(ContentFolder3D + "tank/tank");
+            _tank = Game.Content.Load<Model>(ContentFolder3D + "tank/tank");
 
             // Enable the default lighting for the models
-            EnableDefaultLighting(Robot);
-            EnableDefaultLighting(Tank);
-            EnableDefaultLighting(Chair);
+            EnableDefaultLighting(_robot);
+            EnableDefaultLighting(_tank);
+            EnableDefaultLighting(_chair);
             
             // Save our RobotEffect
-            RobotEffect = ((BasicEffect)Robot.Meshes.FirstOrDefault()?.Effects.FirstOrDefault());
+            _robotEffect = ((BasicEffect)_robot.Meshes.FirstOrDefault()?.Effects.FirstOrDefault());
             
-
             // Create an AABB
             // This gets an AABB with the bounds of the robot model
-            RobotBox = BoundingVolumesExtensions.CreateAABBFrom(Robot);
+            _robotBox = BoundingVolumesExtensions.CreateAABBFrom(_robot);
             // Scale it down half-size as the model is scaled down as well
-            RobotBox = BoundingVolumesExtensions.Scale(RobotBox, 0.3f);
-
-
-
+            _robotBox = BoundingVolumesExtensions.Scale(_robotBox, 0.3f);
 
             // Create an OBB for a model
             // First, get an AABB from the model
-            var temporaryCubeAABB = BoundingVolumesExtensions.CreateAABBFrom(Chair);
+            var temporaryCubeAABB = BoundingVolumesExtensions.CreateAABBFrom(_chair);
             // Scale it to match the model's transform
             temporaryCubeAABB = BoundingVolumesExtensions.Scale(temporaryCubeAABB, 0.5f);
             // Create an Oriented Bounding Box from the AABB
-            ChairBox = OrientedBoundingBox.FromAABB(temporaryCubeAABB);
+            _chairBox = OrientedBoundingBox.FromAABB(temporaryCubeAABB);
             // Move the center
-            ChairBox.Center = Vector3.UnitX * 50f;
+            _chairBox.Center = Vector3.UnitX * 50f;
             // Then set its orientation!
-            ChairBox.Orientation = Matrix.CreateRotationY(ChairAngle);
-
+            _chairBox.Orientation = Matrix.CreateRotationY(_chairAngle);
 
             // Create a Bounding Sphere for a model
-            _tankSphere = BoundingVolumesExtensions.CreateSphereFrom(Tank);
-            _tankSphere.Center = TankPosition;
+            _tankSphere = BoundingVolumesExtensions.CreateSphereFrom(_tank);
+            _tankSphere.Center = _tankPosition;
             _tankSphere.Radius *= 3f;
-
 
             // Set depth to default
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
@@ -212,29 +194,24 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             if (Game.CurrentKeyboardState.IsKeyDown(Keys.Down))
                 MoveRobot(Vector3.Forward);
 
-
             // Update Gizmos with the View Projection matrices
-            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
-
-
+            Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
 
             // Rotate the box
-            ChairAngle += 0.01f;
-            var rotation = Matrix.CreateRotationY(ChairAngle);
-            ChairWorld = ChairScale * rotation * ChairTranslation;
-            ChairBox.Orientation = rotation;
+            _chairAngle += 0.01f;
+            var rotation = Matrix.CreateRotationY(_chairAngle);
+            _chairWorld = _chairScale * rotation * _chairTranslation;
+            _chairBox.Orientation = rotation;
 
             // Create an OBB World-matrix so we can draw a cube representing it
-            ChairOBBWorld = Matrix.CreateScale(ChairBox.Extents * 2f) *
-                 ChairBox.Orientation *
-                 ChairTranslation;
-
-
+            _chairObbWorld = Matrix.CreateScale(_chairBox.Extents * 2f) *
+                 _chairBox.Orientation *
+                 _chairTranslation;
 
             // Update the boolean values depending on the intersection of the Bounding Volumes
-            TouchingChair = ChairBox.Intersects(RobotBox);
-            TouchingTank = _tankSphere.Intersects(RobotBox);
-            TouchingOtherRobot = !RobotTwoCylinder.Intersects(RobotBox).Equals(BoxCylinderIntersection.None);
+            _touchingChair = _chairBox.Intersects(_robotBox);
+            _touchingTank = _tankSphere.Intersects(_robotBox);
+            _touchingOtherRobot = !_robotTwoCylinder.Intersects(_robotBox).Equals(BoxCylinderIntersection.None);
 
             base.Update(gameTime);
         }
@@ -242,47 +219,40 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         private void MoveRobot(Vector3 increment)
         {
             // Update the position of the Robot
-            RobotPosition += increment;
+            _robotPosition += increment;
             // Update its Bounding Box, moving both min and max positions
-            RobotBox = new BoundingBox(RobotBox.Min + increment, RobotBox.Max + increment);
-            RobotWorld = Matrix.CreateScale(0.3f) * Matrix.CreateTranslation(RobotPosition);
+            _robotBox = new BoundingBox(_robotBox.Min + increment, _robotBox.Max + increment);
+            _robotWorld = Matrix.CreateScale(0.3f) * Matrix.CreateTranslation(_robotPosition);
         }
-
 
         /// <inheritdoc />
         public override void Draw(GameTime gameTime)
         {
             // Set the DiffuseColor to white to draw this Robot
-            RobotEffect.DiffuseColor = Color.White.ToVector3();
-            Robot.Draw(RobotWorld, Camera.View, Camera.Projection);
+            _robotEffect.DiffuseColor = Color.White.ToVector3();
+            _robot.Draw(_robotWorld, _camera.View, _camera.Projection);
 
             // Set the DiffuseColor to red to draw this Robot
-            RobotEffect.DiffuseColor = Color.Red.ToVector3();
-            Robot.Draw(RobotTwoWorld, Camera.View, Camera.Projection);
+            _robotEffect.DiffuseColor = Color.Red.ToVector3();
+            _robot.Draw(_robotTwoWorld, _camera.View, _camera.Projection);
 
             // Draw the Chair
-            Chair.Draw(ChairWorld, Camera.View, Camera.Projection);
+            _chair.Draw(_chairWorld, _camera.View, _camera.Projection);
 
             // Draw the Tank
-            Tank.Draw(TankWorld, Camera.View, Camera.Projection);
-
-            
-
-
+            _tank.Draw(_tankWorld, _camera.View, _camera.Projection);
 
             // Draw bounding volumes
 
-            Game.Gizmos.DrawCube(BoundingVolumesExtensions.GetCenter(RobotBox), BoundingVolumesExtensions.GetExtents(RobotBox) * 2f, Color.Yellow);
+            Game.Gizmos.DrawCube(BoundingVolumesExtensions.GetCenter(_robotBox), BoundingVolumesExtensions.GetExtents(_robotBox) * 2f, Color.Yellow);
 
-            Game.Gizmos.DrawCube(ChairOBBWorld, TouchingChair ? Color.Orange : Color.Green);
+            Game.Gizmos.DrawCube(_chairObbWorld, _touchingChair ? Color.Orange : Color.Green);
 
-            Game.Gizmos.DrawSphere(_tankSphere.Center, _tankSphere.Radius * Vector3.One, TouchingTank ? Color.Orange : Color.Purple);
+            Game.Gizmos.DrawSphere(_tankSphere.Center, _tankSphere.Radius * Vector3.One, _touchingTank ? Color.Orange : Color.Purple);
 
-            Game.Gizmos.DrawCylinder(RobotTwoCylinder.Transform, TouchingOtherRobot ? Color.Orange : Color.White);
-
+            Game.Gizmos.DrawCylinder(_robotTwoCylinder.Transform, _touchingOtherRobot ? Color.Orange : Color.White);
 
             base.Draw(gameTime);
         }
-
     }
 }
