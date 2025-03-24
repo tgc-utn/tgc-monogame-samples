@@ -204,7 +204,10 @@ namespace TGC.MonoGame.Samples.Samples.Physics.Bepu
                 _sphereHandles.Add(bodyHandle);
             }
 
-            if (Game.CurrentKeyboardState.IsKeyUp(Keys.Z)) _canShoot = true;
+            if (Game.CurrentKeyboardState.IsKeyUp(Keys.Z))
+            {
+                _canShoot = true;
+            }
 
             _activeBoxesWorld.Clear();
             _inactiveBoxesWorld.Clear();

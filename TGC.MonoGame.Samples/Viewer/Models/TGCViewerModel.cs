@@ -211,14 +211,20 @@ namespace TGC.MonoGame.Samples.Viewer.Models
             {
                 if (ImGui.BeginMenu("File"))
                 {
-                    if (ImGui.MenuItem("Close", "Ctrl+W")) _game.Exit();
+                    if (ImGui.MenuItem("Close", "Ctrl+W"))
+                    {
+                        _game.Exit();
+                    }
 
                     ImGui.EndMenu();
                 }
 
                 if (ImGui.BeginMenu("View"))
                 {
-                    if (ImGui.MenuItem("Full screen")) _game.Graphics.ToggleFullScreen();
+                    if (ImGui.MenuItem("Full screen"))
+                    {
+                        _game.Graphics.ToggleFullScreen();
+                    }
 
                     ImGui.Separator();
                     if (ImGui.MenuItem("FPS"))
@@ -267,7 +273,10 @@ namespace TGC.MonoGame.Samples.Viewer.Models
                         /* Do stuff */
                     }
 
-                    if (ImGui.MenuItem("About")) _aboutVisible = !_aboutVisible;
+                    if (ImGui.MenuItem("About"))
+                    {
+                        _aboutVisible = !_aboutVisible;
+                    }
 
                     ImGui.EndMenu();
                 }
@@ -317,7 +326,10 @@ namespace TGC.MonoGame.Samples.Viewer.Models
                 }
             }
 
-            if (_aboutVisible) ShowAboutWindow();
+            if (_aboutVisible)
+            {
+                ShowAboutWindow();
+            }
 
             DrawModifiers();
 
@@ -343,7 +355,10 @@ namespace TGC.MonoGame.Samples.Viewer.Models
             ImGui.Text("With <3 from Argentine.");
             ImGui.Spacing();
 
-            if (ImGui.Button("Close")) _aboutVisible = !_aboutVisible;
+            if (ImGui.Button("Close"))
+            {
+                _aboutVisible = !_aboutVisible;
+            }
 
             ImGui.End();
         }
