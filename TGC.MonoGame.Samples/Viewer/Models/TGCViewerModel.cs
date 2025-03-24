@@ -306,7 +306,9 @@ namespace TGC.MonoGame.Samples.Viewer.Models
                                             ImGuiTreeNodeFlags.Bullet;
 
                             if (_activeSampleCategoryIndex == i && _activeSampleTreeNode == j)
+                            {
                                 nodeFlags |= ImGuiTreeNodeFlags.Selected;
+                            }
 
                             ImGui.TreeNodeEx(new IntPtr(j), nodeFlags, sample.Name);
                             if (ImGui.IsItemClicked())
@@ -369,8 +371,12 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         public void Dispose()
         {
             foreach (var sample in _samplesByName)
+            {
                 if (_game.Components.Contains(sample.Value))
+                {
                     sample.Value.Dispose();
+                }
+            }
         }
     }
 }
