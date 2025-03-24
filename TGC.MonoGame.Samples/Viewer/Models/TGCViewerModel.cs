@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Samples;
 using TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET;
-using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 using NumericVector2 = System.Numerics.Vector2;
 
 namespace TGC.MonoGame.Samples.Viewer.Models
@@ -19,7 +17,7 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         /// <summary>
         ///     Default constructor.
         /// </summary>
-        /// <param name="game">The game where the explorer is going to be draw.</param>
+        /// <param name="game">The game where the explorer is going to be drawn.</param>
         public TGCViewerModel(TGCViewer game)
         {
             _game = game;
@@ -93,7 +91,11 @@ namespace TGC.MonoGame.Samples.Viewer.Models
 
             foreach (var type in baseType.Assembly.GetTypes())
             {
-                if (type.BaseType != baseType || !type.IsClass || !type.IsPublic || type.IsAbstract) continue;
+                if (type.BaseType != baseType || !type.IsClass || !type.IsPublic || type.IsAbstract)
+                {
+                    continue;
+                }
+                
                 try
                 {
                     var sample = (TGCSample) Activator.CreateInstance(type, _game);
@@ -103,9 +105,13 @@ namespace TGC.MonoGame.Samples.Viewer.Models
                     if (!string.IsNullOrEmpty(sample.Category))
                     {
                         if (_samplesByCategory.ContainsKey(sample.Category))
+                        {
                             _samplesByCategory[sample.Category].Add(sample);
+                        }
                         else
+                        {
                             _samplesByCategory.Add(sample.Category, new List<TGCSample> {sample});
+                        }
                     }
 
                     _samplesByName.Add(sample.Name, sample);
@@ -118,7 +124,7 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         }
 
         /// <summary>
-        ///     Load the welcome sample
+        ///     Load the welcome sample.
         /// </summary>
         public void LoadWelcomeSample()
         {
@@ -144,7 +150,6 @@ namespace TGC.MonoGame.Samples.Viewer.Models
             newSample.Visible = true;
             newSample.Enabled = true;
             _activeSample = newSample;
-
 
             newSample.Prepare();
 
