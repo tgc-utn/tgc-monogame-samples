@@ -8,7 +8,7 @@ Outside of Windows you need [Wine's](https://www.winehq.org) help for Effects(HL
 
 ## Install Homebrew
 
-* [Homebrew](https://brew.sh).
+- [Homebrew](https://brew.sh).
 
 ## Set up MonoGame
 
@@ -86,5 +86,5 @@ dotnet run --project TGC.MonoGame.Samples
 
 ### Known issues
 
-* Assimp.AssimpException: Error loading unmanaged library from path: libassimp.dylib - WIP
-* System.DllNotFoundException: Unable to load shared library 'freetype6' or one of its dependencies. - WIP
+- Assimp.AssimpException: Error loading unmanaged library from path: libassimp.dylib - WIP
+- System.DllNotFoundException: Unable to load shared library 'freetype6' or one of its dependencies. - WIP
