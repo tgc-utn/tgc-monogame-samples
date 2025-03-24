@@ -2,7 +2,7 @@
 
 Test on Windows 10/11.
 
-The offical [documentation](https://docs.monogame.net/articles/getting_started/1_setting_up_your_development_environment_windows.html).
+The offical [documentation](https://docs.monogame.net/articles/getting_started/1_setting_up_your_os_for_development_windows.html).
 
 ## Install PowerShell, Terminal and WinGet CLI on Windows 10 (on Windows 11 is already install)
 
@@ -15,13 +15,17 @@ The offical [documentation](https://docs.monogame.net/articles/getting_started/1
 ```bash
 winget install Microsoft.VCRedist.2013.x64
 winget install Microsoft.VCRedist.2015+.x64
-winget install Microsoft.DotNet.SDK.6
+winget install Microsoft.DotNet.SDK.8
 ```
 
 Open other terminal ([Issue 222](https://github.com/microsoft/winget-cli/issues/222)) so you can use `dotnet` and type:
 
 ```bash
-dotnet new --install MonoGame.Templates.CSharp
+# To check the version installed.
+dotnet --info
+# Install MonoGame templates.
+dotnet new install MonoGame.Templates.CSharp
+dotnet new -l
 
 # Create a basic project to test if MonoGame is working.
 dotnet new mgdesktopgl -o MyGame
@@ -45,7 +49,9 @@ Open other terminal ([Issue 222](https://github.com/microsoft/winget-cli/issues/
 
 ```bash
 # Visual Studio Code extensions
-code --install-extension ms-dotnettools.csharp
+code --install-extension Github.copilot
+code --install-extension Github.copilot-chat
+code --install-extension ms-dotnettools.csdevkit
 code --install-extension timgjones.hlsltools
 ```
 
