@@ -303,8 +303,10 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
             // Setup render state: alpha-blending enabled, no face culling, no depth testing, scissor enabled, vertex/texcoord/color pointers
             var lastViewport = _graphicsDevice.Viewport;
             var lastScissorBox = _graphicsDevice.ScissorRectangle;
-            var lastDepthState = _graphicsDevice.DepthStencilState;
-            var lastRasterizerState = _graphicsDevice.RasterizerState;
+            var lastRasterizer = _graphicsDevice.RasterizerState;
+            var lastDepthStencil = _graphicsDevice.DepthStencilState;
+            var lastBlendFactor = _graphicsDevice.BlendFactor;
+            var lastBlendState = _graphicsDevice.BlendState;
 
             _graphicsDevice.BlendFactor = Color.White;
             _graphicsDevice.BlendState = BlendState.NonPremultiplied;
@@ -324,8 +326,10 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
             // Restore modified state
             _graphicsDevice.Viewport = lastViewport;
             _graphicsDevice.ScissorRectangle = lastScissorBox;
-            _graphicsDevice.DepthStencilState = lastDepthState;
-            _graphicsDevice.RasterizerState = lastRasterizerState;
+            _graphicsDevice.RasterizerState = lastRasterizer;
+            _graphicsDevice.DepthStencilState = lastDepthStencil;
+            _graphicsDevice.BlendState = lastBlendState;
+            _graphicsDevice.BlendFactor = lastBlendFactor;
         }
 
         private unsafe void UpdateBuffers(ImDrawDataPtr drawData)
