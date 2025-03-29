@@ -16,41 +16,40 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         /// </summary>
         public Gizmos()
         {
-            NoDepth = new DepthStencilState();
-            NoDepth.DepthBufferEnable = false;
-            NoDepth.DepthBufferFunction = CompareFunction.Always;
+            _noDepth = new DepthStencilState();
+            _noDepth.DepthBufferEnable = false;
+            _noDepth.DepthBufferFunction = CompareFunction.Always;
         }
 
-        private AxisLines AxisLines { get; set; }
+        private AxisLines _axisLines;
 
-        private EffectPass BackgroundPass { get; set; }
+        private EffectPass _backgroundPass;
 
-        private Color BaseColor { get; set; }
-        private EffectParameter ColorParameter { get; set; }
-        private ContentManager Content { get; set; }
-        private CubeGizmoGeometry Cube { get; set; }
-        private CylinderGizmoGeometry Cylinder { get; set; }
-        private DiskGizmoGeometry Disk { get; set; }
+        private Color _baseColor;
+        private EffectParameter _colorParameter;
+        private ContentManager _content;
+        private CubeGizmoGeometry _cube;
+        private CylinderGizmoGeometry _cylinder;
+        private DiskGizmoGeometry _disk;
 
-        private Dictionary<GizmoGeometry, Dictionary<Color, List<Matrix>>> DrawInstances { get; } =
-            new Dictionary<GizmoGeometry, Dictionary<Color, List<Matrix>>>();
+        private readonly Dictionary<GizmoGeometry, Dictionary<Color, List<Matrix>>> _drawInstances = new ();
 
-        private Effect Effect { get; set; }
-        private EffectPass ForegroundPass { get; set; }
+        private Effect _effect;
+        private EffectPass _foregroundPass;
 
-        private GraphicsDevice GraphicsDevice { get; set; }
+        private GraphicsDevice _graphicsDevice;
 
-        private LineSegmentGizmoGeometry LineSegment { get; set; }
+        private LineSegmentGizmoGeometry _lineSegment;
 
-        private DepthStencilState NoDepth { get; }
-        private PolyLineGizmoGeometry PolyLine { get; set; }
-        private Dictionary<Color, List<Vector3[]>> PolyLinesToDraw { get; } = new Dictionary<Color, List<Vector3[]>>();
-        private Matrix Projection { get; set; }
-        private SphereGizmoGeometry Sphere { get; set; }
+        private readonly DepthStencilState _noDepth;
+        private PolyLineGizmoGeometry _polyLine;
+        private readonly Dictionary<Color, List<Vector3[]>> _polyLinesToDraw = new ();
+        private Matrix _projection;
+        private SphereGizmoGeometry _sphere;
 
-        private Matrix View { get; set; }
-        private Matrix ViewProjection { get; set; }
-        private EffectParameter WorldViewProjectionParameter { get; set; }
+        private Matrix _view;
+        private Matrix _viewProjection;
+        private EffectParameter _worldViewProjectionParameter;
 
         public bool Enabled { get; set; } = true;
 
@@ -61,30 +60,30 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         /// <param name="content">The ContentManager to manage Gizmos resources.</param>
         public void LoadContent(GraphicsDevice device, ContentManager content)
         {
-            GraphicsDevice = device;
+            _graphicsDevice = device;
 
-            Content = content;
+            _content = content;
 
-            Effect = Content.Load<Effect>("Effects/Gizmos");
+            _effect = _content.Load<Effect>("Effects/Gizmos");
 
-            BackgroundPass = Effect.CurrentTechnique.Passes["Background"];
-            ForegroundPass = Effect.CurrentTechnique.Passes["Foreground"];
-            WorldViewProjectionParameter = Effect.Parameters["WorldViewProjection"];
-            ColorParameter = Effect.Parameters["Color"];
+            _backgroundPass = _effect.CurrentTechnique.Passes["Background"];
+            _foregroundPass = _effect.CurrentTechnique.Passes["Foreground"];
+            _worldViewProjectionParameter = _effect.Parameters["WorldViewProjection"];
+            _colorParameter = _effect.Parameters["Color"];
 
-            LineSegment = new LineSegmentGizmoGeometry(GraphicsDevice);
-            Cube = new CubeGizmoGeometry(GraphicsDevice);
-            Sphere = new SphereGizmoGeometry(GraphicsDevice, 20);
-            PolyLine = new PolyLineGizmoGeometry(GraphicsDevice);
-            Disk = new DiskGizmoGeometry(GraphicsDevice, 20);
-            Cylinder = new CylinderGizmoGeometry(GraphicsDevice, 20);
-            AxisLines = new AxisLines(GraphicsDevice, Content.Load<Model>("3D/geometries/arrow"));
+            _lineSegment = new LineSegmentGizmoGeometry(_graphicsDevice);
+            _cube = new CubeGizmoGeometry(_graphicsDevice);
+            _sphere = new SphereGizmoGeometry(_graphicsDevice, 20);
+            _polyLine = new PolyLineGizmoGeometry(_graphicsDevice);
+            _disk = new DiskGizmoGeometry(_graphicsDevice, 20);
+            _cylinder = new CylinderGizmoGeometry(_graphicsDevice, 20);
+            _axisLines = new AxisLines(_graphicsDevice, _content.Load<Model>("3D/geometries/arrow"));
 
-            DrawInstances[LineSegment] = new Dictionary<Color, List<Matrix>>();
-            DrawInstances[Sphere] = new Dictionary<Color, List<Matrix>>();
-            DrawInstances[Cube] = new Dictionary<Color, List<Matrix>>();
-            DrawInstances[Disk] = new Dictionary<Color, List<Matrix>>();
-            DrawInstances[Cylinder] = new Dictionary<Color, List<Matrix>>();
+            _drawInstances[_lineSegment] = new Dictionary<Color, List<Matrix>>();
+            _drawInstances[_sphere] = new Dictionary<Color, List<Matrix>>();
+            _drawInstances[_cube] = new Dictionary<Color, List<Matrix>>();
+            _drawInstances[_disk] = new Dictionary<Color, List<Matrix>>();
+            _drawInstances[_cylinder] = new Dictionary<Color, List<Matrix>>();
         }
 
         /// <summary>
@@ -95,9 +94,9 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         /// <param name="world">The world matrix to be used when drawing.</param>
         private void AddDrawInstance(GizmoGeometry type, Color color, Matrix world)
         {
-            var instancesByType = DrawInstances[type];
+            var instancesByType = _drawInstances[type];
             instancesByType.TryAdd(color, new List<Matrix>());
-            instancesByType[color].Add(world * ViewProjection);
+            instancesByType[color].Add(world * _viewProjection);
         }
 
         /// <summary>
@@ -107,7 +106,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         /// <param name="destination">The final point of the line.</param>
         public void DrawLine(Vector3 origin, Vector3 destination)
         {
-            DrawLine(origin, destination, BaseColor);
+            DrawLine(origin, destination, _baseColor);
         }
 
         /// <summary>
@@ -119,7 +118,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         public void DrawLine(Vector3 origin, Vector3 destination, Color color)
         {
             var world = LineSegmentGizmoGeometry.CalculateWorld(origin, destination);
-            AddDrawInstance(LineSegment, color, world);
+            AddDrawInstance(_lineSegment, color, world);
         }
 
         /// <summary>
@@ -129,7 +128,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         /// <param name="size">The size of the cube.</param>
         public void DrawCube(Vector3 origin, Vector3 size)
         {
-            DrawCube(origin, size, BaseColor);
+            DrawCube(origin, size, _baseColor);
         }
 
         /// <summary>
@@ -138,7 +137,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         /// <param name="world">The World matrix of the cube.</param>
         public void DrawCube(Matrix world)
         {
-            DrawCube(world, BaseColor);
+            DrawCube(world, _baseColor);
         }
 
         /// <summary>
@@ -148,7 +147,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         /// <param name="color">The color of the cube.</param>
         public void DrawCube(Matrix world, Color color)
         {
-            AddDrawInstance(Cube, color, world);
+            AddDrawInstance(_cube, color, world);
         }
 
         /// <summary>
@@ -160,7 +159,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         public void DrawCube(Vector3 origin, Vector3 size, Color color)
         {
             var world = CubeGizmoGeometry.CalculateWorld(origin, size);
-            AddDrawInstance(Cube, color, world);
+            AddDrawInstance(_cube, color, world);
         }
 
         /// <summary>
@@ -170,7 +169,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         /// <param name="size">The size of the sphere.</param>
         public void DrawSphere(Vector3 origin, Vector3 size)
         {
-            DrawSphere(origin, size, BaseColor);
+            DrawSphere(origin, size, _baseColor);
         }
 
         /// <summary>
@@ -182,7 +181,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         public void DrawSphere(Vector3 origin, Vector3 size, Color color)
         {
             var world = SphereGizmoGeometry.CalculateWorld(origin, size);
-            AddDrawInstance(Sphere, color, world);
+            AddDrawInstance(_sphere, color, world);
         }
 
         /// <summary>
@@ -191,7 +190,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         /// <param name="points">The positions of the poly-line points in world space.</param>
         public void DrawPolyLine(Vector3[] points)
         {
-            DrawPolyLine(points, BaseColor);
+            DrawPolyLine(points, _baseColor);
         }
 
         /// <summary>
@@ -201,8 +200,8 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         /// <param name="color">The color of the poly-line.</param>
         public void DrawPolyLine(Vector3[] points, Color color)
         {
-            PolyLinesToDraw.TryAdd(color, new List<Vector3[]>());
-            PolyLinesToDraw[color].Add(points);
+            _polyLinesToDraw.TryAdd(color, new List<Vector3[]>());
+            _polyLinesToDraw[color].Add(points);
         }
 
         /// <summary>
@@ -211,7 +210,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         /// <param name="viewProjection">The ViewProjection matrix of a virtual camera to draw its frustum.</param>
         public void DrawFrustum(Matrix viewProjection)
         {
-            DrawFrustum(viewProjection, BaseColor);
+            DrawFrustum(viewProjection, _baseColor);
         }
 
         /// <summary>
@@ -222,7 +221,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         public void DrawFrustum(Matrix viewProjection, Color color)
         {
             var world = CubeGizmoGeometry.CalculateFrustumWorld(viewProjection);
-            AddDrawInstance(Cube, color, world);
+            AddDrawInstance(_cube, color, world);
         }
 
         /// <summary>
@@ -233,7 +232,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         /// <param name="radius">The radius of the disk in units.</param>
         public void DrawDisk(Vector3 origin, Vector3 normal, float radius)
         {
-            DrawDisk(origin, normal, radius, BaseColor);
+            DrawDisk(origin, normal, radius, _baseColor);
         }
 
         /// <summary>
@@ -246,7 +245,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         public void DrawDisk(Vector3 origin, Vector3 normal, float radius, Color color)
         {
             var world = DiskGizmoGeometry.CalculateWorld(origin, normal, radius);
-            AddDrawInstance(Disk, color, world);
+            AddDrawInstance(_disk, color, world);
         }
 
         /// <summary>
@@ -257,7 +256,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         /// <param name="size">The size of the cylinder.</param>
         public void DrawCylinder(Vector3 origin, Matrix rotation, Vector3 size)
         {
-            DrawCylinder(origin, rotation, size, BaseColor);
+            DrawCylinder(origin, rotation, size, _baseColor);
         }
 
         /// <summary>
@@ -270,7 +269,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         public void DrawCylinder(Vector3 origin, Matrix rotation, Vector3 size, Color color)
         {
             var world = CylinderGizmoGeometry.CalculateWorld(origin, rotation, size);
-            AddDrawInstance(Cylinder, color, world);
+            AddDrawInstance(_cylinder, color, world);
         }
 
         /// <summary>
@@ -279,7 +278,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         /// <param name="world">The World matrix of the cylinder.</param>
         public void DrawCylinder(Matrix world)
         {
-            DrawCylinder(world, BaseColor);
+            DrawCylinder(world, _baseColor);
         }
 
         /// <summary>
@@ -289,7 +288,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         /// <param name="color">The color of the cylinder.</param>
         public void DrawCylinder(Matrix world, Color color)
         {
-            AddDrawInstance(Cylinder, color, world);
+            AddDrawInstance(_cylinder, color, world);
         }
 
         /// <summary>
@@ -298,7 +297,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         /// <param name="color">The Gizmos color to set.</param>
         public void SetColor(Color color)
         {
-            BaseColor = color;
+            _baseColor = color;
         }
 
         /// <summary>
@@ -308,10 +307,10 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         /// <param name="projection">The Projection matrix of a camera or a viewport.</param>
         public void UpdateViewProjection(Matrix view, Matrix projection)
         {
-            View = view;
-            Projection = projection;
-            ViewProjection = View * Projection;
-            AxisLines.SetView(view);
+            _view = view;
+            _projection = projection;
+            _viewProjection = _view * _projection;
+            _axisLines.SetView(view);
         }
 
         /// <summary>
@@ -324,20 +323,20 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
                 return;
 
             // Save our depth state, then use ours
-            var depth = GraphicsDevice.DepthStencilState;
-            GraphicsDevice.DepthStencilState = NoDepth;
+            var depth = _graphicsDevice.DepthStencilState;
+            _graphicsDevice.DepthStencilState = _noDepth;
 
-            DrawBaseGizmosGeometries(BackgroundPass);
-            DrawPolyLines(BackgroundPass);
+            DrawBaseGizmosGeometries(_backgroundPass);
+            DrawPolyLines(_backgroundPass);
 
             // Restore our depth
-            GraphicsDevice.DepthStencilState = depth;
+            _graphicsDevice.DepthStencilState = depth;
 
             // Draw our foreground geometry
-            DrawBaseGizmosGeometries(ForegroundPass);
-            DrawPolyLines(ForegroundPass);
+            DrawBaseGizmosGeometries(_foregroundPass);
+            DrawPolyLines(_foregroundPass);
 
-            AxisLines.Draw();
+            _axisLines.Draw();
 
             CleanDrawInstances();
         }
@@ -350,21 +349,21 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         {
             var count = 0;
             List<Matrix> matrices;
-            foreach (var drawInstance in DrawInstances)
+            foreach (var drawInstance in _drawInstances)
             {
                 var geometry = drawInstance.Key;
                 geometry.Bind();
 
                 foreach (var colorEntry in drawInstance.Value)
                 {
-                    ColorParameter.SetValue(colorEntry.Key.ToVector3());
+                    _colorParameter.SetValue(colorEntry.Key.ToVector3());
 
                     matrices = colorEntry.Value;
                     count = matrices.Count;
 
                     for (var index = 0; index < count; index++)
                     {
-                        WorldViewProjectionParameter.SetValue(matrices[index]);
+                        _worldViewProjectionParameter.SetValue(matrices[index]);
                         pass.Apply();
                         geometry.Draw();
                     }
@@ -380,17 +379,17 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         {
             var count = 0;
             List<Vector3[]> positions;
-            WorldViewProjectionParameter.SetValue(Matrix.Identity);
-            foreach (var polyLineInstance in PolyLinesToDraw)
+            _worldViewProjectionParameter.SetValue(Matrix.Identity);
+            foreach (var polyLineInstance in _polyLinesToDraw)
             {
-                ColorParameter.SetValue(polyLineInstance.Key.ToVector3());
+                _colorParameter.SetValue(polyLineInstance.Key.ToVector3());
 
                 positions = polyLineInstance.Value;
                 count = positions.Count;
                 for (var index = 0; index < count; index++)
                 {
                     pass.Apply();
-                    PolyLine.Draw(positions[index]);
+                    _polyLine.Draw(positions[index]);
                 }
             }
         }
@@ -400,13 +399,13 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         /// </summary>
         private void CleanDrawInstances()
         {
-            PolyLinesToDraw.Clear();
+            _polyLinesToDraw.Clear();
 
-            DrawInstances[LineSegment].Clear();
-            DrawInstances[Sphere].Clear();
-            DrawInstances[Cube].Clear();
-            DrawInstances[Disk].Clear();
-            DrawInstances[Cylinder].Clear();
+            _drawInstances[_lineSegment].Clear();
+            _drawInstances[_sphere].Clear();
+            _drawInstances[_cube].Clear();
+            _drawInstances[_disk].Clear();
+            _drawInstances[_cylinder].Clear();
         }
 
         /// <summary>
@@ -414,13 +413,13 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         /// </summary>
         public void Dispose()
         {
-            LineSegment.Dispose();
-            Sphere.Dispose();
-            Cube.Dispose();
-            Disk.Dispose();
-            Cylinder.Dispose();
-            Effect.Dispose();
-            Content.Dispose();
+            _lineSegment.Dispose();
+            _sphere.Dispose();
+            _cube.Dispose();
+            _disk.Dispose();
+            _cylinder.Dispose();
+            _effect.Dispose();
+            _content.Dispose();
         }
     }
 }

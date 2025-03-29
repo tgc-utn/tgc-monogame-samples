@@ -11,13 +11,13 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     {
         private float _floatValue;
 
-        private string Name { get; set; }
+        private readonly string _name;
 
-        private bool HasBounds { get; set; }
+        private readonly bool _hasBounds;
 
-        private float Min { get; set; }
+        private readonly float _min;
 
-        private float Max { get; set; }
+        private readonly float _max;
 
         /// <summary>
         ///     Creates a Float Modifier with a given name.
@@ -25,7 +25,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <param name="name">The name of the modifier that will show on the GUI</param>
         public FloatModifier(string name)
         {
-            Name = name;
+            _name = name;
         }
 
         /// <summary>
@@ -62,9 +62,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         public FloatModifier(string name, Action<float> baseOnChange, float defaultValue, float min, float max) : this(
             name, baseOnChange, defaultValue)
         {
-            HasBounds = true;
-            Min = min;
-            Max = max;
+            _hasBounds = true;
+            _min = min;
+            _max = max;
             baseOnChange.Invoke(defaultValue);
         }
 
@@ -72,7 +72,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         ///     Creates a Float Modifier with a given name and an <see cref="EffectParameter" />.
         /// </summary>
         /// <param name="name">The name of the modifier that will show on the GUI</param>
-        /// <param name="effectParameter">An <see cref="EffectParameter" /> that will recieve the Float as value</param>
+        /// <param name="effectParameter">An <see cref="EffectParameter" /> that will receive the Float as value</param>
         public FloatModifier(string name, EffectParameter effectParameter) : this(name)
         {
             OnChange += x => effectParameter.SetValue(x);
@@ -82,7 +82,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         ///     Creates a Float Modifier with a given name, an <see cref="EffectParameter" /> and a default value.
         /// </summary>
         /// <param name="name">The name of the modifier that will show on the GUI</param>
-        /// <param name="effectParameter">An <see cref="EffectParameter" /> that will recieve the Float as value</param>
+        /// <param name="effectParameter">An <see cref="EffectParameter" /> that will receive the Float as value</param>
         /// <param name="defaultValue">The default value for the modifier</param>
         public FloatModifier(string name, EffectParameter effectParameter, float defaultValue) : this(name,
             effectParameter)
@@ -96,30 +96,31 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         ///     maximum values for the float.
         /// </summary>
         /// <param name="name">The name of the modifier that will show on the GUI</param>
-        /// <param name="effectParameter">An <see cref="EffectParameter" /> that will recieve the Float as value</param>
+        /// <param name="effectParameter">An <see cref="EffectParameter" /> that will receive the Float as value</param>
         /// <param name="defaultValue">The default value for the modifier</param>
         /// <param name="min">The minimum value for the modifier</param>
         /// <param name="max">The maximum value for the modifier</param>
         public FloatModifier(string name, EffectParameter effectParameter, float defaultValue, float min, float max) :
             this(name, effectParameter, defaultValue)
         {
-            HasBounds = true;
-            Min = min;
-            Max = max;
+            _hasBounds = true;
+            _min = min;
+            _max = max;
         }
-
 
         /// <summary>
         ///     Draws the Float Modifier.
         /// </summary>
         public void Draw()
         {
-            var valueChanged = HasBounds
-                ? ImGui.DragFloat(Name, ref _floatValue, 0.01f * (Max - Min), Min, Max)
-                : ImGui.DragFloat(Name, ref _floatValue);
+            var valueChanged = _hasBounds
+                ? ImGui.DragFloat(_name, ref _floatValue, 0.01f * (_max - _min), _min, _max)
+                : ImGui.DragFloat(_name, ref _floatValue);
 
             if (valueChanged)
+            {
                 OnChange.Invoke(_floatValue);
+            }
         }
 
         private event Action<float> OnChange;

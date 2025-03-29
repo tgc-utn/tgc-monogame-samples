@@ -286,6 +286,12 @@
 /processorParam:DebugMode=Auto
 /build:Effects/SkyBox.fx
 
+#begin Effects/SphereVertexShader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/SphereVertexShader.fx
+
 #begin Effects/Terrain.fx
 /importer:EffectImporter
 /processor:EffectProcessor

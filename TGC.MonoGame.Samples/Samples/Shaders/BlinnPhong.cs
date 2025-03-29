@@ -5,13 +5,12 @@ using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
-using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
 namespace TGC.MonoGame.Samples.Samples.Shaders
 {
     public class BlinnPhong : TGCSample
     {
-        private CubePrimitive lightBox;
+        private CubePrimitive _lightBox;
 
         /// <inheritdoc />
         public BlinnPhong(TGCViewer game) : base(game)
@@ -21,12 +20,11 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             Description = "Applying Blinn-Phong to a scene";
         }
 
-        private Camera Camera { get; set; }
-        private Model Model { get; set; }
-        private Effect Effect { get; set; }
-        private Matrix LightBoxWorld { get; set; } = Matrix.Identity;
-        private float Timer { get; set; }
-
+        private Camera _camera;
+        private Model _model;
+        private Effect _effect;
+        private Matrix _lightBoxWorld = Matrix.Identity;
+        private float _timer;
 
         /// <inheritdoc />
         public override void Initialize()
@@ -34,7 +32,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             var size = GraphicsDevice.Viewport.Bounds.Size;
             size.X /= 2;
             size.Y /= 2;
-            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 50, 1000), size);
+            _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 50, 1000), size);
 
             base.Initialize();
         }
@@ -43,41 +41,45 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         protected override void LoadContent()
         {
             // We load the city meshes into a model
-            Model = Game.Content.Load<Model>(ContentFolder3D + "scene/city");
+            _model = Game.Content.Load<Model>(ContentFolder3D + "scene/city");
 
             // We get the mesh texture. All mesh parts use the same texture so we are fine
-            var texture = ((BasicEffect) Model.Meshes.FirstOrDefault()?.MeshParts.FirstOrDefault()?.Effect)?.Texture;
+            var texture = ((BasicEffect) _model.Meshes.FirstOrDefault()?.MeshParts.FirstOrDefault()?.Effect)?.Texture;
 
             // We load the effect in the .fx file
-            Effect = Game.Content.Load<Effect>(ContentFolderEffects + "BlinnPhong");
+            _effect = Game.Content.Load<Effect>(ContentFolderEffects + "BlinnPhong");
 
             // We assign the effect to each one of the models
-            foreach (var modelMesh in Model.Meshes)
-            foreach (var meshPart in modelMesh.MeshParts)
-                meshPart.Effect = Effect;
+            foreach (var modelMesh in _model.Meshes)
+            {
+                foreach (var meshPart in modelMesh.MeshParts)
+                {
+                    meshPart.Effect = _effect;
+                }
+            }
 
             // Set the texture. This won't change on this effect so we can assign it here
-            Effect.Parameters["baseTexture"].SetValue(texture);
+            _effect.Parameters["baseTexture"].SetValue(texture);
 
             // Set uniforms
-            Effect.Parameters["ambientColor"].SetValue(new Vector3(0.25f, 0.0f, 0.0f));
-            Effect.Parameters["diffuseColor"].SetValue(new Vector3(0.1f, 0.1f, 0.6f));
-            Effect.Parameters["specularColor"].SetValue(new Vector3(1f, 1f, 1f));
+            _effect.Parameters["ambientColor"].SetValue(new Vector3(0.25f, 0.0f, 0.0f));
+            _effect.Parameters["diffuseColor"].SetValue(new Vector3(0.1f, 0.1f, 0.6f));
+            _effect.Parameters["specularColor"].SetValue(new Vector3(1f, 1f, 1f));
 
-            Effect.Parameters["KAmbient"].SetValue(0.1f);
-            Effect.Parameters["KDiffuse"].SetValue(1.0f);
-            Effect.Parameters["KSpecular"].SetValue(0.8f);
-            Effect.Parameters["shininess"].SetValue(16.0f);
+            _effect.Parameters["KAmbient"].SetValue(0.1f);
+            _effect.Parameters["KDiffuse"].SetValue(1.0f);
+            _effect.Parameters["KSpecular"].SetValue(0.8f);
+            _effect.Parameters["shininess"].SetValue(16.0f);
 
-            lightBox = new CubePrimitive(GraphicsDevice, 25, Color.Blue);
+            _lightBox = new CubePrimitive(GraphicsDevice, 25, Color.Blue);
 
-            ModifierController.AddFloat("KA", Effect.Parameters["KAmbient"], 0.2f, 0f, 1f);
-            ModifierController.AddFloat("KD", Effect.Parameters["KDiffuse"], 0.7f, 0f, 1f);
-            ModifierController.AddFloat("KS", Effect.Parameters["KSpecular"], 0.4f, 0f, 1f);
-            ModifierController.AddFloat("Shininess", Effect.Parameters["shininess"], 4.0f, 1f, 64f);
-            ModifierController.AddColor("Ambient Color", Effect.Parameters["ambientColor"], new Color(0.25f, 0f, 0f));
-            ModifierController.AddColor("Diffuse Color", Effect.Parameters["diffuseColor"], new Color(0.1f, 0.1f, 0.6f));
-            ModifierController.AddColor("Specular Color", Effect.Parameters["specularColor"], Color.White);
+            ModifierController.AddFloat("KA", _effect.Parameters["KAmbient"], 0.2f, 0f, 1f);
+            ModifierController.AddFloat("KD", _effect.Parameters["KDiffuse"], 0.7f, 0f, 1f);
+            ModifierController.AddFloat("KS", _effect.Parameters["KSpecular"], 0.4f, 0f, 1f);
+            ModifierController.AddFloat("Shininess", _effect.Parameters["shininess"], 4.0f, 1f, 64f);
+            ModifierController.AddColor("Ambient Color", _effect.Parameters["ambientColor"], new Color(0.25f, 0f, 0f));
+            ModifierController.AddColor("Diffuse Color", _effect.Parameters["diffuseColor"], new Color(0.1f, 0.1f, 0.6f));
+            ModifierController.AddColor("Specular Color", _effect.Parameters["specularColor"], Color.White);
 
             base.LoadContent();
         }
@@ -86,20 +88,20 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         public override void Update(GameTime gameTime)
         {
             // Update the state of the camera
-            Camera.Update(gameTime);
+            _camera.Update(gameTime);
 
             // Rotate our light position in a circle up in the sky
-            var lightPosition = new Vector3((float) Math.Cos(Timer) * 700f, 800f, (float) Math.Sin(Timer) * 700f);
-            LightBoxWorld = Matrix.CreateTranslation(lightPosition);
+            var lightPosition = new Vector3((float) Math.Cos(_timer) * 700f, 800f, (float) Math.Sin(_timer) * 700f);
+            _lightBoxWorld = Matrix.CreateTranslation(lightPosition);
 
             // Set the light position and camera position
             // These change every update so we need to set them on every update call
-            Effect.Parameters["lightPosition"].SetValue(lightPosition);
-            Effect.Parameters["eyePosition"].SetValue(Camera.Position);
+            _effect.Parameters["lightPosition"].SetValue(lightPosition);
+            _effect.Parameters["eyePosition"].SetValue(_camera.Position);
 
-            Timer += (float) gameTime.ElapsedGameTime.TotalSeconds;
+            _timer += (float) gameTime.ElapsedGameTime.TotalSeconds;
 
-            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+            Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
 
             base.Update(gameTime);
         }
@@ -111,27 +113,25 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             Game.Background = Color.Black;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            
-
             // We get the base transform for each mesh
-            var modelMeshesBaseTransforms = new Matrix[Model.Bones.Count];
-            Model.CopyAbsoluteBoneTransformsTo(modelMeshesBaseTransforms);
-            foreach (var modelMesh in Model.Meshes)
+            var modelMeshesBaseTransforms = new Matrix[_model.Bones.Count];
+            _model.CopyAbsoluteBoneTransformsTo(modelMeshesBaseTransforms);
+            foreach (var modelMesh in _model.Meshes)
             {
                 // We set the main matrices for each mesh to draw
                 var worldMatrix = modelMeshesBaseTransforms[modelMesh.ParentBone.Index];
                 // World is used to transform from model space to world space
-                Effect.Parameters["World"].SetValue(worldMatrix);
+                _effect.Parameters["World"].SetValue(worldMatrix);
                 // InverseTransposeWorld is used to rotate normals
-                Effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(worldMatrix)));
+                _effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(worldMatrix)));
                 // WorldViewProjection is used to transform from model space to clip space
-                Effect.Parameters["WorldViewProjection"].SetValue(worldMatrix * Camera.View * Camera.Projection);
+                _effect.Parameters["WorldViewProjection"].SetValue(worldMatrix * _camera.View * _camera.Projection);
 
                 // Once we set these matrices we draw
                 modelMesh.Draw();
             }
 
-            lightBox.Draw(LightBoxWorld, Camera.View, Camera.Projection);
+            _lightBox.Draw(_lightBoxWorld, _camera.View, _camera.Projection);
 
             base.Draw(gameTime);
         }
