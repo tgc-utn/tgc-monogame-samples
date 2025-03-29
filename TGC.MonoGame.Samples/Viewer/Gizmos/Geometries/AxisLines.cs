@@ -11,14 +11,9 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
     {
         private const float AxisScreenOffset = 20f;
         private const float AxisScreenDistance = 40f;
-
-        private GraphicsDevice GraphicsDevice;
-
-        private Model Model;
-
-        private BasicEffect Effect;
-
-        private Matrix BaseScaleTranslation { get; set; }
+        private readonly Model _model;
+        private readonly BasicEffect _effect;
+        private readonly Matrix _baseScaleTranslation;
 
         /// <summary>
         ///     Constructs an AxisLines drawable object.
@@ -27,24 +22,27 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
         /// <param name="model">The Model of the AxisLines, loaded from content.</param>
         public AxisLines(GraphicsDevice device, Model model)
         {
-            GraphicsDevice = device;
-            Model = model;
+            _model = model;
 
-            foreach (var mesh in Model.Meshes)
+            foreach (var mesh in _model.Meshes)
+            {
                 foreach (var part in mesh.MeshParts)
-                    Effect = (BasicEffect)part.Effect;
+                {
+                    _effect = (BasicEffect)part.Effect;
+                }
+            }
 
-            Effect.Projection = Matrix.Identity;
-            Effect.View = Matrix.Identity;
-            Effect.World = Matrix.Identity;
+            _effect.Projection = Matrix.Identity;
+            _effect.View = Matrix.Identity;
+            _effect.World = Matrix.Identity;
 
-            BaseScaleTranslation = 
+            _baseScaleTranslation = 
                 // Scale the arrows
                 Matrix.CreateScale(0.02f) *
                 // Translate them to the bottom left of the screen, and add a Z value to prevent clipping
                 Matrix.CreateTranslation(0.87f, -0.9f, 0.2f);
 
-            Effect.EnableDefaultLighting();
+            _effect.EnableDefaultLighting();
         }
 
         /// <summary>
@@ -54,20 +52,21 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
         public void SetView(Matrix view)
         {
             view.Translation = Vector3.Zero;
-            Effect.World =
+            _effect.World =
                 // Use the View matrix, with no translation, to make the arrows face where the camera is pointing at
                 // Then multiply by the base Scale and Translation
-                view * BaseScaleTranslation;            
+                view * _baseScaleTranslation;            
         }
         
-
         /// <summary>
         ///     Draws the AxisLines
         /// </summary>
         public virtual void Draw()
         {
-            foreach (var mesh in Model.Meshes)
+            foreach (var mesh in _model.Meshes)
+            {
                 mesh.Draw();
+            }
         }
     }
 }

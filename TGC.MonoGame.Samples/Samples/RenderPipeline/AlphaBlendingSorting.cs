@@ -9,70 +9,71 @@ using TGC.MonoGame.Samples.Viewer;
 namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 {
     /// <summary>
-    /// Shows why back-to-front sorting needs to be performed when drawing alpha blended geometry
+    /// Shows why back-to-front sorting needs to be performed when drawing alpha blended geometry.
     /// </summary>
     public class AlphaBlendingSorting : TGCSample
     {
+        private const string WorldViewProjection = "WorldViewProjection";
+        
         /// <summary>
         /// A camera to draw geometry
         /// </summary>
-        private Camera Camera { get; set; }
+        private Camera _camera;
 
         /// <summary>
         /// A quad to draw the floor and transparent geometry
         /// </summary>
-        private QuadPrimitive Quad { get; set; }
+        private QuadPrimitive _quad;
 
         /// <summary>
         /// An Alpha Blending Effect to draw transparent geometry
         /// </summary>
-        private Effect AlphaBlendingEffect { get; set; }
+        private Effect _alphaBlendingEffect;
 
         /// <summary>
         /// A Tiling Texture Effect to draw the floor
         /// </summary>
-        private Effect TilingFloorEffect { get; set; }
+        private Effect _tilingFloorEffect;
 
         /// <summary>
         /// A list containing quad world matrices that should be drawn from further to nearest
         /// </summary>
-        private List<Matrix> BackToFrontQuadWorlds { get; set; }
+        private List<Matrix> _backToFrontQuadWorlds;
 
         /// <summary>
         /// A list containing quad world matrices that should be drawn from nearest to furthest
         /// </summary>
-        private List<Matrix> FrontToBackQuadWorlds { get; set; }
+        private List<Matrix> _frontToBackQuadWorlds;
 
         /// <summary>
         /// A list containing quad world matrices that should be drawn from further to nearest but without depth testing
         /// </summary>
-        private List<Matrix> DepthNoneQuadWorlds { get; set; }
+        private List<Matrix> _depthNoneQuadWorlds;
 
         /// <summary>
         /// Colors per quad
         /// </summary>
-        private List<Color> QuadColors { get; set; }
+        private List<Color> _quadColors;
 
         /// <summary>
         /// A list of the screen positions for the texts, modified on each update
         /// </summary>
-        private List<Vector2> TextScreenPositions { get; set; }
+        private List<Vector2> _textScreenPositions;
 
         /// <summary>
         /// A list of the positions for the texts
         /// </summary>
-        private List<Vector3> TextWorldPositions { get; set; }
+        private List<Vector3> _textWorldPositions;
 
         /// <summary>
         /// A list of texts to display
         /// </summary>
-        private List<string> Texts { get; set; }
+        private List<string> _texts;
 
         /// <summary>
         /// A font to draw text into the screen
         /// </summary>
-        private SpriteFont SpriteFont { get; set; }
-
+        private SpriteFont _spriteFont;
 
         /// <inheritdoc />
         public AlphaBlendingSorting(TGCViewer game) : base(game)
@@ -86,56 +87,54 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         public override void Initialize()
         {
             var baseScaleRotation = Matrix.CreateScale(10f) * Matrix.CreateRotationX(MathF.PI / 2f);
-            BackToFrontQuadWorlds = new List<Matrix>()
+            _backToFrontQuadWorlds = new List<Matrix>
             {
                 baseScaleRotation * Matrix.CreateTranslation(-30f, 5f, 0f),
                 baseScaleRotation * Matrix.CreateTranslation(-30f, 5f, 10f),
                 baseScaleRotation * Matrix.CreateTranslation(-30f, 5f, 20f),
             };
 
-            FrontToBackQuadWorlds = new List<Matrix>()
+            _frontToBackQuadWorlds = new List<Matrix>
             {
                 baseScaleRotation * Matrix.CreateTranslation(0f, 5f, 20f),
                 baseScaleRotation * Matrix.CreateTranslation(0f, 5f, 10f),
                 baseScaleRotation * Matrix.CreateTranslation(0f, 5f, 0f),
             };
 
-            DepthNoneQuadWorlds = new List<Matrix>()
+            _depthNoneQuadWorlds = new List<Matrix>
             {
                 baseScaleRotation * Matrix.CreateTranslation(30f, 5f, 0f),
                 baseScaleRotation * Matrix.CreateTranslation(30f, 5f, 10f),
                 baseScaleRotation * Matrix.CreateTranslation(30f, 5f, 20f),
             };
 
-
-            QuadColors = new List<Color>()
+            _quadColors = new List<Color>
             {
                 Color.Yellow,
                 Color.Red,
                 Color.Blue,
             };
 
-
             var offset = Vector3.Up * 15f;
-            TextWorldPositions = new List<Vector3>
+            _textWorldPositions = new List<Vector3>
             {
-                BackToFrontQuadWorlds[1].Translation + offset,
-                FrontToBackQuadWorlds[1].Translation + offset,
-                DepthNoneQuadWorlds[1].Translation + offset,
+                _backToFrontQuadWorlds[1].Translation + offset,
+                _frontToBackQuadWorlds[1].Translation + offset,
+                _depthNoneQuadWorlds[1].Translation + offset,
             };
 
-            TextScreenPositions = new List<Vector2>
+            _textScreenPositions = new List<Vector2>
             {
                 Vector2.Zero, 
                 Vector2.Zero, 
                 Vector2.Zero,
             };
 
-            Quad = new QuadPrimitive(GraphicsDevice);
+            _quad = new QuadPrimitive(GraphicsDevice);
 
-            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, Vector3.One * 20f);
+            _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0,20,110));
 
-            Texts = new List<string>()
+            _texts = new List<string>
             {
                 "Back to Front\nDepth Test\nDepth Write OFF",
                 "Front to Back\nDepth Test\nDepth Write OFF",
@@ -162,22 +161,20 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             var floorTexture = Game.Content.Load<Texture2D>(ContentFolderTextures + "grass");
 
             // Load the floor effect and set its parameters
-            TilingFloorEffect = Game.Content.Load<Effect>(ContentFolderEffects + "TextureTiling");
-
-            TilingFloorEffect.Parameters["Texture"].SetValue(floorTexture);
-            TilingFloorEffect.Parameters["Tiling"].SetValue(Vector2.One * 10f);
-
-
+            _tilingFloorEffect = Game.Content.Load<Effect>(ContentFolderEffects + "TextureTiling");
+            _tilingFloorEffect.Parameters["Texture"].SetValue(floorTexture);
+            _tilingFloorEffect.Parameters["Tiling"].SetValue(Vector2.One * 10f);
+            
             // Load the texture for the quads
             var quadsTexture = Game.Content.Load<Texture2D>(ContentFolderTextures + "floor/tierra");
 
             // Load the alpha blending effect and set its parameters
-            AlphaBlendingEffect = Game.Content.Load<Effect>(ContentFolderEffects + "AlphaBlending");
-            AlphaBlendingEffect.Parameters["Texture"].SetValue(quadsTexture);
-            AlphaBlendingEffect.Parameters["AlphaFactor"].SetValue(0.5f);
+            _alphaBlendingEffect = Game.Content.Load<Effect>(ContentFolderEffects + "AlphaBlending");
+            _alphaBlendingEffect.Parameters["Texture"].SetValue(quadsTexture);
+            _alphaBlendingEffect.Parameters["AlphaFactor"].SetValue(0.5f);
 
             // Load the Sprite Font to draw text
-            SpriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
+            _spriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
 
             base.LoadContent();
         }
@@ -185,11 +182,13 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
-            Camera.Update(gameTime);
+            _camera.Update(gameTime);
 
             // Update text positions in screen space to face the camera
-            for (var index = 0; index < TextScreenPositions.Count; index++)
+            for (var index = 0; index < _textScreenPositions.Count; index++)
+            {
                 UpdateTextPosition(index);
+            }
 
             base.Update(gameTime);
         }
@@ -201,15 +200,15 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         /// <param name="index">The index of the text to update</param>
         private void UpdateTextPosition(int index)
         {
-            var size = SpriteFont.MeasureString(Texts[index]) / 2f;
-            TextScreenPositions[index] = ToVector2(GraphicsDevice.Viewport.Project(
-                    TextWorldPositions[index], Camera.Projection, Camera.View, Matrix.Identity)) - size;
+            var size = _spriteFont.MeasureString(_texts[index]) / 2f;
+            _textScreenPositions[index] = ToVector2(GraphicsDevice.Viewport.Project(
+                    _textWorldPositions[index], _camera.Projection, _camera.View, Matrix.Identity)) - size;
         }
 
         /// <inheritdoc />
         public override void Draw(GameTime gameTime)
         {
-            var viewProjection = Camera.View * Camera.Projection;
+            var viewProjection = _camera.View * _camera.Projection;
 
             // Enable back-face culling
             // Enable depth testing and writing
@@ -219,8 +218,8 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             GraphicsDevice.BlendState = BlendState.Opaque;
             
             // Draw the floor
-            TilingFloorEffect.Parameters["WorldViewProjection"].SetValue(Matrix.CreateScale(100f) * viewProjection);
-            Quad.Draw(TilingFloorEffect);
+            _tilingFloorEffect.Parameters[WorldViewProjection].SetValue(Matrix.CreateScale(100f) * viewProjection);
+            _quad.Draw(_tilingFloorEffect);
 
             // Set the blend state as alpha blend, 
             // we are doing this operation when writing on the ColorBuffer:
@@ -232,33 +231,32 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             GraphicsDevice.BlendState = BlendState.AlphaBlend;
 
             // Draw back-to-front transparent geometry
-            for (var index = 0; index < BackToFrontQuadWorlds.Count; index++)
+            for (var index = 0; index < _backToFrontQuadWorlds.Count; index++)
             {
-                AlphaBlendingEffect.Parameters["Tint"].SetValue(QuadColors[index].ToVector3());
-                AlphaBlendingEffect.Parameters["WorldViewProjection"].SetValue(BackToFrontQuadWorlds[index] * viewProjection);
-                Quad.Draw(AlphaBlendingEffect);
+                _alphaBlendingEffect.Parameters["Tint"].SetValue(_quadColors[index].ToVector3());
+                _alphaBlendingEffect.Parameters[WorldViewProjection].SetValue(_backToFrontQuadWorlds[index] * viewProjection);
+                _quad.Draw(_alphaBlendingEffect);
             }
 
             // Draw front-to-back transparent geometry
-            for (var index = 0; index < FrontToBackQuadWorlds.Count; index++)
+            for (var index = 0; index < _frontToBackQuadWorlds.Count; index++)
             {
-                var colorIndex = FrontToBackQuadWorlds.Count - index - 1;
-                AlphaBlendingEffect.Parameters["Tint"].SetValue(QuadColors[colorIndex].ToVector3());
-                AlphaBlendingEffect.Parameters["WorldViewProjection"].SetValue(FrontToBackQuadWorlds[index] * viewProjection);
-                Quad.Draw(AlphaBlendingEffect);
+                var colorIndex = _frontToBackQuadWorlds.Count - index - 1;
+                _alphaBlendingEffect.Parameters["Tint"].SetValue(_quadColors[colorIndex].ToVector3());
+                _alphaBlendingEffect.Parameters[WorldViewProjection].SetValue(_frontToBackQuadWorlds[index] * viewProjection);
+                _quad.Draw(_alphaBlendingEffect);
             }
 
             // Set the depth testing OFF and writing OFF
             // Draw back-to-front geometry
             GraphicsDevice.DepthStencilState = DepthStencilState.None;
-            for (var index = 0; index < DepthNoneQuadWorlds.Count; index++)
+            for (var index = 0; index < _depthNoneQuadWorlds.Count; index++)
             {
-                AlphaBlendingEffect.Parameters["Tint"].SetValue(QuadColors[index].ToVector3());
-                AlphaBlendingEffect.Parameters["WorldViewProjection"].SetValue(DepthNoneQuadWorlds[index] * viewProjection);
-                Quad.Draw(AlphaBlendingEffect);
+                _alphaBlendingEffect.Parameters["Tint"].SetValue(_quadColors[index].ToVector3());
+                _alphaBlendingEffect.Parameters[WorldViewProjection].SetValue(_depthNoneQuadWorlds[index] * viewProjection);
+                _quad.Draw(_alphaBlendingEffect);
             }
-
-
+            
             // Draw labels
             Game.SpriteBatch.Begin(
                 SpriteSortMode.Deferred,
@@ -267,13 +265,14 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
                 DepthStencilState.Default,
                 RasterizerState.CullNone);
 
-            for (var index = 0; index < TextScreenPositions.Count; index++)
-                Game.SpriteBatch.DrawString(SpriteFont, Texts[index], TextScreenPositions[index], Color.White);
+            for (var index = 0; index < _textScreenPositions.Count; index++)
+            {
+                Game.SpriteBatch.DrawString(_spriteFont, _texts[index], _textScreenPositions[index], Color.White);
+            }
 
             Game.SpriteBatch.End();
 
             base.Draw(gameTime);
         }
-
     }
 }
