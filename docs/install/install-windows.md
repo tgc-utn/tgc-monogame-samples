@@ -2,7 +2,7 @@
 
 Test on Windows 10/11.
 
-The offical [documentation](https://docs.monogame.net/articles/getting_started/1_setting_up_your_os_for_development_windows.html).
+The official [documentation](https://docs.monogame.net/articles/getting_started/1_setting_up_your_os_for_development_windows.html).
 
 ## Install PowerShell, Terminal and WinGet CLI on Windows 10 (on Windows 11 is already install)
 
@@ -18,7 +18,7 @@ winget install Microsoft.VCRedist.2015+.x64
 winget install Microsoft.DotNet.SDK.8
 ```
 
-Open other terminal ([Issue 222](https://github.com/microsoft/winget-cli/issues/222)) so you can use `dotnet` and type:
+Close the actual terminal and open a new terminal ([Issue 222](https://github.com/microsoft/winget-cli/issues/222)) so you can use `dotnet` command and type:
 
 ```bash
 # To check the version installed.
@@ -45,13 +45,16 @@ You can use Visual Studio Code or Rider. The official documentation only explain
 winget install Microsoft.VisualStudioCode
 ```
 
-Open other terminal ([Issue 222](https://github.com/microsoft/winget-cli/issues/222)) so you can use `code` and type:
+Close the actual terminal and open a new terminal ([Issue 222](https://github.com/microsoft/winget-cli/issues/222)) so you can use `code` command and type:
 
 ```bash
 # Visual Studio Code extensions
+# Copilot (optional)
 code --install-extension Github.copilot
 code --install-extension Github.copilot-chat
+# C# dev tools
 code --install-extension ms-dotnettools.csdevkit
+# HLSL tools
 code --install-extension timgjones.hlsltools
 ```
 
@@ -78,7 +81,7 @@ winget install Microsoft.VisualStudio.2022.Community
 winget install Git.Git
 ```
 
-Open other terminal ([Issue 222](https://github.com/microsoft/winget-cli/issues/222)) so you can use `git` and type:
+Open other terminal ([Issue 222](https://github.com/microsoft/winget-cli/issues/222)) so you can use `git` command and type:
 
 ```bash
 git clone https://github.com/tgc-utn/tgc-monogame-samples.git

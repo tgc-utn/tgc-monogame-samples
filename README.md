@@ -7,7 +7,7 @@
 
 ![tgc-screenshot](https://user-images.githubusercontent.com/7131403/172287114-1bc554f0-3dcd-411f-b5be-a0d994990563.png)
 
-[#BuiltWithMonoGame](http://www.monogame.net) and [.NET Core](https://dotnet.microsoft.com).
+[#BuiltWithMonoGame](https://monogame.net) and [.NET Core](https://dotnet.microsoft.com).
 
 ## Install
 
@@ -16,6 +16,6 @@ for your operating system.
 
 ### Known issues
 
-#### [MGCB Editor](https://docs.monogame.net/articles/tools/mgcb_editor.html)
+#### [MGCB Editor](https://docs.monogame.net/articles/getting_started/tools/mgcb_editor.html)
 
 - Open Asset Import Library with Obj and Dae fails, you have to change it to Fbx importer.

@@ -2,7 +2,7 @@
 
 The samples are test in:
 
-- macOS Ventura.
+- macOS Sequoia.
 - Windows 10/11.
 
 We need the following tools:
