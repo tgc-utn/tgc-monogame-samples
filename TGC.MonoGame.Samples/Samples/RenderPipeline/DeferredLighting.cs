@@ -1,12 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
@@ -22,7 +17,6 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline.DeferredLighting
             Name = "Deferred Lighting";
             Description = "technique for rendering scenes with multiple lights.";
         }
-        private float _time;
         private Camera _camera;
         private Model _cityModel;
         private Texture2D _cityTexture;
@@ -50,8 +44,6 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline.DeferredLighting
         {
             _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(-280f, 190f, 660f));
             
-            _time = 0;
-
             base.Initialize();
         }
         
@@ -66,8 +58,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline.DeferredLighting
 
             // Load deferred shader using Content pipeline.
             _effectDeferred = Game.Content.Load<Effect>(ContentFolderEffects + "Deferred");
-            //_effectDeferred.Parameters["screenSize"].SetValue(new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height));
-
+            
             _sphere = Game.Content.Load<Model>(ContentFolder3D  + "geometries/sphere");
             // Asign the effect to the meshes
             AssignEffectToModel(_effectModel, _cityModel);
@@ -286,6 +277,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline.DeferredLighting
             _showScene = false;
             switch (target)
             {
+                default:
                 case Target.Scene:
                     _showScene = true;
                     break;
@@ -303,13 +295,15 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline.DeferredLighting
                     break;
                 case Target.Light:
                     _currentTarget = _lightTarget;
-                    break;
+                    break;    
             }
         }
         private void OnPointRemoveClick()
         {
             if(_pointLights.Count > 0)
+            {
                 _pointLights.RemoveAt(_pointLights.Count - 1);
+            }
             
         }
         private void OnPointPositionChange(Vector3 position)
@@ -341,7 +335,8 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline.DeferredLighting
 
         private void GeneratePointLights()
         {
-            Vector3 pos, col;
+            Vector3 pos; 
+            Vector3 col;
             float r;
             //cars
             pos = new Vector3(-367, -49, 294);
