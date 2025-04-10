@@ -278,6 +278,8 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline.DeferredLighting
             switch (target)
             {
                 default:
+                    _showScene = true;
+                    break;
                 case Target.Scene:
                     _showScene = true;
                     break;
