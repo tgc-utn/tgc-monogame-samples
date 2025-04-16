@@ -25,7 +25,8 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
         public Vector2 pos;
         public Vector3 tcCitoPos;
         public SimpleTerrain terrain;
-        public float offSet = 0f;
+
+        private float offSet = 0f;
 
         /// <inheritdoc />
         public ModelOnASimpleTerrain(TGCViewer game) : base(game)
