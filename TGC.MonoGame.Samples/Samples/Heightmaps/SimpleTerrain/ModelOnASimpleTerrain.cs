@@ -23,8 +23,10 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
 
         private Model model;
         public Vector2 pos;
-        public Vector3 shipPos;
+        public Vector3 tcCitoPos;
         public SimpleTerrain terrain;
+
+        private float offSet = 0f;
 
         /// <inheritdoc />
         public ModelOnASimpleTerrain(TGCViewer game) : base(game)
@@ -63,6 +65,8 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
             
             model = Game.Content.Load<Model>("3D/tgcito-classic/tgcito-classic");
 
+            offSet = model.Meshes[0].BoundingSphere.Radius;
+
             base.LoadContent();
         }
 
@@ -80,7 +84,8 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
             var X = pos.X;
             var Z = pos.Y;
 
-            DesiredLookAt = shipPos = new Vector3(X, terrain.Height(X, Z), Z);
+            tcCitoPos = new Vector3(X, terrain.Height(X, Z) + offSet, Z);
+            DesiredLookAt = new Vector3(X, terrain.Height(X, Z), Z);
             if (!hay_lookAt)
             {
                 LookAt = DesiredLookAt;
@@ -94,7 +99,7 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
 
             var pos2 = pos - dir * 800;
 
-            // obtengo la altura maxima desde la camara hasta el auto
+            // obtengo la altura maxima desde la camara hasta tgcito
             float H = 0;
             for (var i = 0; i < 10; ++i)
             {
@@ -130,10 +135,10 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
             var tan = new Vector2(-MathF.Sin(angle), MathF.Cos(angle));
             var pos_ade = pos + dir * 100;
             var pos_der = pos + tan * 100;
-            var PosAdelante = new Vector3(pos_ade.X, terrain.Height(pos_ade.X, pos_ade.Y), pos_ade.Y);
-            var PosDerecha = new Vector3(pos_der.X, terrain.Height(pos_der.X, pos_der.Y), pos_der.Y);
+            var PosAdelante = new Vector3(pos_ade.X, terrain.Height(pos_ade.X, pos_ade.Y) + offSet, pos_ade.Y);
+            var PosDerecha = new Vector3(pos_der.X, terrain.Height(pos_der.X, pos_der.Y) + offSet, pos_der.Y);
 
-            var matWorld = CalcularMatrizOrientacion(10, shipPos, PosAdelante, PosDerecha);
+            var matWorld = CalcularMatrizOrientacion(10, tcCitoPos, PosAdelante, PosDerecha);
 
             // dibujo el mesh
             foreach (var mesh in model.Meshes)
