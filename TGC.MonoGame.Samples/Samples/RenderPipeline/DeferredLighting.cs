@@ -37,7 +37,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline.DeferredLighting
         private Vector3 _lightCursorPosition = new Vector3(-345f, -20f, 80f);
         private Vector3 _lightCursorColor = Color.White.ToVector3();
         private float _pointRadius = 50f;
-        private List<PointLight> _pointLights = new List<PointLight>();
+        private readonly List<PointLight> _pointLights = new List<PointLight>();
         private Model _sphere;
         
         public override void Initialize()
@@ -84,8 +84,6 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline.DeferredLighting
 
             base.LoadContent();
         }
-
-        
 
         public override void Update(GameTime gameTime)
         {
@@ -337,324 +335,90 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline.DeferredLighting
 
         private void GeneratePointLights()
         {
-            Vector3 pos; 
-            Vector3 col;
-            float r;
-            //cars
-            pos = new Vector3(-367, -49, 294);
-            col = Color.Cyan.ToVector3();
-            r = 40f;
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-367, -49, 264);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            col = Color.Red.ToVector3();
-            r = 20f;
-            pos = new Vector3(-447, -49, 267);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-447, -49, 287);
-            _pointLights.Add(new PointLight(pos, col, col, r));
+            AddAllLampLights();
+            AddAllCarLights();
+        }
+        private void AddAllCarLights()
+        {
+            AddCarLights(new Vector3(-367, -49, 294), new Vector3(-367, -49, 264),
+                new Vector3(-447, -49, 267), new Vector3(-447, -49, 287), Color.Cyan.ToVector3(), Vector3.UnitX);
+            AddCarLights(new Vector3(-109, -49, 231), new Vector3(-109, -49, 202),
+                new Vector3(39, -49, 202), new Vector3(39, -49, 223), Color.Cyan.ToVector3(), Vector3.UnitX);
+            AddCarLights(new Vector3(-712, -49, 112), new Vector3(-739, -49, 112),
+                new Vector3(-735, -49, 28), new Vector3(-714, -49, 28), Color.Yellow.ToVector3(), Vector3.UnitX);
+            AddCarLights(new Vector3(-455, -49, -180), new Vector3(-455, -49, -203),
+                new Vector3(-537, -49, -198), new Vector3(-537, -49, -178), Color.Blue.ToVector3(), Vector3.UnitX);
+            AddCarLights(new Vector3(-603, -49, -277), new Vector3(-607, -49, -255),
+                new Vector3(-521, -49, -279), new Vector3(-521, -49, -253), new Vector3(1, 0, 0.67f), Vector3.UnitX);
+            AddCarLights(new Vector3(-601, -49, -697), new Vector3(-595, -49, -674),
+                new Vector3(-674, -49, -661), new Vector3(-665, -49, -641), Vector3.One, Vector3.UnitX);
+            AddCarLights(new Vector3(-175, -49, 32), new Vector3(-199, -49, 32),
+                new Vector3(-200, -49, 127), new Vector3(-175, -49, 126), new Vector3(1, 0.5f, 0), Vector3.UnitX);
+            AddCarLights(new Vector3(-202, -49, -86), new Vector3(-174, -49, -86),
+                new Vector3(-175, -49, 12), new Vector3(-201, -49, 12), new Vector3(1, 0.8f, 0f), Vector3.UnitX);
+            AddCarLights(new Vector3(-201, -49, -249), new Vector3(-201, -49, -272),
+                new Vector3(-119, -49, -272), new Vector3(-119, -49, -253), Vector3.One, Vector3.UnitX);
+            AddCarLights(new Vector3(103, -49, -184), new Vector3(103, -49, -207),
+                new Vector3(16, -49, -207), new Vector3(16, -49, -186), new Vector3(1, 0.64f, 0), Vector3.UnitX);
+            AddCarLights(new Vector3(273, -49, -105), new Vector3(298, -49, -105),
+                new Vector3(298, -49, 43), new Vector3(275, -49, 43), Vector3.One, Vector3.UnitX);
+            AddCarLights(new Vector3(225, -49, -416), new Vector3(202, -49, -416),
+                new Vector3(204, -49, -503), new Vector3(226, -49, -503), new Vector3(1, 0.9f, 0), Vector3.UnitX);
+            AddCarLights(new Vector3(273, -49, -664), new Vector3(294, -49, -664),
+                new Vector3(281, -49, -558), new Vector3(301, -49, -561), new Vector3(0.55f, 0, 1), Vector3.UnitX);
+            AddCarLights(new Vector3(50, -49, -542), new Vector3(44, -49, -564),
+                new Vector3(124, -49, -583), new Vector3(130, -49, -556), new Vector3(1, 0, 0.43f), Vector3.UnitX);
+            AddCarLights(new Vector3(123, -49, -661), new Vector3(123, -49, -663),
+                new Vector3(-24, -49, -677), new Vector3(-24, -49, -656), new Vector3(1, 0.94f, 0), Vector3.UnitX);
+            AddCarLights(new Vector3(-221, -49, -665), new Vector3(-206, -49, -650),
+                new Vector3(-152, -49, -708), new Vector3(-168, -49, -723), new Vector3(1, 0, 0.94f), Vector3.UnitX);
+            AddCarLights(new Vector3(-295, -49, -500), new Vector3(-300, -49, -526),
+                new Vector3(-397, -49, -504), new Vector3(-394, -49, -480), new Vector3(0, 0.32f, 1), Vector3.UnitX);
+            AddCarLights(new Vector3(-388, -49, -422), new Vector3(-389, -49, -399),
+                new Vector3(-304, -49, -399), new Vector3(-304, -49, -419), new Vector3(1, 0.9f, 0), Vector3.UnitX);
+            AddCarLights(new Vector3(-397, -49, -346), new Vector3(-397, -49, -323),
+                new Vector3(-314, -49, -323), new Vector3(-313, -49, -346), new Vector3(1, 0.7f, 0), Vector3.UnitX);
+            AddCarLights(new Vector3(-495, -49, -728), new Vector3(-495, -49, -753),
+                new Vector3(-395, -49, -728), new Vector3(-395, -49, -750), new Vector3(0, 0.73f, 1), Vector3.UnitX);
+            AddCarLights(new Vector3(-466, -49, -681), new Vector3(-465, -49, -659),
+                new Vector3(-385, -49, -659), new Vector3(-385, -49, -682), new Vector3(0, 0.96f, 1f), Vector3.UnitX);
+        }
 
-            pos = new Vector3(-109, -49, 231);
-            col = Color.Cyan.ToVector3();
-            r = 40f;
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-109, -49, 202);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            col = Color.Red.ToVector3();
-            r = 20f;
-            pos = new Vector3(39, -49, 202);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(39, -49, 223);
-            _pointLights.Add(new PointLight(pos, col, col, r));
+        private void AddAllLampLights()
+        {
+            AddLampLight(new Vector3(-390, 87, -602));
+            AddLampLight(new Vector3(-386, 87, -329));
+            AddLampLight(new Vector3(-271, 72, -113));
+            AddLampLight(new Vector3(-271, 72, 130));
+            AddLampLight(new Vector3(-101, 72, 203));
+            AddLampLight(new Vector3(113, 72, 203));
+            AddLampLight(new Vector3(205, 72, 19));
+            AddLampLight(new Vector3(210, 72, -480));
+            AddLampLight(new Vector3(110, 72, -665));
+            AddLampLight(new Vector3(-103, 72, -665));
+            AddLampLight(new Vector3(-677, 86, -472));
+            AddLampLight(new Vector3(-664, 72, 131));
+            AddLampLight(new Vector3(-664, 72, -114));
+            AddLampLight(new Vector3(-98, 72, -195));
+            AddLampLight(new Vector3(-98, 73, -270));
+            AddLampLight(new Vector3(109, 72, -270));
+            AddLampLight(new Vector3(114, 73, -194));
+        }
 
-            
-            pos = new Vector3(-712, -49, 112);
-            col = Color.Yellow.ToVector3();
-            r = 40f;
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-739, -49, 112);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            col = Color.Red.ToVector3();
-            r = 20f;
-            pos = new Vector3(-735, -49, 28);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-714, -49, 28);
-            _pointLights.Add(new PointLight(pos, col, col, r));
+        private void AddCarLights(Vector3 posFL, Vector3 posFR, Vector3 posBL, Vector3 posBR, Vector3 frontCol, Vector3 backCol)
+        {
+            _pointLights.Add(new PointLight(posFL, frontCol, frontCol, 40f));
+            _pointLights.Add(new PointLight(posFR, frontCol, frontCol, 40f));
+            _pointLights.Add(new PointLight(posBL, backCol, backCol, 20f));
+            _pointLights.Add(new PointLight(posBR, backCol, backCol, 20f));
+        }
 
-            
-            pos = new Vector3(-455, -49, -180);
-            col = Color.Blue.ToVector3();
-            r = 40f;
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-455, -49, -203);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            col = Color.Red.ToVector3();
-            r = 20f;
-            pos = new Vector3(-537, -49, -198);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-537, -49, -178);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-
-            pos = new Vector3(-603, -49, -277);
-            col = new Vector3(1, 0, 0.67f);
-            r = 40f;
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-607, -49, -255);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            col = Color.Red.ToVector3();
-            r = 20f;
-            pos = new Vector3(-521, -49, -279);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-521, -49, -253);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-
-            pos = new Vector3(-601, -49, -697);
-            col = Vector3.One;
-            r = 40f;
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-595, -49, -674);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            col = Color.Red.ToVector3();
-            r = 20f;
-            pos = new Vector3(-674, -49, -661);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-665, -49, -641);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-
-            pos = new Vector3(-175,-49, 32);
-            col = new Vector3(1, 0.5f, 0);
-            r = 40f;
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-199, -49, 32);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            col = Color.Red.ToVector3();
-            r = 20f;
-            pos = new Vector3(-200, -49, 127);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-175, -49, 126);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-
-            pos = new Vector3(-202, -49, -86);
-            col = new Vector3(1, 0.8f, 0f);
-            r = 40f;
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-174, -49, -86);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            col = Color.Red.ToVector3();
-            r = 20f;
-            pos = new Vector3(-175, -49, 12);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-201, -49, 12);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-
-            pos = new Vector3(-201, -49, -249);
-            col = Vector3.One;
-            r = 40f;
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-201, -49, -272);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            col = Color.Red.ToVector3();
-            r = 20f;
-            pos = new Vector3(-119, -49, -272);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-119, -49, -253);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-
-            pos = new Vector3(103, -49, -184);
-            col = new Vector3(1, 0.64f, 0);
-            r = 40f;
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(103, -49, -207);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            col = Color.Red.ToVector3();
-            r = 20f;
-            pos = new Vector3(16, -49, -207);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(16, -49, -186);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-
-            pos = new Vector3(273, -49, -105);
-            col = Vector3.One;
-            r = 40f;
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(298, -49, -105);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            col = Color.Red.ToVector3();
-            r = 20f;
-            pos = new Vector3(298, -49, 43);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(275, -49, 43);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-
-            pos = new Vector3(225, -49, -416);
-            col = new Vector3(1, 0.9f, 0);
-            r = 40f;
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(202, -49, -416);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            col = Color.Red.ToVector3();
-            r = 20f;
-            pos = new Vector3(204, -49, -503);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(226, -49, -503);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-
-            pos = new Vector3(273, -49, -664);
-            col = new Vector3(0.55f, 0, 1);
-            r = 40f;
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(294, -49, -664);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            col = Color.Red.ToVector3();
-            r = 20f;
-            pos = new Vector3(281, -49, -558);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(301, -49, -561);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-
-            pos = new Vector3(50, -49, -542);
-            col = new Vector3(1,0,0.43f);
-            r = 40f;
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(44, -49, -564);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            col = Color.Red.ToVector3();
-            r = 20f;
-            pos = new Vector3(124, -49, -583);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(130, -49, -556);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-
-            pos = new Vector3(123, -49, -661);
-            col = new Vector3(1, 0.94f, 0);
-            r = 40f;
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(123, -49, -663);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            col = Color.Red.ToVector3();
-            r = 20f;
-            pos = new Vector3(-24, -49, -677);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-24, -49, -656);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-
-            pos = new Vector3(-221, -49, -665);
-            col = new Vector3(1, 0, 0.94f);
-            r = 40f;
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-206, -49, -650);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            col = Color.Red.ToVector3();
-            r = 20f;
-            pos = new Vector3(-152, -49, -708);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-168, -49, -723);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-
-            pos = new Vector3(-295, -49, -500);
-            col = new Vector3(0, 0.32f, 1);
-            r = 40f;
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-300, -49, -526);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            col = Color.Red.ToVector3();
-            r = 20f;
-            pos = new Vector3(-397, -49, -504);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-394, -49, -480);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-
-            pos = new Vector3(-388, -49, -422);
-            col = new Vector3(1, 0.9f, 0);
-            r = 40f;
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-389, -49, -399);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            col = Color.Red.ToVector3();
-            r = 20f;
-            pos = new Vector3(-304, -49, -399);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-304, -49, -419);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-
-            pos = new Vector3(-397, -49, -346);
-            col = new Vector3(1, 0.7f, 0);
-            r = 40f;
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-397, -49, -323);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            col = Color.Red.ToVector3();
-            r = 20f;
-            pos = new Vector3(-314, -49, -323);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-313, -49, -346);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-
-            pos = new Vector3(-495, -49, -728);
-            col = new Vector3(0,0.73f,1);
-            r = 40f;
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-495, -49, -753);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            col = Color.Red.ToVector3();
-            r = 20f;
-            pos = new Vector3(-395, -49, -728);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-395, -49, -750);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-
-            pos = new Vector3(-466, -49, -681);
-            col = new Vector3(0, 0.96f, 1f);
-            r = 40f;
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-465, -49, -659);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            col = Color.Red.ToVector3();
-            r = 20f;
-            pos = new Vector3(-385, -49, -659);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-385, -49, -682);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-
-            //lamps
-            r = 60f;
-            col = Vector3.One;
-            pos = new Vector3(-390, 87, -602);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-386, 87, -329);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-271, 72, -113);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-271, 72, 130);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-101, 72, 203);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(113, 72, 203);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(205, 72, 19);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(210, 72, -480);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(110, 72, -665);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-103, 72, -665);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-677, 86, -472);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-664, 72, 131);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-664, 72, -114);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-98, 72, -195);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(-98, 73, -270);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(109, 72, -270);
-            _pointLights.Add(new PointLight(pos, col, col, r));
-            pos = new Vector3(114, 73, -194);
-            _pointLights.Add(new PointLight(pos, col, col, r));
+        private void AddLampLight(Vector3 pos)
+        {
+            _pointLights.Add(new PointLight(pos, Vector3.One, Vector3.One, 60f));
         }
     }
+
     enum Target
     {
         Scene,
