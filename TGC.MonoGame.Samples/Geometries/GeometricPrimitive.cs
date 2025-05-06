@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -63,7 +64,7 @@ namespace TGC.MonoGame.Samples.Geometries
             if (index > ushort.MaxValue)
                 throw new ArgumentOutOfRangeException(nameof(index));
 
-            Indices.Add((ushort) index);
+            Indices.Add((ushort)index);
         }
 
         /// <summary>
@@ -85,7 +86,7 @@ namespace TGC.MonoGame.Samples.Geometries
             VertexBuffer.SetData(Vertices.ToArray());
 
             // Create an index buffer, and copy our index data into it.
-            IndexBuffer = new IndexBuffer(graphicsDevice, typeof(ushort), Indices.Count, BufferUsage.None);
+            IndexBuffer = new IndexBuffer(graphicsDevice, IndexElementSize.SixteenBits, Indices.Count, BufferUsage.None);
 
             IndexBuffer.SetData(Indices.ToArray());
 
