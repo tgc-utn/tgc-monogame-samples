@@ -49,12 +49,6 @@ public class CustomPipelineManager : PipelineManager
 
     public void BuildAnimationContent(string modelFilename)
     {
-        var importContext = new PipelineImporterContext(this);
-        var importer = new FbxImporter();
-        var nodeContent =
-            importer.Import(ProjectDirectory + modelFilename + _configuration["FbxExtension"], importContext);
-        var animationProcessor = new AnimationProcessor();
-
         var parameters = new OpaqueDataDictionary
         {
             { "ColorKeyColor", "0,0,0,0" },
@@ -72,7 +66,6 @@ public class CustomPipelineManager : PipelineManager
             { "SwapWindingOrder", "False" },
             { "TextureFormat", "Compressed" }
         };
-
         // Record what we're building and how.
         var pipelineEvent = new PipelineBuildEvent
         {
@@ -82,6 +75,12 @@ public class CustomPipelineManager : PipelineManager
             Processor = _configuration["ProcessorName"],
             Parameters = ValidateProcessorParameters(_configuration["ProcessorName"], parameters)
         };
+
+        var importContext = new PipelineImporterContext(this, pipelineEvent);
+        var importer = new FbxImporter();
+        var nodeContent =
+            importer.Import(ProjectDirectory + modelFilename + _configuration["FbxExtension"], importContext);
+        var animationProcessor = new AnimationProcessor();
 
         var processContext = new PipelineProcessorContext(this, pipelineEvent);
         var modelContent = animationProcessor.Process(nodeContent, processContext);
