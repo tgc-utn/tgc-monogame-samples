@@ -12,6 +12,17 @@
 
 
 #---------------------------------- Content ---------------------------------#
+#begin Effects/Deferred.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/Deferred.fx
+
+#begin Effects/DeferredModel.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/DeferredModel.fx
 
 #begin 3D/chair/chair.fbx
 /importer:FbxImporter
