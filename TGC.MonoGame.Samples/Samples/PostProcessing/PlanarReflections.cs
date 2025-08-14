@@ -23,7 +23,10 @@ public class PlanarReflections : TGCSample
     private Matrix _chairWorld;
 
     private BoxPrimitive _box;
-    private Matrix _frameTop, _frameBottom, _frameLeft, _frameRight;
+    private Matrix _frameTop;
+    private Matrix _frameBottom;
+    private Matrix _frameLeft; 
+    private Matrix _frameRight;
 
     public PlanarReflections(TGCViewer game) : base(game)
     {
