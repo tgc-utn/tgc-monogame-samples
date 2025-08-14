@@ -137,6 +137,7 @@ public class PlanarReflections : TGCSample
 
     public override void Draw(GameTime gameTime)
     {
+        GraphicsDevice.DepthStencilState = DepthStencilState.Default;
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
         DrawReflection(_quadWorld, _camera.View, _camera.Projection);
