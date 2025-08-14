@@ -66,6 +66,7 @@ public class CustomPipelineManager : PipelineManager
             { "SwapWindingOrder", "False" },
             { "TextureFormat", "Compressed" }
         };
+
         // Record what we're building and how.
         var pipelineEvent = new PipelineBuildEvent
         {
@@ -76,7 +77,7 @@ public class CustomPipelineManager : PipelineManager
             Parameters = ValidateProcessorParameters(_configuration["ProcessorName"], parameters)
         };
 
-        var importContext = new PipelineImporterContext(this, pipelineEvent);
+        var importContext = new PipelineImporterContext(this);
         var importer = new FbxImporter();
         var nodeContent =
             importer.Import(ProjectDirectory + modelFilename + _configuration["FbxExtension"], importContext);

@@ -13,7 +13,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -81,7 +80,7 @@ namespace TGC.MonoGame.Samples.Geometries
             // Create a vertex declaration, describing the format of our vertex data.
 
             // Create a vertex buffer, and copy our vertex data into it.
-            VertexBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionColorNormal), Vertices.Count,
+            VertexBuffer = new VertexBuffer(graphicsDevice, VertexPositionColorNormal.VertexDeclaration, Vertices.Count,
                 BufferUsage.None);
             VertexBuffer.SetData(Vertices.ToArray());
 
