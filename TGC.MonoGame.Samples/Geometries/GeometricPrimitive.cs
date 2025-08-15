@@ -63,7 +63,7 @@ namespace TGC.MonoGame.Samples.Geometries
             if (index > ushort.MaxValue)
                 throw new ArgumentOutOfRangeException(nameof(index));
 
-            Indices.Add((ushort) index);
+            Indices.Add((ushort)index);
         }
 
         /// <summary>
@@ -80,12 +80,12 @@ namespace TGC.MonoGame.Samples.Geometries
             // Create a vertex declaration, describing the format of our vertex data.
 
             // Create a vertex buffer, and copy our vertex data into it.
-            VertexBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionColorNormal), Vertices.Count,
+            VertexBuffer = new VertexBuffer(graphicsDevice, VertexPositionColorNormal.VertexDeclaration, Vertices.Count,
                 BufferUsage.None);
             VertexBuffer.SetData(Vertices.ToArray());
 
             // Create an index buffer, and copy our index data into it.
-            IndexBuffer = new IndexBuffer(graphicsDevice, typeof(ushort), Indices.Count, BufferUsage.None);
+            IndexBuffer = new IndexBuffer(graphicsDevice, IndexElementSize.SixteenBits, Indices.Count, BufferUsage.None);
 
             IndexBuffer.SetData(Indices.ToArray());
 
