@@ -2,7 +2,8 @@
 
 The samples where tested in:
 
-- macOS Ventura.
+- macOS Sequoia.
+- Ubuntu 24.04 lts.
 - Windows 10/11.
 
 We need the following tools:
@@ -26,8 +27,8 @@ Read more about [.NET Core CLI Tools telemetry](https://aka.ms/dotnet-cli-teleme
 
 ## Setting up your development environment
 
-- [~~Install on Ubuntu~~](install-ubuntu.md).
-- [~~Install on macOS~~](install-mac.md).
+- [Install on macOS](install-mac.md).
+- [Install on Ubuntu](install-ubuntu.md).
 - [Install on Windows](install-windows.md).
 
 The assets are stored using [Git LFS](https://git-lfs.com/). Before cloning the repository it is convenient to have this installed so the pull is made automatically. If you already have it you can do `git lfs pull` or `git lfs install`.

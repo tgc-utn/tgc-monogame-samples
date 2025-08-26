@@ -2,7 +2,7 @@
 
 Test on Windows 10/11.
 
-The offical [documentation](https://docs.monogame.net/articles/getting_started/1_setting_up_your_os_for_development_windows.html).
+The official [documentation](https://docs.monogame.net/articles/getting_started/1_setting_up_your_os_for_development_windows.html).
 
 ## Install PowerShell, Terminal and WinGet CLI on Windows 10 (on Windows 11 is already install)
 
@@ -18,7 +18,7 @@ winget install Microsoft.VCRedist.2015+.x64
 winget install Microsoft.DotNet.SDK.8
 ```
 
-Open other terminal ([Issue 222](https://github.com/microsoft/winget-cli/issues/222)) so you can use `dotnet` and type:
+Close the actual terminal and open a new terminal ([Issue 222](https://github.com/microsoft/winget-cli/issues/222)) so you can use `dotnet` command and type:
 
 ```bash
 # To check the version installed.
@@ -37,23 +37,7 @@ dotnet run
 
 ## Set up the IDE
 
-You can use Visual Studio Code or Rider. The official documentation only explains it for Visual Studio but it is up to you which one you are more comfortable with.
-
-### Visual Studio Code
-
-```bash
-winget install Microsoft.VisualStudioCode
-```
-
-Open other terminal ([Issue 222](https://github.com/microsoft/winget-cli/issues/222)) so you can use `code` and type:
-
-```bash
-# Visual Studio Code extensions
-code --install-extension Github.copilot
-code --install-extension Github.copilot-chat
-code --install-extension ms-dotnettools.csdevkit
-code --install-extension timgjones.hlsltools
-```
+You can use JetBrains Rider or Visual Studio or Visual Studio Code. The official documentation only explains it for Visual Studio but it is up to you which one you are more comfortable with.
 
 ### JetBrains Rider
 
@@ -72,17 +56,37 @@ winget install Microsoft.VisualStudio.2022.Community
 - [HLSL Tools](https://marketplace.visualstudio.com/items?itemName=TimGJones.HLSLToolsforVisualStudio)
 - [MonoGame](https://marketplace.visualstudio.com/items?itemName=MonoGame.MonoGame-Templates-VSExtension)
 
+### Visual Studio Code
+
+```bash
+winget install Microsoft.VisualStudioCode
+```
+
+Close the actual terminal and open a new terminal ([Issue 222](https://github.com/microsoft/winget-cli/issues/222)) so you can use `code` command and type:
+
+```bash
+# Visual Studio Code extensions
+# Copilot (optional)
+code --install-extension Github.copilot
+code --install-extension Github.copilot-chat
+# C# dev tools
+code --install-extension ms-dotnettools.csdevkit
+# HLSL tools
+code --install-extension timgjones.hlsltools
+```
+
 ## Set up tgc-monogame-samples
 
 ```bash
 winget install Git.Git
 ```
 
-Open other terminal ([Issue 222](https://github.com/microsoft/winget-cli/issues/222)) so you can use `git` and type:
+Open other terminal ([Issue 222](https://github.com/microsoft/winget-cli/issues/222)) so you can use `git` command and type:
 
 ```bash
 git clone https://github.com/tgc-utn/tgc-monogame-samples.git
 cd tgc-monogame-samples
+
 # MonoGame Effects Compiler (MGFXC)
 dotnet tool install -g dotnet-mgfxc
 dotnet restore
