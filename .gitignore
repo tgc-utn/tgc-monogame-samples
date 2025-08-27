@@ -1,10 +1,6 @@
 ### Linux ###
 *~
 
-### GIT ###
-hooks/*
-lfs/*
-
 ### macOS ###
 # General
 .DS_Store
