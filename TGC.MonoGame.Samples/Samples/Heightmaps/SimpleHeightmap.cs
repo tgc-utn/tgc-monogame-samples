@@ -15,6 +15,14 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps;
 /// </summary>
 public class SimpleHeightMap : TGCSample
 {
+    private Camera _camera;
+    private BasicEffect _effect;
+    // Triangle count in this case.
+    private int _primitiveCount;
+    private IndexBuffer _terrainIndexBuffer;
+    private Texture2D _terrainTexture;
+    private VertexBuffer _terrainVertexBuffer;
+
     public SimpleHeightMap(TGCViewer game) : base(game)
     {
         Category = TGCSampleCategory.Heightmaps;
@@ -22,19 +30,10 @@ public class SimpleHeightMap : TGCSample
         Description = "Shows how to create a terrain based on a HeightMap texture manually.";
     }
 
-    private BasicEffect Effect { get; set; }
-    private Texture2D TerrainTexture { get; set; }
-    private VertexBuffer TerrainVertexBuffer { get; set; }
-    private IndexBuffer TerrainIndexBuffer { get; set; }
-    private Camera Camera { get; set; }
-
-    // Triangle count in this case.
-    private int PrimitiveCount { get; set; }
-
     /// <inheritdoc />
     public override void Initialize()
     {
-        Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(-400f, 1000f, 2000f), 400, 1.0f, 1,
+        _camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(-500f, 1000f, 2000f), 400, 1.0f, 1,
             6000);
 
         base.Initialize();
@@ -51,15 +50,15 @@ public class SimpleHeightMap : TGCSample
         CreateHeightMapMesh(currentHeightmap, scaleXZ, scaleY);
 
         // Terrain texture.
-        TerrainTexture = Game.Content.Load<Texture2D>(ContentFolderTextures + "heightmaps/terrain-texture-3");
+        _terrainTexture = Game.Content.Load<Texture2D>(ContentFolderTextures + "heightmaps/terrain-texture-3");
 
-        Effect = new BasicEffect(GraphicsDevice)
+        _effect = new BasicEffect(GraphicsDevice)
         {
             World = Matrix.Identity,
             TextureEnabled = true,
-            Texture = TerrainTexture
+            Texture = _terrainTexture
         };
-        Effect.EnableDefaultLighting();
+        _effect.EnableDefaultLighting();
 
         base.LoadContent();
     }
@@ -67,9 +66,9 @@ public class SimpleHeightMap : TGCSample
     /// <inheritdoc />
     public override void Update(GameTime gameTime)
     {
-        Camera.Update(gameTime);
+        _camera.Update(gameTime);
 
-        Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+        Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
 
         base.Update(gameTime);
     }
@@ -79,19 +78,18 @@ public class SimpleHeightMap : TGCSample
     {
         Game.Background = Color.Black;
         GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-        GraphicsDevice.SetVertexBuffer(TerrainVertexBuffer);
-        GraphicsDevice.Indices = TerrainIndexBuffer;
+        GraphicsDevice.SetVertexBuffer(_terrainVertexBuffer);
+        GraphicsDevice.Indices = _terrainIndexBuffer;
 
         // Render terrain.
-        Effect.View = Camera.View;
-        Effect.Projection = Camera.Projection;
+        _effect.View = _camera.View;
+        _effect.Projection = _camera.Projection;
 
-        foreach (var pass in Effect.CurrentTechnique.Passes)
+        foreach (var pass in _effect.CurrentTechnique.Passes)
         {
             pass.Apply();
-            GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, PrimitiveCount);
+            GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, _primitiveCount);
         }
-
 
         base.Draw(gameTime);
     }
@@ -99,20 +97,22 @@ public class SimpleHeightMap : TGCSample
     /// <summary>
     ///     Create and load the VertexBuffer based on a Heightmap texture.
     /// </summary>
-    /// <param name="texture">The Heightmap texture.</param>
-    /// <param name="scaleXZ">ScaleXZ is the distance between the vertices in the XZ plane, where the terrain does not rise.</param>
-    /// <param name="scaleY">ScaleY is the distance by variability of gray in the heightmap.</param>
+    /// <param name="texture">The Heightmap texture</param>
+    /// <param name="scaleXZ">ScaleXZ is the distance between the vertices in the XZ plane, where the terrain does not rise</param>
+    /// <param name="scaleY">ScaleY is the distance by variability of gray in the heightmap</param>
     private void CreateHeightMapMesh(Texture2D texture, float scaleXZ, float scaleY)
     {
+        var heightMap = new HeightMap(texture.Width, texture.Height);
+
         // Parse bitmap and load height matrix.
-        var heightMap = LoadHeightMap(texture);
+        LoadHeightMap(texture, ref heightMap);
 
         CreateVertexBuffer(heightMap, scaleXZ, scaleY);
 
-        var heightMapWidthMinusOne = heightMap.GetLength(0) - 1;
-        var heightMapLengthMinusOne = heightMap.GetLength(1) - 1;
+        var heightMapWidthMinusOne = heightMap.Width - 1;
+        var heightMapLengthMinusOne = heightMap.Length - 1;
 
-        PrimitiveCount = 2 * heightMapWidthMinusOne * heightMapLengthMinusOne;
+        _primitiveCount = 2 * heightMapWidthMinusOne * heightMapLengthMinusOne;
 
         CreateIndexBuffer(heightMapWidthMinusOne, heightMapLengthMinusOne);
     }
@@ -120,16 +120,15 @@ public class SimpleHeightMap : TGCSample
     /// <summary>
     ///     Load Bitmap and get the grayscale value of Y for each coordinate (x, z).
     /// </summary>
-    /// <param name="texture">The Heightmap texture.</param>
-    /// <returns>The height of each vertex from zero to one.</returns>
-    private float[,] LoadHeightMap(Texture2D texture)
+    /// <param name="texture">The Heightmap texture</param>
+    /// <param name="heightMap">The filled heightmap data</param>
+    /// <returns>The height of each vertex from zero to one</returns>
+    private void LoadHeightMap(Texture2D texture, ref HeightMap heightMap)
     {
         var texels = new Color[texture.Width * texture.Height];
 
         // Obtains each texel color from the texture, note that this is an expensive operation.
         texture.GetData(texels);
-
-        var heightmap = new float[texture.Width, texture.Height];
 
         for (var x = 0; x < texture.Width; x++)
         for (var y = 0; y < texture.Height; y++)
@@ -137,10 +136,8 @@ public class SimpleHeightMap : TGCSample
             // Get the color.
             // (j, i) inverted to sweep rows first and then columns.
             var texel = texels[y * texture.Width + x];
-            heightmap[x, y] = texel.R;
+            heightMap[x, y] = texel.R;
         }
-
-        return heightmap;
     }
 
     /// <summary>
@@ -149,38 +146,33 @@ public class SimpleHeightMap : TGCSample
     /// <param name="heightMap">The Heightmap which specifies height for each vertex</param>
     /// <param name="scaleXZ">The distance between the vertices in both the X and Z axis</param>
     /// <param name="scaleY">The scale in the Y axis for the vertices of the HeightMap</param>
-    private void CreateVertexBuffer(float[,] heightMap, float scaleXZ, float scaleY)
+    private void CreateVertexBuffer(in HeightMap heightMap, float scaleXZ, float scaleY)
     {
-        var heightMapWidth = heightMap.GetLength(0);
-        var heightMapLength = heightMap.GetLength(1);
-
-        var offsetX = heightMapWidth * scaleXZ * 0.5f;
-        var offsetZ = heightMapLength * scaleXZ * 0.5f;
+        var offsetX = heightMap.Width * scaleXZ * 0.5f;
+        var offsetZ = heightMap.Length * scaleXZ * 0.5f;
 
         // Amount of subdivisions in X times amount of subdivisions in Z.
-        var vertexCount = heightMapWidth * heightMapLength;
+        var vertexCount = heightMap.Width * heightMap.Length;
 
         // Create temporary array of vertices.
         var vertices = new VertexPositionNormalTexture[vertexCount];
 
         var index = 0;
-        Vector3 position;
-        Vector2 textureCoordinates;
 
-        for (var x = 0; x < heightMapWidth; x++)
-        for (var z = 0; z < heightMapLength; z++)
+        for (var x = 0; x < heightMap.Width; x++)
+        for (var z = 0; z < heightMap.Length; z++)
         {
-            position = new Vector3(x * scaleXZ - offsetX, heightMap[x, z] * scaleY, z * scaleXZ - offsetZ);
-            textureCoordinates = new Vector2((float)x / heightMapWidth, (float)z / heightMapLength);
+            var position = new Vector3(x * scaleXZ - offsetX, heightMap[x, z] * scaleY, z * scaleXZ - offsetZ);
+            var textureCoordinates = new Vector2((float)x / heightMap.Width, (float)z / heightMap.Length);
             var normal = CalculateNormal(heightMap, x, z, scaleXZ, scaleY);
             vertices[index] = new VertexPositionNormalTexture(position, normal, textureCoordinates);
             index++;
         }
 
         // Create the actual vertex buffer.
-        TerrainVertexBuffer = new VertexBuffer(GraphicsDevice, VertexPositionNormalTexture.VertexDeclaration,
+        _terrainVertexBuffer = new VertexBuffer(GraphicsDevice, VertexPositionNormalTexture.VertexDeclaration,
             vertexCount, BufferUsage.None);
-        TerrainVertexBuffer.SetData(vertices);
+        _terrainVertexBuffer.SetData(vertices);
     }
 
     /// <summary>
@@ -195,17 +187,13 @@ public class SimpleHeightMap : TGCSample
         var indices = new ushort[indexCount];
         var index = 0;
 
-        int right;
-        int top;
-        int bottom;
-
         var vertexCountX = quadsInX + 1;
         for (var x = 0; x < quadsInX; x++)
         for (var z = 0; z < quadsInZ; z++)
         {
-            right = x + 1;
-            bottom = z * vertexCountX;
-            top = (z + 1) * vertexCountX;
+            var right = x + 1;
+            var bottom = z * vertexCountX;
+            var top = (z + 1) * vertexCountX;
 
             //  d __ c  
             //   | /|
@@ -234,9 +222,9 @@ public class SimpleHeightMap : TGCSample
             index++;
         }
 
-        TerrainIndexBuffer =
+        _terrainIndexBuffer =
             new IndexBuffer(GraphicsDevice, IndexElementSize.SixteenBits, indexCount, BufferUsage.None);
-        TerrainIndexBuffer.SetData(indices);
+        _terrainIndexBuffer.SetData(indices);
     }
 
     /// <summary>
@@ -248,16 +236,13 @@ public class SimpleHeightMap : TGCSample
     /// <param name="scaleXZ">Scale factor for XZ plane</param>
     /// <param name="scaleY">Scale factor for Y axis</param>
     /// <returns>Normalized normal vector</returns>
-    private Vector3 CalculateNormal(float[,] heightMap, int x, int z, float scaleXZ, float scaleY)
+    private Vector3 CalculateNormal(in HeightMap heightMap, int x, int z, float scaleXZ, float scaleY)
     {
-        var width = heightMap.GetLength(0);
-        var height = heightMap.GetLength(1);
-
         // Get neighboring heights (clamp at edges).
         var hL = heightMap[Math.Max(0, x - 1), z] * scaleY; // Left
-        var hR = heightMap[Math.Min(width - 1, x + 1), z] * scaleY; // Right
+        var hR = heightMap[Math.Min(heightMap.Width - 1, x + 1), z] * scaleY; // Right
         var hD = heightMap[x, Math.Max(0, z - 1)] * scaleY; // Down
-        var hU = heightMap[x, Math.Min(height - 1, z + 1)] * scaleY; // Up
+        var hU = heightMap[x, Math.Min(heightMap.Length - 1, z + 1)] * scaleY; // Up
 
         // Calculate tangent vectors.
         var tangentX = new Vector3(2.0f * scaleXZ, hR - hL, 0);
@@ -273,9 +258,31 @@ public class SimpleHeightMap : TGCSample
     /// <inheritdoc />
     protected override void UnloadContent()
     {
-        TerrainVertexBuffer?.Dispose();
-        TerrainIndexBuffer?.Dispose();
-        Effect?.Dispose();
+        _terrainVertexBuffer?.Dispose();
+        _terrainIndexBuffer?.Dispose();
+        _effect?.Dispose();
         base.UnloadContent();
+    }
+
+    /// <summary>
+    ///     Struct holding heightmap data on a 2D grid (Width x Length).
+    /// </summary>
+    /// <param name="width">Sample count in X</param>
+    /// <param name="length">Sample count in Z</param>
+    private readonly struct HeightMap(int width, int length)
+    {
+        public readonly int Width = width;
+        public readonly int Length = length;
+
+        private readonly float[] _samples = new float[width * length];
+
+        /// <summary>Gets or sets the height at (x, z)</summary>
+        /// <param name="x">X in range [0, Width)</param>
+        /// <param name="z">Z in range [0, Length)</param>
+        public float this[int x, int z]
+        {
+            get => _samples[x + z * Width];
+            set => _samples[x + z * Width] = value;
+        }
     }
 }

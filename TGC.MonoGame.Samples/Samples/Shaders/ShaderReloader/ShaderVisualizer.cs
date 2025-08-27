@@ -17,8 +17,8 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.ShaderReloader;
 public class ShaderVisualizer : TGCSample
 {
     private static readonly string ShaderName = "ShaderVisualizer";
-    private IConfigurationRoot _configuration;
 
+    private IConfigurationRoot _configuration;
     private Effect _effect;
     private FullScreenQuad _quad;
     private ShaderReloader _shaderReloader;
@@ -54,7 +54,7 @@ public class ShaderVisualizer : TGCSample
         _shaderReloader = new ShaderReloader(effectPath, _configuration["ContentExtension"], GraphicsDevice);
         _shaderReloader.OnCompile += OnShaderCompile;
 
-        // Make the window squared
+        // Make the window squared.
         Game.Graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 100;
         Game.Graphics.ApplyChanges();
 
@@ -70,8 +70,7 @@ public class ShaderVisualizer : TGCSample
 
     private string FindProjectDirectory()
     {
-        var rootDirectory = Assembly.GetEntryAssembly()?.GetName().Name ??
-                            Assembly.GetExecutingAssembly().GetName().Name;
+        var rootDirectory = Assembly.GetEntryAssembly()?.GetName().Name ?? GetType().Assembly.GetName().Name;
         var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
         var actual = new DirectoryInfo(baseDirectory);
 
@@ -106,7 +105,7 @@ public class ShaderVisualizer : TGCSample
         _shaderReloader?.Dispose();
         _effect?.Dispose();
 
-        // Restore window width
+        // Restore window width.
         Game.Graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width - 100;
         Game.Graphics.ApplyChanges();
 

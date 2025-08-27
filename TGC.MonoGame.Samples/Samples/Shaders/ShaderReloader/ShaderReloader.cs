@@ -6,9 +6,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TGC.MonoGame.Samples.Samples.Shaders.ShaderReloader;
 
-internal class ShaderReloader
+public class ShaderReloader
 {
     private static readonly string MgfxcTool = "mgfxc";
+
     private readonly GraphicsDevice _graphicsDevice;
     private readonly string _shaderCodeFileName;
     private readonly string _shaderCodePath;
@@ -39,8 +40,8 @@ internal class ShaderReloader
         _fileWatcher.Path = Path.GetDirectoryName(_shaderCodePath);
         _fileWatcher.Filter = _shaderCodeFileName;
 
-        // Add event handlers
-        // Listen to any event, as VS renames files instead of changing them
+        // Add event handlers.
+        // Listen to any event, as VS renames files instead of changing them.
         _fileWatcher.Changed += ReplaceShader;
         _fileWatcher.Created += ReplaceShader;
         _fileWatcher.Deleted += ReplaceShader;
@@ -52,7 +53,7 @@ internal class ShaderReloader
 
     private void ReplaceShader(object sender, FileSystemEventArgs eventArgs)
     {
-        // Can be triggered by temp files with suffixes
+        // Can be triggered by temp files with suffixes.
         if (eventArgs.Name.Equals(_shaderCodeFileName))
         {
             CompileShader();
@@ -62,7 +63,7 @@ internal class ShaderReloader
                 var byteCode = File.ReadAllBytes(_shaderCompiledPath);
                 var effect = new Effect(_graphicsDevice, byteCode);
 
-                // Delete the file as we don't need it anymore
+                // Delete the file as we don't need it anymore.
                 File.Delete(_shaderCompiledPath);
 
                 OnCompile?.Invoke(effect);
@@ -90,11 +91,11 @@ internal class ShaderReloader
         var pProcess = new Process();
         pProcess.StartInfo = _processStartInfo;
         pProcess.EnableRaisingEvents = true;
-        //Get program output
+        //Get program output.
         var stdError = new StringBuilder();
         var stdOutput = new StringBuilder();
 
-        // Callbacks
+        // Callbacks.
         pProcess.OutputDataReceived += (sender, args) => stdOutput.Append(args.Data);
         pProcess.ErrorDataReceived += (sender, args) => stdError.Append(args.Data);
 
