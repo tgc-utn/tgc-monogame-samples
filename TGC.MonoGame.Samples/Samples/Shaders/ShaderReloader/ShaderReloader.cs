@@ -96,8 +96,8 @@ public class ShaderReloader
         var stdOutput = new StringBuilder();
 
         // Callbacks.
-        pProcess.OutputDataReceived += (sender, args) => stdOutput.Append(args.Data);
-        pProcess.ErrorDataReceived += (sender, args) => stdError.Append(args.Data);
+        pProcess.OutputDataReceived += (_, args) => stdOutput.Append(args.Data);
+        pProcess.ErrorDataReceived += (_, args) => stdError.Append(args.Data);
 
         pProcess.Start();
         pProcess.BeginOutputReadLine();

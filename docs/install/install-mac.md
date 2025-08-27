@@ -90,6 +90,6 @@ dotnet run --project TGC.MonoGame.Samples
 
 ### Known issues
 
-- Problem after install MGFXC 
+- Problem after install MGFXC
   - Tools directory '/Users/user/.dotnet/tools' is not currently on the PATH environment variable.
   - Some systems may require you to restart your terminal or IDE to recognize the new tool.

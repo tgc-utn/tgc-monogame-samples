@@ -16,7 +16,9 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps;
 public class SimpleHeightMap : TGCSample
 {
     private Camera _camera;
+
     private BasicEffect _effect;
+
     // Triangle count in this case.
     private int _primitiveCount;
     private IndexBuffer _terrainIndexBuffer;
@@ -131,12 +133,14 @@ public class SimpleHeightMap : TGCSample
         texture.GetData(texels);
 
         for (var x = 0; x < texture.Width; x++)
-        for (var y = 0; y < texture.Height; y++)
         {
-            // Get the color.
-            // (j, i) inverted to sweep rows first and then columns.
-            var texel = texels[y * texture.Width + x];
-            heightMap[x, y] = texel.R;
+            for (var y = 0; y < texture.Height; y++)
+            {
+                // Get the color.
+                // (j, i) inverted to sweep rows first and then columns.
+                var texel = texels[y * texture.Width + x];
+                heightMap[x, y] = texel.R;
+            }
         }
     }
 
@@ -160,13 +164,15 @@ public class SimpleHeightMap : TGCSample
         var index = 0;
 
         for (var x = 0; x < heightMap.Width; x++)
-        for (var z = 0; z < heightMap.Length; z++)
         {
-            var position = new Vector3(x * scaleXZ - offsetX, heightMap[x, z] * scaleY, z * scaleXZ - offsetZ);
-            var textureCoordinates = new Vector2((float)x / heightMap.Width, (float)z / heightMap.Length);
-            var normal = CalculateNormal(heightMap, x, z, scaleXZ, scaleY);
-            vertices[index] = new VertexPositionNormalTexture(position, normal, textureCoordinates);
-            index++;
+            for (var z = 0; z < heightMap.Length; z++)
+            {
+                var position = new Vector3(x * scaleXZ - offsetX, heightMap[x, z] * scaleY, z * scaleXZ - offsetZ);
+                var textureCoordinates = new Vector2((float)x / heightMap.Width, (float)z / heightMap.Length);
+                var normal = CalculateNormal(heightMap, x, z, scaleXZ, scaleY);
+                vertices[index] = new VertexPositionNormalTexture(position, normal, textureCoordinates);
+                index++;
+            }
         }
 
         // Create the actual vertex buffer.
@@ -189,37 +195,39 @@ public class SimpleHeightMap : TGCSample
 
         var vertexCountX = quadsInX + 1;
         for (var x = 0; x < quadsInX; x++)
-        for (var z = 0; z < quadsInZ; z++)
         {
-            var right = x + 1;
-            var bottom = z * vertexCountX;
-            var top = (z + 1) * vertexCountX;
+            for (var z = 0; z < quadsInZ; z++)
+            {
+                var right = x + 1;
+                var bottom = z * vertexCountX;
+                var top = (z + 1) * vertexCountX;
 
-            //  d __ c  
-            //   | /|
-            //   |/_|
-            //  a    b
+                //  d __ c  
+                //   | /|
+                //   |/_|
+                //  a    b
 
-            var a = (ushort)(x + bottom);
-            var b = (ushort)(right + bottom);
-            var c = (ushort)(right + top);
-            var d = (ushort)(x + top);
+                var a = (ushort)(x + bottom);
+                var b = (ushort)(right + bottom);
+                var c = (ushort)(right + top);
+                var d = (ushort)(x + top);
 
-            // ACB
-            indices[index] = a;
-            index++;
-            indices[index] = c;
-            index++;
-            indices[index] = b;
-            index++;
+                // ACB
+                indices[index] = a;
+                index++;
+                indices[index] = c;
+                index++;
+                indices[index] = b;
+                index++;
 
-            // ADC
-            indices[index] = a;
-            index++;
-            indices[index] = d;
-            index++;
-            indices[index] = c;
-            index++;
+                // ADC
+                indices[index] = a;
+                index++;
+                indices[index] = d;
+                index++;
+                indices[index] = c;
+                index++;
+            }
         }
 
         _terrainIndexBuffer =
