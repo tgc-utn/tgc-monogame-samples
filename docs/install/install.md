@@ -1,6 +1,6 @@
 # Install
 
-The samples are test in:
+The samples where tested in:
 
 - macOS Ventura.
 - Windows 10/11.
