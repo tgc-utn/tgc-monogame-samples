@@ -77,7 +77,7 @@ public class CustomPipelineManager : PipelineManager
             Parameters = ValidateProcessorParameters(_configuration["ProcessorName"], parameters)
         };
 
-        var importContext = new PipelineImporterContext(this);
+        var importContext = new PipelineImporterContext(this, pipelineEvent);
         var importer = new FbxImporter();
         var nodeContent =
             importer.Import(ProjectDirectory + modelFilename + _configuration["FbxExtension"], importContext);
