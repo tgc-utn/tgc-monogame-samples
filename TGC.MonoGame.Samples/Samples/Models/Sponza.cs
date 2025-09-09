@@ -1,16 +1,15 @@
 ﻿using System;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Viewer;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.Samples.Models;
 
 namespace TGC.MonoGame.Samples.Samples.Models;
 
-
+/// <summary>
+/// A sample showing how to draw the sponza cathedral.
+/// </summary>
 public class Sponza : TGCSample
 {
     /// <summary>
@@ -29,7 +28,7 @@ public class Sponza : TGCSample
     private Effect _effect;
 
     /// <summary>
-    /// Model info containing data
+    /// Model info that facilitates rendering.
     /// </summary>
     private ModelInfo _info; 
     
@@ -112,11 +111,8 @@ public class Sponza : TGCSample
 
     protected override void UnloadContent()
     {
-        // Need to dispose the GeometryData because GetCenteredXZ copies the buffers
-        foreach (var geometryData in _info.GeometryData)
-        {
-            geometryData.Geometry.Dispose();
-        }
+        // Need to dispose the model info
+        _info.Dispose();
     }
 }
     

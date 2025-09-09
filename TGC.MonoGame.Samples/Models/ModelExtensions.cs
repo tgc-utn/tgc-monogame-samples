@@ -9,6 +9,12 @@ namespace TGC.MonoGame.Samples.Models;
 
 public static class ModelExtensions
 {
+    /// <summary>
+    /// Gets <see cref="ModelInfo"/> for a MonoGame <see cref="Model"/>.
+    /// Lists simplified matrices, textures and geometry for a group of meshes that live inside the model.
+    /// </summary>
+    /// <param name="model">The model to get the info from</param>
+    /// <returns>A collection of associated information to each mesh of the model</returns>
     public static ModelInfo Get(Model model)
     {
         int geometryCount = 0;
@@ -41,7 +47,13 @@ public static class ModelExtensions
         return new ModelInfo(geometryData);
     }
     
-    public static ModelInfo GetMerged(Microsoft.Xna.Framework.Graphics.Model model)
+    /// <summary>
+    /// Gets a <see cref="ModelInfo"/> with a single entry for a MonoGame <see cref="Model"/>.
+    /// Merges meshes and parts that live inside the model according to their matrices.
+    /// </summary>
+    /// <param name="model">The model to get the merged model info from</param>
+    /// <returns>A model info with a single instance of merged geometry</returns>
+    public static ModelInfo GetMerged(Model model)
     {
         var absoluteMatrices = new Matrix[model.Bones.Count];
         model.CopyAbsoluteBoneTransformsTo(absoluteMatrices);
@@ -218,6 +230,14 @@ public static class ModelExtensions
         ]);
     }
 
+    /// <summary>
+    /// Gets <see cref="ModelInfo"/> for a MonoGame <see cref="Model"/>.
+    /// Lists simplified matrices, textures and geometry for a group of meshes that live inside the model.
+    /// Centers all geometry based on the averaged centered position of all meshes inside the model provided.
+    /// <remarks>This method modifies the geometry to center all meshes</remarks>
+    /// </summary>
+    /// <param name="model">The model to get the info from</param>
+    /// <returns>A collection of associated information to each mesh of the model with geometry centered</returns>
     public static ModelInfo GetCentered(Model model)
     {
         int geometryCount = 0;
@@ -350,6 +370,13 @@ public static class ModelExtensions
         return new ModelInfo(geometryData);
     }
     
+    /// <summary>
+    /// Gets <see cref="ModelInfo"/> for a MonoGame <see cref="Model"/>.
+    /// Lists simplified matrices, textures and geometry for a group of meshes that live inside the model.
+    /// Centers all geometry based on the averaged centered position across the XZ plane of all meshes inside the model provided.
+    /// </summary>
+    /// <param name="model">The model to get the info from</param>
+    /// <returns>A collection of associated information to each mesh of the model with geometry centered across the XZ plane</returns>
     public static ModelInfo GetCenteredXZ(Model model)
     {
         int geometryCount = 0;
@@ -482,7 +509,16 @@ public static class ModelExtensions
         return new ModelInfo(geometryData);
     }
 
-    public static ModelInfo GetMergedCentered(Microsoft.Xna.Framework.Graphics.Model model)
+    /// <summary>
+    /// Gets <see cref="ModelInfo"/> for a MonoGame <see cref="Model"/>.
+    /// Lists simplified matrices, textures and geometry for a group of meshes that live inside the model.
+    /// Centers all geometry based on the averaged centered position of all meshes inside the model provided.
+    /// Merges meshes and parts that live inside the model according to their matrices.
+    /// <remarks>This method modifies the geometry to center all meshes</remarks>
+    /// </summary>
+    /// <param name="model">The model to get the merged info from</param>
+    /// <returns>A model info with a single instance of merged geometry</returns>
+    public static ModelInfo GetMergedCentered(Model model)
     {
         var absoluteMatrices = new Matrix[model.Bones.Count];
         model.CopyAbsoluteBoneTransformsTo(absoluteMatrices);
