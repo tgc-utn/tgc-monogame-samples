@@ -82,6 +82,19 @@ namespace TGC.MonoGame.Samples.Cameras
                 Position += -FrontDirection * currentMovementSpeed * elapsedTime;
                 _changed = true;
             }
+
+            if (keyboardState.IsKeyDown(Keys.Space))
+            {
+                Position += Vector3.Up * currentMovementSpeed * elapsedTime;
+                _changed = true;
+            }
+
+            if (keyboardState.IsKeyDown(Keys.LeftControl))
+            {
+                Position -= Vector3.Up * currentMovementSpeed * elapsedTime;
+                _changed = true;
+            }
+
         }
 
         private void ProcessMouseMovement(float elapsedTime)
