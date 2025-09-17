@@ -1,9 +1,10 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
+using TGC.MonoGame.Samples.Geometries.Textures;
 using TGC.MonoGame.Samples.Viewer;
 
 namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
@@ -34,9 +35,14 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
         }
 
         private Camera Camera { get; set; }
+        private Texture2D WoodenTexture { get; set; }
 
         private SpherePrimitive Sphere { get; set; }
+        private BoxPrimitive BoxPrimitive { get; set; }
         private Matrix SphereTranslation { get; set; }
+
+        private Matrix BoxWorld { get; set; }
+        private BasicEffect BoxesEffect { get; set; }
 
         /// <inheritdoc />
         public override void Initialize()
@@ -53,6 +59,8 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
 
             SphereRotation = Matrix.Identity;
 
+            BoxWorld = Matrix.CreateScale(30f) * Matrix.CreateTranslation(spherePos);
+
             base.Initialize();
         }
 
@@ -63,11 +71,17 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
             var terrainHeigthmap = Game.Content.Load<Texture2D>(ContentFolderTextures + "Heightmaps/heightmap");
             // color basico
             var terrainColorMap = Game.Content.Load<Texture2D>(ContentFolderTextures + "Heightmaps/colormap");
+            WoodenTexture = Game.Content.Load<Texture2D>(ContentFolderTextures + "wood/caja-madera-1");
             // blend texture 1
             var terrainGrass = Game.Content.Load<Texture2D>(ContentFolderTextures + "grass");
             // blend texture 2
             var terrainGround = Game.Content.Load<Texture2D>(ContentFolderTextures + "ground");
             terrain = new SimpleTerrain(GraphicsDevice, terrainHeigthmap, terrainColorMap, terrainGrass, terrainGround, terrainEffect);
+
+            BoxesEffect = new BasicEffect(GraphicsDevice);
+            BoxesEffect.TextureEnabled = true;
+
+            BoxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, WoodenTexture);
 
             base.LoadContent();
         }
@@ -175,6 +189,14 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
             GraphicsDevice.RasterizerState = oldRasterizerState;
 
             DrawGeometry(Sphere, Matrix.CreateScale(50 * 0.1f) * SphereRotation * Matrix.CreateTranslation(spherePos));
+
+            Vector3 boxesPos = new Vector3(spherePos.X - 100, spherePos.Y, spherePos.Z - 100);
+            BoxesEffect.World = Matrix.CreateScale(100f) * Matrix.CreateTranslation(boxesPos);
+            BoxesEffect.View = Camera.View;
+            BoxesEffect.Projection = Camera.Projection;
+
+            BoxesEffect.Texture = WoodenTexture;
+            BoxPrimitive.Draw(BoxesEffect);
 
             base.Draw(gameTime);
         }
