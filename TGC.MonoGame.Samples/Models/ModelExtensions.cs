@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
+using Vector3 = Microsoft.Xna.Framework.Vector3;
 
 namespace TGC.MonoGame.Samples.Models;
 
@@ -80,149 +83,10 @@ public static class ModelExtensions
             }
         }
 
-        VertexBuffer vertexBuffer;
-        {
-            // Extract vertices
-            var vertices = new VertexPositionColorNormalTexture[vertexCount];
-
-            Dictionary<VertexBuffer, byte[]> vertexData = new();
-
-            foreach (var mesh in model.Meshes)
-            {
-                var transform = absoluteMatrices[mesh.ParentBone.Index];
-
-                foreach (var part in mesh.MeshParts)
-                {
-                    var partVertexBuffer = part.VertexBuffer;
-
-                    if (!vertexData.TryGetValue(partVertexBuffer, out var bufferData))
-                    {
-                        var declaration = partVertexBuffer.VertexDeclaration;
-                        var vertexSize = declaration.VertexStride;
-                        bufferData = new byte[vertexSize * partVertexBuffer.VertexCount];
-                        partVertexBuffer.GetData(bufferData);
-                        vertexData.Add(partVertexBuffer, bufferData);
-                    }
-
-                    int offsetByStride = part.VertexOffset *
-                                      part.VertexBuffer.VertexDeclaration.VertexStride;
-                    
-                    int numVerticesByStride = part.NumVertices *
-                                      part.VertexBuffer.VertexDeclaration.VertexStride;
-
-                    CopyTo(bufferData.AsSpan().Slice(offsetByStride, numVerticesByStride),
-                        vertices.AsSpan().Slice(part.VertexOffset, part.NumVertices),
-                        transform, partVertexBuffer.VertexDeclaration);
-                }
-            }
-            
-            vertexBuffer = new VertexBuffer(device, typeof(VertexPositionColorNormalTexture), vertices.Length, BufferUsage.None);
-            vertexBuffer.SetData(vertices);
-        }
-
-
-        IndexBuffer indexBuffer = new IndexBuffer(device, 
-            vertexCount > ushort.MaxValue ? IndexElementSize.ThirtyTwoBits : IndexElementSize.SixteenBits, 
-            indexCount, BufferUsage.None);
+        Dictionary<VertexBuffer, byte[]> vertexData = new();
         
-        {
-            // Extract indices
-            
-            Dictionary<IndexBuffer, byte[]> indexData = new();
-            int currentIndexCount = 0;
-
-            if (vertexCount > ushort.MaxValue)
-            {
-                var indices = new uint[indexCount];
-                
-                foreach (var mesh in model.Meshes)
-                {
-                    foreach (var part in mesh.MeshParts)
-                    {
-                        var partIndexBuffer = part.IndexBuffer;
-
-                        int stride = partIndexBuffer.IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4;
-                        
-                        if (!indexData.TryGetValue(partIndexBuffer, out var bufferData))
-                        {
-                            var data = new byte[partIndexBuffer.IndexCount * stride];
-                            partIndexBuffer.GetData(data);
-                            bufferData = data;
-                            indexData.Add(partIndexBuffer, data);
-                        }
-
-                        if (partIndexBuffer.IndexElementSize == IndexElementSize.SixteenBits)
-                        {
-                            var shortIndexData = MemoryMarshal.Cast<byte, ushort>(bufferData.AsSpan()
-                                .Slice(part.StartIndex * stride, part.PrimitiveCount * 3 * stride));
-                            
-                            for (int i = 0; i < shortIndexData.Length; i++)
-                            {
-                                indices[i + currentIndexCount] = shortIndexData[i];
-                            }
-
-                            currentIndexCount += shortIndexData.Length;
-                        }
-                        else
-                        {
-                            var integerIndexData = MemoryMarshal.Cast<byte, uint>(bufferData.AsSpan()
-                                .Slice(part.StartIndex * stride, part.PrimitiveCount * 3 * stride));
-                            
-                            integerIndexData.CopyTo(indices.AsSpan().Slice(currentIndexCount));
-                            currentIndexCount += integerIndexData.Length;
-                        }
-                    }
-                }
-                
-                indexBuffer.SetData(indices);
-            }
-            else
-            {
-                var indices = new ushort[indexCount];
-                
-                foreach (var mesh in model.Meshes)
-                {
-                    foreach (var part in mesh.MeshParts)
-                    {
-                        var partIndexBuffer = part.IndexBuffer;
-
-                        int stride = partIndexBuffer.IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4;
-                        
-                        if (!indexData.TryGetValue(partIndexBuffer, out var bufferData))
-                        {
-                            var data = new byte[partIndexBuffer.IndexCount * stride];
-                            partIndexBuffer.GetData(data);
-                            bufferData = data;
-                            indexData.Add(partIndexBuffer, data);
-                        }
-
-                        if (partIndexBuffer.IndexElementSize == IndexElementSize.SixteenBits)
-                        {
-                            var shortIndexData = MemoryMarshal.Cast<byte, ushort>(bufferData.AsSpan()
-                                .Slice(part.StartIndex * stride, part.PrimitiveCount * 3 * stride));
-                            
-                            shortIndexData.CopyTo(indices.AsSpan().Slice(currentIndexCount));
-                            
-                            currentIndexCount += shortIndexData.Length;
-                        }
-                        else
-                        {
-                            var integerIndexData = MemoryMarshal.Cast<byte, uint>(bufferData.AsSpan()
-                                .Slice(part.StartIndex * stride, part.PrimitiveCount * 3 * stride));
-                            
-                            for (int i = 0; i < integerIndexData.Length; i++)
-                            {
-                                indices[i + currentIndexCount] = (ushort)integerIndexData[i];
-                            }
-
-                            currentIndexCount += integerIndexData.Length;
-                        }
-                    }
-                }
-                
-                indexBuffer.SetData(indices);
-            }
-        }
+        GetMergedBuffers(model, vertexCount, indexCount, absoluteMatrices, Matrix.Identity,
+            vertexData, device, out var vertexBuffer, out var indexBuffer);
         
         return new ModelInfo(
         [
@@ -582,147 +446,141 @@ public static class ModelExtensions
 
         var centeringTransform = Matrix.CreateTranslation(-sum);
         
-        VertexBuffer vertexBuffer;
+        // Extract textures, vertices and indices
+        foreach (var mesh in model.Meshes)
         {
-            // Extract vertices
-            var vertices = new VertexPositionColorNormalTexture[vertexCount];
-
-
-            foreach (var mesh in model.Meshes)
+            foreach (var part in mesh.MeshParts)
             {
-                var transform = absoluteMatrices[mesh.ParentBone.Index] * centeringTransform;
+                vertexCount += part.NumVertices;
+                indexCount += part.PrimitiveCount * 3;
+                
+                var mainTexture = ((BasicEffect)part.Effect).Texture;
 
-                foreach (var part in mesh.MeshParts)
-                {
-                    var partVertexBuffer = part.VertexBuffer;
-
-                    var data = vertexData[partVertexBuffer];
-
-                    int offsetByStride = part.VertexOffset *
-                                      part.VertexBuffer.VertexDeclaration.VertexStride;
-                    
-                    int numVerticesByStride = part.NumVertices *
-                                      part.VertexBuffer.VertexDeclaration.VertexStride;
-
-                    CopyTo(data.AsSpan().Slice(offsetByStride, numVerticesByStride),
-                        vertices.AsSpan().Slice(part.VertexOffset, part.NumVertices),
-                        transform, partVertexBuffer.VertexDeclaration);
-                }
+                if (mainTexture != null)
+                    textures.Add(mainTexture);
             }
-            
-            vertexBuffer = new VertexBuffer(device, typeof(VertexPositionColorNormalTexture), vertices.Length, BufferUsage.None);
-            vertexBuffer.SetData(vertices);
         }
 
-        IndexBuffer indexBuffer = new IndexBuffer(device, 
-            vertexCount > ushort.MaxValue ? IndexElementSize.ThirtyTwoBits : IndexElementSize.SixteenBits, 
-            indexCount, BufferUsage.None);
-        
-        {
-            // Extract indices
-            
-            Dictionary<IndexBuffer, byte[]> indexData = new();
-            int currentIndexCount = 0;
+        GetMergedBuffers(model, vertexCount, indexCount, absoluteMatrices, centeringTransform,
+            vertexData, device, out var vertexBuffer, out var indexBuffer);
 
-            if (vertexCount > ushort.MaxValue)
-            {
-                var indices = new uint[indexCount];
-                
-                foreach (var mesh in model.Meshes)
-                {
-                    foreach (var part in mesh.MeshParts)
-                    {
-                        var partIndexBuffer = part.IndexBuffer;
-
-                        int stride = partIndexBuffer.IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4;
-                        
-                        if (!indexData.TryGetValue(partIndexBuffer, out var bufferData))
-                        {
-                            var data = new byte[partIndexBuffer.IndexCount * stride];
-                            partIndexBuffer.GetData(data);
-                            bufferData = data;
-                            indexData.Add(partIndexBuffer, data);
-                        }
-
-                        if (partIndexBuffer.IndexElementSize == IndexElementSize.SixteenBits)
-                        {
-                            var shortIndexData = MemoryMarshal.Cast<byte, ushort>(bufferData.AsSpan()
-                                .Slice(part.StartIndex * stride, part.PrimitiveCount * 3 * stride));
-                            
-                            for (int i = 0; i < shortIndexData.Length; i++)
-                            {
-                                indices[i + currentIndexCount] = shortIndexData[i];
-                            }
-
-                            currentIndexCount += shortIndexData.Length;
-                        }
-                        else
-                        {
-                            var integerIndexData = MemoryMarshal.Cast<byte, uint>(bufferData.AsSpan()
-                                .Slice(part.StartIndex * stride, part.PrimitiveCount * 3 * stride));
-                            
-                            integerIndexData.CopyTo(indices.AsSpan().Slice(currentIndexCount));
-                            currentIndexCount += integerIndexData.Length;
-                        }
-                    }
-                }
-                
-                indexBuffer.SetData(indices);
-            }
-            else
-            {
-                var indices = new ushort[indexCount];
-                
-                foreach (var mesh in model.Meshes)
-                {
-                    foreach (var part in mesh.MeshParts)
-                    {
-                        var partIndexBuffer = part.IndexBuffer;
-
-                        int stride = partIndexBuffer.IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4;
-                        
-                        if (!indexData.TryGetValue(partIndexBuffer, out var bufferData))
-                        {
-                            var data = new byte[partIndexBuffer.IndexCount * stride];
-                            partIndexBuffer.GetData(data);
-                            bufferData = data;
-                            indexData.Add(partIndexBuffer, data);
-                        }
-
-                        if (partIndexBuffer.IndexElementSize == IndexElementSize.SixteenBits)
-                        {
-                            var shortIndexData = MemoryMarshal.Cast<byte, ushort>(bufferData.AsSpan()
-                                .Slice(part.StartIndex * stride, part.PrimitiveCount * 3 * stride));
-                            
-                            shortIndexData.CopyTo(indices.AsSpan().Slice(currentIndexCount));
-                            
-                            currentIndexCount += shortIndexData.Length;
-                        }
-                        else
-                        {
-                            var integerIndexData = MemoryMarshal.Cast<byte, uint>(bufferData.AsSpan()
-                                .Slice(part.StartIndex * stride, part.PrimitiveCount * 3 * stride));
-                            
-                            for (int i = 0; i < integerIndexData.Length; i++)
-                            {
-                                indices[i + currentIndexCount] = (ushort)integerIndexData[i];
-                            }
-
-                            currentIndexCount += integerIndexData.Length;
-                        }
-                    }
-                }
-                
-                indexBuffer.SetData(indices);
-            }
-        }
-        
         return new ModelInfo(
         [
             new GeometryData(new Geometry(vertexBuffer, indexBuffer), Matrix.Identity, textures.ToArray())
         ]);
     }
-    
+
+    private static void GetMergedBuffers(Model model, int vertexCount, int indexCount,
+        Matrix[] absoluteMatrices, in Matrix absoluteTransform,
+        Dictionary<VertexBuffer, byte[]> vertexData, 
+        GraphicsDevice device, out VertexBuffer vertexBuffer, out IndexBuffer indexBuffer)
+    {
+        var vertices = new VertexPositionColorNormalTexture[vertexCount];
+
+        Dictionary<IndexBuffer, byte[]> indexData = new();
+        
+        bool largeIndices = vertexCount > ushort.MaxValue;
+        
+        ushort[] indicesShort = null;
+        uint[] indicesInt = null;
+            
+        if(largeIndices)
+            indicesInt = new uint[indexCount];
+        else
+            indicesShort = new ushort[indexCount];
+
+        int currentIndex = 0;
+        int vertexOffset = 0;
+        
+        foreach (var mesh in model.Meshes)
+        {
+            var transform = absoluteMatrices[mesh.ParentBone.Index];
+
+            foreach (var part in mesh.MeshParts)
+            {
+                var partVertexBuffer = part.VertexBuffer;
+
+                if (!vertexData.TryGetValue(partVertexBuffer, out var bufferData))
+                {
+                    var declaration = partVertexBuffer.VertexDeclaration;
+                    var vertexSize = declaration.VertexStride;
+                    bufferData = new byte[vertexSize * partVertexBuffer.VertexCount];
+                    partVertexBuffer.GetData(bufferData);
+                    vertexData.Add(partVertexBuffer, bufferData);
+                }
+
+                int indexStride = part.IndexBuffer.IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4; 
+                if (!indexData.TryGetValue(part.IndexBuffer, out var indexBufferData))
+                {
+                    indexBufferData = new byte[part.IndexBuffer.IndexCount * indexStride];
+                    part.IndexBuffer.GetData(indexBufferData);
+                    indexData.Add(part.IndexBuffer, indexBufferData);
+                }
+
+                int offsetByStride = part.VertexOffset *
+                                     part.VertexBuffer.VertexDeclaration.VertexStride;
+                
+                int numVerticesByStride = part.NumVertices *
+                                          part.VertexBuffer.VertexDeclaration.VertexStride;
+
+                CopyTo(bufferData.AsSpan().Slice(offsetByStride, numVerticesByStride),
+                    vertices.AsSpan().Slice(vertexOffset, part.NumVertices),
+                    transform * absoluteTransform, partVertexBuffer.VertexDeclaration);
+                
+                int currentIndexCount = part.PrimitiveCount * 3;
+
+                int startIndexStride = part.StartIndex * indexStride;
+                int countStride = currentIndexCount * indexStride;
+                
+                if (largeIndices)
+                {
+                    if (part.IndexBuffer.IndexElementSize == IndexElementSize.SixteenBits)
+                    {
+                        CopyTo<ushort, uint>(indexBufferData.AsSpan().Slice(startIndexStride, countStride), 
+                            indicesInt.AsSpan().Slice(currentIndex, currentIndexCount), vertexOffset, sizeof(ushort));    
+                    }
+                    else
+                    {
+                        CopyTo<uint, uint>(indexBufferData.AsSpan().Slice(startIndexStride, countStride), 
+                            indicesInt.AsSpan().Slice(currentIndex, currentIndexCount), vertexOffset, sizeof(uint));    
+                    }
+                }
+                else
+                {
+                    if (part.IndexBuffer.IndexElementSize == IndexElementSize.SixteenBits)
+                    {
+                        CopyTo<ushort, ushort>(indexBufferData.AsSpan().Slice(startIndexStride, countStride), 
+                            indicesShort.AsSpan().Slice(currentIndex, currentIndexCount), vertexOffset, sizeof(ushort));    
+                    }
+                    else
+                    {
+                        CopyTo<uint, ushort>(indexBufferData.AsSpan().Slice(startIndexStride, countStride), 
+                            indicesShort.AsSpan().Slice(currentIndex, currentIndexCount), vertexOffset, sizeof(uint));    
+                    }
+                }
+
+                currentIndex += currentIndexCount;
+                vertexOffset += part.NumVertices;
+            }
+        }
+        
+        vertexBuffer = new VertexBuffer(device, typeof(VertexPositionColorNormalTexture), vertices.Length, BufferUsage.None);
+        vertexBuffer.SetData(vertices);
+        
+        indexBuffer = new IndexBuffer(device, 
+            largeIndices ? IndexElementSize.ThirtyTwoBits : IndexElementSize.SixteenBits, 
+            indexCount, BufferUsage.None);
+
+        if (largeIndices)
+        {
+            indexBuffer.SetData(indicesInt);
+        }
+        else
+        {
+            indexBuffer.SetData(indicesShort);
+        }
+    }
+
     private static uint GetMask(VertexElement[] elements)
     {
         uint mask = 0;
@@ -744,6 +602,44 @@ public static class ModelExtensions
         for (int i = 0; i < data.Length; i += declaration.VertexStride)
         {
             sum += MemoryMarshal.AsRef<Vector3>(data.Slice(dataOffset + positionElement.Offset));
+        }
+    }
+
+    private static void CopyTo<TFrom, TTo>(
+        ReadOnlySpan<byte> sourceBytes,
+        Span<TTo> destination,
+        int vertexOffset,
+        int stride)
+        where TFrom : unmanaged
+        where TTo : unmanaged
+    {
+        if (vertexOffset == 0 && stride == Unsafe.SizeOf<TFrom>() && typeof(TFrom) == typeof(TTo))
+        {
+            MemoryMarshal.Cast<byte, TTo>(sourceBytes).CopyTo(destination);
+            return;
+        }
+
+        int elementCount = sourceBytes.Length / stride;
+        for (int i = 0; i < elementCount; i++)
+        {
+            TFrom src = MemoryMarshal.Read<TFrom>(sourceBytes.Slice(i * stride));
+
+            uint value = typeof(TFrom) == typeof(ushort)
+                ? (uint)Unsafe.As<TFrom, ushort>(ref src)
+                : Unsafe.As<TFrom, uint>(ref src);
+
+            value += (uint)vertexOffset;
+
+            if (typeof(TTo) == typeof(ushort))
+            {
+                ushort dst = (ushort)value;
+                destination[i] = Unsafe.As<ushort, TTo>(ref dst);
+            }
+            else
+            {
+                uint dst = value;
+                destination[i] = Unsafe.As<uint, TTo>(ref dst);
+            }
         }
     }
     

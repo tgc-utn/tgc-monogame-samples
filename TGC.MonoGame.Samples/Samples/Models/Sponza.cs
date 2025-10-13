@@ -62,7 +62,7 @@ public class Sponza : TGCSample
 
         _effect = Game.Content.Load<Effect>(ContentFolderEffects + "BasicTexture");
 
-        // This copies the Vertex/Index Buffers into new Geometries.
+        // This could copy the Vertex/Index Buffers into new Geometries.
         // They must be disposed later
         _info = ModelExtensions.GetCenteredXZ(_model);
         
