@@ -15,9 +15,9 @@ public class Geometry : IDisposable
     
     internal int PrimitiveCount;
     
-    internal bool OwnsVertexBuffer = false;
+    internal bool OwnsVertexBuffer;
     
-    internal bool OwnsIndexBuffer = false;
+    internal bool OwnsIndexBuffer;
     
 
     internal static Geometry FromMeshPart(ModelMeshPart part)
