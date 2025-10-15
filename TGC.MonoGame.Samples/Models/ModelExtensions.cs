@@ -242,7 +242,7 @@ public static class ModelExtensions
                 Texture[] textures = mainTexture != null ? [mainTexture] : [];
                 
                 geometryData[geometryIndex] = new GeometryData(
-                    new Geometry()
+                    new Geometry
                     {
                         VertexBuffer = vertexBuffers[vertexData[part.VertexBuffer].Index],
                         PrimitiveCount = part.PrimitiveCount,
@@ -388,7 +388,9 @@ public static class ModelExtensions
                 var mainTexture = ((BasicEffect)part.Effect).Texture;
 
                 if (mainTexture != null)
+                {
                     textures.Add(mainTexture);
+                }
             }
         }
 
