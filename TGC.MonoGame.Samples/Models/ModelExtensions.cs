@@ -336,7 +336,9 @@ public static class ModelExtensions
                 var mainTexture = ((BasicEffect)part.Effect).Texture;
 
                 if (mainTexture != null)
+                {
                     textures.Add(mainTexture);
+                }
             }
         }
 
