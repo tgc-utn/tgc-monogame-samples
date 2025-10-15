@@ -15,8 +15,6 @@ public class Geometry : IDisposable
     
     internal int PrimitiveCount;
     
-    public int VertexCount;
-    
     internal bool OwnsVertexBuffer = false;
     
     internal bool OwnsIndexBuffer = false;
@@ -37,14 +35,12 @@ public class Geometry : IDisposable
         VertexOffset = 0;
         StartIndex = 0;
         PrimitiveCount = indexBuffer.IndexCount / 3;
-        VertexCount = vertexBuffer.VertexCount;
         OwnsVertexBuffer = true;
         OwnsIndexBuffer = true;
     }
     
     private Geometry(ModelMeshPart part)
     {
-        VertexCount = part.NumVertices;
         VertexBuffer = part.VertexBuffer;
         IndexBuffer = part.IndexBuffer;
         VertexOffset = part.VertexOffset;
@@ -72,10 +68,14 @@ public class Geometry : IDisposable
 
     public void Dispose()
     {
-        if(OwnsVertexBuffer)
+        if (OwnsVertexBuffer)
+        {
             VertexBuffer.Dispose();
-        
+        }
+
         if (OwnsIndexBuffer)
+        {
             IndexBuffer.Dispose();
+        }
     }
 }

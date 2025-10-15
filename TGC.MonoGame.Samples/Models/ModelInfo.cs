@@ -14,6 +14,8 @@ public class ModelInfo : IDisposable
     public void Dispose()
     {
         foreach(var geometryData in GeometryData)
+        {
             geometryData.Geometry.Dispose();
+        }
     }
 }

@@ -49,7 +49,7 @@ public class Sponza : TGCSample
         size.Y /= 2;
         _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 5, 0), size);
         _camera.BuildProjection(
-            GraphicsDevice.Viewport.AspectRatio, 0.1f, 100000f,
+            GraphicsDevice.Viewport.AspectRatio, 0.1f, 100_000f,
             MathF.PI / 3f);
 
         base.Initialize();
