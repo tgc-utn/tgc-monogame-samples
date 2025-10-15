@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -65,8 +64,6 @@ public static class ModelExtensions
         int vertexCount = 0;
         int indexCount = 0;
         
-        var device = model.Meshes.First().Effects.First().GraphicsDevice;
-            
         var textures = new List<Texture>();
         
         // Extract textures, vertices and indices
@@ -80,7 +77,9 @@ public static class ModelExtensions
                 var mainTexture = ((BasicEffect)part.Effect).Texture;
 
                 if (mainTexture != null)
+                {
                     textures.Add(mainTexture);
+                }
             }
         }
 
@@ -145,15 +144,10 @@ public static class ModelExtensions
             {
                 var mainTexture = ((BasicEffect)part.Effect).Texture;
 
-                Texture[] textures;
-                
-                if (mainTexture != null)
-                    textures = [mainTexture];
-                else
-                    textures = [];
-                
+                Texture[] textures = mainTexture != null ? [mainTexture] : [];
+
                 geometryData[geometryIndex] = new GeometryData(
-                    new Geometry()
+                    new Geometry
                     {
                         VertexBuffer = vertexBuffers[vertexData[part.VertexBuffer].Index],
                         PrimitiveCount = part.PrimitiveCount,
@@ -558,46 +552,6 @@ public static class ModelExtensions
         {
             var converted = TTo.CreateChecked(source[i]);
             destination[i] = converted + offsetConverted;
-        }
-    }
-    
-    private static void CopyTo<TFrom, TTo>(
-        ReadOnlySpan<byte> sourceBytes,
-        Span<byte> destination,
-        int vertexOffset)
-        where TFrom : unmanaged
-        where TTo : unmanaged
-    {
-        if (vertexOffset == 0 && typeof(TFrom) == typeof(TTo))
-        {
-            sourceBytes.CopyTo(destination);
-            return;
-        }
-
-        int fromStride = Unsafe.SizeOf<TFrom>();
-        int toStride = Unsafe.SizeOf<TTo>();
-        int i = 0;
-        int j = 0;
-        
-        if (fromStride == 2)
-        {
-            for (; i < sourceBytes.Length; i += fromStride)
-            {
-                BitConverter.GetBytes(BitConverter.ToUInt16(sourceBytes.Slice(i)) + vertexOffset).CopyTo(destination.Slice(j));
-                j += toStride;
-            }    
-        }
-        else
-        {
-            for (; i < sourceBytes.Length; i += fromStride)
-            {
-                var asRef = MemoryMarshal.AsRef<uint>(sourceBytes.Slice(i));
-                asRef += (uint)vertexOffset;
-                MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref asRef, 1));
-                
-                BitConverter.GetBytes(BitConverter.ToUInt32(sourceBytes.Slice(i)) + vertexOffset).CopyTo(destination.Slice(j));
-                j += toStride;
-            }    
         }
     }
     
