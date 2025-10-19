@@ -57,7 +57,7 @@ public class Sponza : TGCSample
     
     protected override void LoadContent()
     {
-        // Load the chair model
+        // Load the sponza model
         _model = Game.Content.Load<Model>(ContentFolder3D + "sponza/Sponza");
 
         _effect = Game.Content.Load<Effect>(ContentFolderEffects + "BasicTexture");

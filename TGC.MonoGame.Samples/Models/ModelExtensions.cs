@@ -10,6 +10,9 @@ using Vector3 = Microsoft.Xna.Framework.Vector3;
 
 namespace TGC.MonoGame.Samples.Models;
 
+/// <summary>
+/// Provides utilities to get <see cref="ModelInfo"/> from MonoGame <see cref="Model"/>s.
+/// </summary>
 public static class ModelExtensions
 {
     /// <summary>
@@ -32,20 +35,17 @@ public static class ModelExtensions
         var absoluteMatrices = new Matrix[model.Bones.Count];
         model.CopyAbsoluteBoneTransformsTo(absoluteMatrices);
 
-        foreach (var mesh in model.Meshes)
+        IterateMeshAndParts(model, (mesh, part) => 
         {
-            foreach (var part in mesh.MeshParts)
-            {
-                var mainTexture = ((BasicEffect)part.Effect).Texture;
-                Texture[] textures = mainTexture != null ? [mainTexture] : [];
+            var mainTexture = ((BasicEffect)part.Effect).Texture;
+            Texture[] textures = mainTexture != null ? [mainTexture] : [];
 
-                geometryData[geometryIndex] =
-                    new GeometryData(Geometry.FromMeshPart(part), absoluteMatrices[mesh.ParentBone.Index],
-                        textures);
+            geometryData[geometryIndex] =
+                new GeometryData(Geometry.FromMeshPart(part), absoluteMatrices[mesh.ParentBone.Index],
+                    textures);
 
-                geometryIndex++;
-            }
-        }
+            geometryIndex++;
+        });
 
         return new ModelInfo(geometryData);
     }
@@ -66,22 +66,18 @@ public static class ModelExtensions
         
         var textures = new List<Texture>();
         
-        // Extract textures, vertices and indices
-        foreach (var mesh in model.Meshes)
+        IterateMeshAndParts(model, (_, part) =>
         {
-            foreach (var part in mesh.MeshParts)
-            {
-                vertexCount += part.NumVertices;
-                indexCount += part.PrimitiveCount * 3;
+            vertexCount += part.NumVertices;
+            indexCount += part.PrimitiveCount * 3;
                 
-                var mainTexture = ((BasicEffect)part.Effect).Texture;
+            var mainTexture = ((BasicEffect)part.Effect).Texture;
 
-                if (mainTexture != null)
-                {
-                    textures.Add(mainTexture);
-                }
+            if (mainTexture != null)
+            {
+                textures.Add(mainTexture);
             }
-        }
+        });
 
         Dictionary<VertexBuffer, byte[]> vertexData = new();
         
@@ -93,7 +89,7 @@ public static class ModelExtensions
             new GeometryData(new Geometry(vertexBuffer, indexBuffer), Matrix.Identity, textures.ToArray())
         ]);
     }
-
+    
     /// <summary>
     /// Gets <see cref="ModelInfo"/> for a MonoGame <see cref="Model"/>.
     /// Lists simplified matrices, textures and geometry for a group of meshes that live inside the model.
@@ -138,57 +134,52 @@ public static class ModelExtensions
         HashSet<VertexBuffer> assignedVertexBuffers = new();
 
         int geometryIndex = 0;
-        foreach (var mesh in model.Meshes)
+
+        IterateMeshAndParts(model, (mesh, part) =>
         {
-            foreach (var part in mesh.MeshParts)
-            {
-                var mainTexture = ((BasicEffect)part.Effect).Texture;
+            var mainTexture = ((BasicEffect)part.Effect).Texture;
 
-                Texture[] textures = mainTexture != null ? [mainTexture] : [];
+            Texture[] textures = mainTexture != null ? [mainTexture] : [];
 
-                geometryData[geometryIndex] = new GeometryData(
-                    new Geometry
-                    {
-                        VertexBuffer = vertexBuffers[vertexData[part.VertexBuffer].Index],
-                        PrimitiveCount = part.PrimitiveCount,
-                        IndexBuffer = part.IndexBuffer,
-                        StartIndex = part.StartIndex,
-                        VertexOffset = part.VertexOffset,
-                        OwnsVertexBuffer = assignedVertexBuffers.Add(part.VertexBuffer),
-                        OwnsIndexBuffer = false
-                    },
-                    absoluteMatrices[mesh.ParentBone.Index],
-                    textures
-                );
+            geometryData[geometryIndex] = new GeometryData(
+                new Geometry
+                (
+                    vertexBuffers[vertexData[part.VertexBuffer].Index],
+                    part.IndexBuffer,
+                    part.VertexOffset,
+                    part.StartIndex,
+                    part.PrimitiveCount,
+                    assignedVertexBuffers.Add(part.VertexBuffer),
+                    false
+                ),
+                absoluteMatrices[mesh.ParentBone.Index],
+                textures
+            );
                 
-                geometryIndex++;
-            }
-        }
+            geometryIndex++;
+        });
         
         return new ModelInfo(geometryData);
     }
 
     private static void CopyVertexBuffersIntoSingleBuffer(Model model, Dictionary<VertexBuffer, (int Index, byte[] Data, VertexPositionColorNormalTexture[] Vertices)> vertexData, Matrix transform)
     {
-        foreach (var mesh in model.Meshes)
+        IterateMeshAndParts(model, (_, part) =>
         {
-            foreach (var part in mesh.MeshParts)
-            {
-                var partVertexBuffer = part.VertexBuffer;
+            var partVertexBuffer = part.VertexBuffer;
 
-                var vertexBufferData = vertexData[partVertexBuffer];
+            var vertexBufferData = vertexData[partVertexBuffer];
 
-                int offsetByStride = part.VertexOffset *
-                                     part.VertexBuffer.VertexDeclaration.VertexStride;
+            int offsetByStride = part.VertexOffset *
+                                 part.VertexBuffer.VertexDeclaration.VertexStride;
                 
-                int numVerticesByStride = part.NumVertices *
-                                          part.VertexBuffer.VertexDeclaration.VertexStride;
+            int numVerticesByStride = part.NumVertices *
+                                      part.VertexBuffer.VertexDeclaration.VertexStride;
 
-                CopyTo(vertexBufferData.Data.AsSpan().Slice(offsetByStride, numVerticesByStride),
-                    vertexBufferData.Vertices.AsSpan().Slice(part.VertexOffset, part.NumVertices),
-                    transform, partVertexBuffer.VertexDeclaration);
-            }
-        }
+            CopyTo(vertexBufferData.Data.AsSpan().Slice(offsetByStride, numVerticesByStride),
+                vertexBufferData.Vertices.AsSpan().Slice(part.VertexOffset, part.NumVertices),
+                transform, partVertexBuffer.VertexDeclaration);
+        });
     }
 
     /// <summary>
@@ -233,80 +224,78 @@ public static class ModelExtensions
         HashSet<VertexBuffer> assignedVertexBuffers = new();
 
         int geometryIndex = 0;
-        foreach (var mesh in model.Meshes)
-        {
-            foreach (var part in mesh.MeshParts)
-            {
-                var mainTexture = ((BasicEffect)part.Effect).Texture;
-
-                Texture[] textures = mainTexture != null ? [mainTexture] : [];
-                
-                geometryData[geometryIndex] = new GeometryData(
-                    new Geometry
-                    {
-                        VertexBuffer = vertexBuffers[vertexData[part.VertexBuffer].Index],
-                        PrimitiveCount = part.PrimitiveCount,
-                        IndexBuffer = part.IndexBuffer,
-                        StartIndex = part.StartIndex,
-                        VertexOffset = part.VertexOffset,
-                        OwnsVertexBuffer = assignedVertexBuffers.Add(part.VertexBuffer),
-                        OwnsIndexBuffer = false
-                    },
-                    absoluteMatrices[mesh.ParentBone.Index],
-                    textures
-                );
-                
-                geometryIndex++;
-            }
-        }
         
+        IterateMeshAndParts(model, (mesh, part) =>
+        {
+            var mainTexture = ((BasicEffect)part.Effect).Texture;
+
+            Texture[] textures = mainTexture != null ? [mainTexture] : [];
+                
+            geometryData[geometryIndex] = new GeometryData(
+                new Geometry
+                (
+                    vertexBuffers[vertexData[part.VertexBuffer].Index],
+                    part.IndexBuffer,
+                    part.VertexOffset,
+                    part.StartIndex,
+                    part.PrimitiveCount,
+                    assignedVertexBuffers.Add(part.VertexBuffer),
+                    false
+                ),
+                absoluteMatrices[mesh.ParentBone.Index],
+                textures
+            );
+                
+            geometryIndex++;
+        });
+
         return new ModelInfo(geometryData);
     }
 
     private static void ExtractVertexDataAndSum(Model model, int vertexCount, out Dictionary<VertexBuffer, 
         (int Index, byte[] Data, VertexPositionColorNormalTexture[] Vertices)> vertexBufferData, out Vector3 sum)
     {
-        vertexBufferData = new();
-        sum = Vector3.Zero;
+        var generatedVertexData = new Dictionary<VertexBuffer, 
+            (int Index, byte[] Data, VertexPositionColorNormalTexture[] Vertices)>();
         
-        // Extract vertices
-
+        Vector3 calculatedSum = Vector3.Zero;
+        
         int vertexBufferIndex = 0;
-        
-        foreach (var mesh in model.Meshes)
+
+        IterateMeshAndParts(model, (_, part) =>
         {
-            foreach (var part in mesh.MeshParts)
+            vertexCount += part.NumVertices;
+                
+            var partVertexBuffer = part.VertexBuffer;
+
+            if (!generatedVertexData.TryGetValue(partVertexBuffer, out var bufferData))
             {
-                vertexCount += part.NumVertices;
-                
-                var partVertexBuffer = part.VertexBuffer;
+                var declaration = partVertexBuffer.VertexDeclaration;
+                var vertexSize = declaration.VertexStride;
+                var data = new byte[vertexSize * partVertexBuffer.VertexCount];
+                partVertexBuffer.GetData(data);
 
-                if (!vertexBufferData.TryGetValue(partVertexBuffer, out var bufferData))
-                {
-                    var declaration = partVertexBuffer.VertexDeclaration;
-                    var vertexSize = declaration.VertexStride;
-                    var data = new byte[vertexSize * partVertexBuffer.VertexCount];
-                    partVertexBuffer.GetData(data);
-
-                    bufferData.Index = vertexBufferIndex;
-                    bufferData.Data = data;
-                    bufferData.Vertices = new VertexPositionColorNormalTexture[partVertexBuffer.VertexCount];
-                    vertexBufferData.Add(partVertexBuffer, bufferData);
+                bufferData.Index = vertexBufferIndex;
+                bufferData.Data = data;
+                bufferData.Vertices = new VertexPositionColorNormalTexture[partVertexBuffer.VertexCount];
+                generatedVertexData.Add(partVertexBuffer, bufferData);
                     
-                    vertexBufferIndex++;
-                }
-
-                int offsetByStride = part.VertexOffset *
-                                     part.VertexBuffer.VertexDeclaration.VertexStride;
-                
-                int numVerticesByStride = part.NumVertices *
-                                          part.VertexBuffer.VertexDeclaration.VertexStride;
-
-                Sum(bufferData.Data.AsSpan().Slice(offsetByStride, numVerticesByStride), partVertexBuffer.VertexDeclaration, ref sum);
+                vertexBufferIndex++;
             }
-        }
 
+            int offsetByStride = part.VertexOffset *
+                                 part.VertexBuffer.VertexDeclaration.VertexStride;
+                
+            int numVerticesByStride = part.NumVertices *
+                                      part.VertexBuffer.VertexDeclaration.VertexStride;
+
+            Sum(bufferData.Data.AsSpan().Slice(offsetByStride, numVerticesByStride),
+                partVertexBuffer.VertexDeclaration, ref calculatedSum);
+        });
+
+        sum = calculatedSum;
         sum /= vertexCount;
+        vertexBufferData = generatedVertexData;
     }
 
     /// <summary>
@@ -325,77 +314,47 @@ public static class ModelExtensions
         
         var textures = new List<Texture>();
         
-        // Extract textures, vertices and indices
-        foreach (var mesh in model.Meshes)
-        {
-            foreach (var part in mesh.MeshParts)
-            {
-                vertexCount += part.NumVertices;
-                indexCount += part.PrimitiveCount * 3;
-                
-                var mainTexture = ((BasicEffect)part.Effect).Texture;
-
-                if (mainTexture != null)
-                {
-                    textures.Add(mainTexture);
-                }
-            }
-        }
-
         Vector3 sum = Vector3.Zero;
             
-        Dictionary<VertexBuffer, byte[]> vertexData = new();
+        var vertexData = new Dictionary<VertexBuffer, byte[]>();
         
-        // Extract vertices
-            
-        foreach (var mesh in model.Meshes)
+        IterateMeshAndParts(model, (_, part) =>
         {
-            foreach (var part in mesh.MeshParts)
+            vertexCount += part.NumVertices;
+            indexCount += part.PrimitiveCount * 3;
+                
+            var mainTexture = ((BasicEffect)part.Effect).Texture;
+
+            if (mainTexture != null)
             {
-                vertexCount += part.NumVertices;
-                    
-                var partVertexBuffer = part.VertexBuffer;
-
-                if (!vertexData.TryGetValue(partVertexBuffer, out var bufferData))
-                {
-                    var declaration = partVertexBuffer.VertexDeclaration;
-                    var vertexSize = declaration.VertexStride;
-                    bufferData = new byte[vertexSize * partVertexBuffer.VertexCount];
-                    partVertexBuffer.GetData(bufferData);
-                    vertexData.Add(partVertexBuffer, bufferData);
-                }
-
-                int offsetByStride = part.VertexOffset *
-                                     part.VertexBuffer.VertexDeclaration.VertexStride;
-                    
-                int numVerticesByStride = part.NumVertices *
-                                          part.VertexBuffer.VertexDeclaration.VertexStride;
-
-                Sum(bufferData.AsSpan().Slice(offsetByStride, numVerticesByStride), partVertexBuffer.VertexDeclaration, ref sum);
+                textures.Add(mainTexture);
             }
-        }
+                    
+            var partVertexBuffer = part.VertexBuffer;
+
+            if (!vertexData.TryGetValue(partVertexBuffer, out var bufferData))
+            {
+                var declaration = partVertexBuffer.VertexDeclaration;
+                var vertexSize = declaration.VertexStride;
+                bufferData = new byte[vertexSize * partVertexBuffer.VertexCount];
+                partVertexBuffer.GetData(bufferData);
+                vertexData.Add(partVertexBuffer, bufferData);
+            }
+
+            int offsetByStride = part.VertexOffset *
+                                 part.VertexBuffer.VertexDeclaration.VertexStride;
+                    
+            int numVerticesByStride = part.NumVertices *
+                                      part.VertexBuffer.VertexDeclaration.VertexStride;
+
+            // Done this way so its captured
+            Sum(bufferData.AsSpan().Slice(offsetByStride, numVerticesByStride), partVertexBuffer.VertexDeclaration, ref sum);
+        });
 
         sum /= vertexCount;
 
         var centeringTransform = Matrix.CreateTranslation(-sum);
         
-        // Extract textures, vertices and indices
-        foreach (var mesh in model.Meshes)
-        {
-            foreach (var part in mesh.MeshParts)
-            {
-                vertexCount += part.NumVertices;
-                indexCount += part.PrimitiveCount * 3;
-                
-                var mainTexture = ((BasicEffect)part.Effect).Texture;
-
-                if (mainTexture != null)
-                {
-                    textures.Add(mainTexture);
-                }
-            }
-        }
-
         GetMergedBuffers(model, vertexCount, indexCount, centeringTransform,
             vertexData, out var vertexBuffer, out var indexBuffer);
 
@@ -405,7 +364,7 @@ public static class ModelExtensions
         ]);
     }
 
-    private static void GetMergedBuffers(Model model, int vertexCount, int indexCount, in Matrix absoluteTransform,
+    private static void GetMergedBuffers(Model model, int vertexCount, int indexCount, Matrix absoluteTransform,
         Dictionary<VertexBuffer, byte[]> vertexData, out VertexBuffer vertexBuffer, out IndexBuffer indexBuffer)
     {
         var absoluteMatrices = new Matrix[model.Bones.Count];
@@ -424,62 +383,58 @@ public static class ModelExtensions
         int currentIndex = 0;
         int vertexOffset = 0;
         
-        foreach (var mesh in model.Meshes)
+        IterateMeshAndParts(model, (mesh, part) =>
         {
             var transform = absoluteMatrices[mesh.ParentBone.Index];
+            var partVertexBuffer = part.VertexBuffer;
 
-            foreach (var part in mesh.MeshParts)
+            if (!vertexData.TryGetValue(partVertexBuffer, out var bufferData))
             {
-                var partVertexBuffer = part.VertexBuffer;
-
-                if (!vertexData.TryGetValue(partVertexBuffer, out var bufferData))
-                {
-                    var declaration = partVertexBuffer.VertexDeclaration;
-                    var vertexSize = declaration.VertexStride;
-                    bufferData = new byte[vertexSize * partVertexBuffer.VertexCount];
-                    partVertexBuffer.GetData(bufferData);
-                    vertexData.Add(partVertexBuffer, bufferData);
-                }
-
-                int indexStride = part.IndexBuffer.IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4; 
-                if (!indexData.TryGetValue(part.IndexBuffer, out var indexBufferData))
-                {
-                    indexBufferData = new byte[part.IndexBuffer.IndexCount * indexStride];
-                    part.IndexBuffer.GetData(indexBufferData);
-                    indexData.Add(part.IndexBuffer, indexBufferData);
-                }
-
-                int offsetByStride = part.VertexOffset *
-                                     part.VertexBuffer.VertexDeclaration.VertexStride;
-                
-                int numVerticesByStride = part.NumVertices *
-                                          part.VertexBuffer.VertexDeclaration.VertexStride;
-
-                CopyTo(bufferData.AsSpan().Slice(offsetByStride, numVerticesByStride),
-                    vertices.AsSpan().Slice(vertexOffset, part.NumVertices),
-                    transform * absoluteTransform, partVertexBuffer.VertexDeclaration);
-                
-                int currentIndexCount = part.PrimitiveCount * 3;
-                
-                if (largeIndices)
-                {
-                    CopyIndexBuffer(part, indexBufferData.AsSpan(), 
-                        MemoryMarshal.Cast<byte, uint>(indices.AsSpan())
-                            .Slice(currentIndex, currentIndexCount),
-                        vertexOffset);
-                }
-                else
-                {
-                    CopyIndexBuffer(part, indexBufferData.AsSpan(), 
-                        MemoryMarshal.Cast<byte, ushort>(indices.AsSpan())
-                            .Slice(currentIndex, currentIndexCount),
-                        vertexOffset);
-                }
-
-                currentIndex += currentIndexCount;
-                vertexOffset += part.NumVertices;
+                var declaration = partVertexBuffer.VertexDeclaration;
+                var vertexSize = declaration.VertexStride;
+                bufferData = new byte[vertexSize * partVertexBuffer.VertexCount];
+                partVertexBuffer.GetData(bufferData);
+                vertexData.Add(partVertexBuffer, bufferData);
             }
-        }
+
+            int indexStride = part.IndexBuffer.IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4; 
+            if (!indexData.TryGetValue(part.IndexBuffer, out var indexBufferData))
+            {
+                indexBufferData = new byte[part.IndexBuffer.IndexCount * indexStride];
+                part.IndexBuffer.GetData(indexBufferData);
+                indexData.Add(part.IndexBuffer, indexBufferData);
+            }
+
+            int offsetByStride = part.VertexOffset *
+                                 part.VertexBuffer.VertexDeclaration.VertexStride;
+
+            int numVerticesByStride = part.NumVertices *
+                                      part.VertexBuffer.VertexDeclaration.VertexStride;
+
+            CopyTo(bufferData.AsSpan().Slice(offsetByStride, numVerticesByStride),
+                vertices.AsSpan().Slice(vertexOffset, part.NumVertices),
+                transform * absoluteTransform, partVertexBuffer.VertexDeclaration);
+
+            int currentIndexCount = part.PrimitiveCount * 3;
+
+            if (largeIndices)
+            {
+                CopyIndexBuffer(part, indexBufferData.AsSpan(), 
+                    MemoryMarshal.Cast<byte, uint>(indices.AsSpan())
+                        .Slice(currentIndex, currentIndexCount),
+                    vertexOffset);
+            }
+            else
+            {
+                CopyIndexBuffer(part, indexBufferData.AsSpan(), 
+                    MemoryMarshal.Cast<byte, ushort>(indices.AsSpan())
+                        .Slice(currentIndex, currentIndexCount),
+                    vertexOffset);
+            }
+
+            currentIndex += currentIndexCount;
+            vertexOffset += part.NumVertices;
+        });
         
         vertexBuffer = new VertexBuffer(device, typeof(VertexPositionColorNormalTexture), vertices.Length, BufferUsage.None);
         vertexBuffer.SetData(vertices);
@@ -598,6 +553,17 @@ public static class ModelExtensions
             
             dataOffset += declaration.VertexStride;
             elementIndex = 0;
+        }
+    }
+    
+    private static void IterateMeshAndParts(Model model, Action<ModelMesh, ModelMeshPart> action)
+    {
+        foreach(var mesh in model.Meshes)
+        {
+            foreach (var part in mesh.MeshParts)
+            {
+                action(mesh, part);
+            }
         }
     }
 }

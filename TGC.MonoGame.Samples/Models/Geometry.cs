@@ -3,22 +3,24 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TGC.MonoGame.Samples.Models;
 
+/// <summary>
+/// A representation of a simple triangle-based geometry that can be drawn. 
+/// </summary>
 public class Geometry : IDisposable
 {
-    internal VertexBuffer VertexBuffer;
+    protected VertexBuffer VertexBuffer;
     
-    internal IndexBuffer IndexBuffer;
+    protected IndexBuffer IndexBuffer;
 
-    internal int VertexOffset;
+    protected int VertexOffset;
 
-    internal int StartIndex;
+    protected int StartIndex;
     
-    internal int PrimitiveCount;
+    protected int PrimitiveCount;
     
-    internal bool OwnsVertexBuffer;
+    protected bool OwnsVertexBuffer;
     
-    internal bool OwnsIndexBuffer;
-    
+    protected bool OwnsIndexBuffer;
 
     internal static Geometry FromMeshPart(ModelMeshPart part)
     {
@@ -50,6 +52,19 @@ public class Geometry : IDisposable
         OwnsIndexBuffer = false;
     }
     
+    internal Geometry(VertexBuffer vertexBuffer, IndexBuffer indexBuffer, 
+        int vertexOffset, int startIndex, int primitiveCount,
+        bool ownsVertexBuffer, bool ownsIndexBuffer)
+    {
+        VertexBuffer = vertexBuffer;
+        IndexBuffer = indexBuffer;
+        VertexOffset = vertexOffset;
+        StartIndex = startIndex;
+        PrimitiveCount = primitiveCount;
+        OwnsVertexBuffer = ownsVertexBuffer;
+        OwnsIndexBuffer = ownsIndexBuffer;
+    }
+    
     public void Draw(Effect effect)
     {
         var graphicsDevice = effect.GraphicsDevice;
@@ -64,7 +79,6 @@ public class Geometry : IDisposable
                 VertexOffset, StartIndex, PrimitiveCount);
         }
     }
-    
 
     public void Dispose()
     {
