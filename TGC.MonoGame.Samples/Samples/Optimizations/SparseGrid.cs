@@ -17,15 +17,34 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations;
 /// </summary>
 public class SparseGrid : TGCSample
 {
+    /// <summary>
+    /// Size of the grid cells.
+    /// </summary>
     private const float CellSize = 1000f;
     
-    private const float WorldSize = 50000f;
+    /// <summary>
+    /// Size of the world. Instances can spawn on a box that has this size
+    /// on any axis.
+    /// </summary>
+    private const float WorldRadius = 50000f;
     
+    /// <summary>
+    /// Random number generator for instance movement and generating random positions.
+    /// </summary>
     private readonly Random _random = new();
     
+    /// <summary>
+    /// A list of instances that represent objects we want to interact/draw
+    /// in world space.
+    /// </summary>
     private List<InstanceData> _instances;
 
-    private Dictionary<Vector3I, List<int>> _grid = new();
+    /// <summary>
+    /// Represents a sparse grid. Indices are cells,
+    /// values are lists of instance indices contained on each cell.
+    /// <remarks>Could be int[][] if we wanted it to be a dense grid</remarks>
+    /// </summary>
+    private readonly Dictionary<Vector3I, List<int>> _grid = new();
 
     // Camera to draw the scene
     private Camera _camera;
@@ -33,6 +52,9 @@ public class SparseGrid : TGCSample
     // The Model of the Robot to draw
     private Model _robot;
     
+    /// <summary>
+    /// The AABB of the robot in local space.
+    /// </summary>
     private BoundingBox _robotAABB;
     
     /// <summary>
@@ -45,8 +67,14 @@ public class SparseGrid : TGCSample
     /// </summary>
     private BoundingFrustum _boundingFrustum;
 
+    /// <summary>
+    /// A list of instance indices to be drawn this frame.
+    /// </summary>
     private List<int> _indicesToDraw = new();
 
+    /// <summary>
+    /// If the grid should be enabled or if regular frustum-culling should be used.
+    /// </summary>
     private bool _enabled = true;
     
     public SparseGrid(TGCViewer game) : base(game)
@@ -71,7 +99,7 @@ public class SparseGrid : TGCSample
         size.X /= 2;
         size.Y /= 2;
 
-        // Create a camera not to render objects but to test them against its frustum
+        // Create a camera not to render objects but to test them against the grid and/or frustum
         _testCamera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 50, 1000), size);
         _testCamera.BuildProjection(GraphicsDevice.Viewport.AspectRatio, 0.1f, 5000f,
             (MathF.PI / 180f) * 35f);
@@ -93,6 +121,7 @@ public class SparseGrid : TGCSample
         
         _instances = new List<InstanceData>();
 
+        // Populate instances and put them on their cell
         for (int index = 0; index < 450_000; index++)
         {
             _instances.Add(new InstanceData()
@@ -108,10 +137,11 @@ public class SparseGrid : TGCSample
             ref var instance = ref CollectionsMarshal.AsSpan(_instances)[index];
             instance.Position = Vector3.Lerp(instance.From, instance.Objective, instance.Timer);
             
-            var cell = (Vector3I)Vector3.Floor(instance.Position / CellSize);
+            var cell = GetCell(instance.Position);
             instance.CurrentCell = cell;
             instance.BoundingBox = new BoundingBox(_robotAABB.Min + instance.Position, _robotAABB.Max + instance.Position);
 
+            // If cell doesn't exist, create it
             if (!_grid.TryGetValue(cell, out var list))
             {
                 list = new();
@@ -133,7 +163,7 @@ public class SparseGrid : TGCSample
         
         var instanceSpan = CollectionsMarshal.AsSpan(_instances);
         
-        // Update 100 random instances
+        // Update N random instances
         MoveInstances(instanceSpan, elapsedTime);
 
         _indicesToDraw.Clear();
@@ -293,9 +323,9 @@ public class SparseGrid : TGCSample
 
     private Vector3 GeneratePositionInRange(Random random)
     {
-        return new Vector3(RandomRange(random, -WorldSize, WorldSize),
-            RandomRange(random, -WorldSize, WorldSize),
-            RandomRange(random, -WorldSize, WorldSize));
+        return new Vector3(RandomRange(random, -WorldRadius, WorldRadius),
+            RandomRange(random, -WorldRadius, WorldRadius),
+            RandomRange(random, -WorldRadius, WorldRadius));
     }
 
     private float RandomRange(Random random, float min, float max)
