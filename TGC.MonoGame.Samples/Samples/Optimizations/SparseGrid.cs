@@ -46,10 +46,14 @@ public class SparseGrid : TGCSample
     /// </summary>
     private readonly Dictionary<Vector3I, List<int>> _grid = new();
 
-    // Camera to draw the scene
+    /// <summary>
+    /// Camera to draw the scene
+    /// </summary>
     private Camera _camera;
     
-    // The Model of the Robot to draw
+    /// <summary>
+    /// The Model of the Robot to draw
+    /// </summary>
     private Model _robot;
     
     /// <summary>
@@ -70,7 +74,7 @@ public class SparseGrid : TGCSample
     /// <summary>
     /// A list of instance indices to be drawn this frame.
     /// </summary>
-    private List<int> _indicesToDraw = new();
+    private List<int> _instancesToDraw = new();
 
     /// <summary>
     /// If the grid should be enabled or if regular frustum-culling should be used.
@@ -92,7 +96,7 @@ public class SparseGrid : TGCSample
         _camera = new StaticCamera(GraphicsDevice.Viewport.AspectRatio, 
             Vector3.One * 5000f, -Vector3.Normalize(Vector3.One), Vector3.Up);
         
-        _camera.BuildProjection(GraphicsDevice.Viewport.AspectRatio, 0.1f, 1000000f,
+        _camera.BuildProjection(GraphicsDevice.Viewport.AspectRatio, 0.1f, 10000f,
             (MathF.PI / 180f) * 60f);
 
         var size = GraphicsDevice.Viewport.Bounds.Size;
@@ -166,7 +170,7 @@ public class SparseGrid : TGCSample
         // Update N random instances
         MoveInstances(instanceSpan, elapsedTime);
 
-        _indicesToDraw.Clear();
+        _instancesToDraw.Clear();
 
         _testCamera.Update(gameTime);
         
@@ -185,12 +189,12 @@ public class SparseGrid : TGCSample
                 
                 if (box.Intersects(_boundingFrustum))
                 {
-                    _indicesToDraw.Add(index);
+                    _instancesToDraw.Add(index);
                 }
             }
         }
         
-        foreach(var index in _indicesToDraw)
+        foreach(var index in _instancesToDraw)
         {
             var box = _instances[index].BoundingBox;
             var center = (box.Max + box.Min) * 0.5f;
@@ -209,6 +213,10 @@ public class SparseGrid : TGCSample
         base.Update(gameTime);
     }
 
+    /// <summary>
+    /// Gets the instances that are visible by the frustum and puts them
+    /// into <see cref="_instancesToDraw"/>
+    /// </summary>
     private void TraverseGridAndFindInstances()
     {
         var corners = new Vector3[8];
@@ -221,24 +229,31 @@ public class SparseGrid : TGCSample
             box.Max = Vector3.Max(box.Max, corner);
         }
 
+        // Get the min and max cell of the frustum corners
         var min = GetCell(box.Min);
         var max = GetCell(box.Max);
             
+        
         for(int x = min.X; x <= max.X; x++)
         for(int y = min.Y; y <= max.Y; y++)
         for(int z = min.Z; z <= max.Z; z++)
         {
+            // Convert from cell space into world space
             var cellPositionInWorld = new Vector3(x, y, z) * CellSize;
             
             var bb = new BoundingBox(cellPositionInWorld, 
                 cellPositionInWorld + new Vector3(CellSize));
 
+            // If the bounding box of the cell doesn't intersect the frustum, move into the next cell
+            // This can happen if the frustum AABB is long enough to contains a long span of cells
+            // but the frustum itself doesn't touch all of them
             if (!bb.Intersects(_boundingFrustum))
                 continue;
 
             var center = (bb.Max + bb.Min) * 0.5f;
             var extents = bb.Max - bb.Min;
 
+            // Check if the cell is occupied, meaning it has something inside it
             if (!_grid.TryGetValue(new Vector3I(x, y, z), out var list))
             {
                 Game.Gizmos.DrawCube(center, extents, Color.Red);
@@ -247,11 +262,12 @@ public class SparseGrid : TGCSample
 
             Game.Gizmos.DrawCube(center, extents, Color.Green);
                 
+            // Check against every instance on the cell
             foreach (int item in list)
             {
                 if (_boundingFrustum.Intersects(_instances[item].BoundingBox))
                 {
-                    _indicesToDraw.Add(item);
+                    _instancesToDraw.Add(item);
                 }
             }
         }
@@ -264,6 +280,7 @@ public class SparseGrid : TGCSample
             ref var element = ref instanceSpan[index];
             element.Timer += elapsedTime;
 
+            // If the timer reaches 1 or more, reset the timer and find the next objective
             if (element.Timer >= 1f)
             {
                 element.Timer %= 1f;
@@ -271,6 +288,7 @@ public class SparseGrid : TGCSample
                 element.Objective = GeneratePositionInRange(_random);
             }
             
+            // Moves them from "From" to "Objective" on a timer
             element.Position = Vector3.Lerp(element.From, element.Objective, element.Timer);
             element.BoundingBox = new BoundingBox(_robotAABB.Min + element.Position, _robotAABB.Max + element.Position);
 
@@ -280,6 +298,8 @@ public class SparseGrid : TGCSample
             if (cell.Equals(element.CurrentCell))
                 continue;
             
+            // Instance is on another cell, remove it from there,
+            // move it to the new cell
             _grid[element.CurrentCell].Remove(index);
 
             if (_grid[element.CurrentCell].Count == 0)
@@ -305,7 +325,7 @@ public class SparseGrid : TGCSample
     
         var instanceSpan = CollectionsMarshal.AsSpan(_instances);
     
-        foreach (var index in _indicesToDraw)
+        foreach (var index in _instancesToDraw)
         {
             ref var element = ref instanceSpan[index];
 
