@@ -74,7 +74,7 @@ public class SparseGrid : TGCSample
     /// <summary>
     /// A list of instance indices to be drawn this frame.
     /// </summary>
-    private List<int> _instancesToDraw = new();
+    private readonly List<int> _instancesToDraw = new();
 
     /// <summary>
     /// If the grid should be enabled or if regular frustum-culling should be used.
@@ -128,7 +128,7 @@ public class SparseGrid : TGCSample
         // Populate instances and put them on their cell
         for (int index = 0; index < 450_000; index++)
         {
-            _instances.Add(new InstanceData()
+            _instances.Add(new InstanceData
             {
                 Color = new Color(new Vector3(_random.NextSingle(), 
                     _random.NextSingle(),
@@ -235,39 +235,45 @@ public class SparseGrid : TGCSample
             
         
         for(int x = min.X; x <= max.X; x++)
-        for(int y = min.Y; y <= max.Y; y++)
-        for(int z = min.Z; z <= max.Z; z++)
         {
-            // Convert from cell space into world space
-            var cellPositionInWorld = new Vector3(x, y, z) * CellSize;
-            
-            var bb = new BoundingBox(cellPositionInWorld, 
-                cellPositionInWorld + new Vector3(CellSize));
-
-            // If the bounding box of the cell doesn't intersect the frustum, move into the next cell
-            // This can happen if the frustum AABB is long enough to contains a long span of cells
-            // but the frustum itself doesn't touch all of them
-            if (!bb.Intersects(_boundingFrustum))
-                continue;
-
-            var center = (bb.Max + bb.Min) * 0.5f;
-            var extents = bb.Max - bb.Min;
-
-            // Check if the cell is occupied, meaning it has something inside it
-            if (!_grid.TryGetValue(new Vector3I(x, y, z), out var list))
+            for(int y = min.Y; y <= max.Y; y++)
             {
-                Game.Gizmos.DrawCube(center, extents, Color.Red);
-                continue;
-            }
-
-            Game.Gizmos.DrawCube(center, extents, Color.Green);
-                
-            // Check against every instance on the cell
-            foreach (int item in list)
-            {
-                if (_boundingFrustum.Intersects(_instances[item].BoundingBox))
+                for(int z = min.Z; z <= max.Z; z++)
                 {
-                    _instancesToDraw.Add(item);
+                    // Convert from cell space into world space
+                    var cellPositionInWorld = new Vector3(x, y, z) * CellSize;
+                    
+                    var bb = new BoundingBox(cellPositionInWorld, 
+                        cellPositionInWorld + new Vector3(CellSize));
+
+                    // If the bounding box of the cell doesn't intersect the frustum, move into the next cell
+                    // This can happen if the frustum AABB is long enough to contains a long span of cells
+                    // but the frustum itself doesn't touch all of them
+                    if (!bb.Intersects(_boundingFrustum))
+                    {
+                        continue;
+                    }
+
+                    var center = (bb.Max + bb.Min) * 0.5f;
+                    var extents = bb.Max - bb.Min;
+
+                    // Check if the cell is occupied, meaning it has something inside it
+                    if (!_grid.TryGetValue(new Vector3I(x, y, z), out var list))
+                    {
+                        Game.Gizmos.DrawCube(center, extents, Color.Red);
+                        continue;
+                    }
+
+                    Game.Gizmos.DrawCube(center, extents, Color.Green);
+                        
+                    // Check against every instance on the cell
+                    foreach (int item in list)
+                    {
+                        if (_boundingFrustum.Intersects(_instances[item].BoundingBox))
+                        {
+                            _instancesToDraw.Add(item);
+                        }
+                    }
                 }
             }
         }
@@ -296,7 +302,9 @@ public class SparseGrid : TGCSample
 
             // Instance is on the same cell
             if (cell.Equals(element.CurrentCell))
+            {
                 continue;
+            }
             
             // Instance is on another cell, remove it from there,
             // move it to the new cell

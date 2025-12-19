@@ -11,53 +11,26 @@ public struct Vector3I : IEquatable<Vector3I>
     /// <summary>
     /// The first component of the vector.
     /// </summary>
-    private int x;
+    public int X { get; set; }
 
     /// <summary>
     /// The second component of the vector.
     /// </summary>
-    private int y;
+    public int Y { get; set; }
 
     /// <summary>
-    /// The third componentn of the vector.
+    /// The third component of the vector.
     /// </summary>
-    private int z;
-
-    /// <summary>
-    /// Gets or sets the first component of the vector.
-    /// </summary>
-    public int X
-    {
-        get => x;
-        set => x = value;
-    }
-
-    /// <summary>
-    /// Gets or sets the second component of the vector.
-    /// </summary>
-    public int Y
-    {
-        get => y;
-        set => y = value;
-    }
-
-    /// <summary>
-    /// Gets or sets the third component of the vector.
-    /// </summary>
-    public int Z
-    {
-        get => z;
-        set => z = value;
-    }
+    public int Z { get; set; }
 
     /// <summary>
     /// Creates a vector setting each of its components to the value provided.
     /// </summary>
     public Vector3I(int value)
     {
-        x = value;
-        y = value;
-        z = value;
+        X = value;
+        Y = value;
+        Z = value;
     }
 
     /// <summary>
@@ -65,9 +38,9 @@ public struct Vector3I : IEquatable<Vector3I>
     /// </summary>
     public Vector3I(int x, int y, int z)
     {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        X = x;
+        Y = y;
+        Z = z;
     }
 
     /// <summary>
@@ -80,7 +53,7 @@ public struct Vector3I : IEquatable<Vector3I>
 
     public bool Equals(Vector3I other)
     {
-        return x == other.x && y == other.y && z == other.z;
+        return X == other.X && Y == other.Y && Z == other.Z;
     }
 
     public override bool Equals(object obj)
@@ -90,7 +63,7 @@ public struct Vector3I : IEquatable<Vector3I>
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(x, y, z);
+        return HashCode.Combine(X, Y, Z);
     }
 
     public override string ToString()
