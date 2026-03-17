@@ -329,9 +329,11 @@ namespace TGC.MonoGame.Samples.Collisions
 
             for (int i = 0; i < 15; ++i)
             {
-                if (!OverlapOnAxis(aabb, test[i])) 
+                if (!OverlapOnAxis(aabb, test[i]))
+                {
                     // Separating axis found
-                    return false; 
+                    return false;
+                }
             }
 
             return true;
@@ -369,8 +371,10 @@ namespace TGC.MonoGame.Samples.Collisions
             
             for (int i = 0; i < 15; ++i)
             {
-                if (!OverlapOnAxis(aabb, test[i], out bool shouldFlip, out float currentPenetration)) 
-                    return false; 
+                if (!OverlapOnAxis(aabb, test[i], out bool shouldFlip, out float currentPenetration))
+                {
+                    return false;
+                } 
 
                 if (currentPenetration > 0f && currentPenetration < penetration) 
                 {
