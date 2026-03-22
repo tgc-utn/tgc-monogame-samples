@@ -429,11 +429,7 @@ public struct OrientedBoundingBox
             test[6 + i * 3 + 2] = Vector3.Cross(test[i], test[2]);
         }
 
-        result = new()
-        {
-            Intersects = false,
-            Penetration = float.MaxValue
-        };
+        result = new IntersectionResult(false, Vector3.Zero, float.MaxValue);
         
         for (int i = 0; i < 15; ++i)
         {
@@ -452,6 +448,114 @@ public struct OrientedBoundingBox
         result.Intersects = true;
     }
 
+    /// <summary>
+    ///     Tests if this OBB intersects with a Ray.
+    /// </summary>
+    /// <param name="ray">The ray to test</param>
+    /// <returns>A result containing the OBB intersection with the Ray</returns>
+    public RayCastResult Intersects(Ray ray)
+    {
+        //Transform Ray to OBB-Space
+        var rayOrigin = ray.Position;
+        var rayDestination = rayOrigin + ray.Direction;
+
+        var rayOriginInObbSpace = ToObbSpace(rayOrigin);
+        var rayDestinationInObbSpace = ToObbSpace(rayDestination);
+
+        var rayInObbSpace = new Ray(rayOriginInObbSpace, Vector3.Normalize(rayDestinationInObbSpace - rayOriginInObbSpace));
+
+        // Create an AABB that encloses OBB
+        var enclosingBox = new BoundingBox(-Extents, Extents);
+
+        // Perform Ray-AABB intersection
+        float? testResult = enclosingBox.Intersects(rayInObbSpace);
+
+        if (testResult == null)
+        {
+            return new RayCastResult(false, float.MaxValue);
+        }
+
+        return new RayCastResult(true, testResult.Value);
+    }
+
+
+    /// <summary>
+    ///     Tests if this OBB intersects with a Sphere.
+    /// </summary>
+    /// <param name="sphere">The sphere to test</param>
+    /// <returns>True if the OBB intersects the Sphere</returns>
+    public bool Intersects(BoundingSphere sphere)
+    {
+        // Transform sphere to OBB-Space
+        var obbSpaceSphere = new BoundingSphere(ToObbSpace(sphere.Center), sphere.Radius);
+
+        // Create AABB enclosing the OBB
+        var aabb = new BoundingBox(-Extents, Extents);
+
+        return aabb.Intersects(obbSpaceSphere);
+    }
+
+    /// <summary>
+    ///     Tests the intersection between the OBB and a Plane.
+    /// </summary>
+    /// <param name="plane">The plane to test</param>
+    /// <returns>Front if the OBB is in front of the plane, back if it is behind, and intersecting if it intersects with the plane</returns>
+    public PlaneIntersectionType Intersects(Plane plane)
+    {
+        // Maximum extent in direction of plane normal 
+        var normal = Vector3.Transform(plane.Normal, Orientation);
+
+        // Maximum extent in direction of plane normal 
+        var r = MathF.Abs(Extents.X * normal.X)
+            + MathF.Abs(Extents.Y * normal.Y)
+            + MathF.Abs(Extents.Z * normal.Z);
+
+        // signed distance between box center and plane
+        var d = Vector3.Dot(plane.Normal, Center) + plane.D;
+
+
+        // Return signed distance
+        if (MathF.Abs(d) < r)
+        {
+            return PlaneIntersectionType.Intersecting;
+        }
+
+        if (d < 0.0f)
+        {
+            return PlaneIntersectionType.Front;
+        }
+
+        return PlaneIntersectionType.Back;
+    }
+
+    /// <summary>
+    ///     Tests the intersection between the OBB and a Frustum.
+    /// </summary>
+    /// <param name="frustum">The frustum to test</param>
+    /// <returns>True if the OBB intersects with the Frustum, false otherwise</returns>
+    public bool Intersects(BoundingFrustum frustum)
+    {
+        var planes = new[]
+        {
+            frustum.Left,
+            frustum.Right,
+            frustum.Far,
+            frustum.Near,
+            frustum.Bottom,
+            frustum.Top
+        };
+
+        for (var faceIndex = 0; faceIndex < 6; ++faceIndex)
+        {
+            var side = Intersects(planes[faceIndex]);
+            if (side == PlaneIntersectionType.Back)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     bool OverlapOnAxis(in BoundingBox aabb, in Vector3 axis) 
     {
         Interval a = GetInterval(aabb, axis);
@@ -550,109 +654,6 @@ public struct OrientedBoundingBox
     }
     
     /// <summary>
-    ///     Tests if this OBB intersects with a Ray.
-    /// </summary>
-    /// <param name="ray">The ray to test</param>
-    /// <param name="result">The length in the ray direction from the ray origin</param>
-    /// <returns>True if the OBB intersects the Ray</returns>
-    public bool Intersects(Ray ray, out float? result)
-    {
-        //Transform Ray to OBB-Space
-        var rayOrigin = ray.Position;
-        var rayDestination = rayOrigin + ray.Direction;
-
-        var rayOriginInObbSpace = ToObbSpace(rayOrigin);
-        var rayDestinationInObbSpace = ToObbSpace(rayDestination);
-
-        var rayInObbSpace = new Ray(rayOriginInObbSpace, Vector3.Normalize(rayDestinationInObbSpace - rayOriginInObbSpace));
-
-        // Create an AABB that encloses OBB
-        var enclosingBox = new BoundingBox(-Extents, Extents);
-
-        // Perform Ray-AABB intersection
-        var testResult = enclosingBox.Intersects(rayInObbSpace);
-        result = testResult;
-
-        return testResult != null;
-    }
-
-
-    /// <summary>
-    ///     Tests if this OBB intersects with a Sphere.
-    /// </summary>
-    /// <param name="sphere">The sphere to test</param>
-    /// <returns>True if the OBB intersects the Sphere</returns>
-    public bool Intersects(BoundingSphere sphere)
-    {
-        // Transform sphere to OBB-Space
-        var obbSpaceSphere = new BoundingSphere(ToObbSpace(sphere.Center), sphere.Radius);
-
-        // Create AABB enclosing the OBB
-        var aabb = new BoundingBox(-Extents, Extents);
-
-        return aabb.Intersects(obbSpaceSphere);
-    }
-
-    /// <summary>
-    ///     Tests the intersection between the OBB and a Plane.
-    /// </summary>
-    /// <param name="plane">The plane to test</param>
-    /// <returns>Front if the OBB is in front of the plane, back if it is behind, and intersecting if it intersects with the plane</returns>
-    public PlaneIntersectionType Intersects(Plane plane)
-    {
-        // Maximum extent in direction of plane normal 
-        var normal = Vector3.Transform(plane.Normal, Orientation);
-
-        // Maximum extent in direction of plane normal 
-        var r = MathF.Abs(Extents.X * normal.X)
-            + MathF.Abs(Extents.Y * normal.Y)
-            + MathF.Abs(Extents.Z * normal.Z);
-
-        // signed distance between box center and plane
-        var d = Vector3.Dot(plane.Normal, Center) + plane.D;
-
-
-        // Return signed distance
-        if (MathF.Abs(d) < r)
-        {
-            return PlaneIntersectionType.Intersecting;
-        }
-
-        if (d < 0.0f)
-        {
-            return PlaneIntersectionType.Front;
-        }
-
-        return PlaneIntersectionType.Back;
-    }
-
-    /// <summary>
-    ///     Tests the intersection between the OBB and a Frustum.
-    /// </summary>
-    /// <param name="frustum">The frustum to test</param>
-    /// <returns>True if the OBB intersects with the Frustum, false otherwise</returns>
-    public bool Intersects(BoundingFrustum frustum)
-    {
-        var planes = new[]
-        {
-            frustum.Left,
-            frustum.Right,
-            frustum.Far,
-            frustum.Near,
-            frustum.Bottom,
-            frustum.Top
-        };
-
-        for (var faceIndex = 0; faceIndex < 6; ++faceIndex)
-        {
-            var side = Intersects(planes[faceIndex]);
-            if (side == PlaneIntersectionType.Back)
-                return false;
-        }
-        return true;
-    }
-
-    /// <summary>
     ///     Converts a point from OBB-Space to World-Space.
     /// </summary>
     /// <param name="point">Point in OBB-Space</param>
@@ -664,10 +665,53 @@ public struct OrientedBoundingBox
 
     public struct IntersectionResult
     {
-        public bool Intersects;
-        public Vector3 Normal;
-        public float Penetration;
+        private bool _intersects;
+        private Vector3 _normal;
+        private float _penetration;
+        
+        public bool Intersects
+        {
+            get => _intersects;
+            internal set => _intersects = value;
+        }
+        
+        public Vector3 Normal
+        {
+            get => _normal;
+            internal set => _normal = value;
+        }
+        
+        public float Penetration
+        {
+            get => _penetration;
+            internal set => _penetration = value;
+        }
+
+        public IntersectionResult(bool intersects, Vector3 normal, float penetration)
+        {
+            _intersects = intersects;
+            _normal = normal;
+            _penetration = penetration;
+        }
     }
+
+    public struct RayCastResult
+    {
+        private bool _hasHit;
+        
+        private float _fraction;
+
+        public bool HasHit => _hasHit;
+        
+        public float Fraction => _fraction;
+        
+        public RayCastResult(bool hasHit, float fraction)
+        {
+            _hasHit = hasHit;
+            _fraction = fraction;
+        }
+    }
+    
     
     /// <summary>
     /// Represents a (min, max) range.
