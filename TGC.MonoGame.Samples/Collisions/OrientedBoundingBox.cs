@@ -93,21 +93,20 @@ public struct OrientedBoundingBox
         var minInitValues = Vector3.Zero;
         var minEndValues = Vector3.Zero;
         var transformedPoints = new Vector3[points.Length];
-        float y, z;
 
         var x = initValues.X;
         while (x <= endValues.X)
         {
-            y = initValues.Y;
-            var rotationX = MathHelper.ToRadians(x);
+            float y = initValues.Y;
+            float rotationX = MathHelper.ToRadians(x);
             while (y <= endValues.Y)
             {
-                z = initValues.Z;
-                var rotationY = MathHelper.ToRadians(y);
+                float z = initValues.Z;
+                float rotationY = MathHelper.ToRadians(y);
                 while (z <= endValues.Z)
                 {
                     // Rotation matrix
-                    var rotationZ = MathHelper.ToRadians(z);
+                    float rotationZ = MathHelper.ToRadians(z);
                     var rotationMatrix = Matrix.CreateFromYawPitchRoll(rotationY, rotationX, rotationZ);
 
                     // Transform every point to OBB-Space
@@ -159,7 +158,7 @@ public struct OrientedBoundingBox
     /// </summary>
     /// <param name="box">A <see cref="BoundingBox">BoundingBox</see> to create the <see cref="OrientedBoundingBox">OrientedBoundingBox</see> from</param>
     /// <returns>The generated <see cref="OrientedBoundingBox">OrientedBoundingBox</see></returns>
-    public static OrientedBoundingBox FromAABB(in BoundingBox box)
+    public static OrientedBoundingBox FromAabb(in BoundingBox box)
     {
         var center = BoundingVolumesExtensions.GetCenter(box);
         var extents = BoundingVolumesExtensions.GetExtents(box);
@@ -171,7 +170,7 @@ public struct OrientedBoundingBox
     /// </summary>
     /// <param name="point">Point in World-Space</param>
     /// <returns>The point in OBB-Space</returns>
-    public Vector3 ToOBBSpace(in Vector3 point)
+    public Vector3 ToObbSpace(in Vector3 point)
     {
         var difference = point - Center;
         return Vector3.Transform(difference, Orientation);
@@ -214,8 +213,8 @@ public struct OrientedBoundingBox
     {
         float ra;
         float rb;
-        var R = new float[3, 3];
-        var AbsR = new float[3, 3];
+        var rotation = new float[9];
+        var absoluteRotation = new float[9];
         var ae = ToArray(Extents);
         var be = ToArray(box.Extents);
 
@@ -227,16 +226,15 @@ public struct OrientedBoundingBox
         {
             for (var j = 0; j < 3; j++)
             {
-                     R[i, j] = result[i * 3 + j];
+                GetRotationAt(i, j) = result[i * 3 + j];
             }
         }
 
         // Compute translation vector t
         var tVec = box.Center - Center;
 
-        // Bring translation into this boxs coordinate frame
-
-        var t = ToArray(Vector3.Transform(tVec, Orientation));
+        // Bring translation into this box coordinate frame
+        var translation = ToArray(Vector3.Transform(tVec, Orientation));
 
         // Compute common subexpressions. Add in an epsilon term to
         // counteract arithmetic errors when two edges are parallel and
@@ -246,7 +244,7 @@ public struct OrientedBoundingBox
         {
             for (var j = 0; j < 3; j++)
             {
-                AbsR[i, j] = MathF.Abs(R[i, j]) + float.Epsilon;
+                GetAbsoluteRotationAt(i, j) = MathF.Abs(GetRotationAt(i, j)) + float.Epsilon;
             }
         }
 
@@ -254,65 +252,118 @@ public struct OrientedBoundingBox
         for (var i = 0; i < 3; i++)
         {
             ra = ae[i];
-            rb = be[0] * AbsR[i, 0] + be[1] * AbsR[i, 1] + be[2] * AbsR[i, 2];
-            if (MathF.Abs(t[i]) > ra + rb) return false;
+            rb = be[0] * GetAbsoluteRotationAt(i, 0) + be[1] * GetAbsoluteRotationAt(i, 1) + be[2] * GetAbsoluteRotationAt(i, 2);
+            
+            if (MathF.Abs(translation[i]) > ra + rb)
+            {
+                return false;
+            }
         }
 
         // Test axes L = B0, L = B1, L = B2
         for (var i = 0; i < 3; i++)
         {
-            ra = ae[0] * AbsR[0, i] + ae[1] * AbsR[1, i] + ae[2] * AbsR[2, i];
+            ra = ae[0] * GetAbsoluteRotationAt(0, i) + ae[1] * GetAbsoluteRotationAt(1, i) + ae[2] * GetAbsoluteRotationAt(2, i);
             rb = be[i];
-            if (MathF.Abs(t[0] * R[0, i] + t[1] * R[1, i] + t[2] * R[2, i]) > ra + rb) return false;
+            if (MathF.Abs(translation[0] * GetRotationAt(0, i) + translation[1] * GetRotationAt(1, i) + translation[2] * GetRotationAt(2, i)) > ra + rb)
+            {
+                return false;
+            }
         }
 
         // Test axis L = A0 x B0
-        ra = ae[1] * AbsR[2, 0] + ae[2] * AbsR[1, 0];
-        rb = be[1] * AbsR[0, 2] + be[2] * AbsR[0, 1];
-        if (MathF.Abs(t[2] * R[1, 0] - t[1] * R[2, 0]) > ra + rb) return false;
+        ra = ae[1] * GetAbsoluteRotationAt(2, 0) + ae[2] * GetAbsoluteRotationAt(1, 0);
+        rb = be[1] * GetAbsoluteRotationAt(0, 2) + be[2] * GetAbsoluteRotationAt(0, 1);
+        
+        if (MathF.Abs(translation[2] * GetRotationAt(1, 0) - translation[1] * GetRotationAt(2, 0)) > ra + rb)
+        {
+            return false;
+        }
 
         // Test axis L = A0 x B1
-        ra = ae[1] * AbsR[2, 1] + ae[2] * AbsR[1, 1];
-        rb = be[0] * AbsR[0, 2] + be[2] * AbsR[0, 0];
-        if (MathF.Abs(t[2] * R[1, 1] - t[1] * R[2, 1]) > ra + rb) return false;
+        ra = ae[1] * GetAbsoluteRotationAt(2, 1) + ae[2] * GetAbsoluteRotationAt(1, 1);
+        rb = be[0] * GetAbsoluteRotationAt(0, 2) + be[2] * GetAbsoluteRotationAt(0, 0);
+        
+        if (MathF.Abs(translation[2] * GetRotationAt(1, 1) - translation[1] * GetRotationAt(2, 1)) > ra + rb)
+        {
+            return false;
+        }
 
         // Test axis L = A0 x B2
-        ra = ae[1] * AbsR[2, 2] + ae[2] * AbsR[1, 2];
-        rb = be[0] * AbsR[0, 1] + be[1] * AbsR[0, 0];
-        if (MathF.Abs(t[2] * R[1, 2] - t[1] * R[2, 2]) > ra + rb) return false;
+        ra = ae[1] * GetAbsoluteRotationAt(2, 2) + ae[2] * GetAbsoluteRotationAt(1, 2);
+        rb = be[0] * GetAbsoluteRotationAt(0, 1) + be[1] * GetAbsoluteRotationAt(0, 0);
+        
+        if (MathF.Abs(translation[2] * GetRotationAt(1, 2) - translation[1] * GetRotationAt(2, 2)) > ra + rb)
+        {
+            return false;
+        }
 
         // Test axis L = A1 x B0
-        ra = ae[0] * AbsR[2, 0] + ae[2] * AbsR[0, 0];
-        rb = be[1] * AbsR[1, 2] + be[2] * AbsR[1, 1];
-        if (MathF.Abs(t[0] * R[2, 0] - t[2] * R[0, 0]) > ra + rb) return false;
+        ra = ae[0] * GetAbsoluteRotationAt(2, 0) + ae[2] * GetAbsoluteRotationAt(0, 0);
+        rb = be[1] * GetAbsoluteRotationAt(1, 2) + be[2] * GetAbsoluteRotationAt(1, 1);
+
+        if (MathF.Abs(translation[0] * GetRotationAt(2, 0) - translation[2] * GetRotationAt(0, 0)) > ra + rb)
+        {
+            return false;
+        }
 
         // Test axis L = A1 x B1
-        ra = ae[0] * AbsR[2, 1] + ae[2] * AbsR[0, 1];
-        rb = be[0] * AbsR[1, 2] + be[2] * AbsR[1, 0];
-        if (MathF.Abs(t[0] * R[2, 1] - t[2] * R[0, 1]) > ra + rb) return false;
+        ra = ae[0] * GetAbsoluteRotationAt(2, 1) + ae[2] * GetAbsoluteRotationAt(0, 1);
+        rb = be[0] * GetAbsoluteRotationAt(1, 2) + be[2] * GetAbsoluteRotationAt(1, 0);
+        
+        if (MathF.Abs(translation[0] * GetRotationAt(2, 1) - translation[2] * GetRotationAt(0, 1)) > ra + rb)
+        {
+            return false;
+        }
 
         // Test axis L = A1 x B2
-        ra = ae[0] * AbsR[2, 2] + ae[2] * AbsR[0, 2];
-        rb = be[0] * AbsR[1, 1] + be[1] * AbsR[1, 0];
-        if (MathF.Abs(t[0] * R[2, 2] - t[2] * R[0, 2]) > ra + rb) return false;
+        ra = ae[0] * GetAbsoluteRotationAt(2, 2) + ae[2] * GetAbsoluteRotationAt(0, 2);
+        rb = be[0] * GetAbsoluteRotationAt(1, 1) + be[1] * GetAbsoluteRotationAt(1, 0);
+        
+        if (MathF.Abs(translation[0] * GetRotationAt(2, 2) - translation[2] * GetRotationAt(0, 2)) > ra + rb)
+        {
+            return false;
+        }
 
         // Test axis L = A2 x B0
-        ra = ae[0] * AbsR[1, 0] + ae[1] * AbsR[0, 0];
-        rb = be[1] * AbsR[2, 2] + be[2] * AbsR[2, 1];
-        if (MathF.Abs(t[1] * R[0, 0] - t[0] * R[1, 0]) > ra + rb) return false;
+        ra = ae[0] * GetAbsoluteRotationAt(1, 0) + ae[1] * GetAbsoluteRotationAt(0, 0);
+        rb = be[1] * GetAbsoluteRotationAt(2, 2) + be[2] * GetAbsoluteRotationAt(2, 1);
+        
+        if (MathF.Abs(translation[1] * GetRotationAt(0, 0) - translation[0] * GetRotationAt(1, 0)) > ra + rb)
+        {
+            return false;
+        }
 
         // Test axis L = A2 x B1
-        ra = ae[0] * AbsR[1, 1] + ae[1] * AbsR[0, 1];
-        rb = be[0] * AbsR[2, 2] + be[2] * AbsR[2, 0];
-        if (MathF.Abs(t[1] * R[0, 1] - t[0] * R[1, 1]) > ra + rb) return false;
+        ra = ae[0] * GetAbsoluteRotationAt(1, 1) + ae[1] * GetAbsoluteRotationAt(0, 1);
+        rb = be[0] * GetAbsoluteRotationAt(2, 2) + be[2] * GetAbsoluteRotationAt(2, 0);
+        
+        if (MathF.Abs(translation[1] * GetRotationAt(0, 1) - translation[0] * GetRotationAt(1, 1)) > ra + rb)
+        {
+            return false;
+        }
 
         // Test axis L = A2 x B2
-        ra = ae[0] * AbsR[1, 2] + ae[1] * AbsR[0, 2];
-        rb = be[0] * AbsR[2, 1] + be[1] * AbsR[2, 0];
-        if (MathF.Abs(t[1] * R[0, 2] - t[0] * R[1, 2]) > ra + rb) return false;
+        ra = ae[0] * GetAbsoluteRotationAt(1, 2) + ae[1] * GetAbsoluteRotationAt(0, 2);
+        rb = be[0] * GetAbsoluteRotationAt(2, 1) + be[1] * GetAbsoluteRotationAt(2, 0);
+
+        if (MathF.Abs(translation[1] * GetRotationAt(0, 2) - translation[0] * GetRotationAt(1, 2)) > ra + rb)
+        {
+            return false;
+        }
 
         // Since no separating axis is found, the OBBs must be intersecting
         return true;
+
+        ref float GetRotationAt(int x, int y)
+        {
+            return ref rotation[x * 3 + y];
+        }
+        
+        ref float GetAbsoluteRotationAt(int x, int y)
+        {
+            return ref absoluteRotation[x * 3 + y];
+        }
     }
 
     /// <summary>
@@ -510,8 +561,8 @@ public struct OrientedBoundingBox
         var rayOrigin = ray.Position;
         var rayDestination = rayOrigin + ray.Direction;
 
-        var rayOriginInObbSpace = ToOBBSpace(rayOrigin);
-        var rayDestinationInObbSpace = ToOBBSpace(rayDestination);
+        var rayOriginInObbSpace = ToObbSpace(rayOrigin);
+        var rayDestinationInObbSpace = ToObbSpace(rayDestination);
 
         var rayInObbSpace = new Ray(rayOriginInObbSpace, Vector3.Normalize(rayDestinationInObbSpace - rayOriginInObbSpace));
 
@@ -534,15 +585,13 @@ public struct OrientedBoundingBox
     public bool Intersects(BoundingSphere sphere)
     {
         // Transform sphere to OBB-Space
-        var obbSpaceSphere = new BoundingSphere(ToOBBSpace(sphere.Center), sphere.Radius);
+        var obbSpaceSphere = new BoundingSphere(ToObbSpace(sphere.Center), sphere.Radius);
 
         // Create AABB enclosing the OBB
         var aabb = new BoundingBox(-Extents, Extents);
 
         return aabb.Intersects(obbSpaceSphere);
     }
-
-
 
     /// <summary>
     ///     Tests the intersection between the OBB and a Plane.

@@ -55,9 +55,6 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
         // The World Matrix for the Chair Oriented Bounding Box
         private Matrix ChairOBBWorld { get; set; }
-
-        // The OrientedBoundingBox of the Chair
-        private OrientedBoundingBox ChairBox { get; set; }
         
         // The Y Angle for the Chair
         private float ChairAngle { get; set; }
@@ -102,6 +99,9 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         // Indicates if the Robot is touching the other Robot
         private bool TouchingOtherRobot { get; set; } = false;
 
+        // The OrientedBoundingBox of the Chair
+        private OrientedBoundingBox _chairBox;
+        
         /// <inheritdoc />
         public override void Initialize()
         {
@@ -170,11 +170,12 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             // Scale it to match the model's transform
             temporaryCubeAABB = BoundingVolumesExtensions.Scale(temporaryCubeAABB, 0.5f);
             // Create an Oriented Bounding Box from the AABB
-            ChairBox = OrientedBoundingBox.FromAABB(temporaryCubeAABB);
+            
+            _chairBox = OrientedBoundingBox.FromAabb(temporaryCubeAABB);
             // Move the center
-            ChairBox.Center = Vector3.UnitX * 50f;
+            _chairBox.Center = Vector3.UnitX * 50f;
             // Then set its orientation!
-            ChairBox.Orientation = Matrix.CreateRotationY(ChairAngle);
+            _chairBox.Orientation = Matrix.CreateRotationY(ChairAngle);
 
 
             // Create a Bounding Sphere for a model
@@ -222,17 +223,17 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             ChairAngle += 0.01f;
             var rotation = Matrix.CreateRotationY(ChairAngle);
             ChairWorld = ChairScale * rotation * ChairTranslation;
-            ChairBox.Orientation = rotation;
+            _chairBox.Orientation = rotation;
 
             // Create an OBB World-matrix so we can draw a cube representing it
-            ChairOBBWorld = Matrix.CreateScale(ChairBox.Extents * 2f) *
-                 ChairBox.Orientation *
+            ChairOBBWorld = Matrix.CreateScale(_chairBox.Extents * 2f) *
+                            _chairBox.Orientation *
                  ChairTranslation;
 
 
 
             // Update the boolean values depending on the intersection of the Bounding Volumes
-            TouchingChair = ChairBox.Intersects(RobotBox);
+            TouchingChair = _chairBox.Intersects(RobotBox);
             TouchingTank = _tankSphere.Intersects(RobotBox);
             TouchingOtherRobot = !RobotTwoCylinder.Intersects(RobotBox).Equals(BoxCylinderIntersection.None);
 
