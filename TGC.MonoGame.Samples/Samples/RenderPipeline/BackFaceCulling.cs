@@ -41,6 +41,12 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
         private RenderTarget2D _depthRenderTarget;
 
+        private List<string> _texts;
+        private List<Vector2> _textScreenPositions;
+        private List<Vector3> _textWorldPositions;
+
+        private SpriteFont _spriteFont;
+
         public BackFaceCulling(TGCViewer game) : base(game)
         {
             Category = TGCSampleCategory.RenderPipeline;
@@ -53,19 +59,44 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         {
             var screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
             _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0f, 0f, 50f), screenSize);
-            
+
             _baseScale = Matrix.CreateScale(BaseScaleScalar);
 
             _arrows = new List<Arrowz>();
-            
+
+            _texts = new List<string>
+            {
+                "Clockwise culling",
+                "Cull none",
+                "Counter-clockwise culling",
+            };
+
+
+            _textScreenPositions = new List<Vector2>
+            {
+                Vector2.Zero,
+                Vector2.Zero,
+                Vector2.Zero,
+            };
+            var offset = Vector3.Up * 15f;
+
+            _textWorldPositions = new List<Vector3>
+            {
+                -Displacement * Vector3.UnitX + offset,
+                Vector3.Zero + offset,
+                Displacement * Vector3.UnitX + offset,
+            };
+
+
             base.Initialize();
         }
 
         /// <inheritdoc />
         protected override void LoadContent()
         {
-            // We load the sphere mesh into a model
-            _primitive = new SpherePrimitive(GraphicsDevice, 1f, 6);
+            _spriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
+            // We load the cylinder mesh into a model
+            _primitive = new CylinderPrimitive(GraphicsDevice, 2f, 1f);
 
             LoadArrows(_primitive);
 
@@ -73,11 +104,11 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             _effect = Game.Content.Load<Effect>(ContentFolderEffects + "BackFace");
 
             _drawDepthEffect = Game.Content.Load<Effect>(ContentFolderEffects + "ShadowMap");
-            
+
             // Create a depth render target. It stores depth from the camera
             _depthRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, false,
                 SurfaceFormat.Single, DepthFormat.Depth24, 0, RenderTargetUsage.PlatformContents);
-                        
+
             ModifierController.AddToggle("Show Wireframe", (enabled) => _showWireframe = enabled, false);
             ModifierController.AddToggle("Show Triangle Normals", (enabled) => _showArrows = enabled, false);
             ModifierController.AddToggle("Enable Back-Face Culling", (enabled) => _backFace = enabled, true);
@@ -108,7 +139,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
                 normal.Normalize();
 
                 bool isForward = Vector3.Dot(normal, Vector3.UnitZ) >= 0f;
-               
+
                 bool inside = InsideCylinder(vertexOne);
                 inside |= InsideCylinder(vertexTwo);
                 inside |= InsideCylinder(vertexThree);
@@ -131,8 +162,8 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
                     // Right outer arrow
                     displacedAverage = average + Displacement * Vector3.UnitX;
-                    AddArrow(displacedAverage, normal, Color.Magenta); 
-                    
+                    AddArrow(displacedAverage, normal, Color.Magenta);
+
                     // Right outer arrow
                     AddArrow(displacedAverage, -normal, Color.Yellow);
                 }
@@ -151,9 +182,32 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
         private bool InsideCylinder(Vector3 position)
         {
-            return  (new Vector2(position.X, position.Y)).Length() <= 0.2f;
+            return (new Vector2(position.X, position.Y)).Length() <= 0.2f;
         }
 
+
+        /// <summary>
+        /// Returns a <see cref="Vector2"/> containing the XY components of a <see cref="Vector3"/>.
+        /// </summary>
+        /// <param name="vector">The <see cref="Vector3"/> to obtain its XY components</param>
+        /// <returns>A <see cref="Vector2"/> containing the XY components of the given vector</returns>
+        private Vector2 ToVector2(Vector3 vector)
+        {
+            return new Vector2(vector.X, vector.Y);
+        }
+        /// <summary>
+        /// Updates text positions in screen space to face the camera, 
+        /// based on the world space positions and the camera values.
+        /// </summary>
+        private void UpdateTextPositions()
+        {
+            for (var index = 0; index < _textScreenPositions.Count; index++)
+            {
+                var size = _spriteFont.MeasureString(_texts[index]) / 2f;
+                _textScreenPositions[index] = ToVector2(GraphicsDevice.Viewport.Project(
+                        _textWorldPositions[index], _camera.Projection, _camera.View, Matrix.Identity)) - size;
+            }
+        }
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
@@ -163,6 +217,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             _effect.Parameters["cameraPosition"]?.SetValue(_camera.Position);
 
             Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
+            UpdateTextPositions();
 
             base.Update(gameTime);
         }
@@ -179,13 +234,13 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             GraphicsDevice.SetRenderTarget(_depthRenderTarget);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1f, 0);
 
-            DrawSpheres(_drawDepthEffect, viewProjection);
+            DrawCylinders(_drawDepthEffect, viewProjection);
 
             // Set the render target as null, we are drawing on the screen!
             GraphicsDevice.SetRenderTarget(null);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1f, 0);
 
-            DrawSpheres(_effect, viewProjection);
+            DrawCylinders(_effect, viewProjection);
 
             RasterizerState rasterizerState = new RasterizerState();
             rasterizerState.CullMode = CullMode.None;
@@ -199,67 +254,55 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
                     arr = _arrows[index];
                     Game.Gizmos.DrawLine(arr.Position, arr.Target, arr.Color);
                 }
-            } 
-            
+            }
+
+            // Draw labels
+            Game.SpriteBatch.Begin(
+                SpriteSortMode.Immediate,
+                BlendState.AlphaBlend,
+                SamplerState.LinearClamp,
+                DepthStencilState.Default,
+                RasterizerState.CullNone);
+
+            for (var index = 0; index < _textScreenPositions.Count; index++)
+            {
+                Game.SpriteBatch.DrawString(_spriteFont, _texts[index], _textScreenPositions[index], Color.White);
+            }
+
+            Game.SpriteBatch.End();
+
             base.Draw(gameTime);
         }
 
-        private void DrawSpheres(Effect effect, Matrix viewProjection)
+
+        private void DrawCylinder(Effect effect, Matrix viewProjection, CullMode cullMode, float displacement)
         {
             RasterizerState rasterizerState = new RasterizerState();
-            if(!_backFace)
-            {
-                rasterizerState.CullMode = CullMode.None;
-            }
-            else
-            {
-                rasterizerState.CullMode = CullMode.CullClockwiseFace;
-            }
-
             if (_showWireframe)
             {
                 rasterizerState.FillMode = FillMode.WireFrame;
             }
-
-            GraphicsDevice.RasterizerState = rasterizerState;
-
-            var world = _baseScale * Matrix.CreateTranslation(Vector3.UnitX * Displacement);
-            effect.Parameters["WorldViewProjection"].SetValue(world * viewProjection);
-            _primitive.Draw(effect);
-
-            rasterizerState = new RasterizerState();
-            rasterizerState.CullMode = CullMode.None;
-            if (_showWireframe)
-            {
-                rasterizerState.FillMode = FillMode.WireFrame;
-            }
-
-            GraphicsDevice.RasterizerState = rasterizerState;
-
-            world = _baseScale;
-            effect.Parameters["WorldViewProjection"].SetValue(world * viewProjection);
-            _primitive.Draw(effect);
-
-            rasterizerState = new RasterizerState();
             if (!_backFace)
             {
-                rasterizerState.CullMode = CullMode.None;
+                cullMode = CullMode.None;
             }
-            else
-            {
-                rasterizerState.CullMode = CullMode.CullCounterClockwiseFace;
-            }
-
-            if (_showWireframe)
-            {
-                rasterizerState.FillMode = FillMode.WireFrame;
-            }
-
+            rasterizerState.CullMode = cullMode;
             GraphicsDevice.RasterizerState = rasterizerState;
 
-            world = _baseScale * Matrix.CreateTranslation(Vector3.UnitX * -Displacement);
+            var world = _baseScale * Matrix.CreateTranslation(Vector3.UnitX * displacement);
             effect.Parameters["WorldViewProjection"].SetValue(world * viewProjection);
             _primitive.Draw(effect);
+        }
+        private void DrawCylinders(Effect effect, Matrix viewProjection)
+        {
+            // Clockwise cylinder
+            DrawCylinder(effect, viewProjection, CullMode.CullClockwiseFace, -Displacement);
+
+            // Cull none cylinder
+            DrawCylinder(effect, viewProjection, CullMode.None, 0f);
+
+            // Counter-clockwise cylinder
+            DrawCylinder(effect, viewProjection, CullMode.CullCounterClockwiseFace, Displacement);
         }
 
         /// <inheritdoc />
