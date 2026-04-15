@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using TGC.MonoGame.Samples.Viewer.Models;
 
 namespace TGC.MonoGame.Samples.Viewer
@@ -29,6 +30,10 @@ namespace TGC.MonoGame.Samples.Viewer
             Graphics.GraphicsProfile = GraphicsProfile.HiDef;
             // Commented because of https://github.com/MonoGame/MonoGame/issues/7914
             //Graphics.PreferMultiSampling = true;
+
+            if(DisplayInfo.TryGetRefreshRate(out var hz))
+                TargetElapsedTime = TimeSpan.FromMilliseconds(1000.0 / hz);
+
             Content.RootDirectory = ContentFolder;
             IsMouseVisible = true;
             Gizmos = new Gizmos.Gizmos();
