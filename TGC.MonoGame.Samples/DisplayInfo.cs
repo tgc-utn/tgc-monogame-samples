@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.InteropServices;
 
 namespace TGC.MonoGame.Samples
@@ -71,7 +72,7 @@ namespace TGC.MonoGame.Samples
                         {
                             if (parts[i].Equals("*", StringComparison.InvariantCultureIgnoreCase)  && i > 0)
                             {
-                                refreshRate = (int)Math.Round(double.Parse(parts[i - 1]));
+                                refreshRate = (int)Math.Round(double.Parse(parts[i - 1], CultureInfo.InvariantCulture));
 
                                 return true;
                             }
@@ -87,7 +88,9 @@ namespace TGC.MonoGame.Samples
                     // xrandr failed / not installed
                 }
                 else
+                {
                     throw;
+                }
             }
             return false;
         }
@@ -114,7 +117,7 @@ namespace TGC.MonoGame.Samples
                 {
                     if (line.Contains("Hertz:", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        refreshRate = int.Parse(line.Split(':')[1].Trim());
+                        refreshRate = int.Parse(line.Split(':')[1].Trim(), CultureInfo.InvariantCulture);
 
                         return true;
                     }
@@ -128,7 +131,9 @@ namespace TGC.MonoGame.Samples
                     // displayplacer failed / not installed
                 }
                 else
+                {
                     throw;   
+                }
             }
             return false;
         }
