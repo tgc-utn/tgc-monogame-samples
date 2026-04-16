@@ -32,7 +32,9 @@ namespace TGC.MonoGame.Samples.Viewer
             //Graphics.PreferMultiSampling = true;
 
             if(DisplayInfo.TryGetRefreshRate(out var hz))
+            {
                 TargetElapsedTime = TimeSpan.FromMilliseconds(1000.0 / hz);
+            }
 
             Content.RootDirectory = ContentFolder;
             IsMouseVisible = true;

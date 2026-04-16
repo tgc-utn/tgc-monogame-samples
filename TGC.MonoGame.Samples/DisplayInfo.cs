@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
@@ -9,7 +10,7 @@ namespace TGC.MonoGame.Samples
         public static bool TryGetRefreshRate(out int refreshRate)
         {
             refreshRate = 0;
-            
+
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 return TryWindows(out refreshRate);
@@ -20,21 +21,25 @@ namespace TGC.MonoGame.Samples
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                return TryOSX(out refreshRate);
+                return TryOsx(out refreshRate);
             }
-
-            // platform not supported
-            return false;
+            else
+            {
+                // platform not supported
+                return false;
+            }
         }
 
         private static bool TryWindows(out int refreshRate)
         {
             refreshRate = 0;
-            var devMode = new DEVMODE();
+            var devMode = new Devmode();
             devMode.dmSize = (short)Marshal.SizeOf(devMode);
             var res = EnumDisplaySettings(null, ENUM_CURRENT_SETTINGS, ref devMode);
             if (res)
+            {
                 refreshRate = devMode.dmDisplayFrequency;
+            }
 
             return res;
         }
@@ -58,12 +63,13 @@ namespace TGC.MonoGame.Samples
                 // Parse active mode line, e.g. "1920x1080     60.00*+"
                 foreach (string line in output.Split('\n'))
                 {
-                    if (line.Contains(" connected ") && line.Contains("*"))
+                    if (line.Contains(" connected ",StringComparison.InvariantCultureIgnoreCase) 
+                        && line.Contains("*", StringComparison.InvariantCultureIgnoreCase))
                     {
                         var parts = line.Trim().Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
                         for (int i = 0; i < parts.Length; i++)
                         {
-                            if (parts[i] == "*" && i > 0)
+                            if (parts[i].Equals("*", StringComparison.InvariantCultureIgnoreCase)  && i > 0)
                             {
                                 refreshRate = (int)Math.Round(double.Parse(parts[i - 1]));
 
@@ -73,13 +79,19 @@ namespace TGC.MonoGame.Samples
                     }
                 }
             }
-            catch
+            catch (Exception e)
             {
-                // xrandr failed / not installed
+                if (e is InvalidOperationException || e is Win32Exception)
+                {
+                    return false;
+                    // xrandr failed / not installed
+                }
+                else
+                    throw;
             }
             return false;
         }
-        private static bool TryOSX(out int refreshRate)
+        private static bool TryOsx(out int refreshRate)
         {
             refreshRate = 0;
 
@@ -100,7 +112,7 @@ namespace TGC.MonoGame.Samples
                 // Parse "Hertz: 60"
                 foreach (string line in output.Split('\n'))
                 {
-                    if (line.Contains("Hertz:"))
+                    if (line.Contains("Hertz:", StringComparison.InvariantCultureIgnoreCase))
                     {
                         refreshRate = int.Parse(line.Split(':')[1].Trim());
 
@@ -108,20 +120,26 @@ namespace TGC.MonoGame.Samples
                     }
                 }
             }
-            catch
+            catch(Exception e)
             {
-                // displayplacer failed / not installed
+                if (e is InvalidOperationException || e is Win32Exception)
+                {
+                    return false;
+                    // displayplacer failed / not installed
+                }
+                else
+                    throw;   
             }
             return false;
         }
 
         [DllImport("user32.dll")]
-        private static extern bool EnumDisplaySettings(string lpszDeviceName, int iModeNum, ref DEVMODE lpDevMode);
+        private static extern bool EnumDisplaySettings(string lpszDeviceName, int iModeNum, ref Devmode lpDevMode);
 
         private const int ENUM_CURRENT_SETTINGS = -1;
 
         [StructLayout(LayoutKind.Sequential)]
-        private struct DEVMODE
+        private struct Devmode
         {
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
             public string dmDeviceName;
