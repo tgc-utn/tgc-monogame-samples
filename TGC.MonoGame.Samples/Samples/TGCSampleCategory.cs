@@ -18,5 +18,6 @@
         public const string Shaders = "Shaders";
         public const string Transformations = "Transformations";
         public const string Tutorials = "Tutorials";
+        public const string UI = "UI";
     }
 }
