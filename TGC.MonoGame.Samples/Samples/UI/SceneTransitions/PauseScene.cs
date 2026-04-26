@@ -55,5 +55,4 @@ public class PauseScene : IScene
         _system.End();
     }
 
-    public void Dispose() { }
 }

@@ -52,6 +52,4 @@ public class MenuScene : IScene
         _system.SpriteBatch.DrawString(_spriteFont, Text, _textPosition, Color.Black);
         _system.End();
     }
-
-    public void Dispose() { }
 }

@@ -7,7 +7,7 @@ using TGC.MonoGame.Samples.Geometries;
 
 namespace TGC.MonoGame.Samples.Samples.UI.SceneTransitions;
 
-public class GameScene : IScene
+public class GameScene : IScene, IDisposable
 {
     private readonly Action _pause;
     private readonly Action _exit;

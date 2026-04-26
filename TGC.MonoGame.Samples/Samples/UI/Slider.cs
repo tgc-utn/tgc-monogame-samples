@@ -32,7 +32,7 @@ public class Slider
     /// <param name="initialValue">Starting value (clamped to [min, max])</param>
     /// <param name="onValueChanged">Called whenever the value changes while dragging</param>
     public Slider(ControlsSystem controls, Rectangle trackBounds, float min, float max, float initialValue,
-        Action<float> onValueChanged = null)
+        Action<float> onValueChanged)
     {
         _controls = controls;
         _trackBounds = trackBounds;
@@ -82,7 +82,7 @@ public class Slider
             
             float newValue = MathUtils.MathUtils.RemapClamped(0f, totalWidth, _min, _max, relativeX);
                 
-            if (newValue != Value)
+            if (Math.Abs(newValue - Value) > 0.0001f)
             {
                 Value = newValue;
                 _onValueChanged?.Invoke(Value);

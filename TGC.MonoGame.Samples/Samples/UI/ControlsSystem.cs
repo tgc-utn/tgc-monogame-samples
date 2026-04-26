@@ -8,7 +8,7 @@ public class ControlsSystem : IDisposable
 {
     internal SpriteBatch SpriteBatch { get; private set; }
 
-    private Texture2D _dummyTexture;
+    private readonly Texture2D _dummyTexture;
     
 
     public ControlsSystem(GraphicsDevice device)

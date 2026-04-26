@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using TGC.MonoGame.Samples.Viewer;
@@ -66,8 +67,6 @@ public class SceneTransitions : TGCSample
     {
         base.UnloadContent();
         _system.Dispose();
-        _menuScene.Dispose();
-        _gameScene.Dispose();
-        _pauseScene.Dispose();
+        ((IDisposable)_gameScene).Dispose();
     }
 }

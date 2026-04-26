@@ -20,7 +20,7 @@ public class Button
 
     private readonly Action _onPressed;
     
-    private Rectangle _bounds;
+    private readonly Rectangle _bounds;
 
     /// <summary>
     /// Tells the current state the button is in on this tick.
@@ -104,7 +104,7 @@ public class Button
                 break;
 
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(CurrentState));
         }
     }
 

@@ -19,5 +19,6 @@
         public static readonly string Shaders = "Shaders";
         public static readonly string Transformations = "Transformations";
         public static readonly string Tutorials = "Tutorials";
+        public static readonly string UI = "UI";
     }
 }

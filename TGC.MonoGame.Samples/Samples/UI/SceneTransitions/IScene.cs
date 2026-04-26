@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace TGC.MonoGame.Samples.Samples.UI.SceneTransitions;
 
-public interface IScene : IDisposable
+public interface IScene
 {
     void LoadContent(ContentManager content, GraphicsDeviceManager graphics, ControlsSystem controls);
 
