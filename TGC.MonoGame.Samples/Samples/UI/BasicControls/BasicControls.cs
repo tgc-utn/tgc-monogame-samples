@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using TGC.MonoGame.Samples.Viewer;
 
-namespace TGC.MonoGame.Samples.Samples.UI;
+namespace TGC.MonoGame.Samples.Samples.UI.BasicControls;
 
 public class BasicControls : TGCSample
 {
@@ -133,5 +133,11 @@ public class BasicControls : TGCSample
         Vector2 rightAlignedTextSize = _spriteFont.MeasureString(rightText);
         _controls.SpriteBatch.DrawString(_spriteFont, rightText, 
             new Vector2(screenSize.X - rightAlignedTextSize.X - 40f, 100f), Color.Red);
+    }
+
+    protected override void UnloadContent()
+    {
+        base.UnloadContent();
+        _controls.Dispose();
     }
 }

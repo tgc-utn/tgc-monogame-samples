@@ -29,6 +29,8 @@ public class Button
     /// </summary>
     public State CurrentState { get; private set; }
 
+    public Vector2 Center => _bounds.Center.ToVector2();
+    
     public Button(ControlsSystem system, Point position, Action onPressed, Texture2D baseTexture,
         Texture2D pressedTexture = null, Texture2D hoverTexture = null)
         : this(system, new Rectangle(position.X - baseTexture.Width / 2,
