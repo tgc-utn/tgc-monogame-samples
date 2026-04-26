@@ -12,13 +12,11 @@ public class Button
 {
     private readonly ControlsSystem _controls;
 
-    private readonly GraphicsDevice _device;
-
     private readonly Texture2D _baseTexture;
 
-    private readonly Texture2D? _pressedTexture;
+    private readonly Texture2D _pressedTexture;
 
-    private readonly Texture2D? _hoverTexture;
+    private readonly Texture2D _hoverTexture;
 
     private readonly Action _onPressed;
     

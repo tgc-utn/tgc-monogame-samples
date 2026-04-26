@@ -16,7 +16,7 @@ public class BasicControls : TGCSample
     private Slider _slider;
 
     private string _text = "";
-    private float _sliderValue = 0.5f;
+    private float _sliderValue = 50f;
 
     private SpriteFont _spriteFont;
 
