@@ -11,6 +11,14 @@ namespace TGC.MonoGame.Samples.Samples
     /// </summary>
     public class TGCLogoSample : TGCSample
     {
+        private Camera _camera;
+
+        private Model _model;
+
+        private Matrix _world;
+
+        private float _angle;
+
         /// <summary>
         ///     Default constructor.
         /// </summary>
@@ -20,16 +28,11 @@ namespace TGC.MonoGame.Samples.Samples
             Name = GetType().Name;
             Description = Description = "Time to explore the samples :)";
         }
-
-        private Camera Camera { get; set; }
-        private Model Model { get; set; }
-        private Matrix ModelWorld { get; set; }
-        private float ModelRotation { get; set; }
-
+        
         /// <inheritdoc />
         public override void Initialize()
         {
-            Camera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, Vector3.UnitZ * 150, Vector3.UnitZ);
+            _camera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, Vector3.UnitZ * 150, Vector3.UnitZ);
 
             base.Initialize();
         }
@@ -38,11 +41,11 @@ namespace TGC.MonoGame.Samples.Samples
         protected override void LoadContent()
         {
             // Load mesh.
-            Model = Game.Content.Load<Model>(ContentFolder3D + "tgc-logo/tgc-logo");
-            var modelEffect = (BasicEffect) Model.Meshes[0].Effects[0];
+            _model = Game.Content.Load<Model>(ContentFolder3D + "tgc-logo/tgc-logo");
+            var modelEffect = (BasicEffect) _model.Meshes[0].Effects[0];
             modelEffect.DiffuseColor = Color.DarkBlue.ToVector3();
             modelEffect.EnableDefaultLighting();
-            ModelWorld = Matrix.CreateRotationY(MathHelper.Pi);
+            _world = Matrix.Identity;
 
             base.LoadContent();
         }
@@ -50,9 +53,10 @@ namespace TGC.MonoGame.Samples.Samples
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
-            ModelRotation += Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
+            _angle += Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
+            _world = Matrix.CreateRotationY(_angle);
 
-            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+            Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
 
             base.Update(gameTime);
         }
@@ -63,7 +67,7 @@ namespace TGC.MonoGame.Samples.Samples
             Game.Background = Color.Black;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            Model.Draw(ModelWorld * Matrix.CreateRotationY(ModelRotation), Camera.View, Camera.Projection);
+            _model.Draw(_world, _camera.View, _camera.Projection);
 
             base.Draw(gameTime);
         }

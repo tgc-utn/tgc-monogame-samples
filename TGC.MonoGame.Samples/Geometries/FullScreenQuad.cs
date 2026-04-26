@@ -5,9 +5,9 @@ namespace TGC.MonoGame.Samples.Geometries
 {
     public class FullScreenQuad
     {
-        private readonly GraphicsDevice device;
-        private IndexBuffer indexBuffer;
-        private VertexBuffer vertexBuffer;
+        private readonly GraphicsDevice _device;
+        private IndexBuffer _indexBuffer;
+        private VertexBuffer _vertexBuffer;
 
         /// <summary>
         ///     Create a quad used in clip space
@@ -15,7 +15,7 @@ namespace TGC.MonoGame.Samples.Geometries
         /// <param name="device">Used to initialize and control the presentation of the graphics device.</param>
         public FullScreenQuad(GraphicsDevice device)
         {
-            this.device = device;
+            this._device = device;
             CreateVertexBuffer();
             CreateIndexBuffer();
         }
@@ -32,9 +32,9 @@ namespace TGC.MonoGame.Samples.Geometries
             vertices[3].Position = new Vector3(1f, 1f, 0f);
             vertices[3].TextureCoordinate = new Vector2(1f, 0f);
 
-            vertexBuffer = new VertexBuffer(device, VertexPositionTexture.VertexDeclaration, 4,
+            _vertexBuffer = new VertexBuffer(_device, VertexPositionTexture.VertexDeclaration, 4,
                 BufferUsage.WriteOnly);
-            vertexBuffer.SetData(vertices);
+            _vertexBuffer.SetData(vertices);
         }
 
         private void CreateIndexBuffer()
@@ -48,27 +48,27 @@ namespace TGC.MonoGame.Samples.Geometries
             indices[4] = 3;
             indices[5] = 2;
 
-            indexBuffer = new IndexBuffer(device, IndexElementSize.SixteenBits, 6, BufferUsage.WriteOnly);
-            indexBuffer.SetData(indices);
+            _indexBuffer = new IndexBuffer(_device, IndexElementSize.SixteenBits, 6, BufferUsage.WriteOnly);
+            _indexBuffer.SetData(indices);
         }
 
 
         public void Draw(Effect effect)
         {
-            device.SetVertexBuffer(vertexBuffer);
-            device.Indices = indexBuffer;
+            _device.SetVertexBuffer(_vertexBuffer);
+            _device.Indices = _indexBuffer;
 
             foreach (var pass in effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 2);
+                _device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 2);
             }
         }
 
         public void Dispose()
         {
-            vertexBuffer.Dispose();
-            indexBuffer.Dispose();
+            _vertexBuffer.Dispose();
+            _indexBuffer.Dispose();
         }
     }
 }

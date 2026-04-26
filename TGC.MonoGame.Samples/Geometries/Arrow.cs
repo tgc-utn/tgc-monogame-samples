@@ -152,11 +152,11 @@ namespace TGC.MonoGame.Samples.Geometries
         }
 
 
-        public void Draw(Matrix World, Matrix View, Matrix Projection)
+        public void Draw(Matrix world, Matrix view, Matrix projection)
         {
-            Effect.World = World;
-            Effect.View = View;
-            Effect.Projection = Projection;
+            Effect.World = world;
+            Effect.View = view;
+            Effect.Projection = projection;
 
             var graphicsDevice = Effect.GraphicsDevice;
             graphicsDevice.SetVertexBuffer(VertexBuffer);

@@ -16,7 +16,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
     /// </summary>
     public class BasicShader : TGCSample
     {
-        private float time;
+        private float _time;
 
         /// <inheritdoc />
         public BasicShader(TGCViewer game) : base(game)
@@ -26,34 +26,34 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             Description = "Basic Shader Sample. Animation by vertex shader and coloring by pixel shader.";
         }
 
-        private Camera Camera { get; set; }
-        private Effect Effect { get; set; }
-        private Model Model { get; set; }
-        private Texture2D Texture { get; set; }
+        private Camera _camera;
+        private Effect _effect;
+        private Model _model;
+        private Texture2D _texture;
 
         /// <inheritdoc />
         public override void Initialize()
         {
-            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0f, 50f, 400f));
-            time = 0;
+            _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0f, 50f, 400f));
+            _time = 0;
             base.Initialize();
         }
 
         /// <inheritdoc />
         protected override void LoadContent()
         {
-            Model = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
+            _model = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
             // From the effect of the model I keep the texture.
-            Texture = ((BasicEffect) Model.Meshes.FirstOrDefault()?.MeshParts.FirstOrDefault()?.Effect)?.Texture;
+            _texture = ((BasicEffect) _model.Meshes.FirstOrDefault()?.MeshParts.FirstOrDefault()?.Effect)?.Texture;
 
             // Load a shader in runtime, outside the Content pipeline.
             // First you must run "mgfxc <SourceFile> <OutputFile> [/Debug] [/Profile:<DirectX_11,OpenGL>]"
             // https://docs.monogame.net/articles/tools/mgfxc.html
-            //byte[] byteCode = File.ReadAllBytes(Game.Content.RootDirectory + "/" + ContentFolderEffects + "BasicShader.fx");
-            //Effect = new Effect(GraphicsDevice, byteCode);
+            // To read the file byte[] byteCode = File.ReadAllBytes(Game.Content.RootDirectory + "/" + ContentFolderEffects + "BasicShader.fx");
+            // To create de Effect _effect = new Effect(GraphicsDevice, byteCode);
 
             // Load a shader using Content pipeline.
-            Effect = Game.Content.Load<Effect>(ContentFolderEffects + "BasicShader");
+            _effect = Game.Content.Load<Effect>(ContentFolderEffects + "BasicShader");
 
             base.LoadContent();
         }
@@ -61,9 +61,9 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
-            Camera.Update(gameTime);
+            _camera.Update(gameTime);
 
-            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+            Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
 
             base.Update(gameTime);
         }
@@ -75,23 +75,20 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            
+            _time += Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
 
-            time += Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
-
-            var mesh = Model.Meshes.FirstOrDefault();
+            var mesh = _model.Meshes.FirstOrDefault();
 
             if (mesh != null)
             {
                 foreach (var part in mesh.MeshParts)
                 {
-                    part.Effect = Effect;
-                    Effect.Parameters["World"].SetValue(mesh.ParentBone.Transform);
-                    Effect.Parameters["View"].SetValue(Camera.View);
-                    Effect.Parameters["Projection"].SetValue(Camera.Projection);
-                    //Effect.Parameters["WorldViewProjection"].SetValue(Camera.WorldMatrix * Camera.View * Camera.Projection);
-                    Effect.Parameters["ModelTexture"].SetValue(Texture);
-                    Effect.Parameters["Time"].SetValue(time);
+                    part.Effect = _effect;
+                    _effect.Parameters["World"].SetValue(mesh.ParentBone.Transform);
+                    _effect.Parameters["View"].SetValue(_camera.View);
+                    _effect.Parameters["Projection"].SetValue(_camera.Projection);
+                    _effect.Parameters["ModelTexture"].SetValue(_texture);
+                    _effect.Parameters["Time"].SetValue(_time);
                 }
 
                 mesh.Draw();

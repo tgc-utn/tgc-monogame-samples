@@ -24,17 +24,17 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             Description = "Shows how to create a Quad and a Box with a 2D image as a texture to give it color.";
         }
 
-        private Camera Camera { get; set; }
-        private QuadPrimitive Quad { get; set; }
-        private Matrix QuadWorld { get; set; }
-        private BoxPrimitive Box { get; set; }
-        private Matrix BoxWorld { get; set; }
-        private float BoxRotation { get; set; }
+        private Camera _camera;
+        private QuadPrimitive _quad;
+        private Matrix _quadWorld;
+        private BoxPrimitive _box;
+        private Matrix _boxWorld;
+        private float _boxRotation;
 
         /// <inheritdoc />
         public override void Initialize()
         {
-            Camera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 10, 60), Vector3.Zero);
+            _camera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 10, 60), Vector3.Zero);
 
             base.Initialize();
         }
@@ -43,13 +43,13 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         protected override void LoadContent()
         {
             var texture = Game.Content.Load<Texture2D>(ContentFolderTextures + "wood/caja-madera-3");
-            Quad = new QuadPrimitive(GraphicsDevice);
-            Quad.Effect.Texture = texture;
+            _quad = new QuadPrimitive(GraphicsDevice);
+            _quad.Effect.Texture = texture;
 
-            QuadWorld = Matrix.CreateScale(10f) * Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateTranslation(Vector3.UnitX * 14);
+            _quadWorld = Matrix.CreateScale(10f) * Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateTranslation(Vector3.UnitX * 14);
              
-            Box = new BoxPrimitive(GraphicsDevice, Vector3.One * 20, texture);
-            BoxWorld = Matrix.CreateTranslation(Vector3.UnitX * -14);
+            _box = new BoxPrimitive(GraphicsDevice, Vector3.One * 20, texture);
+            _boxWorld = Matrix.CreateTranslation(Vector3.UnitX * -14);
 
             base.LoadContent();
         }
@@ -57,10 +57,10 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
-            Camera.Update(gameTime);
-            BoxRotation += Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
+            _camera.Update(gameTime);
+            _boxRotation += Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
 
-            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+            Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
 
             base.Update(gameTime);
         }
@@ -71,9 +71,8 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             Game.Background = Color.CornflowerBlue;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             
-
-            Box.Draw(Matrix.CreateRotationY(BoxRotation) * BoxWorld, Camera.View, Camera.Projection);
-            Quad.Draw(QuadWorld, Camera.View, Camera.Projection);
+            _box.Draw(Matrix.CreateRotationY(_boxRotation) * _boxWorld, _camera.View, _camera.Projection);
+            _quad.Draw(_quadWorld, _camera.View, _camera.Projection);
 
             base.Draw(gameTime);
         }

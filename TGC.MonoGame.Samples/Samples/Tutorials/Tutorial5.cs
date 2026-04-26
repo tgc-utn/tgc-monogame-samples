@@ -23,14 +23,14 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
                 "Shows how to load a 3D model. You can move around the scene with a simple camera that handles asdw and arrows keys.";
         }
 
-        private Camera Camera { get; set; }
-        private Model Model1 { get; set; }
-        private Model Model2 { get; set; }
+        private Camera _camera;
+        private Model _model1;
+        private Model _model2;
 
         /// <inheritdoc />
         public override void Initialize()
         {
-            Camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, Vector3.UnitZ * 55, 15, 0.5f);
+            _camera = new SimpleCamera(GraphicsDevice.Viewport.AspectRatio, Vector3.UnitZ * 55, 15, 0.5f);
 
             base.Initialize();
         }
@@ -38,12 +38,15 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         /// <inheritdoc />
         protected override void LoadContent()
         {
-            Model1 = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
-            ((BasicEffect) Model1.Meshes.FirstOrDefault()?.Effects.FirstOrDefault())?.EnableDefaultLighting();
+            _model1 = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
+            ((BasicEffect) _model1.Meshes.FirstOrDefault()?.Effects.FirstOrDefault())?.EnableDefaultLighting();
 
-            Model2 = Game.Content.Load<Model>(ContentFolder3D + "tank/tank");
+            _model2 = Game.Content.Load<Model>(ContentFolder3D + "tank/tank");
 
-            foreach (var mesh in Model2.Meshes) ((BasicEffect) mesh.Effects.FirstOrDefault())?.EnableDefaultLighting();
+            foreach (var mesh in _model2.Meshes)
+            {
+                ((BasicEffect) mesh.Effects.FirstOrDefault())?.EnableDefaultLighting();
+            }
 
             base.LoadContent();
         }
@@ -51,9 +54,9 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
-            Camera.Update(gameTime);
+            _camera.Update(gameTime);
 
-            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+            Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
 
             base.Update(gameTime);
         }
@@ -64,10 +67,10 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             Game.Background = Color.CornflowerBlue;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            Model1.Draw(Matrix.CreateScale(0.1f) * Matrix.CreateTranslation(Vector3.UnitX * -8), Camera.View,
-                Camera.Projection);
-            Model2.Draw(Matrix.CreateScale(2.8f) * Matrix.CreateTranslation(new Vector3(8, -5, 0)), Camera.View,
-                Camera.Projection);
+            _model1.Draw(Matrix.CreateScale(0.1f) * Matrix.CreateTranslation(Vector3.UnitX * -8), _camera.View,
+                _camera.Projection);
+            _model2.Draw(Matrix.CreateScale(2.8f) * Matrix.CreateTranslation(new Vector3(8, -5, 0)), _camera.View,
+                _camera.Projection);
 
             base.Draw(gameTime);
         }

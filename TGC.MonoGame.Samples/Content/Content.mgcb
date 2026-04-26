@@ -12,6 +12,17 @@
 
 
 #---------------------------------- Content ---------------------------------#
+#begin Effects/Deferred.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/Deferred.fx
+
+#begin Effects/DeferredModel.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/DeferredModel.fx
 
 #begin 3D/chair/chair.fbx
 /importer:FbxImporter
@@ -108,6 +119,25 @@
 /processorParam:TextureFormat=Compressed
 /build:3D/skybox/cube.fbx
 
+#begin 3D/sponza/Sponza.fbx
+/importer:FbxImporter
+/processor:ModelProcessor
+/processorParam:ColorKeyColor=0,0,0,0
+/processorParam:ColorKeyEnabled=True
+/processorParam:DefaultEffect=BasicEffect
+/processorParam:GenerateMipmaps=True
+/processorParam:GenerateTangentFrames=False
+/processorParam:PremultiplyTextureAlpha=True
+/processorParam:PremultiplyVertexColors=True
+/processorParam:ResizeTexturesToPowerOfTwo=False
+/processorParam:RotationX=0
+/processorParam:RotationY=0
+/processorParam:RotationZ=0
+/processorParam:Scale=1
+/processorParam:SwapWindingOrder=False
+/processorParam:TextureFormat=Compressed
+/build:3D/sponza/Sponza.fbx
+
 #begin 3D/tank/tank.fbx
 /importer:FbxImporter
 /processor:ModelProcessor
@@ -126,6 +156,25 @@
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
 /build:3D/tank/tank.fbx
+
+#begin 3D/tgc-logo/tgc-logo.fbx
+/importer:FbxImporter
+/processor:ModelProcessor
+/processorParam:ColorKeyColor=0,0,0,0
+/processorParam:ColorKeyEnabled=True
+/processorParam:DefaultEffect=BasicEffect
+/processorParam:GenerateMipmaps=True
+/processorParam:GenerateTangentFrames=False
+/processorParam:PremultiplyTextureAlpha=True
+/processorParam:PremultiplyVertexColors=True
+/processorParam:ResizeTexturesToPowerOfTwo=False
+/processorParam:RotationX=0
+/processorParam:RotationY=0
+/processorParam:RotationZ=0
+/processorParam:Scale=1
+/processorParam:SwapWindingOrder=False
+/processorParam:TextureFormat=Compressed
+/build:3D/tgc-logo/tgc-logo.fbx
 
 #begin 3D/tgcito-classic/tgcito-classic.obj
 /importer:FbxImporter
@@ -165,25 +214,6 @@
 /processorParam:TextureFormat=Compressed
 /build:3D/tgcito-mega/tgcito-mega.obj
 
-#begin 3D/tgc-logo/tgc-logo.fbx
-/importer:FbxImporter
-/processor:ModelProcessor
-/processorParam:ColorKeyColor=0,0,0,0
-/processorParam:ColorKeyEnabled=True
-/processorParam:DefaultEffect=BasicEffect
-/processorParam:GenerateMipmaps=True
-/processorParam:GenerateTangentFrames=False
-/processorParam:PremultiplyTextureAlpha=True
-/processorParam:PremultiplyVertexColors=True
-/processorParam:ResizeTexturesToPowerOfTwo=False
-/processorParam:RotationX=0
-/processorParam:RotationY=0
-/processorParam:RotationZ=0
-/processorParam:Scale=1
-/processorParam:SwapWindingOrder=False
-/processorParam:TextureFormat=Compressed
-/build:3D/tgc-logo/tgc-logo.fbx
-
 #begin Effects/AlphaBlending.fx
 /importer:EffectImporter
 /processor:EffectProcessor
@@ -201,6 +231,12 @@
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:Effects/BasicShader.fx
+
+#begin Effects/BasicTexture.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/BasicTexture.fx
 
 #begin Effects/BlinnPhong.fx
 /importer:EffectImporter
@@ -268,6 +304,12 @@
 /processorParam:DebugMode=Auto
 /build:Effects/PBR.fx
 
+#begin Effects/PlanarReflections.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/PlanarReflections.fx
+
 #begin Effects/ShaderVisualizer.fx
 /importer:EffectImporter
 /processor:EffectProcessor
@@ -285,6 +327,12 @@
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:Effects/SkyBox.fx
+
+#begin Effects/SphereVertexShader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/SphereVertexShader.fx
 
 #begin Effects/Terrain.fx
 /importer:EffectImporter
@@ -348,18 +396,6 @@
 #begin SpriteFonts/CascadiaCode/CascadiaMonoPL.ttf
 /copy:SpriteFonts/CascadiaCode/CascadiaMonoPL.ttf
 
-#begin Textures/floor/adoquin.jpg
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Textures/floor/adoquin.jpg
-
 #begin Textures/floor/adoquin-2.jpg
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -371,6 +407,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/floor/adoquin-2.jpg
+
+#begin Textures/floor/adoquin.jpg
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/floor/adoquin.jpg
 
 #begin Textures/floor/tierra.jpg
 /importer:TextureImporter
@@ -468,18 +516,6 @@
 /processorParam:TextureFormat=Color
 /build:Textures/heightmaps/colormap.jpg
 
-#begin Textures/heightmaps/heightmap.jpg
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Textures/heightmaps/heightmap.jpg
-
 #begin Textures/heightmaps/heightmap-3.jpg
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -491,6 +527,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/heightmaps/heightmap-3.jpg
+
+#begin Textures/heightmaps/heightmap.jpg
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/heightmaps/heightmap.jpg
 
 #begin Textures/heightmaps/terrain-texture-3.jpg
 /importer:TextureImporter

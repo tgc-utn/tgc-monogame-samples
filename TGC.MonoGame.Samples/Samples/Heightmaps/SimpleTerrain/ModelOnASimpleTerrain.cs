@@ -23,8 +23,10 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
 
         private Model model;
         public Vector2 pos;
-        public Vector3 shipPos;
+        public Vector3 tgcitoPos;
         public SimpleTerrain terrain;
+
+        private float offSet;
 
         /// <inheritdoc />
         public ModelOnASimpleTerrain(TGCViewer game) : base(game)
@@ -51,9 +53,9 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
         protected override void LoadContent()
         {
             var terrainEffect = Game.Content.Load<Effect>(ContentFolderEffects + "Terrain");
-            // alturas pp dichas
+            // heights
             var terrainHeigthmap = Game.Content.Load<Texture2D>(ContentFolderTextures + "Heightmaps/heightmap");
-            // color basico
+            // basic color
             var terrainColorMap = Game.Content.Load<Texture2D>(ContentFolderTextures + "Heightmaps/colormap");
             // blend texture 1
             var terrainGrass = Game.Content.Load<Texture2D>(ContentFolderTextures + "grass");
@@ -62,6 +64,8 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
             terrain = new SimpleTerrain(GraphicsDevice, terrainHeigthmap, terrainColorMap, terrainGrass, terrainGround, terrainEffect);
             
             model = Game.Content.Load<Model>("3D/tgcito-classic/tgcito-classic");
+
+            offSet = model.Meshes[0].BoundingSphere.Radius;
 
             base.LoadContent();
         }
@@ -80,7 +84,8 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
             var X = pos.X;
             var Z = pos.Y;
 
-            DesiredLookAt = shipPos = new Vector3(X, terrain.Height(X, Z), Z);
+            tgcitoPos = new Vector3(X, terrain.Height(X, Z) + offSet, Z);
+            DesiredLookAt = new Vector3(X, terrain.Height(X, Z), Z);
             if (!hay_lookAt)
             {
                 LookAt = DesiredLookAt;
@@ -94,7 +99,7 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
 
             var pos2 = pos - dir * 800;
 
-            // obtengo la altura maxima desde la camara hasta el auto
+            // I get the maximum height from the camera to tgcito.
             float H = 0;
             for (var i = 0; i < 10; ++i)
             {
@@ -119,23 +124,23 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
             Game.Background = Color.CornflowerBlue;
             Game.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            // dibujo el terreno, apagando el backface culling
+            // I draw the terrain, turning off the backface culling
             var oldRasterizerState = GraphicsDevice.RasterizerState;
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
             terrain.Draw(Matrix.Identity, Camera.View, Camera.Projection);
             GraphicsDevice.RasterizerState = oldRasterizerState;
 
-            // computo 3 puntos sobre la superficie del heighmap
+            // compute 3 points on the heightmap surface
             var dir = new Vector2(MathF.Cos(angle), MathF.Sin(angle));
             var tan = new Vector2(-MathF.Sin(angle), MathF.Cos(angle));
             var pos_ade = pos + dir * 100;
             var pos_der = pos + tan * 100;
-            var PosAdelante = new Vector3(pos_ade.X, terrain.Height(pos_ade.X, pos_ade.Y), pos_ade.Y);
-            var PosDerecha = new Vector3(pos_der.X, terrain.Height(pos_der.X, pos_der.Y), pos_der.Y);
+            var PosAdelante = new Vector3(pos_ade.X, terrain.Height(pos_ade.X, pos_ade.Y) + offSet, pos_ade.Y);
+            var PosDerecha = new Vector3(pos_der.X, terrain.Height(pos_der.X, pos_der.Y) + offSet, pos_der.Y);
 
-            var matWorld = CalcularMatrizOrientacion(10, shipPos, PosAdelante, PosDerecha);
+            var matWorld = CalcularMatrizOrientacion(10, tgcitoPos, PosAdelante, PosDerecha);
 
-            // dibujo el mesh
+            // I draw the mesh
             foreach (var mesh in model.Meshes)
             {
                 foreach (BasicEffect effect in mesh.Effects)
@@ -153,12 +158,12 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
             base.Draw(gameTime);
         }
 
-        // helper, calcula una matrix de world en base a la posicion, escalado y direccion del mesh
+        // helper, calculates a world matrix based on the position, scaling, and direction of the mesh
         public Matrix CalcularMatrizOrientacion(float scale, Vector3 p0, Vector3 p1, Vector3 p2)
         {
             var matWorld = Matrix.CreateScale(scale * 0.1f);
 
-            // determino la orientacion
+            // I set the orientation
             var Dir = p1 - p0;
             Dir.Normalize();
             var Tan = p2 - p0;
@@ -193,7 +198,7 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
             Orientacion.M44 = 1;
             matWorld = matWorld * Orientacion;
 
-            // traslado
+            // transfer
             matWorld = matWorld * Matrix.CreateTranslation(p0);
             return matWorld;
         }

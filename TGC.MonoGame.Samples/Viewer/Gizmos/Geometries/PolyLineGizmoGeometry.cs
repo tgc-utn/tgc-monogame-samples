@@ -9,8 +9,8 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
     /// </summary>
     class PolyLineGizmoGeometry
     {
-        private GraphicsDevice GraphicsDevice;
-        private short[] Indices;
+        private readonly GraphicsDevice _graphicsDevice;
+        private readonly short[] _indices;
 
         /// <summary>
         ///     Creates a wire PolyLine.
@@ -18,13 +18,13 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
         /// <param name="graphicsDevice">Graphics Device to bind the geometry to.</param>
         public PolyLineGizmoGeometry(GraphicsDevice graphicsDevice)
         {
-            GraphicsDevice = graphicsDevice;
-            Indices = new short[1000];
-            Indices[0] = 0;
+            _graphicsDevice = graphicsDevice;
+            _indices = new short[1000];
+            _indices[0] = 0;
             for (short index = 1; index < 999; index += 2)
             {
-                Indices[index] = index;
-                Indices[index + 1] = index;
+                _indices[index] = index;
+                _indices[index + 1] = index;
             }
         }
 
@@ -38,9 +38,9 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
 
             var primitiveCount = vertices.Length - 1;
             var indexCount = primitiveCount * 2;
-            var indices = Indices.Take(indexCount).ToArray();
+            var indices = _indices.Take(indexCount).ToArray();
 
-            GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.LineList, vertices, 0, vertices.Length, indices, 0, primitiveCount);
+            _graphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.LineList, vertices, 0, vertices.Length, indices, 0, primitiveCount);
         }
     }
 }

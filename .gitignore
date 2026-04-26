@@ -57,7 +57,13 @@ ehthumbs_vista.db
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 
-# Rider
+### Rider ###
 .idea/
 *.iml
 *.ipr
+
+### MonoGame ###
+*.xnb
+
+### ImGui ###
+imgui.ini

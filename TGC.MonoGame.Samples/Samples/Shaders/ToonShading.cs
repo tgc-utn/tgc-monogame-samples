@@ -18,50 +18,48 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         /// <summary>
         /// A Camera to draw models in space
         /// </summary>
-        private Camera Camera { get; set; }
+        private Camera _camera;
 
         /// <summary>
         /// A model to draw in the center of the scene
         /// </summary>
-        private Model Model { get; set; }
+        private Model _model;
 
         /// <summary>
         /// Geometry to draw a floor
         /// </summary>
-        private QuadPrimitive Floor { get; set; }
+        private QuadPrimitive _floor;
 
         /// <summary>
         /// A box to draw where the light is
         /// </summary>
-        private CubePrimitive LightBox { get; set; }
+        private CubePrimitive _lightBox;
 
         /// <summary>
         /// An effect to draw using toon shading techniques
         /// </summary>
-        private Effect Effect { get; set; }
-
+        private Effect _effect;
 
         /// <summary>
         /// Texture to use as Look Up Table
         /// </summary>
-        private Texture2D LookUpTable { get; set; }
+        private Texture2D _lookUpTable;
 
         /// <summary>
         /// The world matrix for the light box
         /// </summary>
-        private Matrix LightBoxWorld { get; set; } = Matrix.Identity;
+        private Matrix _lightBoxWorld = Matrix.Identity;
 
         /// <summary>
         /// The world matrix for the model
         /// </summary>
-        private Matrix ModelWorld { get; set; }
+        private Matrix _modelWorld;
 
         /// <summary>
         /// The world matrix for the floor
         /// </summary>
-        private Matrix FloorWorld { get; set; }
-
-
+        private Matrix _floorWorld;
+        
         /// <inheritdoc />
         public ToonShading(TGCViewer game) : base(game)
         {
@@ -69,52 +67,49 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             Name = "Toon Shading Types";
             Description = "Applying Toon Shading to models";
         }
-
-
+        
         /// <inheritdoc />
         public override void Initialize()
         {
             var size = GraphicsDevice.Viewport.Bounds.Size;
             size.X /= 2;
             size.Y /= 2;
-            Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 50, 1000), size);
+            _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 50, 1000), size);
 
-            FloorWorld = Matrix.CreateScale(300f) * Matrix.CreateTranslation(0f, -20f, 0f);
+            _floorWorld = Matrix.CreateScale(300f) * Matrix.CreateTranslation(0f, -20f, 0f);
 
             base.Initialize();
         }
-
-
-
+        
         /// <inheritdoc />
         protected override void LoadContent()
         {
             // We load the sphere mesh and floor, from runtime generated primitives
 
-            Model = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
+            _model = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
             
-            var aabb = BoundingVolumesExtensions.CreateAABBFrom(Model);
+            var aabb = BoundingVolumesExtensions.CreateAABBFrom(_model);
             var height = (aabb.Max.Y - aabb.Min.Y) / 2f;
 
-            ModelWorld = Matrix.CreateTranslation(0f, height, 0f);
+            _modelWorld = Matrix.CreateTranslation(0f, height, 0f);
 
-            Floor = new QuadPrimitive(GraphicsDevice);
+            _floor = new QuadPrimitive(GraphicsDevice);
             
-            Effect = Game.Content.Load<Effect>(ContentFolderEffects + "ToonShading");
+            _effect = Game.Content.Load<Effect>(ContentFolderEffects + "ToonShading");
 
-            foreach (var modelMesh in Model.Meshes)
+            foreach (var modelMesh in _model.Meshes)
             {
                 foreach (var meshPart in modelMesh.MeshParts)
                 {
                     meshPart.Effect.Dispose();
-                    meshPart.Effect = Effect;
+                    meshPart.Effect = _effect;
                 }
             }
             
-            LightBox = new CubePrimitive(GraphicsDevice, 1f, Color.White);
+            _lightBox = new CubePrimitive(GraphicsDevice, 1f, Color.White);
             
-            LookUpTable = Game.Content.Load<Texture2D>(ContentFolderTextures + "toon/lut");
-            Effect.Parameters["LookUpTableTexture"].SetValue(LookUpTable);
+            _lookUpTable = Game.Content.Load<Texture2D>(ContentFolderTextures + "toon/lut");
+            _effect.Parameters["LookUpTableTexture"].SetValue(_lookUpTable);
 
             // Add options to pick the blinn phong type
             ModifierController.AddOptions("Toon Shading Type", new[]
@@ -127,16 +122,15 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             // Add mappings for modifiers to control values
             ModifierController.AddVector("Light Position", SetLightPosition, new Vector3(70f, 160f, 40f));
             
+            ModifierController.AddColor("Color A", _effect.Parameters["colorA"], new Color(0.152f, 0f, 0.072f));
+            ModifierController.AddColor("Color B", _effect.Parameters["colorB"], new Color(0.373f, 0.105f, 0.009f));
+            ModifierController.AddColor("Color C", _effect.Parameters["colorC"], new Color(1f, 0.529f, 0f));
+            ModifierController.AddColor("Color D", _effect.Parameters["colorD"], new Color(1f, 0.794f, 0f));
 
-            ModifierController.AddColor("Color A", Effect.Parameters["colorA"], new Color(0.152f, 0f, 0.072f));
-            ModifierController.AddColor("Color B", Effect.Parameters["colorB"], new Color(0.373f, 0.105f, 0.009f));
-            ModifierController.AddColor("Color C", Effect.Parameters["colorC"], new Color(1f, 0.529f, 0f));
-            ModifierController.AddColor("Color D", Effect.Parameters["colorD"], new Color(1f, 0.794f, 0f));
+            ModifierController.AddVector("Color Range", _effect.Parameters["colorRange"], new Vector3(0.2f, 0.4f, 0.75f));
+            ModifierController.AddFloat("Ambient", _effect.Parameters["KAmbient"], 0.05f, 0f, 1f);
 
-            ModifierController.AddVector("Color Range", Effect.Parameters["colorRange"], new Vector3(0.2f, 0.4f, 0.75f));
-            ModifierController.AddFloat("Ambient", Effect.Parameters["KAmbient"], 0.05f, 0f, 1f);
-
-            ModifierController.AddTexture("LUT", LookUpTable);
+            ModifierController.AddTexture("LUT", _lookUpTable);
 
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
@@ -149,51 +143,48 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         /// <param name="position">The new light position in world space</param>
         private void SetLightPosition(Vector3 position)
         {
-            LightBoxWorld = Matrix.CreateScale(3f) *  Matrix.CreateTranslation(position);
-            Effect.Parameters["lightPosition"].SetValue(position);
+            _lightBoxWorld = Matrix.CreateScale(3f) *  Matrix.CreateTranslation(position);
+            _effect.Parameters["lightPosition"].SetValue(position);
         }
 
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
             // Update the state of the camera
-            Camera.Update(gameTime);
+            _camera.Update(gameTime);
 
-            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+            Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
 
             base.Update(gameTime);
         }
-
 
         /// <inheritdoc />
         public override void Draw(GameTime gameTime)
         {
             // Set the background color to black
             Game.Background = Color.Black;
-
             
-            var viewProjection = Camera.View * Camera.Projection;
-
+            var viewProjection = _camera.View * _camera.Projection;
             
             // Draw the model, pass the World, WorldViewProjection and InverseTransposeWorld matrices
-            Effect.Parameters["World"].SetValue(ModelWorld);
-            Effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Invert(Matrix.Transpose(ModelWorld)));
-            Effect.Parameters["WorldViewProjection"].SetValue(ModelWorld * viewProjection);
+            _effect.Parameters["World"].SetValue(_modelWorld);
+            _effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Invert(Matrix.Transpose(_modelWorld)));
+            _effect.Parameters["WorldViewProjection"].SetValue(_modelWorld * viewProjection);
 
-            foreach (var modelMesh in Model.Meshes)
+            foreach (var modelMesh in _model.Meshes)
             { 
                 modelMesh.Draw(); 
             }
 
             // Draw the floor, pass the World, WorldViewProjection and InverseTransposeWorld matrices
-            Effect.Parameters["World"].SetValue(FloorWorld);
-            Effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Invert(Matrix.Transpose(FloorWorld)));
-            Effect.Parameters["WorldViewProjection"].SetValue(FloorWorld * viewProjection);
+            _effect.Parameters["World"].SetValue(_floorWorld);
+            _effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Invert(Matrix.Transpose(_floorWorld)));
+            _effect.Parameters["WorldViewProjection"].SetValue(_floorWorld * viewProjection);
 
-            Floor.Draw(Effect);
+            _floor.Draw(_effect);
 
             // Draw a box to show where the light is
-            LightBox.Draw(LightBoxWorld, Camera.View, Camera.Projection);
+            _lightBox.Draw(_lightBoxWorld, _camera.View, _camera.Projection);
 
             base.Draw(gameTime);
         }
@@ -206,15 +197,14 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         {
             if (type.Equals(ToonShadingType.LOOKUPTABLE))
             {
-                Effect.CurrentTechnique = Effect.Techniques["LookUpTable"];
+                _effect.CurrentTechnique = _effect.Techniques["LookUpTable"];
             }
             else
             {
-                Effect.CurrentTechnique = Effect.Techniques["Default"];
+                _effect.CurrentTechnique = _effect.Techniques["Default"];
             }
         }
-
-
+        
         /// <summary>
         /// The different types of toon-shading
         /// </summary>

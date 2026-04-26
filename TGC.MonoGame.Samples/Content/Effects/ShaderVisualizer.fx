@@ -7,6 +7,8 @@
 	#define PS_SHADERMODEL ps_4_0_level_9_1
 #endif
 
+#include "ShaderIncludes.fx"
+
 float Time = 0.0;
 
 struct VertexShaderInput

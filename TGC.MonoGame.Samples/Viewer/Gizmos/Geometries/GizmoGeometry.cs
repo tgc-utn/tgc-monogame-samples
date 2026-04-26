@@ -7,13 +7,13 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
     /// </summary>
     abstract class GizmoGeometry
     {
-        protected GraphicsDevice GraphicsDevice;
+        private readonly GraphicsDevice _graphicsDevice;
 
-        protected VertexBuffer VertexBuffer;
-        
-        protected IndexBuffer IndexBuffer;
+        private VertexBuffer _vertexBuffer;
 
-        private int PrimitiveCount;
+        private IndexBuffer _indexBuffer;
+
+        private int _primitiveCount;
 
         /// <summary>
         ///     Creates a Gizmo Geometry.
@@ -21,7 +21,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
         /// <param name="device">Graphics Device to bind the geometry to,</param>
         public GizmoGeometry(GraphicsDevice device)
         {
-            GraphicsDevice = device;
+            _graphicsDevice = device;
         }
 
         /// <summary>
@@ -30,8 +30,8 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
         /// <param name="positions">An array of vertices in local space.</param>
         protected void InitializeVertices(VertexPosition[] positions)
         {
-            VertexBuffer = new VertexBuffer(GraphicsDevice, typeof(VertexPosition), positions.Length, BufferUsage.WriteOnly);
-            VertexBuffer.SetData(positions);
+            _vertexBuffer = new VertexBuffer(_graphicsDevice, typeof(VertexPosition), positions.Length, BufferUsage.WriteOnly);
+            _vertexBuffer.SetData(positions);
         }
 
         /// <summary>
@@ -40,10 +40,10 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
         /// <param name="indices">The indices that points to the line vertices.</param>
         protected void InitializeIndices(ushort[] indices)
         {
-            IndexBuffer = new IndexBuffer(GraphicsDevice, IndexElementSize.SixteenBits, indices.Length, BufferUsage.WriteOnly);
-            IndexBuffer.SetData(indices);
+            _indexBuffer = new IndexBuffer(_graphicsDevice, IndexElementSize.SixteenBits, indices.Length, BufferUsage.WriteOnly);
+            _indexBuffer.SetData(indices);
 
-            PrimitiveCount = indices.Length / 2;
+            _primitiveCount = indices.Length / 2;
         }
 
         /// <summary>
@@ -51,8 +51,8 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
         /// </summary>
         public virtual void Bind()
         {
-            GraphicsDevice.SetVertexBuffer(VertexBuffer);
-            GraphicsDevice.Indices = IndexBuffer;
+            _graphicsDevice.SetVertexBuffer(_vertexBuffer);
+            _graphicsDevice.Indices = _indexBuffer;
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
         /// </summary>
         public virtual void Draw()
         {
-            GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.LineList, 0, 0, PrimitiveCount);
+            _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.LineList, 0, 0, _primitiveCount);
         }
 
         /// <summary>
@@ -68,8 +68,8 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
         /// </summary>
         public void Dispose()
         {
-            VertexBuffer.Dispose();
-            IndexBuffer.Dispose();
+            _vertexBuffer.Dispose();
+            _indexBuffer.Dispose();
         }
     }
 }

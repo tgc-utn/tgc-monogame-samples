@@ -24,18 +24,18 @@ namespace TGC.MonoGame.Samples.Samples.Audio
                 "Shows how to play a song file in MP3 format for example. Audio from https://www.fesliyanstudios.com";
         }
 
-        private SpriteFont Font { get; set; }
-        private string Instructions { get; set; }
-        private Vector2 InstructionsSize { get; set; }
-        private Song Song { get; set; }
-        private string SongName { get; set; }
+        private SpriteFont _font;
+        private string _instructions;
+        private Vector2 _instructionsSize;
+        private Song _song;
+        private string _songName;
 
         /// <inheritdoc />
         public override void Initialize()
         {
             Game.Background = Color.CornflowerBlue;
-            Instructions = "Y = Play, U = Pause, I = Resume, O = Stop.";
-            SongName = "No music";
+            _instructions = "Y = Play, U = Pause, I = Resume, O = Stop.";
+            _songName = "No music";
             Game.Gizmos.Enabled = false;
             base.Initialize();
         }
@@ -43,10 +43,10 @@ namespace TGC.MonoGame.Samples.Samples.Audio
         /// <inheritdoc />
         protected override void LoadContent()
         {
-            Font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
-            InstructionsSize = Font.MeasureString(Instructions);
-            SongName = "retro-platforming";
-            Song = Game.Content.Load<Song>(ContentFolderMusic + SongName);
+            _font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
+            _instructionsSize = _font.MeasureString(_instructions);
+            _songName = "retro-platforming";
+            _song = Game.Content.Load<Song>(ContentFolderMusic + _songName);
 
             MediaPlayer.IsRepeating = true;
 
@@ -57,20 +57,19 @@ namespace TGC.MonoGame.Samples.Samples.Audio
         public override void Update(GameTime gameTime)
         {
             if (Game.CurrentKeyboardState.IsKeyDown(Keys.Y) && MediaPlayer.State == MediaState.Stopped)
-                //Parar y reproducir MP3
-                MediaPlayer.Play(Song);
+                //Start and Stop the MP3
+                MediaPlayer.Play(_song);
             else if (Game.CurrentKeyboardState.IsKeyDown(Keys.U) && MediaPlayer.State == MediaState.Playing)
-                //Pausar el MP3
+                //Pause the MP3
                 MediaPlayer.Pause();
             else if (Game.CurrentKeyboardState.IsKeyDown(Keys.I) && MediaPlayer.State == MediaState.Paused)
-                //Resumir la ejecución del MP3
+                //Resume the MP3
                 MediaPlayer.Resume();
             else if (Game.CurrentKeyboardState.IsKeyDown(Keys.O) && MediaPlayer.State == MediaState.Playing)
-                //Parar el MP3
+                //Stop the MP3
                 MediaPlayer.Stop();
 
             Game.Gizmos.UpdateViewProjection(Matrix.Identity, Matrix.Identity);
-
 
             base.Update(gameTime);
         }
@@ -84,11 +83,11 @@ namespace TGC.MonoGame.Samples.Samples.Audio
             Game.SpriteBatch.Begin();
 
             var songNamePosition = new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2f, 20) -
-                                   Font.MeasureString(SongName) / 2;
-            Game.SpriteBatch.DrawString(Font, "Playing: " + SongName, songNamePosition, Color.DarkMagenta);
+                                   _font.MeasureString(_songName) / 2;
+            Game.SpriteBatch.DrawString(_font, "Playing: " + _songName, songNamePosition, Color.DarkMagenta);
             var instructionsPosition = new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2f, 60) -
-                                       InstructionsSize / 2;
-            Game.SpriteBatch.DrawString(Font, Instructions, instructionsPosition, Color.DarkGreen);
+                                       _instructionsSize / 2;
+            Game.SpriteBatch.DrawString(_font, _instructions, instructionsPosition, Color.DarkGreen);
 
             Game.SpriteBatch.End();
 

@@ -1,24 +1,25 @@
 # Install on macOS
 
-Tested on Mac with Intel processor and macOS Ventura.
+Tested on Mac with M3 processor and macOS Sequoia.
 
-The offical [documentation](https://docs.monogame.net/articles/getting_started/1_setting_up_your_development_environment_macos.html).
+The official [documentation](https://docs.monogame.net/articles/getting_started/1_setting_up_your_os_for_development_macos.html).
 
 Outside of Windows you need [Wine's](https://www.winehq.org) help for Effects(HLSL), at least for [now](https://github.com/MonoGame/MonoGame/issues/2167).
 
 ## Install Homebrew
 
-* [Homebrew](https://brew.sh).
+- [Homebrew](https://brew.sh).
 
 ## Set up MonoGame
 
 ```bash
-brew install dotnet@6
-echo 'export PATH="/opt/homebrew/opt/dotnet@6/bin:$PATH"' >> ~/.zshrc
-source ~/.zshrc
+brew install --cask dotnet-sdk@8
+
 # To check the version installed.
 dotnet --info
-dotnet new --install MonoGame.Templates.CSharp
+
+# Install MonoGame templates.
+dotnet new install MonoGame.Templates.CSharp
 dotnet new -l
 
 # Create a basic project to test if MonoGame is working.
@@ -31,33 +32,23 @@ dotnet run
 
 ## Set up Wine for effect compilation
 
-For now it does not work on ARM chips (M1 and M2).
-
 ```bash
-brew install p7zip wget wine-stable xquartz
-wine64 --version
+brew install curl p7zip wget
+brew install --cask wine-stable
+xattr -dr com.apple.quarantine "/Applications/Wine Stable.app"
 ```
 
 You will need to open Wine manually first. Otherwise, you will get an error that Apple couldn't verify it.
 
 ```bash
-wget -qO- https://raw.githubusercontent.com/MonoGame/MonoGame/develop/Tools/MonoGame.Effect.Compiler/mgfxc_wine_setup.sh | bash
+wget -qO- https://monogame.net/downloads/net8_mgfxc_wine_setup.sh | bash
 ```
+
+This will create new directory called .winemonogame in your home directory. If you ever wish to undo the setup this script performed, just simply delete that directory.
 
 ## Set up the IDE
 
-You can use Visual Studio Code or Rider. The official documentation only explains it for Visual Studio but it is up to
-you which one you are more comfortable with.
-
-### Visual Studio Code
-
-```bash
-brew install --cask visual-studio-code
-
-# Visual Studio Code extensions
-code --install-extension ms-dotnettools.csharp
-code --install-extension timgjones.hlsltools
-```
+You can use JetBrains Rider or Visual Studio Code.
 
 ### JetBrains Rider
 
@@ -65,10 +56,21 @@ code --install-extension timgjones.hlsltools
 brew install --cask rider
 ```
 
-## Visual Studio
+### Visual Studio Code
 
-Go to the official page to download and
-install [Visual Studio 2022 for Mac](https://visualstudio.microsoft.com/es/vs/mac/).
+```bash
+brew install --cask visual-studio-code
+
+# Copilot (optional)
+code --install-extension Github.copilot
+code --install-extension Github.copilot-chat
+
+# C# dev tools
+code --install-extension ms-dotnettools.csdevkit
+
+# HLSL tools
+code --install-extension timgjones.hlsltools
+```
 
 ## Set up tgc-monogame-samples
 
@@ -77,8 +79,10 @@ brew install git git-lfs
 git lfs install
 git clone https://github.com/tgc-utn/tgc-monogame-samples.git
 cd tgc-monogame-samples
-# MonoGame Effects Compiler (MGFXC)
+
+# MonoGame Effects Compiler (MGFXC).
 dotnet tool install -g dotnet-mgfxc
+# After the tool installation, check the command output for any additional setup instructions.
 dotnet restore
 dotnet build
 dotnet run --project TGC.MonoGame.Samples
@@ -86,5 +90,6 @@ dotnet run --project TGC.MonoGame.Samples
 
 ### Known issues
 
-* Assimp.AssimpException: Error loading unmanaged library from path: libassimp.dylib - WIP
-* System.DllNotFoundException: Unable to load shared library 'freetype6' or one of its dependencies. - WIP
+- Problem after install MGFXC
+  - Tools directory '/Users/user/.dotnet/tools' is not currently on the PATH environment variable.
+  - Some systems may require you to restart your terminal or IDE to recognize the new tool.

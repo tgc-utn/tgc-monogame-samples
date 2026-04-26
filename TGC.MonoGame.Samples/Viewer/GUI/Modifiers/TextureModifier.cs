@@ -11,14 +11,13 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     /// </summary>
     internal class TextureModifier : IModifier
     {
-        private static Vector4 BorderColor { get; set; } = new Vector4(0.3f, 0.3f, 0.3f, 0.7f);
+        private static readonly Vector4 BorderColor = new (0.3f, 0.3f, 0.3f, 0.7f);
 
-        private string Name { get; set; }
+        private readonly string _name;
 
-        private Texture2D Texture { get; set; }
+        private readonly Texture2D _texture;
 
-        private IntPtr TextureReference { get; set; }
-
+        private IntPtr _textureReference;
 
         /// <summary>
         ///     Creates a Texture Modifier using a name and a texture to bind.
@@ -27,10 +26,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <param name="texture">The texture to be bound to this object</param>
         public TextureModifier(string name, Texture2D texture)
         {
-            Name = name;
-            Texture = texture;
+            _name = name;
+            _texture = texture;
         }
-
 
         /// <summary>
         ///     Draws the Texture Modifier with a border
@@ -38,8 +36,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         public void Draw()
         {
             ImGui.Spacing();
-            if (ImGui.CollapsingHeader(Name, ImGuiTreeNodeFlags.DefaultOpen))
-                ImGui.Image(TextureReference,
+            if (ImGui.CollapsingHeader(_name, ImGuiTreeNodeFlags.DefaultOpen))
+            {
+                ImGui.Image(_textureReference,
                     // Size
                     new Vector2(ImGui.CalcItemWidth(), ImGui.CalcItemWidth()),
                     Vector2.Zero,
@@ -47,6 +46,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
                     Vector4.One,
                     // Border Color
                     BorderColor);
+            }
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <param name="renderer">The ImGUI Renderer that will bind the texture to ImGUI</param>
         public void Bind(ImGuiRenderer renderer)
         {
-            TextureReference = renderer.BindTexture(Texture);
+            _textureReference = renderer.BindTexture(_texture);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <param name="renderer">The ImGUI Renderer that will unbind the texture from ImGUI</param>
         public void Unbind(ImGuiRenderer renderer)
         {
-            renderer.UnbindTexture(TextureReference);
+            renderer.UnbindTexture(_textureReference);
         }
     }
 }

@@ -4,126 +4,115 @@ using System.IO;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace TGC.MonoGame.Samples.Samples.Shaders.ShaderReloader
+namespace TGC.MonoGame.Samples.Samples.Shaders.ShaderReloader;
+
+public class ShaderReloader
 {
-    class ShaderReloader
+    private static readonly string MgfxcTool = "mgfxc";
+
+    private readonly GraphicsDevice _graphicsDevice;
+    private readonly string _shaderCodeFileName;
+    private readonly string _shaderCodePath;
+    private readonly string _shaderCompiledPath;
+
+    private bool _compileError;
+    private FileSystemWatcher _fileWatcher;
+    private ProcessStartInfo _processStartInfo;
+
+    public ShaderReloader(string path, string compiledFileExtension, GraphicsDevice device)
     {
-        private readonly static string CompiledShaderFileExtension = ".xnb";
+        _shaderCodePath = path;
+        _shaderCompiledPath = Path.ChangeExtension(path, compiledFileExtension);
+        _shaderCodeFileName = Path.GetFileName(_shaderCodePath);
 
-        private string ShaderCodePath;
-        private string ShaderCompiledPath;
-        private string ShaderCodeFileName;
+        _graphicsDevice = device;
 
-        private FileSystemWatcher FileWatcher;
-        private ProcessStartInfo ProcessStartInfo;
-        
-        private GraphicsDevice GraphicsDevice;
+        ConfigureProcessStartInfo();
+        ConfigureWatcher();
+    }
 
-        private bool CompileError;
+    public event Action<Effect> OnCompile;
 
-        public event Action<Effect> OnCompile;
+    private void ConfigureWatcher()
+    {
+        _fileWatcher = new FileSystemWatcher();
 
+        _fileWatcher.Path = Path.GetDirectoryName(_shaderCodePath);
+        _fileWatcher.Filter = _shaderCodeFileName;
 
+        // Add event handlers.
+        // Listen to any event, as VS renames files instead of changing them.
+        _fileWatcher.Changed += ReplaceShader;
+        _fileWatcher.Created += ReplaceShader;
+        _fileWatcher.Deleted += ReplaceShader;
+        _fileWatcher.Renamed += ReplaceShader;
 
-        public ShaderReloader(string path, GraphicsDevice device)
+        // Begin watching.
+        _fileWatcher.EnableRaisingEvents = true;
+    }
+
+    private void ReplaceShader(object sender, FileSystemEventArgs eventArgs)
+    {
+        // Can be triggered by temp files with suffixes.
+        if (eventArgs.Name.Equals(_shaderCodeFileName))
         {
-            ShaderCodePath = path;
-            ShaderCompiledPath = Path.ChangeExtension(path, CompiledShaderFileExtension);
-            ShaderCodeFileName = Path.GetFileName(ShaderCodePath);
+            CompileShader();
 
-            GraphicsDevice = device;
-
-            ConfigureProcessStartInfo();
-            ConfigureWatcher();
-        }
-
-
-
-        private void ConfigureWatcher()
-        {
-            FileWatcher = new FileSystemWatcher();
-
-            FileWatcher.Path = Path.GetDirectoryName(ShaderCodePath);
-            FileWatcher.Filter = ShaderCodeFileName;
-
-            // Add event handlers
-            // Listen to any event, as VS renames files instead of changing them
-            FileWatcher.Changed += ReplaceShader;
-            FileWatcher.Created += ReplaceShader;
-            FileWatcher.Deleted += ReplaceShader;
-            FileWatcher.Renamed += ReplaceShader;
-
-            // Begin watching.
-            FileWatcher.EnableRaisingEvents = true;
-        }
-
-        private void ReplaceShader(object sender, FileSystemEventArgs eventArgs)
-        {
-            // Can be triggered by temp files with suffixes
-            if (!eventArgs.Name.Equals(ShaderCodeFileName))
+            if (!_compileError && File.Exists(_shaderCompiledPath))
             {
-                CompileShader();
-                if (!CompileError)
-                {
-                    var byteCode = File.ReadAllBytes(ShaderCompiledPath);
-                    var effect = new Effect(GraphicsDevice, byteCode);
+                var byteCode = File.ReadAllBytes(_shaderCompiledPath);
+                var effect = new Effect(_graphicsDevice, byteCode);
 
-                    // Delete the file as we don't need it anymore
-                    File.Delete(ShaderCompiledPath);
+                // Delete the file as we don't need it anymore.
+                File.Delete(_shaderCompiledPath);
 
-                    OnCompile.Invoke(effect);
-                }
+                OnCompile?.Invoke(effect);
             }
         }
+    }
 
-
-
-        private void ConfigureProcessStartInfo()
+    private void ConfigureProcessStartInfo()
+    {
+        _processStartInfo = new ProcessStartInfo
         {
-            ProcessStartInfo = new ProcessStartInfo
-            {
-                FileName = "mgfxc",
-                Arguments = ShaderCodePath + " " + ShaderCompiledPath,
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true,
-            };
-        }
+            FileName = MgfxcTool,
+            Arguments = _shaderCodePath + " " + _shaderCompiledPath,
+            CreateNoWindow = true,
+            UseShellExecute = false,
+            RedirectStandardError = true,
+            RedirectStandardOutput = true
+        };
+    }
 
-        private void CompileShader()
+    private void CompileShader()
+    {
+        _compileError = false;
+
+        var pProcess = new Process();
+        pProcess.StartInfo = _processStartInfo;
+        pProcess.EnableRaisingEvents = true;
+        //Get program output.
+        var stdError = new StringBuilder();
+        var stdOutput = new StringBuilder();
+
+        // Callbacks.
+        pProcess.OutputDataReceived += (_, args) => stdOutput.Append(args.Data);
+        pProcess.ErrorDataReceived += (_, args) => stdError.Append(args.Data);
+
+        pProcess.Start();
+        pProcess.BeginOutputReadLine();
+        pProcess.BeginErrorReadLine();
+        pProcess.WaitForExit();
+
+        if (pProcess.ExitCode != 0)
         {
-            CompileError = false;
-
-            Process pProcess = new Process();
-            pProcess.StartInfo = ProcessStartInfo;
-            pProcess.EnableRaisingEvents = true;
-            //Get program output
-            string stdError = null;
-            StringBuilder stdOutput = new StringBuilder();
-            
-            // Callbacks
-            pProcess.OutputDataReceived += (sender, args) => stdOutput.Append(args.Data);
-
-            pProcess.Start();
-            pProcess.BeginOutputReadLine();
-            stdError = pProcess.StandardError.ReadToEnd();
-            pProcess.WaitForExit();
-
-            if (!stdError.Equals(""))
-                ProcessError(stdError);
+            Debug.WriteLine(stdError.ToString(), "Shader-Error");
+            _compileError = true;
         }
+    }
 
-        private void ProcessError(string error)
-        {
-            Debug.WriteLine(error, "Shader-Error");
-            CompileError = true;
-        }
-
-        public void Dispose()
-        {
-            FileWatcher.Dispose();
-        }
-
+    public void Dispose()
+    {
+        _fileWatcher.Dispose();
     }
 }

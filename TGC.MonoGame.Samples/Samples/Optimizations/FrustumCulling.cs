@@ -13,7 +13,6 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
     /// </summary>
     public class FrustumCulling : TGCSample
     {
-
         /// <summary>
         /// The index of the box Bounding Volume model to update
         /// </summary>
@@ -27,33 +26,32 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
         /// <summary>
         /// A Camera to check against bounding volumes
         /// </summary>
-        private Camera TestCamera { get; set; }
+        private Camera _testCamera;
 
         /// <summary>
         /// A Camera to view the optimization technique
         /// </summary>
-        private Camera Camera { get; set; }
+        private Camera _camera;
 
         /// <summary>
         /// A Bounding Frustum to check visibility
         /// </summary>
-        private BoundingFrustum BoundingFrustum { get; set; }
+        private BoundingFrustum _boundingFrustum;
 
         /// <summary>
         /// A collection of models to draw with World matrices and AABBs for visibility testing
         /// </summary>
-        private DrawInstanceBox[] BoxModels { get; set; }
+        private DrawInstanceBox[] _boxModels;
 
         /// <summary>
         /// A collection of models to draw with World matrices and spheres for visibility testing
         /// </summary>
-        private DrawInstanceSphere[] SphereModels { get; set; }
+        private DrawInstanceSphere[] _sphereModels;
 
         /// <summary>
         /// A font to draw text
         /// </summary>
-        private SpriteFont Font { get; set; }
-
+        private SpriteFont _font;
 
         /// <inheritdoc />
         public FrustumCulling(TGCViewer game) : base(game)
@@ -63,7 +61,6 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
             Description = "Shows how to perform basic frustum culling for visibility testing";
         }
 
-
         /// <inheritdoc />
         public override void Initialize()
         {
@@ -72,27 +69,26 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
             size.Y /= 2;
 
             // Create a camera not to render objects but to test them against its frustum
-            TestCamera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 50, 1000), size);
+            _testCamera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 50, 1000), size);
             
             // Create a camera to render the scene and visualize the frustum culling technique
             var cameraPosition = Vector3.One * 1000f;
-            Camera = new StaticCamera(
+            _camera = new StaticCamera(
                 GraphicsDevice.Viewport.AspectRatio,
                 cameraPosition, Vector3.Normalize(Vector3.Backward * 500f - cameraPosition), Vector3.Up);
-            Camera.BuildProjection(GraphicsDevice.Viewport.AspectRatio, 60.0f, 30000f, MathF.PI / 2.5f);
+            _camera.BuildProjection(GraphicsDevice.Viewport.AspectRatio, 60.0f, 30000f, MathF.PI / 2.5f);
           
             // Create a bounding frustum to check bounding volumes against it
-            BoundingFrustum = new BoundingFrustum(TestCamera.View * TestCamera.Projection);
+            _boundingFrustum = new BoundingFrustum(_testCamera.View * _testCamera.Projection);
 
             base.Initialize();
         }
-
 
         /// <inheritdoc />
         protected override void LoadContent()
         {
             // Load a font to render the draw call count
-            Font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
+            _font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
 
             // Load the robot mesh, and generate an AABB and sphere from it
             var robot = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
@@ -108,9 +104,8 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
             var logo = Game.Content.Load<Model>(ContentFolder3D + "tgc-logo/tgc-logo");
             var logoAABB = BoundingVolumesExtensions.CreateAABBFrom(logo);
 
-
             // Create draw instances for models that use AABBs for bounding volumes
-            BoxModels = new []
+            _boxModels = new []
             {
                 new DrawInstanceBox
                 {
@@ -139,13 +134,13 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
             };
 
             // Update the AABBs
-            for (var index = 0; index < BoxModels.Length; index++)
+            for (var index = 0; index < _boxModels.Length; index++)
             {
-                BoxModels[index].UpdateAABB();
+                _boxModels[index].UpdateAABB();
             }
 
             // Create draw instances for models that use spheres for bounding volumes
-            SphereModels = new []
+            _sphereModels = new []
             {
                 new DrawInstanceSphere
                 {
@@ -168,9 +163,9 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
             };
 
             // Update the spheres
-            for (var index = 0; index < SphereModels.Length; index++)
+            for (var index = 0; index < _sphereModels.Length; index++)
             {
-                SphereModels[index].UpdateSphere();
+                _sphereModels[index].UpdateSphere();
             }
 
             base.LoadContent();
@@ -180,20 +175,20 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
         public override void Update(GameTime gameTime)
         {
             // Update the state of the camera to test collisions against
-            TestCamera.Update(gameTime);
+            _testCamera.Update(gameTime);
 
-            Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
+            Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
 
             // Update the view projection matrix of the bounding frustum
-            BoundingFrustum.Matrix = TestCamera.View * TestCamera.Projection;
+            _boundingFrustum.Matrix = _testCamera.View * _testCamera.Projection;
 
             // Move a model from each type
             var time = Convert.ToSingle(gameTime.TotalGameTime.TotalSeconds);
 
-            BoxModels[BoxIndexToUpdate].World = Matrix.CreateTranslation(Vector3.Right * MathF.Sin(time) * 400f);
-            BoxModels[BoxIndexToUpdate].UpdateAABB();
-            SphereModels[SphereIndexToUpdate].World = Matrix.CreateTranslation(Vector3.Up * MathF.Cos(time) * 400f);
-            SphereModels[SphereIndexToUpdate].UpdateSphere();
+            _boxModels[BoxIndexToUpdate].World = Matrix.CreateTranslation(Vector3.Right * MathF.Sin(time) * 400f);
+            _boxModels[BoxIndexToUpdate].UpdateAABB();
+            _sphereModels[SphereIndexToUpdate].World = Matrix.CreateTranslation(Vector3.Up * MathF.Cos(time) * 400f);
+            _sphereModels[SphereIndexToUpdate].UpdateSphere();
 
             base.Update(gameTime);
         }
@@ -217,13 +212,13 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
 
             // For each model that uses an AABB for visibility testing
             // Check if it collides with the frustum, then draw
-            for (var index = 0; index < BoxModels.Length; index++)
+            for (var index = 0; index < _boxModels.Length; index++)
             {
-                boxModel = BoxModels[index];
+                boxModel = _boxModels[index];
                 drawn = false;
-                if (BoundingFrustum.Intersects(boxModel.BoxWorldSpace))
+                if (_boundingFrustum.Intersects(boxModel.BoxWorldSpace))
                 {
-                    boxModel.Model.Draw(boxModel.World, Camera.View, Camera.Projection);                    
+                    boxModel.Model.Draw(boxModel.World, _camera.View, _camera.Projection);                    
                     drawCallCount++;
                     drawn = true;
                 }
@@ -234,18 +229,17 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
                 Game.Gizmos.DrawCube(box, extents, drawn ? Color.Red : Color.Green);
             }
 
-            
             DrawInstanceSphere sphereModel;
 
             // For each model that uses a sphere for visibility testing
             // Check if it collides with the frustum, then draw
-            for (var index = 0; index < SphereModels.Length; index++)
+            for (var index = 0; index < _sphereModels.Length; index++)
             {
-                sphereModel = SphereModels[index];
+                sphereModel = _sphereModels[index];
                 drawn = false;
-                if (BoundingFrustum.Intersects(sphereModel.Sphere))
+                if (_boundingFrustum.Intersects(sphereModel.Sphere))
                 {
-                    sphereModel.Model.Draw(sphereModel.World, Camera.View, Camera.Projection);
+                    sphereModel.Model.Draw(sphereModel.World, _camera.View, _camera.Projection);
                     drawCallCount++;
                     drawn = true;
                 }
@@ -256,7 +250,7 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
             }
 
             // Draw a gizmo for the frustum
-            Game.Gizmos.DrawFrustum(TestCamera.View * TestCamera.Projection, Color.Yellow);
+            Game.Gizmos.DrawFrustum(_testCamera.View * _testCamera.Projection, Color.Yellow);
 
             // Show the draw call count
             DisplayDrawCallCount(drawCallCount);
@@ -274,13 +268,12 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
 
             var textToShow = "Draw Calls: " + drawCallCount.ToString();
             var textPosition = new Vector2(GraphicsDevice.Viewport.Width / 2f, 20) -
-                                    Font.MeasureString(textToShow) / 2;
+                                    _font.MeasureString(textToShow) / 2;
 
-            Game.SpriteBatch.DrawString(Font, textToShow, textPosition, Color.Black);
+            Game.SpriteBatch.DrawString(_font, textToShow, textPosition, Color.Black);
             
             Game.SpriteBatch.End();
         }
-
     }
 
     /// <summary>
@@ -318,7 +311,6 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
             BoxWorldSpace.Max = Box.Max + translation;
         }
 
-
         /// <inheritdoc />
         public bool Equals(DrawInstanceBox other)
         {
@@ -345,7 +337,6 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
         /// A world matrix to transform the model into world space
         /// </summary>
         public Matrix World;
-
 
         /// <summary>
         /// Updates the sphere by using the world matrix
