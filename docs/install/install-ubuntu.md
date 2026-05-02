@@ -1,15 +1,22 @@
 # Install on Ubuntu
 
-Tested on Ubuntu 24.04 LTS.
+Tested on Ubuntu 24.04 LTS and 26.04 LTS.
 
 The official [documentation](https://docs.monogame.net/articles/getting_started/1_setting_up_your_os_for_development_ubuntu.html).
 
-Outside of Windows you need [Wine's](https://www.winehq.org) help for Effects(HLSL), at least for [now](https://github.com/MonoGame/MonoGame/issues/2167).
+Outside of Windows you need [Wine's](https://www.winehq.org) help for Effects(HLSL),
+at least for [now](https://github.com/MonoGame/MonoGame/issues/2167).
 
 ## Set up MonoGame
 
 ```bash
 sudo apt update && sudo apt full-upgrade
+
+# On Ubuntu 26.04, .NET 10 is the default version. To install .NET 8.0,
+# first register the Ubuntu .NET Backports package repository:
+# https://learn.microsoft.com/dotnet/core/install/linux-ubuntu-decision#register-the-ubuntu-net-backports-package-repository
+sudo add-apt-repository ppa:dotnet/backports && sudo apt update
+
 sudo apt install dotnet-sdk-8.0
 
 # To check the version installed.
@@ -35,7 +42,9 @@ wine --version
 wget -qO- https://monogame.net/downloads/net8_mgfxc_wine_setup.sh | bash
 ```
 
-This will create new directory called .winemonogame in your home directory. If you ever wish to undo the setup this script performed, just simply delete that directory.
+This will create new directory called .winemonogame in your home directory.
+If you ever wish to undo the setup this script performed,
+just simply delete that directory.
 
 ## Set up the IDE
 
@@ -79,7 +88,8 @@ cd tgc-monogame-samples
 
 # MonoGame Effects Compiler (MGFXC).
 dotnet tool install -g dotnet-mgfxc
-# After the tool installation, check the command output for any additional setup instructions.
+# After the tool installation, check the command output
+# for any additional setup instructions.
 dotnet restore
 dotnet build
 dotnet run --project TGC.MonoGame.Samples
@@ -88,5 +98,7 @@ dotnet run --project TGC.MonoGame.Samples
 ### Known issues
 
 - Problem after install MGFXC
-  - Tools directory '/Users/user/.dotnet/tools' is not currently on the PATH environment variable.
-  - Some systems may require you to restart your terminal or IDE to recognize the new tool.
+  - Tools directory '/Users/user/.dotnet/tools' is not currently on the
+    PATH environment variable.
+  - Some systems may require you to restart your terminal or IDE
+    to recognize the new tool.

@@ -1,0 +1,64 @@
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v6.0.0
+  hooks:
+  - id: check-added-large-files
+  - id: check-merge-conflict
+  - id: check-xml
+  - id: check-yaml
+  - id: check-json
+  - id: detect-private-key
+  - id: end-of-file-fixer
+  - id: pretty-format-json
+    args: [--autofix, --indent, '2', --no-sort-keys]
+  - id: trailing-whitespace
+
+- repo: https://github.com/igorshubovych/markdownlint-cli
+  rev: v0.48.0
+  hooks:
+  - id: markdownlint-fix
+
+- repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+  rev: v2.16.0
+  hooks:
+  - id: pretty-format-yaml
+    args: [--autofix, --indent, '2']
+
+- repo: https://github.com/semgrep/semgrep
+  rev: v1.161.0
+  hooks:
+  - id: semgrep
+    args: [--config, p/csharp, --error]
+
+- repo: local
+  hooks:
+  - id: dotnet-format
+    name: dotnet format
+    language: system
+    entry: dotnet format TGC.MonoGame.Samples.sln
+    pass_filenames: false
+    types_or: [c#]
+
+  - id: dotnet-build
+    name: dotnet build (analyzers)
+    language: system
+    # TODO: The existing codebase has StyleCop violations. Run the build manually
+    # to see them: dotnet build TGC.MonoGame.Samples.sln -p:EnableMGCBItems=false
+    # Fix all violations before enabling this hook, then remove this comment.
+    entry: dotnet build TGC.MonoGame.Samples.sln --no-restore -warnaserror -p:EnableMGCBItems=false
+    pass_filenames: false
+    types_or: [c#]
+
+  - id: dotnet-vulnerable
+    name: dotnet list vulnerable packages (fails if found — .NET 7+ exits 1)
+    language: system
+    entry: dotnet list package --vulnerable --include-transitive
+    pass_filenames: false
+
+  - id: lizard
+    name: lizard complexity check
+    language: python
+    entry: lizard
+    args: [--CCN, '15', --length, '175', -w, --languages, csharp]   # TODO: reduce to 100 once long methods are refactored
+    types_or: [c#]
+    additional_dependencies: [lizard]
