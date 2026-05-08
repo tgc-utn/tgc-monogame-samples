@@ -127,6 +127,9 @@ csharp_style_unused_value_expression_statement_preference = discard_variable:sil
 # 'using' directive preferences
 csharp_using_directive_placement = outside_namespace:suggestion
 
+# Namespace preferences
+csharp_style_namespace_declarations = file_scoped:suggestion
+
 #### C# Formatting Rules ####
 
 # New line preferences
@@ -207,9 +210,9 @@ dotnet_naming_rule.local_variables_should_be_camelcase.severity = suggestion
 dotnet_naming_rule.local_variables_should_be_camelcase.symbols = local_variables
 dotnet_naming_rule.local_variables_should_be_camelcase.style = camelcase
 
-dotnet_naming_rule.local_constants_should_be_camelcase.severity = suggestion
-dotnet_naming_rule.local_constants_should_be_camelcase.symbols = local_constants
-dotnet_naming_rule.local_constants_should_be_camelcase.style = camelcase
+dotnet_naming_rule.local_constants_should_be_pascalcase.severity = suggestion
+dotnet_naming_rule.local_constants_should_be_pascalcase.symbols = local_constants
+dotnet_naming_rule.local_constants_should_be_pascalcase.style = pascalcase
 
 dotnet_naming_rule.parameters_should_be_camelcase.severity = suggestion
 dotnet_naming_rule.parameters_should_be_camelcase.symbols = parameters
@@ -223,9 +226,9 @@ dotnet_naming_rule.private_fields_should_be__camelcase.severity = suggestion
 dotnet_naming_rule.private_fields_should_be__camelcase.symbols = private_fields
 dotnet_naming_rule.private_fields_should_be__camelcase.style = _camelcase
 
-dotnet_naming_rule.private_static_fields_should_be__camelcase.severity = suggestion
-dotnet_naming_rule.private_static_fields_should_be__camelcase.symbols = private_static_fields
-dotnet_naming_rule.private_static_fields_should_be__camelcase.style = _camelcase
+dotnet_naming_rule.private_static_fields_should_be_s_camelcase.severity = suggestion
+dotnet_naming_rule.private_static_fields_should_be_s_camelcase.symbols = private_static_fields
+dotnet_naming_rule.private_static_fields_should_be_s_camelcase.style = s_camelcase
 
 dotnet_naming_rule.public_constant_fields_should_be_pascalcase.severity = suggestion
 dotnet_naming_rule.public_constant_fields_should_be_pascalcase.symbols = public_constant_fields
@@ -239,9 +242,9 @@ dotnet_naming_rule.public_static_readonly_fields_should_be_pascalcase.severity =
 dotnet_naming_rule.public_static_readonly_fields_should_be_pascalcase.symbols = public_static_readonly_fields
 dotnet_naming_rule.public_static_readonly_fields_should_be_pascalcase.style = pascalcase
 
-dotnet_naming_rule.private_static_readonly_fields_should_be_pascalcase.severity = suggestion
-dotnet_naming_rule.private_static_readonly_fields_should_be_pascalcase.symbols = private_static_readonly_fields
-dotnet_naming_rule.private_static_readonly_fields_should_be_pascalcase.style = pascalcase
+dotnet_naming_rule.private_static_readonly_fields_should_be_s_camelcase.severity = suggestion
+dotnet_naming_rule.private_static_readonly_fields_should_be_s_camelcase.symbols = private_static_readonly_fields
+dotnet_naming_rule.private_static_readonly_fields_should_be_s_camelcase.style = s_camelcase
 
 dotnet_naming_rule.enums_should_be_pascalcase.severity = suggestion
 dotnet_naming_rule.enums_should_be_pascalcase.symbols = enums
@@ -333,10 +336,15 @@ dotnet_naming_symbols.local_functions.applicable_kinds = local_function
 dotnet_naming_symbols.local_functions.applicable_accessibilities = *
 dotnet_naming_symbols.local_functions.required_modifiers =
 
-# Naming styles
+# Diagnostic severity overrides
+
+# SA1101: StyleCop default, disabled — conflicts with dotnet_style_qualification_for_field = false
+dotnet_diagnostic.SA1101.severity = none
 
 # SA1633: File must have a copyright header — disabled, project does not use per-file copyright headers.
 dotnet_diagnostic.SA1633.severity = none
+
+# Naming styles
 
 dotnet_naming_style.pascalcase.required_prefix =
 dotnet_naming_style.pascalcase.required_suffix =
@@ -362,3 +370,8 @@ dotnet_naming_style.camelcase.required_prefix =
 dotnet_naming_style.camelcase.required_suffix =
 dotnet_naming_style.camelcase.word_separator =
 dotnet_naming_style.camelcase.capitalization = camel_case
+
+dotnet_naming_style.s_camelcase.required_prefix = s_
+dotnet_naming_style.s_camelcase.required_suffix =
+dotnet_naming_style.s_camelcase.word_separator =
+dotnet_naming_style.s_camelcase.capitalization = camel_case
