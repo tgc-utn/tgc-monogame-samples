@@ -42,9 +42,11 @@ repos:
   - id: dotnet-build
     name: dotnet build (analyzers)
     language: system
-    # TODO: The existing codebase has StyleCop violations. Run the build manually
-    # to see them: dotnet build TGC.MonoGame.Samples.sln -p:EnableMGCBItems=false
-    # Fix all violations before enabling this hook, then remove this comment.
+    # TODO: disabled until StyleCop violations are resolved. Steps to enable:
+    #   1. Run: dotnet build TGC.MonoGame.Samples.sln -p:EnableMGCBItems=false
+    #   2. Fix all reported violations (SA-prefixed warnings)
+    #   3. Remove this comment block and the `stages` key below
+    # stages: [manual]
     entry: dotnet build TGC.MonoGame.Samples.sln --no-restore -warnaserror -p:EnableMGCBItems=false
     pass_filenames: false
     types_or: [c#]
