@@ -17,6 +17,7 @@ jobs:
       uses: actions/setup-dotnet@v5
       with:
         dotnet-version: 8.0.x
+        cache: true
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
