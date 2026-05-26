@@ -19,7 +19,11 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
     {
         private Camera _camera;
 
-        private GeometricPrimitive _primitive;
+        private GeometricPrimitive _teapot;
+
+        private GeometricPrimitive _cilinder;
+
+        private GeometricPrimitive _currentPrimitive;
 
         private Effect _effect;
 
@@ -29,6 +33,11 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
         private Matrix _baseScale;
 
+        private Matrix _baseRotation;
+
+
+        private List<Arrowz> _cilinderArrows;
+        private List<Arrowz> _teapotArrows;
         private List<Arrowz> _arrows;
 
         private bool _showWireframe;
@@ -61,6 +70,8 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0f, 0f, 50f), screenSize);
 
             _baseScale = Matrix.CreateScale(BaseScaleScalar);
+
+            _baseRotation = Matrix.Identity;
 
             _arrows = new List<Arrowz>();
 
@@ -95,10 +106,15 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         protected override void LoadContent()
         {
             _spriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
-            // We load the cylinder mesh into a model
-            _primitive = new CylinderPrimitive(GraphicsDevice, 2f, 1f);
-
-            LoadArrows(_primitive);
+            // We load the primitive meshes into models
+            _teapot = new TeapotPrimitive(GraphicsDevice);
+            _cilinder = new CylinderPrimitive(GraphicsDevice);
+            _currentPrimitive = _cilinder;
+            _cilinderArrows = new List<Arrowz>();
+            _teapotArrows = new List<Arrowz>();
+            LoadArrows(_cilinder, _cilinderArrows);
+            LoadArrows(_teapot, _teapotArrows);
+            _arrows = _cilinderArrows;
 
             // Load the effect
             _effect = Game.Content.Load<Effect>(ContentFolderEffects + "BackFace");
@@ -117,7 +133,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             base.LoadContent();
         }
 
-        private void LoadArrows(GeometricPrimitive primitive)
+        private void LoadArrows(GeometricPrimitive primitive, List<Arrowz> arrowzs)
         {
             List<ushort> indices = primitive.Indices;
             List<VertexPositionColorNormal> vertices = primitive.Vertices;
@@ -147,32 +163,31 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
                 if (!inside || isForward)
                 {
                     // Center outer arrow
-                    AddArrow(average, normal, Color.Magenta);
+                    AddArrow(arrowzs, average, normal, Color.Magenta);
 
                     // Center inner arrow
-                    AddArrow(average, -normal, Color.Yellow);
+                    AddArrow(arrowzs, average, -normal, Color.Yellow);
 
                     // Left outer arrow
                     Vector3 displacedAverage = average - Displacement * Vector3.UnitX;
-                    AddArrow(displacedAverage, normal, Color.Magenta);
-
+                    AddArrow(arrowzs, displacedAverage, normal, Color.Magenta);
                     // Left inner arrow
-                    AddArrow(displacedAverage, -normal, Color.Yellow);
+                    AddArrow(arrowzs, displacedAverage, -normal, Color.Yellow);
 
 
                     // Right outer arrow
                     displacedAverage = average + Displacement * Vector3.UnitX;
-                    AddArrow(displacedAverage, normal, Color.Magenta);
+                    AddArrow(arrowzs, displacedAverage, normal, Color.Magenta);
 
-                    // Right outer arrow
-                    AddArrow(displacedAverage, -normal, Color.Yellow);
+                    // Right inner arrow
+                    AddArrow(arrowzs, displacedAverage, -normal, Color.Yellow);
                 }
             }
         }
 
-        private void AddArrow(Vector3 position, Vector3 normal, Color color)
+        private void AddArrow(List<Arrowz> arrowzs, Vector3 position, Vector3 normal, Color color)
         {
-            _arrows.Add(new Arrowz
+            arrowzs.Add(new Arrowz
             {
                 Position = position,
                 Target = position + normal * 0.75f,
@@ -219,6 +234,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
             UpdateTextPositions();
 
+            _baseRotation *= Matrix.CreateFromAxisAngle(Vector3.UnitY, (float)gameTime.ElapsedGameTime.TotalSeconds);
             base.Update(gameTime);
         }
 
@@ -252,7 +268,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
                 for (int index = 0; index < _arrows.Count; index++)
                 {
                     arr = _arrows[index];
-                    Game.Gizmos.DrawLine(arr.Position, arr.Target, arr.Color);
+                    Game.Gizmos.DrawLine(Vector3.Transform(arr.Position, _baseRotation), arr.Target, arr.Color);
                 }
             }
 
@@ -275,7 +291,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         }
 
 
-        private void DrawCylinder(Effect effect, Matrix viewProjection, CullMode cullMode, float displacement)
+        private void DrawPrimitive(Effect effect, Matrix viewProjection, CullMode cullMode, float displacement)
         {
             RasterizerState rasterizerState = new RasterizerState();
             if (_showWireframe)
@@ -289,28 +305,28 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             rasterizerState.CullMode = cullMode;
             GraphicsDevice.RasterizerState = rasterizerState;
 
-            var world = _baseScale * Matrix.CreateTranslation(Vector3.UnitX * displacement);
+            var world = _baseScale * _baseRotation * Matrix.CreateTranslation(Vector3.UnitX * displacement);
             effect.Parameters["WorldViewProjection"].SetValue(world * viewProjection);
-            _primitive.Draw(effect);
+            _cilinder.Draw(effect);
         }
         private void DrawCylinders(Effect effect, Matrix viewProjection)
         {
-            // Clockwise cylinder
-            DrawCylinder(effect, viewProjection, CullMode.CullClockwiseFace, -Displacement);
+            // Clockwise primitive
+            DrawPrimitive(effect, viewProjection, CullMode.CullClockwiseFace, -Displacement);
 
-            // Cull none cylinder
-            DrawCylinder(effect, viewProjection, CullMode.None, 0f);
+            // Cull none primitive
+            DrawPrimitive(effect, viewProjection, CullMode.None, 0f);
 
-            // Counter-clockwise cylinder
-            DrawCylinder(effect, viewProjection, CullMode.CullCounterClockwiseFace, Displacement);
+            // Counter-clockwise primitive
+            DrawPrimitive(effect, viewProjection, CullMode.CullCounterClockwiseFace, Displacement);
         }
 
         /// <inheritdoc />
         protected override void UnloadContent()
         {
-            _primitive.Dispose();
+            _teapot.Dispose();
+            _cilinder.Dispose();
             _arrows.Clear();
-            _primitive.Dispose();
             _effect.Dispose();
             base.UnloadContent();
         }
