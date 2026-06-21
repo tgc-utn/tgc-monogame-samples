@@ -2,7 +2,8 @@
 
 Tested on Ubuntu 24.04 LTS and 26.04 LTS.
 
-The official [documentation](https://docs.monogame.net/articles/getting_started/1_setting_up_your_os_for_development_ubuntu.html).
+The
+official [documentation](https://docs.monogame.net/articles/getting_started/1_setting_up_your_os_for_development_ubuntu.html).
 
 Outside of Windows you need [Wine's](https://www.winehq.org) help for Effects(HLSL),
 at least for [now](https://github.com/MonoGame/MonoGame/issues/2167).
@@ -81,10 +82,11 @@ code --install-extension timgjones.hlsltools
 ## Set up tgc-monogame-samples
 
 ```bash
-sudo apt install git git-lfs
+sudo apt install git git-lfs pre-commit
 git lfs install
 git clone https://github.com/tgc-utn/tgc-monogame-samples.git
 cd tgc-monogame-samples
+pre-commit install
 
 # MonoGame Effects Compiler (MGFXC).
 dotnet tool install -g dotnet-mgfxc
@@ -99,6 +101,6 @@ dotnet run --project TGC.MonoGame.Samples
 
 - Problem after install MGFXC
   - Tools directory '/Users/user/.dotnet/tools' is not currently on the
-    PATH environment variable.
+      PATH environment variable.
   - Some systems may require you to restart your terminal or IDE
-    to recognize the new tool.
+      to recognize the new tool.
