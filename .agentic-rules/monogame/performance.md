@@ -23,8 +23,10 @@
   pauses cause frame drops.
 - Do not use LINQ inside `Update()` or `Draw()`; it allocates
   enumerators.
-- Replace `foreach` with `for` in hot paths; `foreach` allocates an
-  enumerator on collections.
+- **Avoid** `foreach` over `IEnumerable<T>`, `IList<T>`, or any
+  interface type in hot paths; the enumerator is boxed and allocates
+  on the heap. Arrays and `List<T>` are safe; the compiler resolves
+  the struct enumerator directly.
 - Do not use string concatenation or interpolation in the game loop.
 - Prefer `struct` over `class` for small, frequently created data
   (vectors, colors, transforms).

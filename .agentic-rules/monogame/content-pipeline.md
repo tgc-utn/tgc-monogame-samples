@@ -16,7 +16,7 @@ Content/
 ## Path constants
 
 - **Never** hardcode content path strings; use the constants defined
-  on `TGCSample`:
+  on `TGCSample`.
 
 ```csharp
 ContentFolder2D           // "2D/"
