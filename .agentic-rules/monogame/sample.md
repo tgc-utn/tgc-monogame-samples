@@ -13,7 +13,8 @@
 Each lifecycle method has a single responsibility. Do not bleed logic between them.
 
 - Constructor: set `Category`, `Name`, and `Description`.
-- `Initialize()`: anything that does not require loaded content.
+- `Initialize()`: anything that does not require loaded content or
+  procedurally created disposable resources (GPU, audio, fonts).
 - `LoadContent()`: assets, primitives, effects.
 - `Update(GameTime)`: camera, game logic, time-varying shader parameters.
 - `Draw(GameTime)`: draw calls only.
