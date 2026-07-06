@@ -13,12 +13,14 @@
 Each lifecycle method has a single responsibility. Do not bleed logic between them.
 
 - Constructor: set `Category`, `Name`, and `Description`.
-- `Initialize()`: camera, `GraphicsDevice` states, `Game.Background`.
+- `Initialize()`: anything that does not require loaded content.
 - `LoadContent()`: assets, primitives, effects.
 - `Update(GameTime)`: camera, game logic, time-varying shader parameters.
 - `Draw(GameTime)`: draw calls only.
-- `UnloadContent()`: dispose all `IDisposable` resources; the sample
-  may be shown again.
+- `UnloadContent()`: dispose all `IDisposable` resources and any
+  content created in `LoadContent()` not managed by `Content.Load`
+  (Textures, RenderTargets, VertexBuffers); the sample may be shown
+  again.
 
 ## What TGCSample provides
 

@@ -27,7 +27,8 @@
   interface type in hot paths; the enumerator is boxed and allocates
   on the heap. Arrays and `List<T>` are safe; the compiler resolves
   the struct enumerator directly.
-- Do not use string concatenation or interpolation in the game loop.
+- Do not use string concatenation or interpolation in the game loop,
+  except for diagnostic output in debug mode.
 - Prefer `struct` over `class` for small, frequently created data
   (vectors, colors, transforms).
 - Reuse arrays and collections across frames; avoid `new List<T>()`

@@ -1,8 +1,5 @@
 # Security patterns
 
-`semgrep --config p/csharp` and `detect-private-key` run on every
-commit and cover generic patterns automatically.
-
 ## Rules
 
 - **Avoid** using reflection to load or execute code at runtime.

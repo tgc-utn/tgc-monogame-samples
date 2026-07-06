@@ -37,8 +37,7 @@ are defined in `.agentic-rules/`:
 - `.agentic-rules/csharp/coding-conventions.md`: C# naming conventions,
   code style, and analyzer rules.
 - `.agentic-rules/csharp/documentation.md`: XML doc comment standards.
-- `.agentic-rules/csharp/project-structure.md`: solution layout, NuGet
-  dependency management, and CI build commands.
+- `.agentic-rules/csharp/project.md`: C# project-level policies and standards.
 - `.agentic-rules/csharp/testing.md`: testing approach and manual
   verification conventions.
 - `.agentic-rules/csharp/security-patterns.md`: secure coding patterns
@@ -70,8 +69,7 @@ are defined in `.agentic-rules/`:
 - **Before creating or editing a sample**: read `sample.md`.
 - **Before touching assets or shaders**: read `content-pipeline.md`.
 - **Before writing or modifying tests**: read `testing.md`.
-- **Before any structural change to the solution**: read
-  `project-structure.md`.
+- **Before adding or updating dependencies**: read `project.md`.
 - **Before writing or modifying documentation**: read
   `writing-style.md`.
 - **Before writing or modifying XML doc comments**: read

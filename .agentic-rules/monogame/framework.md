@@ -2,7 +2,7 @@
 
 ## Version
 
-- MonoGame 3.8.4 (DesktopGL), targeting Windows 8.1+, Linux, and macOS 10.15+.
+- MonoGame 3.8.4 (DesktopGL).
 - Graphics backend: OpenGL via SDL 2.32.2.1.
 - Shaders: written in HLSL Shader Model 3.0 (`vs_3_0` / `ps_3_0`) and
   transpiled to GLSL by MojoShader at content build time.

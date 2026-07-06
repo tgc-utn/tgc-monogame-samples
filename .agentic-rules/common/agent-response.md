@@ -20,13 +20,6 @@ Adapt the response depth to the task complexity:
 4. Summary and recommendations: what was done, next steps, and any
    follow-up considerations.
 
-## Code formatting
-
-- Enclose all code in triple backticks with the appropriate language
-  identifier (e.g. ` ```csharp `, ` ```glsl `).
-- Keep lines ≤ 120 characters for readability.
-- Write comments and identifiers in English.
-
 ## Clarity and brevity
 
 - Deliver complete yet concise answers; avoid unnecessary verbosity.

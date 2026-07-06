@@ -18,16 +18,6 @@ Content/
 - **Never** hardcode content path strings; use the constants defined
   on `TGCSample`.
 
-```csharp
-ContentFolder2D           // "2D/"
-ContentFolder3D           // "3D/"
-ContentFolderEffects      // "Effects/"
-ContentFolderTextures     // "Textures/"
-ContentFolderSpriteFonts  // "SpriteFonts/"
-ContentFolderMusic        // "Music/"
-ContentFolderSounds       // "Sounds/"
-```
-
 ## Registering new assets
 
 - Every new asset **must** be registered in `Content/Content.mgcb`
@@ -47,11 +37,8 @@ ContentFolderSounds       // "Sounds/"
 - Write shaders in HLSL; MGCB compiles them and MojoShader transpiles
   to GLSL at build time. **Never** write GLSL directly.
 - Target shader model: `vs_3_0` / `ps_3_0` (DesktopGL / OpenGL).
+- Access shader parameters with `?` (null-conditional) if the parameter
+  is not guaranteed to exist:
+  `Effect.Parameters["Variable"]?.SetValue(value)`.
 - `SV_POSITION` is not supported on OpenGL and **must** be aliased to
   `POSITION` in every shader.
-
-## Build flag
-
-- Skip content pipeline processing in fast builds with
-  `-p:EnableMGCBItems=false`; do not use this flag for local
-  development runs.

@@ -50,5 +50,6 @@ This project follows Gitflow:
 
 ## Verification
 
-- Run `dotnet build TGC.MonoGame.Samples.sln` before committing.
-- Run pre-commit checks locally before pushing: `pre-commit run --all-files`.
+- Verify the project builds and all tests pass before committing.
+- **Never** bypass pre-commit hooks with `--no-verify`.
+- Run pre-commit checks locally before pushing: `pre-commit run`.

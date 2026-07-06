@@ -13,5 +13,5 @@
 
 ## Frame-rate independence
 
-- **Always** scale movement and physics by
+- **Always** scale movement, physics, and animations by
   `gameTime.ElapsedGameTime.TotalSeconds` in `Update()`.
