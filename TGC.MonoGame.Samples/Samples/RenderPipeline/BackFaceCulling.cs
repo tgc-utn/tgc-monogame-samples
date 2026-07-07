@@ -1,62 +1,115 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System.Collections.Generic;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
 
 namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 {
-    struct Arrowz
+    /// <summary>
+    /// Data for a single debug arrow used to visualize triangle normals.
+    /// </summary>
+    internal struct Arrowz
     {
+        /// <summary>Arrow origin in world space.</summary>
         public Vector3 Position;
+
+        /// <summary>Arrow tip in world space.</summary>
         public Vector3 Target;
+
+        /// <summary>Arrow color.</summary>
         public Color Color;
     }
 
+    /// <summary>
+    /// Back-Face Culling sample: visualizes clockwise, counter-clockwise, and no culling modes side by side.
+    /// </summary>
     public class BackFaceCulling : TGCSample
     {
+        /// <summary>Camera used to view the scene.</summary>
         private Camera _camera;
 
+        /// <summary>Teapot primitive geometry.</summary>
         private GeometricPrimitive _teapot;
 
+        /// <summary>Cylinder primitive geometry.</summary>
         private GeometricPrimitive _cilinder;
 
+        /// <summary>Currently displayed primitive.</summary>
         private GeometricPrimitive _currentPrimitive;
 
+        /// <summary>Effect used to shade the primitives.</summary>
         private Effect _effect;
 
+        /// <summary>Uniform scale applied to primitives.</summary>
         private const float BaseScaleScalar = 10f;
 
+        /// <summary>Horizontal offset between the three drawn copies.</summary>
         private const float Displacement = 15f;
 
+        /// <summary>Base scale matrix built from <see cref="BaseScaleScalar"/>.</summary>
         private Matrix _baseScale;
 
+        /// <summary>Accumulated rotation applied to primitives.</summary>
         private Matrix _baseRotation;
 
 
+        /// <summary>Precomputed normal arrows for the cylinder.</summary>
         private List<Arrowz> _cilinderArrows;
+
+        /// <summary>Precomputed normal arrows for the teapot.</summary>
         private List<Arrowz> _teapotArrows;
+
+        /// <summary>Arrows currently being rendered.</summary>
         private List<Arrowz> _arrows;
 
+        /// <summary>Available primitives to display.</summary>
+        private enum _primitive
+        {
+            /// <summary>Cylinder primitive.</summary>
+            Cylinder,
+
+            /// <summary>Teapot primitive.</summary>
+            Teapot,
+        }
+
+        /// <summary>Whether to render primitives in wireframe.</summary>
         private bool _showWireframe;
 
+        /// <summary>Whether to draw triangle normal arrows.</summary>
         private bool _showArrows;
 
+        /// <summary>Whether back-face culling is enabled.</summary>
         private bool _backFace = true;
 
+        /// <summary>Effect used to write linear depth into <see cref="_depthRenderTarget"/>.</summary>
         private Effect _drawDepthEffect;
 
+        /// <summary>Render target holding camera depth for debug preview.</summary>
         private RenderTarget2D _depthRenderTarget;
 
+        /// <summary>Label strings shown above each primitive.</summary>
         private List<string> _texts;
+
+        /// <summary>Screen-space positions for each label.</summary>
         private List<Vector2> _textScreenPositions;
+
+        /// <summary>World-space anchor positions for each label.</summary>
         private List<Vector3> _textWorldPositions;
 
+        /// <summary>Font used to draw labels.</summary>
         private SpriteFont _spriteFont;
 
-        public BackFaceCulling(TGCViewer game) : base(game)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BackFaceCulling"/> class.
+        /// </summary>
+        /// <param name="game">monogame game.</param>
+        public BackFaceCulling(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.RenderPipeline;
             Name = "Back-Face Culling";
@@ -133,6 +186,11 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             base.LoadContent();
         }
 
+        /// <summary>
+        /// Builds a list of normal arrows for each triangle of the given primitive.
+        /// </summary>
+        /// <param name="primitive">Primitive whose triangles are inspected.</param>
+        /// <param name="arrowzs">List that receives the generated arrows.</param>
         private void LoadArrows(GeometricPrimitive primitive, List<Arrowz> arrowzs)
         {
             List<ushort> indices = primitive.Indices;
@@ -185,20 +243,26 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             }
         }
 
-        private void AddArrow(List<Arrowz> arrowzs, Vector3 position, Vector3 normal, Color color)
+        /// <summary>
+        /// Appends a single arrow to the given list.
+        /// </summary>
+        /// <param name="arrowzs">Destination list.</param>
+        /// <param name="position">Arrow origin.</param>
+        /// <param name="normal">Direction the arrow points to.</param>
+        /// <param name="color">Arrow color.</param>
+        private void AddArrow(List<Arrowz> arrowzs, Vector3 position, Vector3 normal, Color color) => arrowzs.Add(new Arrowz
         {
-            arrowzs.Add(new Arrowz
-            {
-                Position = position,
-                Target = position + normal * 0.75f,
-                Color = color
-            });
-        }
+            Position = position,
+            Target = position + normal * 0.75f,
+            Color = color
+        });
 
-        private bool InsideCylinder(Vector3 position)
-        {
-            return (new Vector2(position.X, position.Y)).Length() <= 0.2f;
-        }
+        /// <summary>
+        /// Returns true when the given point lies within the inner region of the cylinder in XY.
+        /// </summary>
+        /// <param name="position">Point to test.</param>
+        /// <returns>True if inside the cylinder radius.</returns>
+        private bool InsideCylinder(Vector3 position) => (new Vector2(position.X, position.Y)).Length() <= 0.2f;
 
 
         /// <summary>
@@ -206,12 +270,9 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         /// </summary>
         /// <param name="vector">The <see cref="Vector3"/> to obtain its XY components</param>
         /// <returns>A <see cref="Vector2"/> containing the XY components of the given vector</returns>
-        private Vector2 ToVector2(Vector3 vector)
-        {
-            return new Vector2(vector.X, vector.Y);
-        }
+        private Vector2 ToVector2(Vector3 vector) => new Vector2(vector.X, vector.Y);
         /// <summary>
-        /// Updates text positions in screen space to face the camera, 
+        /// Updates text positions in screen space to face the camera,
         /// based on the world space positions and the camera values.
         /// </summary>
         private void UpdateTextPositions()
@@ -291,6 +352,13 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         }
 
 
+        /// <summary>
+        /// Draws the current primitive with a given cull mode, effect, and horizontal displacement.
+        /// </summary>
+        /// <param name="effect">Effect used to draw.</param>
+        /// <param name="viewProjection">Combined view * projection matrix.</param>
+        /// <param name="cullMode">Cull mode to apply when back-face culling is enabled.</param>
+        /// <param name="displacement">X-axis offset applied to the primitive.</param>
         private void DrawPrimitive(Effect effect, Matrix viewProjection, CullMode cullMode, float displacement)
         {
             RasterizerState rasterizerState = new RasterizerState();
@@ -309,6 +377,12 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             effect.Parameters["WorldViewProjection"].SetValue(world * viewProjection);
             _cilinder.Draw(effect);
         }
+
+        /// <summary>
+        /// Draws the three primitive copies with clockwise, none, and counter-clockwise culling.
+        /// </summary>
+        /// <param name="effect">Effect used to draw.</param>
+        /// <param name="viewProjection">Combined view * projection matrix.</param>
         private void DrawCylinders(Effect effect, Matrix viewProjection)
         {
             // Clockwise primitive
