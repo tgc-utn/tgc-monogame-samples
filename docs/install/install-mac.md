@@ -1,10 +1,12 @@
 # Install on macOS
 
-Tested on Mac with M3 processor and macOS Sequoia.
+Tested on Mac with M3 processor and macOS Tahoe.
 
-The official [documentation](https://docs.monogame.net/articles/getting_started/1_setting_up_your_os_for_development_macos.html).
+The official
+[documentation](https://docs.monogame.net/articles/getting_started/1_setting_up_your_os_for_development_macos.html).
 
-Outside of Windows you need [Wine's](https://www.winehq.org) help for Effects(HLSL), at least for [now](https://github.com/MonoGame/MonoGame/issues/2167).
+Outside of Windows you need [Wine's](https://www.winehq.org) help for Effects
+(HLSL), at least for [now](https://github.com/MonoGame/MonoGame/issues/2167).
 
 ## Install Homebrew
 
@@ -38,13 +40,16 @@ brew install --cask wine-stable
 xattr -dr com.apple.quarantine "/Applications/Wine Stable.app"
 ```
 
-You will need to open Wine manually first. Otherwise, you will get an error that Apple couldn't verify it.
+You will need to open Wine manually first. Otherwise, you will get an error
+that Apple couldn't verify it.
 
 ```bash
 wget -qO- https://monogame.net/downloads/net8_mgfxc_wine_setup.sh | bash
 ```
 
-This will create new directory called .winemonogame in your home directory. If you ever wish to undo the setup this script performed, just simply delete that directory.
+This will create new directory called .winemonogame in your home directory. If
+you ever wish to undo the setup this script performed, just simply delete that
+directory.
 
 ## Set up the IDE
 
@@ -75,14 +80,16 @@ code --install-extension timgjones.hlsltools
 ## Set up tgc-monogame-samples
 
 ```bash
-brew install git git-lfs
+brew install git git-lfs pre-commit
 git lfs install
 git clone https://github.com/tgc-utn/tgc-monogame-samples.git
 cd tgc-monogame-samples
+pre-commit install
 
 # MonoGame Effects Compiler (MGFXC).
 dotnet tool install -g dotnet-mgfxc
-# After the tool installation, check the command output for any additional setup instructions.
+# After the tool installation, check the command output for any additional
+# setup instructions.
 dotnet restore
 dotnet build
 dotnet run --project TGC.MonoGame.Samples
@@ -91,5 +98,7 @@ dotnet run --project TGC.MonoGame.Samples
 ### Known issues
 
 - Problem after install MGFXC
-  - Tools directory '/Users/user/.dotnet/tools' is not currently on the PATH environment variable.
-  - Some systems may require you to restart your terminal or IDE to recognize the new tool.
+  - Tools directory '/Users/user/.dotnet/tools' is not currently on the PATH
+  environment variable.
+  - Some systems may require you to restart your terminal or IDE to recognize
+  - the new tool.
