@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -13,9 +14,9 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
         ///     Creates a Radial Geometry, which contains a radial wire shape.
         /// </summary>
         /// <param name="device">Graphics Device to bind the geometry to.</param>
-        protected RadialGizmoGeometry(GraphicsDevice device) : base(device)
+        protected RadialGizmoGeometry(GraphicsDevice device)
+            : base(device)
         {
-
         }
 
         /// <summary>
@@ -31,7 +32,9 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
 
             // Odd? Then start at 90 degrees
             if (subdivisions % 2 == 1)
+            {
                 offset = MathHelper.PiOver2;
+            }
 
             var increment = MathHelper.TwoPi / subdivisions;
             for (ushort index = 0; index < subdivisions; index++)
@@ -56,7 +59,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
             for (ushort index = 0; index < subdivisions; index++)
             {
                 indices[index * 2] = index;
-                indices[index * 2 + 1] = (ushort)(index + 1);
+                indices[(index * 2) + 1] = (ushort)(index + 1);
             }
 
             // Override the last index, close the loop

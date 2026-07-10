@@ -1,14 +1,16 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System.Collections.Generic;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
 
 namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 {
-    struct Arrowz
+    internal struct Arrowz
     {
         public Vector3 Position;
         public Vector3 Target;
@@ -41,7 +43,8 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
         private RenderTarget2D _depthRenderTarget;
 
-        public BackFaceCulling(TGCViewer game) : base(game)
+        public BackFaceCulling(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.RenderPipeline;
             Name = "Back-Face Culling";
@@ -53,11 +56,11 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         {
             var screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
             _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0f, 0f, 50f), screenSize);
-            
+
             _baseScale = Matrix.CreateScale(BaseScaleScalar);
 
             _arrows = new List<Arrowz>();
-            
+
             base.Initialize();
         }
 
@@ -73,11 +76,11 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             _effect = Game.Content.Load<Effect>(ContentFolderEffects + "BackFace");
 
             _drawDepthEffect = Game.Content.Load<Effect>(ContentFolderEffects + "ShadowMap");
-            
+
             // Create a depth render target. It stores depth from the camera
             _depthRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, false,
                 SurfaceFormat.Single, DepthFormat.Depth24, 0, RenderTargetUsage.PlatformContents);
-                        
+
             ModifierController.AddToggle("Show Wireframe", (enabled) => _showWireframe = enabled, false);
             ModifierController.AddToggle("Show Triangle Normals", (enabled) => _showArrows = enabled, false);
             ModifierController.AddToggle("Enable Back-Face Culling", (enabled) => _backFace = enabled, true);
@@ -108,7 +111,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
                 normal.Normalize();
 
                 bool isForward = Vector3.Dot(normal, Vector3.UnitZ) >= 0f;
-               
+
                 bool inside = InsideCylinder(vertexOne);
                 inside |= InsideCylinder(vertexTwo);
                 inside |= InsideCylinder(vertexThree);
@@ -122,17 +125,16 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
                     AddArrow(average, -normal, Color.Yellow);
 
                     // Left outer arrow
-                    Vector3 displacedAverage = average - Displacement * Vector3.UnitX;
+                    Vector3 displacedAverage = average - (Displacement * Vector3.UnitX);
                     AddArrow(displacedAverage, normal, Color.Magenta);
 
                     // Left inner arrow
                     AddArrow(displacedAverage, -normal, Color.Yellow);
 
-
                     // Right outer arrow
-                    displacedAverage = average + Displacement * Vector3.UnitX;
-                    AddArrow(displacedAverage, normal, Color.Magenta); 
-                    
+                    displacedAverage = average + (Displacement * Vector3.UnitX);
+                    AddArrow(displacedAverage, normal, Color.Magenta);
+
                     // Right outer arrow
                     AddArrow(displacedAverage, -normal, Color.Yellow);
                 }
@@ -144,14 +146,14 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             _arrows.Add(new Arrowz
             {
                 Position = position,
-                Target = position + normal * 0.75f,
-                Color = color
+                Target = position + (normal * 0.75f),
+                Color = color,
             });
         }
 
         private bool InsideCylinder(Vector3 position)
         {
-            return  (new Vector2(position.X, position.Y)).Length() <= 0.2f;
+            return new Vector2(position.X, position.Y).Length() <= 0.2f;
         }
 
         /// <inheritdoc />
@@ -199,15 +201,15 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
                     arr = _arrows[index];
                     Game.Gizmos.DrawLine(arr.Position, arr.Target, arr.Color);
                 }
-            } 
-            
+            }
+
             base.Draw(gameTime);
         }
 
         private void DrawSpheres(Effect effect, Matrix viewProjection)
         {
             RasterizerState rasterizerState = new RasterizerState();
-            if(!_backFace)
+            if (!_backFace)
             {
                 rasterizerState.CullMode = CullMode.None;
             }

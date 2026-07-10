@@ -1,4 +1,5 @@
 ﻿using ImGuiNET;
+
 using Microsoft.Xna.Framework.Graphics;
 
 namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
@@ -29,8 +30,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
                 new VertexElement(8, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0),
 
                 // Color
-                new VertexElement(16, VertexElementFormat.Color, VertexElementUsage.Color, 0)
-            );
+                new VertexElement(16, VertexElementFormat.Color, VertexElementUsage.Color, 0));
         }
     }
 }

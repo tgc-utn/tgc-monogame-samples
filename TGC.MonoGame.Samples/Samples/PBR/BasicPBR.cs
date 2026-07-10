@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
 
 namespace TGC.MonoGame.Samples.Samples.PBR
 {
-    public class BasicPBR : TGCSample   
+    public class BasicPBR : TGCSample
     {
         private Texture2D _albedo;
         private Texture2D _ao;
@@ -31,7 +33,8 @@ namespace TGC.MonoGame.Samples.Samples.PBR
         ///     Default constructor.
         /// </summary>
         /// <param name="game">The game.</param>
-        public BasicPBR(TGCViewer game) : base(game)
+        public BasicPBR(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.PBR;
             Name = "Basic PBR";
@@ -75,7 +78,7 @@ namespace TGC.MonoGame.Samples.Samples.PBR
                 "Grass",
                 "Gold",
                 "Marble",
-                "Metal"
+                "Metal",
             }, Material.RustedMetal, OnMaterialChange);
 
             base.LoadContent();
@@ -169,11 +172,11 @@ namespace TGC.MonoGame.Samples.Samples.PBR
             lightTwo.Color = new Vector3(100f, 30f, 100f);
 
             var lightThree = new Light();
-            lightThree.Position = Vector3.One * distance - new Vector3(2f * distance, 0f, 0f);
+            lightThree.Position = (Vector3.One * distance) - new Vector3(2f * distance, 0f, 0f);
             lightThree.Color = new Vector3(100f, 100f, 0f);
 
             var lightFour = new Light();
-            lightFour.Position = Vector3.One * -distance + new Vector3(2f * distance, 0f, 0f);
+            lightFour.Position = (Vector3.One * -distance) + new Vector3(2f * distance, 0f, 0f);
             lightFour.Color = new Vector3(0f, 100f, 100f);
 
             _lights.Add(lightOne);

@@ -352,6 +352,48 @@ dotnet_diagnostic.SA1309.severity = none
 # SA1633: File must have a copyright header — disabled, project does not use per-file copyright headers.
 dotnet_diagnostic.SA1633.severity = none
 
+# SA1623: Property summary must say "Gets/Sets" — downgraded to suggestion to keep existing comments as-is.
+dotnet_diagnostic.SA1623.severity = suggestion
+
+# SA1642: Constructor summary must begin with standard text — downgraded to suggestion to keep existing comments as-is.
+dotnet_diagnostic.SA1642.severity = suggestion
+
+# SA1643: Destructor summary must begin with standard text — downgraded to suggestion to keep existing comments as-is.
+dotnet_diagnostic.SA1643.severity = suggestion
+
+# SA1124: Do not use #region — downgraded, IDE nudge only, not enforced automatically.
+dotnet_diagnostic.SA1124.severity = suggestion
+
+# SA1625: Docs must not be copy-pasted between elements — downgraded, false positives on simple overloads.
+dotnet_diagnostic.SA1625.severity = suggestion
+
+# S3267: Loops should be simplified using LINQ — disabled, conflicts with the performance/GC policy for hot paths.
+dotnet_diagnostic.S3267.severity = none
+
+# S1450: Private field only used as a local should be a local — downgraded so the dev keeps control.
+dotnet_diagnostic.S1450.severity = suggestion
+
+# S1144: Unused private member should be removed — downgraded so the dev keeps control.
+dotnet_diagnostic.S1144.severity = suggestion
+
+# SA1306: Field must begin with lower-case letter — downgraded, avoids blind fixes on pre-existing names without context.
+dotnet_diagnostic.SA1306.severity = suggestion
+
+# SA1310: Field must not contain underscore — downgraded, avoids blind fixes on pre-existing names without context.
+dotnet_diagnostic.SA1310.severity = suggestion
+
+# SA1311: Static readonly field must begin with upper-case letter — downgraded, avoids blind fixes on pre-existing names without context.
+dotnet_diagnostic.SA1311.severity = suggestion
+
+# SA1129: Do not use default value type constructor — disabled, team convention prefers new T(), default(T) reserved for structs with a custom parameterless constructor.
+dotnet_diagnostic.SA1129.severity = none
+
+# S3217: Foreach implicit cast to narrower type — downgraded, the autofix silently swaps a crash for a skip.
+dotnet_diagnostic.S3217.severity = suggestion
+
+# SA1123: Region should not be located within a code element — downgraded, IDE nudge only, not enforced automatically.
+dotnet_diagnostic.SA1123.severity = suggestion
+
 # Naming styles
 
 dotnet_naming_style._camelcase.required_prefix = _

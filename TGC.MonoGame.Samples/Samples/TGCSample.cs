@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+
 using TGC.MonoGame.Samples.Viewer;
 using TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET;
 using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
@@ -23,7 +24,8 @@ namespace TGC.MonoGame.Samples.Samples
         ///     Default constructor.
         /// </summary>
         /// <param name="game">The game.</param>
-        public TGCSample(TGCViewer game) : base(game)
+        public TGCSample(TGCViewer game)
+            : base(game)
         {
             Game = game;
             ModifierController = new ModifierController();
@@ -48,7 +50,6 @@ namespace TGC.MonoGame.Samples.Samples
         ///     Description of the topics applied in the example.
         /// </summary>
         public string Description { get; set; }
-
 
         /// <summary>
         ///     Modifier controller for each sample.
@@ -79,7 +80,6 @@ namespace TGC.MonoGame.Samples.Samples
         {
             base.LoadContent();
         }
-
 
         /// <summary>
         ///     Prepares the Sample to be displayed.
@@ -119,7 +119,7 @@ namespace TGC.MonoGame.Samples.Samples
         /// <summary>
         ///     Binds the Modifier Controller to the ImGuiRenderer.
         /// </summary>
-        /// <param name="renderer">The ImGuiRenderer to bind the Modifier Controller to</param>
+        /// <param name="renderer">The ImGuiRenderer to bind the Modifier Controller to.</param>
         public void BindModifiers(ImGuiRenderer renderer)
         {
             ModifierController.Bind(renderer);
@@ -128,7 +128,7 @@ namespace TGC.MonoGame.Samples.Samples
         /// <summary>
         ///     Unbinds the Modifier Controller to the ImGuiRenderer.
         /// </summary>
-        /// <param name="renderer">The ImGuiRenderer to unbind the Modifier Controller</param>
+        /// <param name="renderer">The ImGuiRenderer to unbind the Modifier Controller.</param>
         public void UnbindModifiers(ImGuiRenderer renderer)
         {
             ModifierController.Unbind(renderer);

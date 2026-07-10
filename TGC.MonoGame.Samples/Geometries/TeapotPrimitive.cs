@@ -6,13 +6,13 @@
 // Microsoft XNA Community Game Platform
 // Copyright (C) Microsoft Corporation. All rights reserved.
 //-----------------------------------------------------------------------------
-
 #endregion File Description
 
 #region Using Statements
 
 using System;
 using System.Diagnostics;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -27,7 +27,7 @@ namespace TGC.MonoGame.Samples.Geometries
     ///     various levels of detail. The use of curved surfaces allows a smoothly curved, visually interesting, and instantly
     ///     recognizable shape to be specified by a tiny amount of data, which made the teapot a popular test data set for
     ///     computer graphics researchers. It has been used in so many papers and demos that many graphics programmers have
-    ///     come to think of it as a standard geometric primitive, right up there with cubes and spheres!
+    ///     come to think of it as a standard geometric primitive, right up there with cubes and spheres!.
     /// </summary>
     public class TeapotPrimitive : BezierPrimitive
     {
@@ -39,58 +39,58 @@ namespace TGC.MonoGame.Samples.Geometries
             // Rim.
             new TeapotPatch(true, new[]
             {
-                102, 103, 104, 105, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+                102, 103, 104, 105, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
             }),
 
             // Body.
             new TeapotPatch(true, new[]
             {
-                12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27
+                12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,
             }),
 
             new TeapotPatch(true, new[]
             {
-                24, 25, 26, 27, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40
+                24, 25, 26, 27, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
             }),
 
             // Lid.
             new TeapotPatch(true, new[]
             {
-                96, 96, 96, 96, 97, 98, 99, 100, 101, 101, 101, 101, 0, 1, 2, 3
+                96, 96, 96, 96, 97, 98, 99, 100, 101, 101, 101, 101, 0, 1, 2, 3,
             }),
 
             new TeapotPatch(true, new[]
             {
-                0, 1, 2, 3, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117
+                0, 1, 2, 3, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117,
             }),
 
             // Handle.
             new TeapotPatch(false, new[]
             {
-                41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56
+                41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56,
             }),
 
             new TeapotPatch(false, new[]
             {
-                53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 28, 65, 66, 67
+                53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 28, 65, 66, 67,
             }),
 
             // Spout.
             new TeapotPatch(false, new[]
             {
-                68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83
+                68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83,
             }),
 
             new TeapotPatch(false, new[]
             {
-                80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95
+                80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95,
             }),
 
             // Bottom.
             new TeapotPatch(true, new[]
             {
-                118, 118, 118, 118, 124, 122, 119, 121, 123, 126, 125, 120, 40, 39, 38, 37
-            })
+                118, 118, 118, 118, 124, 122, 119, 121, 123, 126, 125, 120, 40, 39, 38, 37,
+            }),
         };
 
         /// <summary>
@@ -224,7 +224,7 @@ namespace TGC.MonoGame.Samples.Geometries
             new Vector3(-0.375f, -0.31125f, -0f),
             new Vector3(-0.35625f, -0.33f, -0f),
             new Vector3(-0.21f, -0.31125f, -0.375f),
-            new Vector3(-0.375f, -0.31125f, -0.21f)
+            new Vector3(-0.375f, -0.31125f, -0.21f),
         };
 
         /// <summary>
@@ -233,7 +233,9 @@ namespace TGC.MonoGame.Samples.Geometries
         public TeapotPrimitive(GraphicsDevice graphicsDevice, float size = 1, int tessellation = 8)
         {
             if (tessellation < 1)
+            {
                 throw new ArgumentOutOfRangeException(nameof(tessellation));
+            }
 
             foreach (var patch in TeapotPatches)
             {

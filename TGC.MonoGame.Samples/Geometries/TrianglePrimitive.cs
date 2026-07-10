@@ -15,7 +15,8 @@ namespace TGC.MonoGame.Samples.Geometries
         /// <param name="vertex1">Vertex of the triangle.</param>
         /// <param name="vertex2">Vertex of the triangle.</param>
         /// <param name="vertex3">Vertex of the triangle.</param>
-        public TrianglePrimitive(GraphicsDevice device, Vector3 vertex1, Vector3 vertex2, Vector3 vertex3) : this(
+        public TrianglePrimitive(GraphicsDevice device, Vector3 vertex1, Vector3 vertex2, Vector3 vertex3)
+            : this(
             device, vertex1, vertex2, vertex3, Color.White)
         {
         }
@@ -29,7 +30,8 @@ namespace TGC.MonoGame.Samples.Geometries
         /// <param name="vertex3">Vertex of the triangle.</param>
         /// <param name="vertexColor">The color of the triangle.</param>
         public TrianglePrimitive(GraphicsDevice device, Vector3 vertex1, Vector3 vertex2, Vector3 vertex3,
-            Color vertexColor) : this(device, vertex1, vertex2, vertex3, vertexColor, vertexColor, vertexColor)
+            Color vertexColor)
+            : this(device, vertex1, vertex2, vertex3, vertexColor, vertexColor, vertexColor)
         {
         }
 

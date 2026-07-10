@@ -1,6 +1,8 @@
 ﻿using System.Linq;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Viewer;
 
@@ -15,7 +17,8 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
     /// </summary>
     public class Tutorial5 : TGCSample
     {
-        public Tutorial5(TGCViewer game) : base(game)
+        public Tutorial5(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.Tutorials;
             Name = "Tutorial 5";
@@ -39,13 +42,13 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         protected override void LoadContent()
         {
             _model1 = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
-            ((BasicEffect) _model1.Meshes.FirstOrDefault()?.Effects.FirstOrDefault())?.EnableDefaultLighting();
+            ((BasicEffect)_model1.Meshes.FirstOrDefault()?.Effects.FirstOrDefault())?.EnableDefaultLighting();
 
             _model2 = Game.Content.Load<Model>(ContentFolder3D + "tank/tank");
 
             foreach (var mesh in _model2.Meshes)
             {
-                ((BasicEffect) mesh.Effects.FirstOrDefault())?.EnableDefaultLighting();
+                ((BasicEffect)mesh.Effects.FirstOrDefault())?.EnableDefaultLighting();
             }
 
             base.LoadContent();

@@ -1,10 +1,13 @@
-﻿using ImGuiNET;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+
+using ImGuiNET;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
+
 using NumericVector2 = System.Numerics.Vector2;
 
 namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
@@ -15,13 +18,13 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
     /// </summary>
     public sealed class ImGuiRenderer
     {
-        private Game _game;
+        private readonly Game _game;
 
         // Graphics
-        private GraphicsDevice _graphicsDevice;
+        private readonly GraphicsDevice _graphicsDevice;
 
         private BasicEffect _effect;
-        private RasterizerState _rasterizerState;
+        private readonly RasterizerState _rasterizerState;
 
         private byte[] _vertexData;
         private VertexBuffer _vertexBuffer;
@@ -32,7 +35,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
         private int _indexBufferSize;
 
         // Textures
-        private Dictionary<IntPtr, Texture2D> _loadedTextures;
+        private readonly Dictionary<IntPtr, Texture2D> _loadedTextures;
 
         private int _textureId;
         private IntPtr? _fontTextureId;
@@ -61,7 +64,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
                 FillMode = FillMode.Solid,
                 MultiSampleAntiAlias = false,
                 ScissorTestEnable = true,
-                SlopeScaleDepthBias = 0
+                SlopeScaleDepthBias = 0,
             };
 
             SetupInput();
@@ -70,7 +73,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
         #region ImGuiRenderer
 
         /// <summary>
-        /// Creates a texture and loads the font data from ImGui. Should be called when the <see cref="GraphicsDevice" /> is initialized but before any rendering is done
+        /// Creates a texture and loads the font data from ImGui. Should be called when the <see cref="GraphicsDevice" /> is initialized but before any rendering is done.
         /// </summary>
         public unsafe void RebuildFontAtlas()
         {
@@ -87,7 +90,10 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
             tex2d.SetData(pixels);
 
             // Should a texture already have been build previously, unbind it first so it can be deallocated
-            if (_fontTextureId.HasValue) UnbindTexture(_fontTextureId.Value);
+            if (_fontTextureId.HasValue)
+            {
+                UnbindTexture(_fontTextureId.Value);
+            }
 
             // Bind the new texture to an ImGui-friendly id
             _fontTextureId = BindTexture(tex2d);
@@ -98,8 +104,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
         }
 
         /// <summary>
-        /// Creates a pointer to a texture, which can be passed through ImGui calls such as <see cref="ImGui.Image" />. That pointer is then used by ImGui to let us know what texture to draw
+        /// Creates a pointer to a texture, which can be passed through ImGui calls such as <see cref="ImGui.Image" />. That pointer is then used by ImGui to let us know what texture to draw.
         /// </summary>
+        /// <returns>The id assigned to the texture, used to look it up when rendering.</returns>
         public IntPtr BindTexture(Texture2D texture)
         {
             var id = new IntPtr(_textureId++);
@@ -110,7 +117,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
         }
 
         /// <summary>
-        /// Removes a previously created texture pointer, releasing its reference and allowing it to be deallocated
+        /// Removes a previously created texture pointer, releasing its reference and allowing it to be deallocated.
         /// </summary>
         public void UnbindTexture(IntPtr textureId)
         {
@@ -118,7 +125,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
         }
 
         /// <summary>
-        /// Sets up ImGui for a new frame, should be called at frame start
+        /// Sets up ImGui for a new frame, should be called at frame start.
         /// </summary>
         /// <param name="gameTime">Holds the time state of a <see cref="Game" />.</param>
         public void BeforeLayout(GameTime gameTime)
@@ -131,7 +138,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
         }
 
         /// <summary>
-        /// Asks ImGui for the generated geometry data and sends it to the graphics pipeline, should be called after the UI is drawn using ImGui.** calls
+        /// Asks ImGui for the generated geometry data and sends it to the graphics pipeline, should be called after the UI is drawn using ImGui.** calls.
         /// </summary>
         public void AfterLayout()
         {
@@ -154,24 +161,28 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
             // MonoGame-specific //////////////////////
             _game.Window.TextInput += (s, a) =>
             {
-                if (a.Character == '\t') return;
+                if (a.Character == '\t')
+                {
+                    return;
+                }
+
                 io.AddInputCharacter(a.Character);
             };
 
             ///////////////////////////////////////////
 
             // FNA-specific ///////////////////////////
-            //TextInputEXT.TextInput += c =>
-            //{
+            // TextInputEXT.TextInput += c =>
+            // {
             //    if (c == '\t') return;
 
-            //    ImGui.GetIO().AddInputCharacter(c);
-            //};
+            // ImGui.GetIO().AddInputCharacter(c);
+            // };
             ///////////////////////////////////////////
         }
 
         /// <summary>
-        /// Updates the <see cref="Effect" /> to the current matrices and texture
+        /// Updates the <see cref="Effect" /> to the current matrices and texture.
         /// </summary>
         private Effect UpdateEffect(Texture2D texture)
         {
@@ -190,11 +201,12 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
         }
 
         /// <summary>
-        /// Sends XNA input state to ImGui
+        /// Sends XNA input state to ImGui.
         /// </summary>
         private void UpdateInput()
         {
-            if (!_game.IsActive){
+            if (!_game.IsActive)
+            {
                 return;
             }
 
@@ -230,9 +242,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
 
         private bool TryMapKeys(Keys key, out ImGuiKey imguikey)
         {
-            //Special case not handed in the switch...
-            //If the actual key we put in is "None", return none and true. 
-            //otherwise, return none and false.
+            // Special case not handed in the switch...
+            // If the actual key we put in is "None", return none and true.
+            // otherwise, return none and false.
             if (key == Keys.None)
             {
                 imguikey = ImGuiKey.None;
@@ -296,7 +308,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
         #region Internals
 
         /// <summary>
-        /// Gets the geometry as set up by ImGui and sends it to the graphics device
+        /// Gets the geometry as set up by ImGui and sends it to the graphics device.
         /// </summary>
         private void RenderDrawData(ImDrawDataPtr drawData)
         {
@@ -367,10 +379,12 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
                 ImDrawListPtr cmdList = drawData.CmdLists[n];
 
                 fixed (void* vtxDstPtr = &_vertexData[vtxOffset * DrawVertDeclaration.Size])
-                fixed (void* idxDstPtr = &_indexData[idxOffset * sizeof(ushort)])
                 {
-                    Buffer.MemoryCopy((void*)cmdList.VtxBuffer.Data, vtxDstPtr, _vertexData.Length, cmdList.VtxBuffer.Size * DrawVertDeclaration.Size);
-                    Buffer.MemoryCopy((void*)cmdList.IdxBuffer.Data, idxDstPtr, _indexData.Length, cmdList.IdxBuffer.Size * sizeof(ushort));
+                    fixed (void* idxDstPtr = &_indexData[idxOffset * sizeof(ushort)])
+                    {
+                        Buffer.MemoryCopy((void*)cmdList.VtxBuffer.Data, vtxDstPtr, _vertexData.Length, cmdList.VtxBuffer.Size * DrawVertDeclaration.Size);
+                        Buffer.MemoryCopy((void*)cmdList.IdxBuffer.Data, idxDstPtr, _indexData.Length, cmdList.IdxBuffer.Size * sizeof(ushort));
+                    }
                 }
 
                 vtxOffset += cmdList.VtxBuffer.Size;
@@ -398,7 +412,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
                 {
                     ImDrawCmdPtr drawCmd = cmdList.CmdBuffer[cmdi];
 
-                    if (drawCmd.ElemCount == 0) 
+                    if (drawCmd.ElemCount == 0)
                     {
                         continue;
                     }
@@ -412,8 +426,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
                         (int)drawCmd.ClipRect.X,
                         (int)drawCmd.ClipRect.Y,
                         (int)(drawCmd.ClipRect.Z - drawCmd.ClipRect.X),
-                        (int)(drawCmd.ClipRect.W - drawCmd.ClipRect.Y)
-                    );
+                        (int)(drawCmd.ClipRect.W - drawCmd.ClipRect.Y));
 
                     var effect = UpdateEffect(_loadedTextures[drawCmd.TextureId]);
 
@@ -428,8 +441,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
                             minVertexIndex: 0,
                             numVertices: cmdList.VtxBuffer.Size,
                             startIndex: (int)drawCmd.IdxOffset + idxOffset,
-                            primitiveCount: (int)drawCmd.ElemCount / 3
-                        );
+                            primitiveCount: (int)drawCmd.ElemCount / 3);
 #pragma warning restore CS0618
                     }
                 }

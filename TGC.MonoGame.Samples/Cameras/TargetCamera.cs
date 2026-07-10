@@ -18,7 +18,8 @@ namespace TGC.MonoGame.Samples.Cameras
         /// <param name="aspectRatio">Aspect ratio, defined as view space width divided by height.</param>
         /// <param name="position">The position of the camera.</param>
         /// <param name="targetPosition">The target towards which the camera is pointing.</param>
-        public TargetCamera(float aspectRatio, Vector3 position, Vector3 targetPosition) : base(aspectRatio)
+        public TargetCamera(float aspectRatio, Vector3 position, Vector3 targetPosition)
+            : base(aspectRatio)
         {
             BuildView(position, targetPosition);
         }
@@ -32,7 +33,8 @@ namespace TGC.MonoGame.Samples.Cameras
         /// <param name="nearPlaneDistance">Distance to the near view plane.</param>
         /// <param name="farPlaneDistance">Distance to the far view plane.</param>
         public TargetCamera(float aspectRatio, Vector3 position, Vector3 targetPosition, float nearPlaneDistance,
-            float farPlaneDistance) : base(aspectRatio, nearPlaneDistance, farPlaneDistance)
+            float farPlaneDistance)
+            : base(aspectRatio, nearPlaneDistance, farPlaneDistance)
         {
             BuildView(position, targetPosition);
         }

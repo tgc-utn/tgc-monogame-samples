@@ -1,17 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using BepuPhysics;
 using BepuPhysics.Collidables;
 using BepuPhysics.Constraints;
+
 using BepuUtilities.Memory;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Geometries.Textures;
 using TGC.MonoGame.Samples.Physics.Bepu;
 using TGC.MonoGame.Samples.Viewer;
+
 using NumericVector3 = System.Numerics.Vector3;
 
 namespace TGC.MonoGame.Samples.Samples.Physics.Bepu;
@@ -64,7 +69,8 @@ public class WallOfBoxes : TGCSample
     private Effect _tilingEffect;
 
     /// <inheritdoc />
-    public WallOfBoxes(TGCViewer game) : base(game)
+    public WallOfBoxes(TGCViewer game)
+        : base(game)
     {
         Category = TGCSampleCategory.Physics;
         Name = "BepuPhysics - Wall of boxes";
@@ -86,7 +92,7 @@ public class WallOfBoxes : TGCSample
 
         _spriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
 
-        //The buffer pool is a source of raw memory blobs for the engine to use.
+        // The buffer pool is a source of raw memory blobs for the engine to use.
         _bufferPool = new BufferPool();
 
         _radii = new List<float>();
@@ -100,7 +106,8 @@ public class WallOfBoxes : TGCSample
         _sphereHandles = new List<BodyHandle>();
         _boxHandles = new List<BodyHandle>();
 
-        var targetThreadCount = Math.Max(1,
+        var targetThreadCount = Math.Max(
+            1,
             Environment.ProcessorCount > 4 ? Environment.ProcessorCount - 2 : Environment.ProcessorCount - 1);
         _threadDispatcher = new SimpleThreadDispatcher(targetThreadCount);
 
@@ -108,7 +115,8 @@ public class WallOfBoxes : TGCSample
         // The PositionFirstTimestepper is the simplest timestepping mode, but since it integrates velocity into position at the start of the frame, directly modified velocities outside of the timestep
         // will be integrated before collision detection or the solver has a chance to intervene. That's fine in this demo. Other built-in options include the PositionLastTimestepper and the SubsteppingTimestepper.
         // Note that the timestepper also has callbacks that you can use for executing logic between processing stages, like BeforeCollisionDetection.
-        _simulation = Simulation.Create(_bufferPool,
+        _simulation = Simulation.Create(
+            _bufferPool,
             new NarrowPhaseCallbacks(new SpringSettings(30, 1)),
             new PoseIntegratorCallbacks(new NumericVector3(0, -100, 0)),
             new SolveDescription(8, 1));
@@ -122,7 +130,8 @@ public class WallOfBoxes : TGCSample
         _tilingEffect.Parameters["Tiling"].SetValue(Vector2.One * 50f);
 
         _floorWorld = Matrix.CreateScale(400f) * Matrix.CreateTranslation(new Vector3(75, 0, -150));
-        _simulation.Statics.Add(new StaticDescription(new NumericVector3(0, -0.5f, 0),
+        _simulation.Statics.Add(new StaticDescription(
+            new NumericVector3(0, -0.5f, 0),
             _simulation.Shapes.Add(new Box(2000, 1, 2000))));
 
         _boxesWorld = new List<Matrix>();
@@ -137,7 +146,7 @@ public class WallOfBoxes : TGCSample
                 var boxShape = new Box(radius, radius, radius);
                 var boxInertia = boxShape.ComputeInertia(0.4f);
                 var boxIndex = _simulation.Shapes.Add(boxShape);
-                var position = new NumericVector3(-30 + i * 10 + 1, j * 10 + 1, -40);
+                var position = new NumericVector3(-30 + (i * 10) + 1, (j * 10) + 1, -40);
 
                 var bodyDescription = BodyDescription.CreateDynamic(position, boxInertia,
                     new CollidableDescription(boxIndex, 0.1f), new BodyActivityDescription(0.01f));
@@ -166,11 +175,12 @@ public class WallOfBoxes : TGCSample
         if (Game.CurrentKeyboardState.IsKeyDown(Keys.Z) && _canShoot)
         {
             _canShoot = false;
+
             // Create the shape that we'll launch at the pyramids when the user presses a button.
-            var radius = 0.5f + 5 * (float)_random.NextDouble();
+            var radius = 0.5f + (5 * (float)_random.NextDouble());
             var bulletShape = new Sphere(radius);
 
-            // Note that the use of radius^3 for mass can produce some pretty serious mass ratios. 
+            // Note that the use of radius^3 for mass can produce some pretty serious mass ratios.
             // Observe what happens when a large ball sits on top of a few boxes with a fraction of the mass-
             // the collision appears much squishier and less stable. For most games, if you want to maintain rigidity, you'll want to use some combination of:
             // 1) Limit the ratio of heavy object masses to light object masses when those heavy objects depend on the light objects.
@@ -179,8 +189,9 @@ public class WallOfBoxes : TGCSample
             // #2 and #3 can become very expensive. In pathological cases, it can end up slower than using a quality-focused solver for the same simulation.
             // Unfortunately, at the moment, bepuphysics v2 does not contain any alternative solvers, so if you can't afford to brute force the the problem away,
             // the best solution is to cheat as much as possible to avoid the corner cases.
-            var position = new NumericVector3(-40 + 210 * (float)_random.NextDouble(), 130, 130);
-            var bodyDescription = BodyDescription.CreateConvexDynamic(position,
+            var position = new NumericVector3(-40 + (210 * (float)_random.NextDouble()), 130, 130);
+            var bodyDescription = BodyDescription.CreateConvexDynamic(
+                position,
                 new BodyVelocity(new NumericVector3((float)_random.NextDouble(), 0, -110)),
                 bulletShape.Radius * bulletShape.Radius * bulletShape.Radius, _simulation.Shapes, bulletShape);
 

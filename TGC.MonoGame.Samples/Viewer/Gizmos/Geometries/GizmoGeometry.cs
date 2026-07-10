@@ -5,7 +5,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
     /// <summary>
     ///     Gizmo that is drawn using non-user indexed line lists.
     /// </summary>
-    abstract class GizmoGeometry
+    internal abstract class GizmoGeometry
     {
         private readonly GraphicsDevice _graphicsDevice;
 
@@ -18,7 +18,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
         /// <summary>
         ///     Creates a Gizmo Geometry.
         /// </summary>
-        /// <param name="device">Graphics Device to bind the geometry to,</param>
+        /// <param name="device">Graphics Device to bind the geometry to.</param>
         public GizmoGeometry(GraphicsDevice device)
         {
             _graphicsDevice = device;

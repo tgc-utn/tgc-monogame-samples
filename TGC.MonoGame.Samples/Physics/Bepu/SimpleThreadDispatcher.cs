@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading;
+
 using BepuUtilities;
 using BepuUtilities.Memory;
 
@@ -23,10 +24,11 @@ public class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
 
     /// <summary>
     ///     Creates a new thread dispatcher with the given number of threads. With default value in
-    ///     threadPoolBlockAllocationSize = 16384
+    ///     threadPoolBlockAllocationSize = 16384.
     /// </summary>
     /// <param name="threadCount">Number of threads to dispatch on each invocation.</param>
-    public SimpleThreadDispatcher(int threadCount) : this(threadCount, 16384)
+    public SimpleThreadDispatcher(int threadCount)
+        : this(threadCount, 16384)
     {
     }
 
@@ -81,6 +83,7 @@ public class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
     /// </summary>
     public int ThreadCount { get; }
 
+    /// <inheritdoc/>
     public void DispatchWorkers(Action<int> workerBody, int maximumWorkerCount = int.MaxValue)
     {
         if (maximumWorkerCount > 1)
@@ -88,7 +91,8 @@ public class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
             Debug.Assert(this.workerBody == null);
             this.workerBody = workerBody;
             SignalThreads(maximumWorkerCount);
-            //Calling thread does work. No reason to spin up another worker and block this one!
+
+            // Calling thread does work. No reason to spin up another worker and block this one!
             DispatchThread(0);
             finished.WaitOne();
             this.workerBody = null;
@@ -99,6 +103,7 @@ public class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
         }
     }
 
+    /// <inheritdoc/>
     public BufferPool GetThreadMemoryPool(int workerIndex)
     {
         return bufferPools[workerIndex];
@@ -125,14 +130,15 @@ public class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
             {
                 return;
             }
+
             DispatchThread(workerIndex);
         }
     }
 
     private void SignalThreads(int maximumWorkerCount)
     {
-        //Worker 0 is not signalled; it's the executing thread.
-        //So if we want 4 total executing threads, we should signal 3 workers.
+        // Worker 0 is not signalled; it's the executing thread.
+        // So if we want 4 total executing threads, we should signal 3 workers.
         var maximumWorkersToSignal = maximumWorkerCount - 1;
         var workersToSignal = maximumWorkersToSignal < workers.Length ? maximumWorkersToSignal : workers.Length;
         remainingWorkerCounter = workersToSignal;

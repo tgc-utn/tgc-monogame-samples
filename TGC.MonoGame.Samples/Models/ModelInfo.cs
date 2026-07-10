@@ -11,9 +11,10 @@ public class ModelInfo : IDisposable
         GeometryData = geometryData;
     }
 
+    /// <inheritdoc/>
     public void Dispose()
     {
-        foreach(var geometryData in GeometryData)
+        foreach (var geometryData in GeometryData)
         {
             geometryData.Geometry.Dispose();
         }

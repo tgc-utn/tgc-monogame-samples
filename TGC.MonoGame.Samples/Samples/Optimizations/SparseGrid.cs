@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Collisions;
 using TGC.MonoGame.Samples.Mathematics;
@@ -21,18 +23,18 @@ public class SparseGrid : TGCSample
     /// Size of the grid cells.
     /// </summary>
     private const float CellSize = 1000f;
-    
+
     /// <summary>
     /// Size of the world. Instances can spawn on a box that has this size
     /// on any axis.
     /// </summary>
     private const float WorldRadius = 50000f;
-    
+
     /// <summary>
     /// Random number generator for instance movement and generating random positions.
     /// </summary>
     private readonly Random _random = new();
-    
+
     /// <summary>
     /// A list of instances that represent objects we want to interact/draw
     /// in world space.
@@ -47,27 +49,27 @@ public class SparseGrid : TGCSample
     private readonly Dictionary<Vector3I, List<int>> _grid = new();
 
     /// <summary>
-    /// Camera to draw the scene
+    /// Camera to draw the scene.
     /// </summary>
     private Camera _camera;
-    
+
     /// <summary>
-    /// The Model of the Robot to draw
+    /// The Model of the Robot to draw.
     /// </summary>
     private Model _robot;
-    
+
     /// <summary>
     /// The AABB of the robot in local space.
     /// </summary>
     private BoundingBox _robotAABB;
-    
+
     /// <summary>
-    /// A Camera to check against bounding volumes
+    /// A Camera to check against bounding volumes.
     /// </summary>
     private Camera _testCamera;
-    
+
     /// <summary>
-    /// A Bounding Frustum to check visibility
+    /// A Bounding Frustum to check visibility.
     /// </summary>
     private BoundingFrustum _boundingFrustum;
 
@@ -80,22 +82,25 @@ public class SparseGrid : TGCSample
     /// If the grid should be enabled or if regular frustum-culling should be used.
     /// </summary>
     private bool _enabled = true;
-    
-    public SparseGrid(TGCViewer game) : base(game)
+
+    public SparseGrid(TGCViewer game)
+        : base(game)
     {
         Category = TGCSampleCategory.Optimizations;
         Name = "Sparse Grid";
         Description = "Shows how to create a Sparse Grid to optimize rendering";
     }
 
+    /// <inheritdoc/>
     public override void Initialize()
     {
         Game.Background = Color.CornflowerBlue;
-            
+
         // Creates a Static Camera looking at the origin
-        _camera = new StaticCamera(GraphicsDevice.Viewport.AspectRatio, 
+        _camera = new StaticCamera(
+            GraphicsDevice.Viewport.AspectRatio,
             Vector3.One * 5000f, -Vector3.Normalize(Vector3.One), Vector3.Up);
-        
+
         _camera.BuildProjection(GraphicsDevice.Viewport.AspectRatio, 0.1f, 10000f,
             (MathF.PI / 180f) * 60f);
 
@@ -111,18 +116,19 @@ public class SparseGrid : TGCSample
         _boundingFrustum = new BoundingFrustum(_testCamera.View * _testCamera.Projection);
 
         ModifierController.AddToggle("Use Sparse Grid", (toggle) => _enabled = toggle, true);
-        
+
         base.Initialize();
     }
 
+    /// <inheritdoc/>
     protected override void LoadContent()
     {
         // Load the Robot Model and enable default lighting
         _robot = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
         ((BasicEffect)_robot.Meshes.FirstOrDefault()?.Effects.FirstOrDefault())?.EnableDefaultLighting();
-        
+
         _robotAABB = BoundingVolumesExtensions.CreateAABBFrom(_robot);
-        
+
         _instances = new List<InstanceData>();
 
         // Populate instances and put them on their cell
@@ -130,7 +136,8 @@ public class SparseGrid : TGCSample
         {
             _instances.Add(new InstanceData
             {
-                Color = new Color(new Vector3(_random.NextSingle(), 
+                Color = new Color(new Vector3(
+                    _random.NextSingle(),
                     _random.NextSingle(),
                     _random.NextSingle())),
                 Objective = GeneratePositionInRange(_random),
@@ -140,7 +147,7 @@ public class SparseGrid : TGCSample
 
             ref var instance = ref CollectionsMarshal.AsSpan(_instances)[index];
             instance.Position = Vector3.Lerp(instance.From, instance.Objective, instance.Timer);
-            
+
             var cell = GetCell(instance.Position);
             instance.CurrentCell = cell;
             instance.BoundingBox = new BoundingBox(_robotAABB.Min + instance.Position, _robotAABB.Max + instance.Position);
@@ -154,26 +161,27 @@ public class SparseGrid : TGCSample
 
             list.Add(index);
         }
-        
+
         // Set depth to default
         GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
         base.LoadContent();
     }
 
+    /// <inheritdoc/>
     public override void Update(GameTime gameTime)
     {
         float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-        
+
         var instanceSpan = CollectionsMarshal.AsSpan(_instances);
-        
+
         // Update N random instances
         MoveInstances(instanceSpan, elapsedTime);
 
         _instancesToDraw.Clear();
 
         _testCamera.Update(gameTime);
-        
+
         _boundingFrustum.Matrix = _testCamera.View * _testCamera.Projection;
 
         if (_enabled)
@@ -186,36 +194,35 @@ public class SparseGrid : TGCSample
             for (int index = 0; index < _instances.Count; index++)
             {
                 var box = _instances[index].BoundingBox;
-                
+
                 if (box.Intersects(_boundingFrustum))
                 {
                     _instancesToDraw.Add(index);
                 }
             }
         }
-        
-        foreach(var index in _instancesToDraw)
+
+        foreach (var index in _instancesToDraw)
         {
             var box = _instances[index].BoundingBox;
             var center = (box.Max + box.Min) * 0.5f;
             var extents = (box.Max - box.Min) * 0.5f;
-            
+
             Game.Gizmos.DrawCube(center, extents, Color.Lime);
         }
-        
+
         // Draw a gizmo for the frustum
         Game.Gizmos.DrawFrustum(_testCamera.View * _testCamera.Projection, Color.Yellow);
-        
-        
+
         // Update Gizmos with the View Projection matrices
         Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
-        
+
         base.Update(gameTime);
     }
 
     /// <summary>
     /// Gets the instances that are visible by the frustum and puts them
-    /// into <see cref="_instancesToDraw"/>
+    /// into <see cref="_instancesToDraw"/>.
     /// </summary>
     private void TraverseGridAndFindInstances()
     {
@@ -232,18 +239,18 @@ public class SparseGrid : TGCSample
         // Get the min and max cell of the frustum corners
         var min = GetCell(box.Min);
         var max = GetCell(box.Max);
-            
-        
-        for(int x = min.X; x <= max.X; x++)
+
+        for (int x = min.X; x <= max.X; x++)
         {
-            for(int y = min.Y; y <= max.Y; y++)
+            for (int y = min.Y; y <= max.Y; y++)
             {
-                for(int z = min.Z; z <= max.Z; z++)
+                for (int z = min.Z; z <= max.Z; z++)
                 {
                     // Convert from cell space into world space
                     var cellPositionInWorld = new Vector3(x, y, z) * CellSize;
-                    
-                    var bb = new BoundingBox(cellPositionInWorld, 
+
+                    var bb = new BoundingBox(
+                        cellPositionInWorld,
                         cellPositionInWorld + new Vector3(CellSize));
 
                     // If the bounding box of the cell doesn't intersect the frustum, move into the next cell
@@ -265,7 +272,7 @@ public class SparseGrid : TGCSample
                     }
 
                     Game.Gizmos.DrawCube(center, extents, Color.Green);
-                        
+
                     // Check against every instance on the cell
                     foreach (int item in list)
                     {
@@ -293,7 +300,7 @@ public class SparseGrid : TGCSample
                 element.From = element.Objective;
                 element.Objective = GeneratePositionInRange(_random);
             }
-            
+
             // Moves them from "From" to "Objective" on a timer
             element.Position = Vector3.Lerp(element.From, element.Objective, element.Timer);
             element.BoundingBox = new BoundingBox(_robotAABB.Min + element.Position, _robotAABB.Max + element.Position);
@@ -305,7 +312,7 @@ public class SparseGrid : TGCSample
             {
                 continue;
             }
-            
+
             // Instance is on another cell, remove it from there,
             // move it to the new cell
             _grid[element.CurrentCell].Remove(index);
@@ -320,19 +327,20 @@ public class SparseGrid : TGCSample
                 list = new List<int>();
                 _grid.Add(cell, list);
             }
-                
+
             list.Add(index);
-                
+
             element.CurrentCell = cell;
         }
     }
 
+    /// <inheritdoc/>
     public override void Draw(GameTime gameTime)
     {
         Game.GraphicsDevice.Clear(Color.CornflowerBlue);
-    
+
         var instanceSpan = CollectionsMarshal.AsSpan(_instances);
-    
+
         foreach (var index in _instancesToDraw)
         {
             ref var element = ref instanceSpan[index];
@@ -342,30 +350,31 @@ public class SparseGrid : TGCSample
             {
                 basicEffect.DiffuseColor = element.Color.ToVector3();
             }
-            
+
             var world = Matrix.CreateTranslation(element.Position);
-            
+
             _robot.Draw(world, _camera.View, _camera.Projection);
         }
     }
 
     private Vector3 GeneratePositionInRange(Random random)
     {
-        return new Vector3(RandomRange(random, -WorldRadius, WorldRadius),
+        return new Vector3(
+            RandomRange(random, -WorldRadius, WorldRadius),
             RandomRange(random, -WorldRadius, WorldRadius),
             RandomRange(random, -WorldRadius, WorldRadius));
     }
 
     private float RandomRange(Random random, float min, float max)
     {
-        return random.NextSingle() * (max - min) + min;
+        return (random.NextSingle() * (max - min)) + min;
     }
 
     private Vector3I GetCell(in Vector3 position)
     {
         return (Vector3I)Vector3.Floor(position / CellSize);
     }
-    
+
     private struct InstanceData
     {
         public Vector3 Position;

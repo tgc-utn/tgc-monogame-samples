@@ -50,7 +50,7 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 
 	output.Position = mul(input.Position, World);
 	output.TextureCoordinates = input.TextureCoordinates;
-	
+
 	return output;
 }
 
@@ -62,7 +62,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 // Required when using a perspective projection matrix
 float LinearizeDepth(float depth)
 {
-    float z = depth * 2.0 - 1.0; // Back to NDC 
+    float z = depth * 2.0 - 1.0; // Back to NDC
     return ((2.0 * nearPlaneDistance * farPlaneDistance) / (farPlaneDistance + nearPlaneDistance - z * (farPlaneDistance - nearPlaneDistance))) / farPlaneDistance;
 }
 
@@ -71,7 +71,7 @@ float4 DepthPS(VertexShaderOutput input) : COLOR
     float depth = tex2D(textureSampler, input.TextureCoordinates).r;
     float linearDepth = LinearizeDepth(depth);
 	// Perspective
-	return float4(linearDepth, linearDepth, linearDepth, 1.0); 
+	return float4(linearDepth, linearDepth, linearDepth, 1.0);
 }
 
 
@@ -79,9 +79,9 @@ float4 DepthPS(VertexShaderOutput input) : COLOR
 float4 CubeMapPS(VertexShaderOutput input) : COLOR
 {
     float2 remappedTextureCoordinates = input.TextureCoordinates * 2.0 - 1.0;
-    
+
     float division = input.TextureCoordinates.x * 6.0;
-    
+
     float2 fractional = float2(frac(input.TextureCoordinates.x * 6.0), remappedTextureCoordinates.y);
     float integer = floor(division);
     float3 lookUpVector = float3(0, 0, 0);
@@ -97,7 +97,7 @@ float4 CubeMapPS(VertexShaderOutput input) : COLOR
         lookUpVector = float3(fractional.x, 1, fractional.y);
     else if (integer == 5)
         lookUpVector = float3(fractional.x, -1, fractional.y);
-    
+
     return texCUBE(cubeMapTextureSampler, lookUpVector);
 }
 

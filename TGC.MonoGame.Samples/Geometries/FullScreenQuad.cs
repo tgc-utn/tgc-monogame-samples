@@ -10,7 +10,7 @@ namespace TGC.MonoGame.Samples.Geometries
         private VertexBuffer _vertexBuffer;
 
         /// <summary>
-        ///     Create a quad used in clip space
+        ///     Create a quad used in clip space.
         /// </summary>
         /// <param name="device">Used to initialize and control the presentation of the graphics device.</param>
         public FullScreenQuad(GraphicsDevice device)
@@ -51,7 +51,6 @@ namespace TGC.MonoGame.Samples.Geometries
             _indexBuffer = new IndexBuffer(_device, IndexElementSize.SixteenBits, 6, BufferUsage.WriteOnly);
             _indexBuffer.SetData(indices);
         }
-
 
         public void Draw(Effect effect)
         {

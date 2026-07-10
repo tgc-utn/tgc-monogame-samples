@@ -6,12 +6,12 @@
 // Microsoft XNA Community Game Platform
 // Copyright (C) Microsoft Corporation. All rights reserved.
 //-----------------------------------------------------------------------------
-
 #endregion File Description
 
 #region Using Statements
 
 using System;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -31,7 +31,9 @@ namespace TGC.MonoGame.Samples.Geometries
             int tessellation = 32)
         {
             if (tessellation < 3)
+            {
                 throw new ArgumentOutOfRangeException(nameof(tessellation));
+            }
 
             height /= 2;
 
@@ -42,16 +44,16 @@ namespace TGC.MonoGame.Samples.Geometries
             {
                 var normal = GetCircleVector(i, tessellation);
 
-                AddVertex(normal * radius + Vector3.Up * height, Color.AliceBlue, normal);
-                AddVertex(normal * radius + Vector3.Down * height, Color.DarkGray, normal);
+                AddVertex((normal * radius) + (Vector3.Up * height), Color.AliceBlue, normal);
+                AddVertex((normal * radius) + (Vector3.Down * height), Color.DarkGray, normal);
 
                 AddIndex(i * 2);
-                AddIndex(i * 2 + 1);
-                AddIndex((i * 2 + 2) % (tessellation * 2));
+                AddIndex((i * 2) + 1);
+                AddIndex(((i * 2) + 2) % (tessellation * 2));
 
-                AddIndex(i * 2 + 1);
-                AddIndex((i * 2 + 3) % (tessellation * 2));
-                AddIndex((i * 2 + 2) % (tessellation * 2));
+                AddIndex((i * 2) + 1);
+                AddIndex(((i * 2) + 3) % (tessellation * 2));
+                AddIndex(((i * 2) + 2) % (tessellation * 2));
             }
 
             // Create flat triangle fan caps to seal the top and bottom.
@@ -68,23 +70,25 @@ namespace TGC.MonoGame.Samples.Geometries
         {
             // Create cap indices.
             for (var i = 0; i < tessellation - 2; i++)
+            {
                 if (normal.Y > 0)
                 {
                     AddIndex(CurrentVertex);
-                    AddIndex(CurrentVertex + (i + 1) % tessellation);
-                    AddIndex(CurrentVertex + (i + 2) % tessellation);
+                    AddIndex(CurrentVertex + ((i + 1) % tessellation));
+                    AddIndex(CurrentVertex + ((i + 2) % tessellation));
                 }
                 else
                 {
                     AddIndex(CurrentVertex);
-                    AddIndex(CurrentVertex + (i + 2) % tessellation);
-                    AddIndex(CurrentVertex + (i + 1) % tessellation);
+                    AddIndex(CurrentVertex + ((i + 2) % tessellation));
+                    AddIndex(CurrentVertex + ((i + 1) % tessellation));
                 }
+            }
 
             // Create cap vertices.
             for (var i = 0; i < tessellation; i++)
             {
-                var position = GetCircleVector(i, tessellation) * radius + normal * height;
+                var position = (GetCircleVector(i, tessellation) * radius) + (normal * height);
 
                 AddVertex(position, Color.Azure, normal);
             }
@@ -97,8 +101,8 @@ namespace TGC.MonoGame.Samples.Geometries
         {
             var angle = i * MathHelper.TwoPi / tessellation;
 
-            var dx = (float) Math.Cos(angle);
-            var dz = (float) Math.Sin(angle);
+            var dx = (float)Math.Cos(angle);
+            var dz = (float)Math.Sin(angle);
 
             return new Vector3(dx, 0, dz);
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -8,22 +9,23 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
     /// <summary>
     ///     Gizmo for drawing Wire Cylinders.
     /// </summary>
-    class CylinderGizmoGeometry : RadialGizmoGeometry
+    internal class CylinderGizmoGeometry : RadialGizmoGeometry
     {
         /// <summary>
         ///     Creates a Wire Cylinder with a number of subdivisions for the top and bottom.
         /// </summary>
         /// <param name="device">The device to bind geometry to.</param>
-        /// <param name="subdivisions">The number of subdivisions to </param>
-        public CylinderGizmoGeometry(GraphicsDevice device, int subdivisions) : base(device)
+        /// <param name="subdivisions">The number of subdivisions to. </param>
+        public CylinderGizmoGeometry(GraphicsDevice device, int subdivisions)
+            : base(device)
         {
             var positions = GeneratePolygonPositions(subdivisions);
             var originalIndices = GeneratePolygonIndices(subdivisions);
 
             var subdivisionsTimesTwo = subdivisions * 2;
-            
+
             // Lines for each circle, and four lines joining them
-            var indices = new ushort[subdivisions * 6 + 8];
+            var indices = new ushort[(subdivisions * 6) + 8];
 
             Array.Copy(originalIndices, 0, indices, 0, subdivisionsTimesTwo);
             Array.Copy(originalIndices.Select(index => (ushort)(index + subdivisions)).ToArray(), 0, indices, subdivisionsTimesTwo, subdivisionsTimesTwo);
@@ -61,11 +63,13 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
                 .ToArray()
                 .CopyTo(vertices, 0);
 
-            Array.Copy(positions
+            Array.Copy(
+                positions
                 .Select(position => new VertexPosition(new Vector3(position.X, -1f, position.Y)))
                 .ToArray(), 0, vertices, subdivisions, subdivisions);
 
-            Array.Copy(positions
+            Array.Copy(
+                positions
                 .Select(position => new VertexPosition(new Vector3(position.X, 0f, position.Y)))
                 .ToArray(), 0, vertices, subdivisionsTimesTwo, subdivisions);
 
@@ -79,7 +83,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
         /// <param name="origin">The position in world space.</param>
         /// <param name="rotation">The rotation of the Cylinder.</param>
         /// <param name="scale">The scale of the Cylinder.</param>
-        /// <returns>The calculated World matrix</returns>
+        /// <returns>The calculated World matrix.</returns>
         public static Matrix CalculateWorld(Vector3 origin, Matrix rotation, Vector3 scale)
         {
             return Matrix.CreateScale(scale) * rotation * Matrix.CreateTranslation(origin);

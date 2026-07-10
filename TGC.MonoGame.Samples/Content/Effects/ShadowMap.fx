@@ -28,7 +28,7 @@ sampler2D textureSampler = sampler_state
 	AddressU = Clamp;
 	AddressV = Clamp;
 };
-    
+
 
 texture shadowMap;
 sampler2D shadowMapSampler =
@@ -104,18 +104,18 @@ float4 ShadowedPS(in ShadowedVertexShaderOutput input) : COLOR
     float3 lightSpacePosition = input.LightSpacePosition.xyz / input.LightSpacePosition.w;
     float2 shadowMapTextureCoordinates = 0.5 * lightSpacePosition.xy + float2(0.5, 0.5);
     shadowMapTextureCoordinates.y = 1.0f - shadowMapTextureCoordinates.y;
-	
-	
+
+
     float3 normal = normalize(input.Normal.rgb);
     float3 lightDirection = normalize(lightPosition - input.WorldSpacePosition.xyz);
     float inclinationBias = max(modulatedEpsilon * (1.0 - dot(normal, lightDirection)), maxEpsilon);
-	
+
     float shadowMapDepth = tex2D(shadowMapSampler, shadowMapTextureCoordinates).r + inclinationBias;
-	
+
 	// Compare the shadowmap with the REAL depth of this fragment
 	// in light space
     float notInShadow = step(lightSpacePosition.z, shadowMapDepth);
-	
+
 	float4 baseColor = tex2D(textureSampler, input.TextureCoordinates);
     baseColor.rgb *= 0.5 + 0.5 * notInShadow;
 	return baseColor;
@@ -126,11 +126,11 @@ float4 ShadowedPCFPS(in ShadowedVertexShaderOutput input) : COLOR
     float3 lightSpacePosition = input.LightSpacePosition.xyz / input.LightSpacePosition.w;
     float2 shadowMapTextureCoordinates = 0.5 * lightSpacePosition.xy + float2(0.5, 0.5);
     shadowMapTextureCoordinates.y = 1.0f - shadowMapTextureCoordinates.y;
-	
+
     float3 normal = normalize(input.Normal.rgb);
     float3 lightDirection = normalize(lightPosition - input.WorldSpacePosition.xyz);
     float inclinationBias = max(modulatedEpsilon * (1.0 - dot(normal, lightDirection)), maxEpsilon);
-	
+
 	// Sample and smooth the shadowmap
 	// Also perform the comparison inside the loop and average the result
     float notInShadow = 0.0;
@@ -141,7 +141,7 @@ float4 ShadowedPCFPS(in ShadowedVertexShaderOutput input) : COLOR
             float pcfDepth = tex2D(shadowMapSampler, shadowMapTextureCoordinates + float2(x, y) * texelSize).r + inclinationBias;
             notInShadow += step(lightSpacePosition.z, pcfDepth) / 9.0;
         }
-	
+
     float4 baseColor = tex2D(textureSampler, input.TextureCoordinates);
     baseColor.rgb *= 0.5 + 0.5 * notInShadow;
     return baseColor;

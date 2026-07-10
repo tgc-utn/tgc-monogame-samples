@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -17,13 +18,15 @@ namespace TGC.MonoGame.Samples.Cameras
         // Angles
         private float _yaw = -90f;
 
-        public FreeCamera(float aspectRatio, Vector3 position, Point screenCenter) : this(aspectRatio, position)
+        public FreeCamera(float aspectRatio, Vector3 position, Point screenCenter)
+            : this(aspectRatio, position)
         {
             _lockMouse = true;
             this._screenCenter = screenCenter;
         }
 
-        public FreeCamera(float aspectRatio, Vector3 position) : base(aspectRatio)
+        public FreeCamera(float aspectRatio, Vector3 position)
+            : base(aspectRatio)
         {
             Position = position;
             _pastMousePosition = Mouse.GetState().Position.ToVector2();
@@ -32,6 +35,7 @@ namespace TGC.MonoGame.Samples.Cameras
         }
 
         public float MovementSpeed { get; set; } = 100f;
+
         public float MouseSensitivity { get; set; } = 5f;
 
         private void CalculateView()
@@ -42,13 +46,15 @@ namespace TGC.MonoGame.Samples.Cameras
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
-            var elapsedTime = (float) gameTime.ElapsedGameTime.TotalSeconds;
+            var elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             _changed = false;
             ProcessKeyboard(elapsedTime);
             ProcessMouseMovement(elapsedTime);
 
             if (_changed)
+            {
                 CalculateView();
+            }
         }
 
         private void ProcessKeyboard(float elapsedTime)
@@ -57,7 +63,9 @@ namespace TGC.MonoGame.Samples.Cameras
 
             var currentMovementSpeed = MovementSpeed;
             if (keyboardState.IsKeyDown(Keys.LeftShift))
+            {
                 currentMovementSpeed *= 5f;
+            }
 
             if (keyboardState.IsKeyDown(Keys.A) || keyboardState.IsKeyDown(Keys.Left))
             {
@@ -94,7 +102,6 @@ namespace TGC.MonoGame.Samples.Cameras
                 Position -= Vector3.Up * currentMovementSpeed * elapsedTime;
                 _changed = true;
             }
-
         }
 
         private void ProcessMouseMovement(float elapsedTime)
@@ -110,9 +117,14 @@ namespace TGC.MonoGame.Samples.Cameras
                 _pitch += mouseDelta.Y;
 
                 if (_pitch > 89.0f)
+                {
                     _pitch = 89.0f;
+                }
+
                 if (_pitch < -89.0f)
+                {
                     _pitch = -89.0f;
+                }
 
                 _changed = true;
                 UpdateCameraVectors();

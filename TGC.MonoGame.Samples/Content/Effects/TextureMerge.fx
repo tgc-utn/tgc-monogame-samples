@@ -29,7 +29,7 @@ sampler2D overlayTextureSampler = sampler_state
     AddressV = Clamp;
 };
 
-    
+
 struct VertexShaderInput
 {
     float4 Position : POSITION0;
@@ -49,7 +49,7 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 
     output.Position = input.Position;
     output.TextureCoordinates = input.TextureCoordinates;
-	
+
     return output;
 }
 
@@ -57,10 +57,10 @@ float4 MergePS(VertexShaderOutput input) : COLOR
 {
     float4 baseColor = tex2D(textureSampler, input.TextureCoordinates);
 	float4 overlayColor = tex2D(overlayTextureSampler, input.TextureCoordinates);
-    
+
 	float timeFactor = sin(time * 2.0) * 0.5 + 0.5;
 	float4 finalColor = float4(lerp(baseColor.rgb, overlayColor.rgb, overlayColor.a * timeFactor), 1.0);
-    
+
     return finalColor;
 }
 

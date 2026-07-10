@@ -7,7 +7,7 @@ namespace TGC.MonoGame.Samples.Models;
 /// Data associated to a geometry, generally extracted from a MonoGame <see cref="Model"/>.
 /// Represents an instance to be drawn with special custom data that a mesh contained.
 /// </summary>
-/// <param name="relativeMatrix">A matrix that </param>
+/// <param name="relativeMatrix">A matrix that. </param>
 /// <param name="textures"></param>
 public struct GeometryData(Geometry geometry, Matrix relativeMatrix, Texture[] textures)
 {
