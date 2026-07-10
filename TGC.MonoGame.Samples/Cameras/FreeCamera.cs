@@ -1,9 +1,13 @@
 ﻿using System;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace TGC.MonoGame.Samples.Cameras
 {
+    /// <summary>
+    ///     Free-look camera controlled with keyboard for movement and mouse for orientation.
+    /// </summary>
     internal class FreeCamera : Camera
     {
         private readonly bool _lockMouse;
@@ -17,12 +21,25 @@ namespace TGC.MonoGame.Samples.Cameras
         // Angles
         private float _yaw = -90f;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FreeCamera"/> class.
+        ///     Creates a free camera that locks and recenters the mouse cursor while rotating.
+        /// </summary>
+        /// <param name="aspectRatio">The viewport aspect ratio (width divided by height).</param>
+        /// <param name="position">Initial world-space position of the camera.</param>
+        /// <param name="screenCenter">Screen point where the mouse will be recentered.</param>
         public FreeCamera(float aspectRatio, Vector3 position, Point screenCenter) : this(aspectRatio, position)
         {
             _lockMouse = true;
             this._screenCenter = screenCenter;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FreeCamera"/> class.
+        ///     Creates a free camera without locking the mouse cursor.
+        /// </summary>
+        /// <param name="aspectRatio">The viewport aspect ratio (width divided by height).</param>
+        /// <param name="position">Initial world-space position of the camera.</param>
         public FreeCamera(float aspectRatio, Vector3 position) : base(aspectRatio)
         {
             Position = position;
@@ -31,24 +48,33 @@ namespace TGC.MonoGame.Samples.Cameras
             CalculateView();
         }
 
+        /// <summary>
+        ///     Gets or sets movement speed of the camera in world units per second.
+        /// </summary>
         public float MovementSpeed { get; set; } = 100f;
-        public float MouseSensitivity { get; set; } = 5f;
 
-        private void CalculateView()
-        {
-            View = Matrix.CreateLookAt(Position, Position + FrontDirection, UpDirection);
-        }
+        /// <summary>
+        ///     Gets or sets rotation sensitivity applied to mouse movement.
+        /// </summary>
+        public float MouseSensitivity { get; set; } = 5f;
 
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
-            var elapsedTime = (float) gameTime.ElapsedGameTime.TotalSeconds;
+            var elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             _changed = false;
             ProcessKeyboard(elapsedTime);
             ProcessMouseMovement(elapsedTime);
 
             if (_changed)
+            {
                 CalculateView();
+            }
+        }
+
+        private void CalculateView()
+        {
+            View = Matrix.CreateLookAt(Position, Position + FrontDirection, UpDirection);
         }
 
         private void ProcessKeyboard(float elapsedTime)
@@ -57,7 +83,9 @@ namespace TGC.MonoGame.Samples.Cameras
 
             var currentMovementSpeed = MovementSpeed;
             if (keyboardState.IsKeyDown(Keys.LeftShift))
+            {
                 currentMovementSpeed *= 5f;
+            }
 
             if (keyboardState.IsKeyDown(Keys.A) || keyboardState.IsKeyDown(Keys.Left))
             {
@@ -110,9 +138,14 @@ namespace TGC.MonoGame.Samples.Cameras
                 _pitch += mouseDelta.Y;
 
                 if (_pitch > 89.0f)
+                {
                     _pitch = 89.0f;
+                }
+
                 if (_pitch < -89.0f)
+                {
                     _pitch = -89.0f;
+                }
 
                 _changed = true;
                 UpdateCameraVectors();
