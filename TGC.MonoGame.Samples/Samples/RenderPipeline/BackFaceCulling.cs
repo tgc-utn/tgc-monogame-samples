@@ -2,7 +2,6 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
@@ -56,6 +55,9 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
         /// <summary>Whether to draw triangle normal arrows.</summary>
         private bool _showArrows;
+
+        /// <summary>Whether to paint with the normal color or diffuse color.</summary>
+        private bool _showNormalColor = false;
 
         /// <summary>Whether back-face culling is enabled.</summary>
         private bool _backFace = true;
@@ -119,35 +121,35 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         public override void Initialize()
         {
             var screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
-            _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0f, 0f, 50f), screenSize);
+            _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(-5f, 0f, 50f), screenSize);
 
             _baseScale = Matrix.CreateScale(BaseScaleScalar);
 
             _baseRotation = Matrix.Identity;
 
-            _arrows = new List<Arrowz>();
+            _arrows = [];
 
-            _texts = new List<string>
-            {
+            _texts =
+            [
                 "Clockwise culling",
                 "Cull none",
                 "Counter-clockwise culling",
-            };
+            ];
 
-            _textScreenPositions = new List<Vector2>
-            {
+            _textScreenPositions =
+            [
                 Vector2.Zero,
                 Vector2.Zero,
                 Vector2.Zero,
-            };
+            ];
             var offset = Vector3.Up * 15f;
 
-            _textWorldPositions = new List<Vector3>
-            {
+            _textWorldPositions =
+            [
                 -(Displacement * Vector3.UnitX) + offset,
                 Vector3.Zero + offset,
                 (Displacement * Vector3.UnitX) + offset,
-            };
+            ];
 
             base.Initialize();
         }
@@ -187,19 +189,11 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
             DrawPrimitives(_effect, viewProjection);
 
-            RasterizerState rasterizerState = new RasterizerState();
-            rasterizerState.CullMode = CullMode.None;
-            GraphicsDevice.RasterizerState = rasterizerState;
-
-            if (_showArrows)
+            var rasterizerState = new RasterizerState
             {
-                Arrowz arr;
-                for (int index = 0; index < _arrows.Count; index++)
-                {
-                    arr = _arrows[index];
-                    Game.Gizmos.DrawLine(Vector3.Transform(arr.Position, _baseRotation), arr.Target, arr.Color);
-                }
-            }
+                CullMode = CullMode.None,
+            };
+            GraphicsDevice.RasterizerState = rasterizerState;
 
             // Draw labels
             Game.SpriteBatch.Begin(
@@ -228,8 +222,8 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             _teapot = new TeapotPrimitive(GraphicsDevice);
             _cilinder = new CylinderPrimitive(GraphicsDevice);
             _currentPrimitive = _cilinder;
-            _cilinderArrows = new List<Arrowz>();
-            _teapotArrows = new List<Arrowz>();
+            _cilinderArrows = [];
+            _teapotArrows = [];
             LoadArrows(_cilinder, _cilinderArrows);
             LoadArrows(_teapot, _teapotArrows);
             _arrows = _cilinderArrows;
@@ -251,8 +245,9 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
                 RenderTargetUsage.PlatformContents);
 
             ModifierController.AddToggle("Show Wireframe", (enabled) => _showWireframe = enabled, false);
-            ModifierController.AddToggle("Show Triangle Normals", (enabled) => _showArrows = enabled, false);
+            ModifierController.AddToggle("Show Triangle Normals", (enabled) => _showArrows = enabled, true);
             ModifierController.AddToggle("Enable Back-Face Culling", (enabled) => _backFace = enabled, true);
+            ModifierController.AddToggle("Show Normal Color", (enabled) => _showNormalColor = enabled, false);
             ModifierController.AddOptions("Primitive", Primitive.Cylinder, (selected) =>
             {
                 if (selected == Primitive.Cylinder)
@@ -303,7 +298,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
                 vertexTwo = vertices[indices[index + 1]].Position;
                 vertexThree = vertices[indices[index + 2]].Position;
 
-                Vector3 average = (vertexOne + vertexTwo + vertexThree) * BaseScaleScalar / 3f;
+                Vector3 average = (vertexOne + vertexTwo + vertexThree) / 3f;
                 normal = Vector3.Cross(vertexTwo - vertexOne, vertexThree - vertexOne);
                 normal.Normalize();
 
@@ -320,20 +315,6 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
                     // Center inner arrow
                     AddArrow(arrowzs, average, -normal, Color.Yellow);
-
-                    // Left outer arrow
-                    Vector3 displacedAverage = average - (Displacement * Vector3.UnitX);
-                    AddArrow(arrowzs, displacedAverage, normal, Color.Magenta);
-
-                    // Left inner arrow
-                    AddArrow(arrowzs, displacedAverage, -normal, Color.Yellow);
-
-                    // Right outer arrow
-                    displacedAverage = average + (Displacement * Vector3.UnitX);
-                    AddArrow(arrowzs, displacedAverage, normal, Color.Magenta);
-
-                    // Right inner arrow
-                    AddArrow(arrowzs, displacedAverage, -normal, Color.Yellow);
                 }
             }
         }
@@ -348,7 +329,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         private static void AddArrow(List<Arrowz> arrowzs, Vector3 position, Vector3 normal, Color color) => arrowzs.Add(new Arrowz
         {
             Position = position,
-            Target = position + (normal * 0.75f),
+            Target = position + (normal * 0.075f),
             Color = color,
         });
 
@@ -405,7 +386,19 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
             var world = _baseScale * _baseRotation * Matrix.CreateTranslation(Vector3.UnitX * displacement);
             effect.Parameters["WorldViewProjection"].SetValue(world * viewProjection);
+            effect.Parameters["DrawNormalColor"]?.SetValue(_showNormalColor);
             _currentPrimitive.Draw(effect);
+
+            if (_showArrows)
+            {
+                Arrowz arr;
+                for (int index = 0; index < _arrows.Count; index++)
+                {
+                    arr = _arrows[index];
+                    Game.Gizmos.DrawLine(Vector3.Transform(arr.Position, world), Vector3.Transform(arr.Target, world), arr.Color);
+                }
+            }
+
         }
 
         /// <summary>
