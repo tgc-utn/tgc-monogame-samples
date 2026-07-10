@@ -28,7 +28,8 @@ namespace TGC.MonoGame.Samples.Cameras
         /// <param name="aspectRatio">The viewport aspect ratio (width divided by height).</param>
         /// <param name="position">Initial world-space position of the camera.</param>
         /// <param name="screenCenter">Screen point where the mouse will be recentered.</param>
-        public FreeCamera(float aspectRatio, Vector3 position, Point screenCenter) : this(aspectRatio, position)
+        public FreeCamera(float aspectRatio, Vector3 position, Point screenCenter)
+        : this(aspectRatio, position)
         {
             _lockMouse = true;
             this._screenCenter = screenCenter;
@@ -40,10 +41,28 @@ namespace TGC.MonoGame.Samples.Cameras
         /// </summary>
         /// <param name="aspectRatio">The viewport aspect ratio (width divided by height).</param>
         /// <param name="position">Initial world-space position of the camera.</param>
-        public FreeCamera(float aspectRatio, Vector3 position) : base(aspectRatio)
+        public FreeCamera(float aspectRatio, Vector3 position)
+        : base(aspectRatio)
         {
             Position = position;
             _pastMousePosition = Mouse.GetState().Position.ToVector2();
+            UpdateCameraVectors();
+            CalculateView();
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="FreeCamera"/> class with an explicit initial orientation.
+        /// </summary>
+        /// <param name="aspectRatio">The viewport aspect ratio (width divided by height).</param>
+        /// <param name="position">Initial world-space position of the camera.</param>
+        /// <param name="yaw">Initial yaw angle in degrees (rotation around the vertical axis).</param>
+        /// <param name="pitch">Initial pitch angle in degrees (rotation around the horizontal axis).</param>
+        /// <param name="screenCenter">Screen point where the mouse will be recentered.</param>
+        public FreeCamera(float aspectRatio, Vector3 position, float yaw, float pitch, Point screenCenter)
+        : this(aspectRatio, position, screenCenter)
+        {
+            _yaw = yaw;
+            _pitch = pitch;
             UpdateCameraVectors();
             CalculateView();
         }

@@ -121,7 +121,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         public override void Initialize()
         {
             var screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
-            _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(-5f, 0f, 50f), screenSize);
+            _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(-5f, 20f, 50f), -90f, -20f, screenSize);
 
             _baseScale = Matrix.CreateScale(BaseScaleScalar);
 
