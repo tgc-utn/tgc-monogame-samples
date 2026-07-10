@@ -13,7 +13,7 @@ using NumericVector2 = System.Numerics.Vector2;
 namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
 {
     /// <summary>
-    /// ImGui renderer for use with XNA-likes (FNA & MonoGame).
+    /// ImGui renderer for use with XNA-likes (FNA and MonoGame).
     /// TODO try to remove unsafe code.
     /// </summary>
     public sealed class ImGuiRenderer

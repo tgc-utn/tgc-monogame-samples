@@ -34,8 +34,8 @@ namespace TGC.MonoGame.Samples.Collisions
         /// <summary>
         ///     Builds a Oriented Bounding-Box with a center and extents.
         /// </summary>
-        /// <param name="center"></param>
-        /// <param name="extents"></param>
+        /// <param name="center">The center of the box.</param>
+        /// <param name="extents">The extents of the box.</param>
         public OrientedBoundingBox(Vector3 center, Vector3 extents)
         {
             Center = center;

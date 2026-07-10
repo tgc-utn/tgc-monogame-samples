@@ -43,7 +43,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
         /// </summary>
         /// <param name="origin">The position in world space.</param>
         /// <param name="normal">The normal of the Disk. The circle will face this vector.</param>
-        /// <param name="scale">The radius of the Disk.</param>
+        /// <param name="radius">The radius of the Disk.</param>
         /// <returns>The calculated World matrix.</returns>
         public static Matrix CalculateWorld(Vector3 origin, Vector3 normal, float radius)
         {

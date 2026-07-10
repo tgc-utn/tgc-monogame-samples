@@ -48,8 +48,8 @@ namespace TGC.MonoGame.Samples.Collisions
         /// <summary>
         ///     Scales the box by a given scalar.
         /// </summary>
-        /// <param name="scale">The scale for every axis.</param>
         /// <param name="box">The <see cref="BoundingBox"/> to scale.</param>
+        /// <param name="scale">The scale for every axis.</param>
         /// <returns>A new box with its extents scaled.</returns>
         public static BoundingBox Scale(BoundingBox box, float scale)
         {

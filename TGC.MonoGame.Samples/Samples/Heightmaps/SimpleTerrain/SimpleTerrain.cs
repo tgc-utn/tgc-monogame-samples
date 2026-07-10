@@ -71,6 +71,7 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
         /// <summary>
         ///     Crea la malla de un terreno en base a un Heightmap.
         /// </summary>
+        /// <param name="graphicsDevice">Dispositivo gráfico para administrar los recursos y el renderizado.</param>
         /// <param name="heightmap">Imagen de Heightmap.</param>
         /// <param name="scaleXZ">Escala para los ejes X y Z.</param>
         /// <param name="scaleY">Escala para el eje Y.</param>

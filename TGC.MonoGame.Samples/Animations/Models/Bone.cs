@@ -106,15 +106,13 @@ public class Bone
                         Matrix.CreateTranslation(_translation) * _bindTransform;
 
         if (_parent != null)
-
-        // This bone has a Parent bone.
         {
+            // This bone has a Parent bone.
             AbsoluteTransform = transform * _parent.AbsoluteTransform;
         }
         else
-
-        // The root bone.
         {
+            // The root bone.
             AbsoluteTransform = transform;
         }
     }

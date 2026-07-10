@@ -211,9 +211,8 @@ public class AnimationProcessor : ModelProcessor
     {
         // It has to be a MeshContent node.
         if (node is MeshContent mesh)
-
-        // In the geometry we have to find a vertex channel that has a bone weight collection.
         {
+            // In the geometry we have to find a vertex channel that has a bone weight collection.
             foreach (var geometry in mesh.Geometry)
             {
                 foreach (var vertexChannel in geometry.Vertices.Channels)
@@ -237,9 +236,8 @@ public class AnimationProcessor : ModelProcessor
     {
         // It has to be a MeshContent node.
         if (node is MeshContent mesh)
-
-        // In the geometry we have to find a vertex channel that has a bone weight collection.
         {
+            // In the geometry we have to find a vertex channel that has a bone weight collection.
             foreach (var geometry in mesh.Geometry)
             {
                 var swap = false;

@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET
 {
     /// <summary>
-    ///     ImGui class to use with XNA-likes (FNA & MonoGame).
+    ///     ImGui class to use with XNA-likes (FNA and MonoGame).
     /// </summary>
     public static class DrawVertDeclaration
     {
