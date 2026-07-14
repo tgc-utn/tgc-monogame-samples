@@ -24,7 +24,7 @@ namespace TGC.MonoGame.Samples.Samples
         ///     Default constructor.
         /// </summary>
         /// <param name="game">The game.</param>
-        public TGCSample(TGCViewer game)
+        protected TGCSample(TGCViewer game)
             : base(game)
         {
             Game = game;

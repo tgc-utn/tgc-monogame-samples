@@ -8,7 +8,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     /// <summary>
     ///     An Options Modifier that allows for selecting a value from a list.
     /// </summary>
-    internal class OptionsModifier<EnumType> : IModifier
+    public class OptionsModifier<EnumType> : IModifier
         where EnumType : Enum
     {
         private int _currentOptionIndex;

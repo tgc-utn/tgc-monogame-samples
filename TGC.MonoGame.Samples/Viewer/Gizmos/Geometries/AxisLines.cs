@@ -1,6 +1,4 @@
-﻿using System;
-
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
@@ -8,7 +6,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
     /// <summary>
     ///     Gizmo for drawing the Axis Lines of an application.
     /// </summary>
-    internal class AxisLines
+    public class AxisLines
     {
         private const float AxisScreenOffset = 20f;
         private const float AxisScreenDistance = 40f;

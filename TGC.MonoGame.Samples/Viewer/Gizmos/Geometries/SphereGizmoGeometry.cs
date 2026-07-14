@@ -9,7 +9,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
     /// <summary>
     ///     Gizmo for drawing Wire Spheres.
     /// </summary>
-    internal class SphereGizmoGeometry : RadialGizmoGeometry
+    public class SphereGizmoGeometry : RadialGizmoGeometry
     {
         /// <summary>
         ///     Constructs a Wire Sphere.

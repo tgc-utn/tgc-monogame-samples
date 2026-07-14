@@ -9,7 +9,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
     /// <summary>
     ///     Gizmo for drawing Wire Disks.
     /// </summary>
-    internal class DiskGizmoGeometry : RadialGizmoGeometry
+    public class DiskGizmoGeometry : RadialGizmoGeometry
     {
         /// <summary>
         ///     Creates a Wire Disk geometry.

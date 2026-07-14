@@ -48,7 +48,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         ///     Creates a Vector3 Modifier with a given name, action and default value.
         /// </summary>
         /// <param name="name">The name that will show in the GUI.</param>
-        /// <param name="effectParameter">An <see cref="EffectParameter" /> that will recieve the Vector3 as value.</param>
+        /// <param name="effectParameter">An <see cref="EffectParameter" /> that will receive the Vector3 as value.</param>
         /// <param name="defaultValue">The Vector3 default value.</param>
         public Vector3Modifier(string name, EffectParameter effectParameter, MonoGameVector3 defaultValue)
         : this(name, (vector) => effectParameter.SetValue(vector))

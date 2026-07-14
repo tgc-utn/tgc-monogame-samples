@@ -5,29 +5,34 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 using TGC.MonoGame.Samples.Collisions;
-using TGC.MonoGame.Samples.Physics;
 
 namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
 {
     // TODO needs a refactor.
     public class TunelMesh
     {
-        public const int Max_path = 800;
+        private const int MaxPath = 800;
         public float Angle;
         public float Ant_pos;
-        public bool Colision;
+
+        public bool Colision { get; private set; }
+
         public int Curr_obs;
         public short[] Indexes;
-        public int Level;
+
+        public int Level { get; set; }
+
         public int NumberOfIndices;
         public int NumberOfVertices;
-        public int[,] Obstaculo = new int[2, Max_path];
-        public Vector3[] Path = new Vector3[Max_path];
-        public float Pos;
+        public int[,] Obstaculo = new int[2, MaxPath];
+        private readonly Vector3[] _path = new Vector3[MaxPath];
+
+        public float Pos { get; private set; }
+
         public Vector3 PosGamer;
         public Vector3 Position;
         public Vector3 Up;
-        public float Vel_lineal = 6.0f;
+        private readonly float _velLineal = 6.0f;
         public VertexPositionColorTexture[] Vertices;
         public Vector3 ViewDir;
 
@@ -46,10 +51,10 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
             var rnd = new Random();
             float r = Level == 0 ? 300 : 200;
 
-            for (var s = 0; s < Max_path; ++s)
+            for (var s = 0; s < MaxPath; ++s)
             {
-                Path[s] = new Vector3(MathF.Cos(s * 16f * MathF.PI / Max_path) * 10000f, s * 10f,
-                    MathF.Sin(s * 16f * MathF.PI / Max_path) * 10000f);
+                _path[s] = new Vector3(MathF.Cos(s * 16f * MathF.PI / MaxPath) * 10000f, s * 10f,
+                    MathF.Sin(s * 16f * MathF.PI / MaxPath) * 10000f);
                 /*
                 //x = jCos(a * t) - Cos(b * t) ^ 3 y = Sin(c * t) - Sin(d * t) ^ 3;
                 float ts = s * 0.01f;
@@ -61,7 +66,7 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
                 float Y = MathF.Sin(c * ts) - MathF.Pow(MathF.Sin(d * ts), 3.0f);
                 //float X = s*0.1f;
                 //float Y = 0;
-                Path[s] = new Vector3(X * 10000f, s * 0f, Y * 10000f);
+                _path[s] = new Vector3(X * 10000f, s * 0f, Y * 10000f);
                 */
             }
 
@@ -72,10 +77,10 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
             colores[3] = new Color(255, 255, 0);
             colores[4] = new Color(0, 255, 255);
             colores[5] = new Color(255, 255, 255);
-            for (var s = 0; s < Max_path - 1; ++s)
+            for (var s = 0; s < MaxPath - 1; ++s)
             {
-                var q0 = Path[s];
-                var q11 = Path[s + 1];
+                var q0 = _path[s];
+                var q11 = _path[s + 1];
 
                 var dist = (q11 - q0).Length();
                 var n = Vector3.Normalize(q11 - q0);
@@ -268,13 +273,13 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
             }
 
             Ant_pos = Pos;
-            Pos += elapsedTime * (keyboardState.IsKeyDown(Keys.Space) ? 0 : Vel_lineal);
+            Pos += elapsedTime * (keyboardState.IsKeyDown(Keys.Space) ? 0 : _velLineal);
             var i = (int)Math.Floor(Pos);
 
             var frac = Pos - i;
-            var q0 = Path[i % Max_path];
-            var q1 = Path[(i + 1) % Max_path];
-            var q2 = Path[(i + 2) % Max_path];
+            var q0 = _path[i % MaxPath];
+            var q1 = _path[(i + 1) % MaxPath];
+            var q2 = _path[(i + 2) % MaxPath];
             var n0 = Vector3.Normalize(q1 - q0);
             var n1 = Vector3.Normalize(q2 - q1);
 

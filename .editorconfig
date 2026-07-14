@@ -394,6 +394,9 @@ dotnet_diagnostic.S3217.severity = suggestion
 # SA1123: Region should not be located within a code element — downgraded, IDE nudge only, not enforced automatically.
 dotnet_diagnostic.SA1123.severity = suggestion
 
+# S3967: Multidimensional arrays should not be used — downgraded, our arrays are fully dense, jagged saves no memory here.
+dotnet_diagnostic.S3967.severity = suggestion
+
 # Naming styles
 
 dotnet_naming_style._camelcase.required_prefix = _

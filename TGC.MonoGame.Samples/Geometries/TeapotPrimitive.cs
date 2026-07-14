@@ -27,7 +27,7 @@ namespace TGC.MonoGame.Samples.Geometries
     ///     various levels of detail. The use of curved surfaces allows a smoothly curved, visually interesting, and instantly
     ///     recognizable shape to be specified by a tiny amount of data, which made the teapot a popular test data set for
     ///     computer graphics researchers. It has been used in so many papers and demos that many graphics programmers have
-    ///     come to think of it as a standard geometric primitive, right up there with cubes and spheres!.
+    ///     come to think of it as a standard geometric primitive, right up there with cubes and spheres.
     /// </summary>
     public class TeapotPrimitive : BezierPrimitive
     {

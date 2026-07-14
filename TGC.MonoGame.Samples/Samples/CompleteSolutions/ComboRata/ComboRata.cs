@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -29,13 +30,13 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
         public Effect Effect;
         public SpriteFont Font;
 
-        public bool God_mode;
+        private bool _godMode;
         public SpriteBatch SpriteBatch;
 
         public int Status = ST_PRESENTACION;
-        public Texture2D Texture;
-        public Texture2D TextureAux;
-        public float Timer_level;
+        private Texture2D _texture;
+        private Texture2D _textureAux;
+        private float _timerLevel;
         public TunelMesh Tunel;
 
         /// <inheritdoc />
@@ -57,8 +58,8 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
         /// <inheritdoc />
         protected override void LoadContent()
         {
-            Texture = Game.Content.Load<Texture2D>(ContentFolderTextures + "tunel/metal");
-            TextureAux = Game.Content.Load<Texture2D>(ContentFolderTextures + "tunel/level2");
+            _texture = Game.Content.Load<Texture2D>(ContentFolderTextures + "tunel/metal");
+            _textureAux = Game.Content.Load<Texture2D>(ContentFolderTextures + "tunel/level2");
 
             // Load a shader using Content pipeline.
             Effect = Game.Content.Load<Effect>(ContentFolderEffects + "ComboRata");
@@ -70,7 +71,7 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
             Game.Gizmos.UpdateViewProjection(Matrix.Identity, projectionMatrix);
 
             Effect.Parameters["Projection"].SetValue(projectionMatrix);
-            Effect.Parameters["ModelTexture"].SetValue(Texture);
+            Effect.Parameters["ModelTexture"].SetValue(_texture);
             Font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
             SpriteBatch = new SpriteBatch(GraphicsDevice);
             Effect.CurrentTechnique = Effect.Techniques["ColorDrawing"];
@@ -85,8 +86,8 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
             switch (Status)
             {
                 case ST_CAMBIO_NIVEL:
-                    Timer_level -= elapsedTime;
-                    if (Timer_level < 0)
+                    _timerLevel -= elapsedTime;
+                    if (_timerLevel < 0)
                     {
                         Status = ST_STAGE_1;
                     }
@@ -110,12 +111,12 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
                         {
                             if (keys[0] == Keys.G)
                             {
-                                God_mode = !God_mode;
+                                _godMode = !_godMode;
                             }
                         }
 
                         Tunel.Update(elapsedTime, Game.CurrentKeyboardState);
-                        if (Tunel.Colision && !God_mode)
+                        if (Tunel.Colision && !_godMode)
                         {
                             Status = ST_GAME_OVER;
                         }
@@ -126,30 +127,7 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
                         {
                             // paso al siguiente stage
                             Status++;
-                            switch (Status)
-                            {
-                                case ST_STAGE_2:
-                                    Effect.CurrentTechnique = Effect.Techniques["EdgeDectect"];
-                                    break;
-                                case ST_STAGE_3:
-                                    Effect.CurrentTechnique = Effect.Techniques["TexCoordsDrawing"];
-                                    break;
-                                case ST_STAGE_4:
-                                    Effect.CurrentTechnique = Effect.Techniques["TextureDrawing"];
-                                    break;
-                                case ST_STAGE_5:
-                                    Effect.Parameters["ModelTexture"].SetValue(TextureAux);
-                                    break;
-                                case 6:
-                                    // paso al siguiente nivel
-                                    Status = ST_CAMBIO_NIVEL;
-                                    Tunel.Level = 1 - Tunel.Level;
-                                    Tunel.FillVertices();
-                                    Effect.CurrentTechnique = Effect.Techniques["ColorDrawing"];
-                                    Effect.Parameters["ModelTexture"].SetValue(Texture);
-                                    Timer_level = 2;
-                                    break;
-                            }
+                            AdvanceStage();
                         }
                     }
 
@@ -157,6 +135,37 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
             }
 
             base.Update(gameTime);
+        }
+
+        private void AdvanceStage()
+        {
+            switch (Status)
+            {
+                case ST_STAGE_2:
+                    Effect.CurrentTechnique = Effect.Techniques["EdgeDectect"];
+                    break;
+                case ST_STAGE_3:
+                    Effect.CurrentTechnique = Effect.Techniques["TexCoordsDrawing"];
+                    break;
+                case ST_STAGE_4:
+                    Effect.CurrentTechnique = Effect.Techniques["TextureDrawing"];
+                    break;
+                case ST_STAGE_5:
+                    Effect.Parameters["ModelTexture"].SetValue(_textureAux);
+                    break;
+                case 6:
+                    // paso al siguiente nivel
+                    Status = ST_CAMBIO_NIVEL;
+                    Tunel.Level = 1 - Tunel.Level;
+                    Tunel.FillVertices();
+                    Effect.CurrentTechnique = Effect.Techniques["ColorDrawing"];
+                    Effect.Parameters["ModelTexture"].SetValue(_texture);
+                    _timerLevel = 2;
+                    break;
+                default:
+                    Debug.WriteLine($"Unexpected Status value: {Status}", "ComboRata");
+                    break;
+            }
         }
 
         /// <inheritdoc />
@@ -196,7 +205,7 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
                     SpriteBatch.DrawString(Font, "Distancia:" + Math.Round(Tunel.Pos, 1), new Vector2(10, 10),
                         Color.White);
                     SpriteBatch.End();
-                    if (God_mode)
+                    if (_godMode)
                     {
                         DrawRightText("GODMODE", 10, 1);
                     }
@@ -221,7 +230,6 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
         public void DrawCenterTextY(string msg, float y, float escala)
         {
             var w = GraphicsDevice.Viewport.Width;
-            var h = GraphicsDevice.Viewport.Height;
             var size = Font.MeasureString(msg) * escala;
             SpriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null,
                 Matrix.CreateScale(escala) * Matrix.CreateTranslation((w - size.X) / 2, y, 0));
@@ -232,7 +240,6 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
         public void DrawRightText(string msg, float y, float escala)
         {
             var w = GraphicsDevice.Viewport.Width;
-            var h = GraphicsDevice.Viewport.Height;
             var size = Font.MeasureString(msg) * escala;
             SpriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null,
                 Matrix.CreateScale(escala) * Matrix.CreateTranslation(w - size.X - 20, y, 0));

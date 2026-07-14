@@ -57,7 +57,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         ///     Creates a Color Modifier with a given name and an <see cref="EffectParameter" />.
         /// </summary>
         /// <param name="name">The name of the modifier that will show on the GUI.</param>
-        /// <param name="effectParameter">An <see cref="EffectParameter" /> that will recieve the Color as value.</param>
+        /// <param name="effectParameter">An <see cref="EffectParameter" /> that will receive the Color as value.</param>
         public ColorModifier(string name, EffectParameter effectParameter)
             : this(name)
         {
@@ -68,7 +68,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         ///     Creates a Color Modifier with a given name, an <see cref="EffectParameter" />, and a default Color.
         /// </summary>
         /// <param name="name">The name of the modifier that will show on the GUI.</param>
-        /// <param name="effectParameter">An <see cref="EffectParameter" /> that will recieve the Color as value.</param>
+        /// <param name="effectParameter">An <see cref="EffectParameter" /> that will receive the Color as value.</param>
         /// <param name="defaultColor">The Color that the Color Modifier starts with.</param>
         public ColorModifier(string name, EffectParameter effectParameter, MonoGameColor defaultColor)
             : this(

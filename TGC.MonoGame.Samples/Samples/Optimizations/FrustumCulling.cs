@@ -287,27 +287,27 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
         /// <summary>
         /// A model to draw.
         /// </summary>
-        public Model Model;
+        internal Model Model;
 
         /// <summary>
         /// A box to get its max and min positions in local coordinates.
         /// </summary>
-        public BoundingBox Box;
+        internal BoundingBox Box;
 
         /// <summary>
         /// The actual box to perform intersection tests.
         /// </summary>
-        public BoundingBox BoxWorldSpace;
+        internal BoundingBox BoxWorldSpace;
 
         /// <summary>
         /// A world matrix to transform the model into world space.
         /// </summary>
-        public Matrix World;
+        internal Matrix World;
 
         /// <summary>
         /// Updates the AABB by using the world matrix and the original box min and max positions (in local coordinates).
         /// </summary>
-        public void UpdateAABB()
+        internal void UpdateAABB()
         {
             var translation = World.Translation;
             BoxWorldSpace.Min = Box.Min + translation;
@@ -329,22 +329,22 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
         /// <summary>
         /// A model to draw.
         /// </summary>
-        public Model Model;
+        internal Model Model;
 
         /// <summary>
         /// A sphere to perform intersection tests.
         /// </summary>
-        public BoundingSphere Sphere;
+        internal BoundingSphere Sphere;
 
         /// <summary>
         /// A world matrix to transform the model into world space.
         /// </summary>
-        public Matrix World;
+        internal Matrix World;
 
         /// <summary>
         /// Updates the sphere by using the world matrix.
         /// </summary>
-        public void UpdateSphere()
+        internal void UpdateSphere()
         {
             Sphere.Center = World.Translation;
         }

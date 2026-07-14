@@ -9,13 +9,13 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
     /// <summary>
     ///     Gizmo for drawing Wire Cylinders.
     /// </summary>
-    internal class CylinderGizmoGeometry : RadialGizmoGeometry
+    public class CylinderGizmoGeometry : RadialGizmoGeometry
     {
         /// <summary>
         ///     Creates a Wire Cylinder with a number of subdivisions for the top and bottom.
         /// </summary>
         /// <param name="device">The device to bind geometry to.</param>
-        /// <param name="subdivisions">The number of subdivisions to. </param>
+        /// <param name="subdivisions">The number of subdivisions that each circle will contain.</param>
         public CylinderGizmoGeometry(GraphicsDevice device, int subdivisions)
             : base(device)
         {

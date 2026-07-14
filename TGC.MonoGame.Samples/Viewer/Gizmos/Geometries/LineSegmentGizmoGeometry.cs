@@ -6,7 +6,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
     /// <summary>
     ///     Gizmo for drawing lines.
     /// </summary>
-    internal class LineSegmentGizmoGeometry : GizmoGeometry
+    public class LineSegmentGizmoGeometry : GizmoGeometry
     {
         /// <summary>
         ///     Creates a wire Line Segment.

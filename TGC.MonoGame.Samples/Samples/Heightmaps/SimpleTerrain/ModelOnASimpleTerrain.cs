@@ -20,13 +20,13 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
     {
         public float Angle;
         public Vector3 DesiredLookAt;
-        public bool Hay_lookAt;
+        private bool _hayLookAt;
         public Vector3 LookAt;
 
         private Model model;
         public Vector2 Pos;
-        public Vector3 TgcitoPos;
-        public SimpleTerrain Terrain;
+        private Vector3 _tgcitoPos;
+        private SimpleTerrain _terrain;
 
         private float offSet;
 
@@ -69,7 +69,7 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
 
             // blend texture 2
             var terrainGround = Game.Content.Load<Texture2D>(ContentFolderTextures + "ground");
-            Terrain = new SimpleTerrain(GraphicsDevice, terrainHeigthmap, terrainColorMap, terrainGrass, terrainGround, terrainEffect);
+            _terrain = new SimpleTerrain(GraphicsDevice, terrainHeigthmap, terrainColorMap, terrainGrass, terrainGround, terrainEffect);
 
             model = Game.Content.Load<Model>("3D/tgcito-classic/tgcito-classic");
 
@@ -107,12 +107,12 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
             var x = Pos.X;
             var z = Pos.Y;
 
-            TgcitoPos = new Vector3(x, Terrain.Height(x, z) + offSet, z);
-            DesiredLookAt = new Vector3(x, Terrain.Height(x, z), z);
-            if (!Hay_lookAt)
+            _tgcitoPos = new Vector3(x, _terrain.Height(x, z) + offSet, z);
+            DesiredLookAt = new Vector3(x, _terrain.Height(x, z), z);
+            if (!_hayLookAt)
             {
                 LookAt = DesiredLookAt;
-                Hay_lookAt = true;
+                _hayLookAt = true;
             }
             else
             {
@@ -128,7 +128,7 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
             {
                 var t = i / 10.0f;
                 var p = (pos2 * t) + (Pos * (1 - t));
-                var hi = Terrain.Height(p.X, p.Y) + 50;
+                var hi = _terrain.Height(p.X, p.Y) + 50;
                 if (hi > h)
                 {
                     h = hi;
@@ -152,7 +152,7 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
             // I draw the terrain, turning off the backface culling
             var oldRasterizerState = GraphicsDevice.RasterizerState;
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
-            Terrain.Draw(Matrix.Identity, Camera.View, Camera.Projection);
+            _terrain.Draw(Matrix.Identity, Camera.View, Camera.Projection);
             GraphicsDevice.RasterizerState = oldRasterizerState;
 
             // compute 3 points on the heightmap surface
@@ -160,10 +160,10 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
             var tan = new Vector2(-MathF.Sin(Angle), MathF.Cos(Angle));
             var pos_ade = Pos + (dir * 100);
             var pos_der = Pos + (tan * 100);
-            var posAdelante = new Vector3(pos_ade.X, Terrain.Height(pos_ade.X, pos_ade.Y) + offSet, pos_ade.Y);
-            var posDerecha = new Vector3(pos_der.X, Terrain.Height(pos_der.X, pos_der.Y) + offSet, pos_der.Y);
+            var posAdelante = new Vector3(pos_ade.X, _terrain.Height(pos_ade.X, pos_ade.Y) + offSet, pos_ade.Y);
+            var posDerecha = new Vector3(pos_der.X, _terrain.Height(pos_der.X, pos_der.Y) + offSet, pos_der.Y);
 
-            var matWorld = CalcularMatrizOrientacion(10, TgcitoPos, posAdelante, posDerecha);
+            var matWorld = CalcularMatrizOrientacion(10, _tgcitoPos, posAdelante, posDerecha);
 
             // I draw the mesh
             foreach (var mesh in model.Meshes)

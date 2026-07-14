@@ -8,7 +8,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
     /// <summary>
     ///     Gizmo for drawing Poly-Lines.
     /// </summary>
-    internal class PolyLineGizmoGeometry
+    public class PolyLineGizmoGeometry
     {
         private readonly GraphicsDevice _graphicsDevice;
         private readonly short[] _indices;

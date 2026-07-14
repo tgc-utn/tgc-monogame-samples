@@ -44,7 +44,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
             {
                 _oldVisibility = isVisible;
 
-                // Visiblity has changed.
+                // Visibility has changed.
                 if (isVisible)
                 {
                     // Only run when the visibility state changes to visible.

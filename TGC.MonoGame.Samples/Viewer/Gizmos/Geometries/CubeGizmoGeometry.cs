@@ -6,7 +6,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
     /// <summary>
     ///     Gizmo for drawing Wire Cubes.
     /// </summary>
-    internal class CubeGizmoGeometry : GizmoGeometry
+    public class CubeGizmoGeometry : GizmoGeometry
     {
         private static readonly Matrix PrecalculatedFrustumTransform = Matrix.CreateTranslation(Vector3.Backward * 0.5f) * Matrix.CreateScale(new Vector3(2f, 2f, 1f));
 

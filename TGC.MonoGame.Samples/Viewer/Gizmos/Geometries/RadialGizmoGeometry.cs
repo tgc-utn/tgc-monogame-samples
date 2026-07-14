@@ -8,7 +8,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
     /// <summary>
     ///     Abstract class for any geometry that contains a circle.
     /// </summary>
-    internal abstract class RadialGizmoGeometry : GizmoGeometry
+    public abstract class RadialGizmoGeometry : GizmoGeometry
     {
         /// <summary>
         ///     Creates a Radial Geometry, which contains a radial wire shape.

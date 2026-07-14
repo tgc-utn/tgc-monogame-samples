@@ -2,7 +2,6 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
@@ -12,9 +11,9 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 {
     internal struct Arrowz
     {
-        public Vector3 Position;
-        public Vector3 Target;
-        public Color Color;
+        internal Vector3 Position;
+        internal Vector3 Target;
+        internal Color Color;
     }
 
     public class BackFaceCulling : TGCSample
