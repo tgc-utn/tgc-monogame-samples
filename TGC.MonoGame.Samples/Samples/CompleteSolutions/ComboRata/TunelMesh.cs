@@ -24,7 +24,7 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
 
         public int NumberOfIndices;
         public int NumberOfVertices;
-        private int[,] _obstaculo = new int[2, MaxPath];
+        private readonly int[,] _obstaculo = new int[2, MaxPath];
         private readonly Vector3[] _path = new Vector3[MaxPath];
 
         public float Pos { get; private set; }
