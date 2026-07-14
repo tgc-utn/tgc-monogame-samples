@@ -207,9 +207,9 @@ namespace TGC.MonoGame.Samples.Collisions
                 t2 = (1 - y0) / yt;
             }
 
-            float a = (xt * xt) + (zt * zt),
-                b = (2 * x0 * xt) + (2 * z0 * zt),
-                c = (x0 * x0) + (z0 * z0) - 1;
+            float a = (xt * xt) + (zt * zt);
+            float b = (2 * x0 * xt) + (2 * z0 * zt);
+            float c = (x0 * x0) + (z0 * z0) - 1;
 
             var root = (b * b) - (4 * a * c);
 

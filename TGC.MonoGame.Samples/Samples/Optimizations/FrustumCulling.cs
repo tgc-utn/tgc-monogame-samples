@@ -139,7 +139,7 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
             // Update the AABBs
             for (var index = 0; index < _boxModels.Length; index++)
             {
-                _boxModels[index].UpdateAABB();
+                _boxModels[index].UpdateAabb();
             }
 
             // Create draw instances for models that use spheres for bounding volumes
@@ -189,7 +189,7 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
             var time = Convert.ToSingle(gameTime.TotalGameTime.TotalSeconds);
 
             _boxModels[BoxIndexToUpdate].World = Matrix.CreateTranslation(Vector3.Right * MathF.Sin(time) * 400f);
-            _boxModels[BoxIndexToUpdate].UpdateAABB();
+            _boxModels[BoxIndexToUpdate].UpdateAabb();
             _sphereModels[SphereIndexToUpdate].World = Matrix.CreateTranslation(Vector3.Up * MathF.Cos(time) * 400f);
             _sphereModels[SphereIndexToUpdate].UpdateSphere();
 
@@ -307,7 +307,7 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
         /// <summary>
         /// Updates the AABB by using the world matrix and the original box min and max positions (in local coordinates).
         /// </summary>
-        internal void UpdateAABB()
+        internal void UpdateAabb()
         {
             var translation = World.Translation;
             BoxWorldSpace.Min = Box.Min + translation;

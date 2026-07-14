@@ -33,7 +33,7 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
         private bool _godMode;
         public SpriteBatch SpriteBatch;
 
-        public int Status = ST_PRESENTACION;
+        private int _status = ST_PRESENTACION;
         private Texture2D _texture;
         private Texture2D _textureAux;
         private float _timerLevel;
@@ -83,13 +83,13 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
         {
             var elapsedTime = gameTime.ElapsedGameTime.Milliseconds / 1000f;
 
-            switch (Status)
+            switch (_status)
             {
                 case ST_CAMBIO_NIVEL:
                     _timerLevel -= elapsedTime;
                     if (_timerLevel < 0)
                     {
-                        Status = ST_STAGE_1;
+                        _status = ST_STAGE_1;
                     }
 
                     break;
@@ -100,7 +100,7 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
                 case ST_PRESENTACION:
                     if (Game.CurrentKeyboardState.IsKeyDown(Keys.Space))
                     {
-                        Status = ST_STAGE_1;
+                        _status = ST_STAGE_1;
                     }
 
                     break;
@@ -118,7 +118,7 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
                         Tunel.Update(elapsedTime, Game.CurrentKeyboardState);
                         if (Tunel.Colision && !_godMode)
                         {
-                            Status = ST_GAME_OVER;
+                            _status = ST_GAME_OVER;
                         }
 
                         var p_ant = 1 + (int)Tunel.Ant_pos;
@@ -126,7 +126,7 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
                         if (p_ant != p && p % 50 == 0)
                         {
                             // paso al siguiente stage
-                            Status++;
+                            _status++;
                             AdvanceStage();
                         }
                     }
@@ -139,7 +139,7 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
 
         private void AdvanceStage()
         {
-            switch (Status)
+            switch (_status)
             {
                 case ST_STAGE_2:
                     Effect.CurrentTechnique = Effect.Techniques["EdgeDectect"];
@@ -155,7 +155,7 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
                     break;
                 case 6:
                     // paso al siguiente nivel
-                    Status = ST_CAMBIO_NIVEL;
+                    _status = ST_CAMBIO_NIVEL;
                     Tunel.Level = 1 - Tunel.Level;
                     Tunel.FillVertices();
                     Effect.CurrentTechnique = Effect.Techniques["ColorDrawing"];
@@ -163,7 +163,7 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
                     _timerLevel = 2;
                     break;
                 default:
-                    Debug.WriteLine($"Unexpected Status value: {Status}", "ComboRata");
+                    Debug.WriteLine($"Unexpected Status value: {_status}", "ComboRata");
                     break;
             }
         }
@@ -182,7 +182,7 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
             // var world = Matrix.CreateScale(Vector3.One * 10) * Matrix.CreateTranslation(Tunel.PosGamer + Tunel.ViewDir * 50);
             // Effect.Parameters["World"].SetValue(world);
             // Box.Draw(Effect);
-            switch (Status)
+            switch (_status)
             {
                 case ST_CAMBIO_NIVEL:
                     DrawCenterText("NEXT LEVEL!!!!", 5);

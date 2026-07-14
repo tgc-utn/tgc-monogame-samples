@@ -17,14 +17,14 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
 
         public bool Colision { get; private set; }
 
-        public int Curr_obs;
+        private int _currObs;
         public short[] Indexes;
 
         public int Level { get; set; }
 
         public int NumberOfIndices;
         public int NumberOfVertices;
-        public int[,] Obstaculo = new int[2, MaxPath];
+        private int[,] _obstaculo = new int[2, MaxPath];
         private readonly Vector3[] _path = new Vector3[MaxPath];
 
         public float Pos { get; private set; }
@@ -130,7 +130,7 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
                     if (Level == 0)
                     {
                         // obstaculos en el nivel 0
-                        Obstaculo[0, s] = t; // primer vertice del obstaculo
+                        _obstaculo[0, s] = t; // primer vertice del obstaculo
                         var i = rnd.Next(0, step);
                         int[] ndx;
                         int tipo;
@@ -177,7 +177,7 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
 
                         if (rnd.NextDouble() < 0.5)
                         {
-                            Obstaculo[1, s] = t; // primer vertice del obstaculo
+                            _obstaculo[1, s] = t; // primer vertice del obstaculo
                             i += tipo == 0 ? 4 : 2;
                             for (var j = 0; j < 4; ++j)
                             {
@@ -215,7 +215,7 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
                         // obstaculos en el nivel 1
                         for (var l = 0; l < 2; ++l)
                         {
-                            Obstaculo[l, s] = t; // primer vertice del obstaculo
+                            _obstaculo[l, s] = t; // primer vertice del obstaculo
                             var i = rnd.Next(0, step);
                             var alfa_0 = 2.0f * MathF.PI / step * i;
                             var p0 = q0 + (u * MathF.Sin(alfa_0) * r) + (v * MathF.Cos(alfa_0) * r);
@@ -305,7 +305,7 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
             {
                 for (var k = 1; k < 3 && !Colision; ++k)
                 {
-                    var p_obs = Curr_obs = Obstaculo[l, i + k];
+                    var p_obs = _currObs = _obstaculo[l, i + k];
                     if (p_obs > 0)
                     {
                         var p = PosGamer - (ViewDir * 50);
