@@ -105,10 +105,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             public Color Color;
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BackFaceCulling"/> class.
-        /// </summary>
-        /// <param name="game">monogame game.</param>
+        /// <inheritdoc />
         public BackFaceCulling(TGCViewer game)
             : base(game)
         {
@@ -273,6 +270,8 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             _cylinder.Dispose();
             _arrows.Clear();
             _effect.Dispose();
+            _drawDepthEffect.Dispose();
+            _depthRenderTarget.Dispose();
             base.UnloadContent();
         }
 
