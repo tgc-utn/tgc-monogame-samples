@@ -27,7 +27,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         private GeometricPrimitive _teapot;
 
         /// <summary>Cylinder primitive geometry.</summary>
-        private GeometricPrimitive _cilinder;
+        private GeometricPrimitive _cylinder;
 
         /// <summary>Currently displayed primitive.</summary>
         private GeometricPrimitive _currentPrimitive;
@@ -42,7 +42,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         private Matrix _baseRotation;
 
         /// <summary>Precomputed normal arrows for the cylinder.</summary>
-        private List<Arrowz> _cilinderArrows;
+        private List<Arrowz> _cylinderArrows;
 
         /// <summary>Precomputed normal arrows for the teapot.</summary>
         private List<Arrowz> _teapotArrows;
@@ -220,13 +220,13 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
             // We load the primitive meshes into models
             _teapot = new TeapotPrimitive(GraphicsDevice);
-            _cilinder = new CylinderPrimitive(GraphicsDevice);
-            _currentPrimitive = _cilinder;
-            _cilinderArrows = [];
+            _cylinder = new CylinderPrimitive(GraphicsDevice);
+            _currentPrimitive = _cylinder;
+            _cylinderArrows = [];
             _teapotArrows = [];
-            LoadArrows(_cilinder, _cilinderArrows);
+            LoadArrows(_cylinder, _cylinderArrows);
             LoadArrows(_teapot, _teapotArrows);
-            _arrows = _cilinderArrows;
+            _arrows = _cylinderArrows;
 
             // Load the effect
             _effect = Game.Content.Load<Effect>(ContentFolderEffects + "BackFace");
@@ -252,8 +252,8 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             {
                 if (selected == Primitive.Cylinder)
                 {
-                    _currentPrimitive = _cilinder;
-                    _arrows = _cilinderArrows;
+                    _currentPrimitive = _cylinder;
+                    _arrows = _cylinderArrows;
                 }
                 else if (selected == Primitive.Teapot)
                 {
@@ -270,7 +270,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         protected override void UnloadContent()
         {
             _teapot.Dispose();
-            _cilinder.Dispose();
+            _cylinder.Dispose();
             _arrows.Clear();
             _effect.Dispose();
             base.UnloadContent();
