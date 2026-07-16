@@ -57,7 +57,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         private bool _showArrows;
 
         /// <summary>Whether to paint with the normal color or diffuse color.</summary>
-        private bool _showNormalColor = false;
+        private bool _showNormalColor;
 
         /// <summary>Whether back-face culling is enabled.</summary>
         private bool _backFace = true;
@@ -252,7 +252,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
                     _currentPrimitive = _cylinder;
                     _arrows = _cylinderArrows;
                 }
-                else if (selected == Primitive.Teapot)
+                else // selected == Primitive.Teapot
                 {
                     _currentPrimitive = _teapot;
                     _arrows = _teapotArrows;
@@ -375,12 +375,15 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
                 rasterizerState.FillMode = FillMode.WireFrame;
             }
 
-            if (!_backFace)
+            if (_backFace)
             {
-                cullMode = CullMode.None;
+                rasterizerState.CullMode = cullMode;
+            }
+            else
+            {
+                rasterizerState.CullMode = CullMode.None;
             }
 
-            rasterizerState.CullMode = cullMode;
             GraphicsDevice.RasterizerState = rasterizerState;
 
             var world = _baseScale * _baseRotation * Matrix.CreateTranslation(Vector3.UnitX * displacement);
