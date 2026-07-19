@@ -78,15 +78,15 @@ VertexShaderOutput PointLightVS(VertexShaderInput input)
     float4 worldPosition = mul(input.Position, world);
     float4 viewPosition = mul(worldPosition, view);
     float4 screenPos = mul(viewPosition, projection);
-    
+
     output.Position = screenPos;
-    
+
     float2 ndc = screenPos.xy / screenPos.w;
-    
+
     output.TextureCoordinates = ndc * 0.5 + 0.5;
-    
+
     output.TextureCoordinates.y = 1.0 - output.TextureCoordinates.y;
-    
+
     return output;
 }
 float sqr(float x)
@@ -111,7 +111,7 @@ float3 getPixelColorNoAmbient(float3 worldPos, float3 normal, float KD, float KS
     float3 lightDirection = normalize(lightPosition - worldPos);
     float3 viewDirection = normalize(cameraPosition - worldPos);
     float3 halfVector = normalize(lightDirection + viewDirection);
-    
+
     float NdotL = saturate(dot(normal, lightDirection));
     float3 diffuseLight = KD * lightDiffuseColor * NdotL;
     float NdotH = dot(normal, halfVector);
@@ -120,30 +120,30 @@ float3 getPixelColorNoAmbient(float3 worldPos, float3 normal, float KD, float KS
 }
 float4 PointLightPS(VertexShaderOutput input) : COLOR
 {
-    
+
     float2 sceneCoord = input.TextureCoordinates;
-    
+
     float4 materialRaw = tex2D(materialMapSampler, sceneCoord);
-    
+
     float KD = materialRaw.r;
-    
+
     float4 normalRaw = tex2D(normalMapSampler, sceneCoord);
-    
+
     if (KD == 0)
     {
         return float4(1, 0, 1, 1);
     }
-    
+
     float KS = materialRaw.g;
     float4 worldRaw = tex2D(positionMapSampler, sceneCoord);
     float shininess = materialRaw.b * 60;
-    
+
     float3 normal = normalize((normalRaw.rgb * 2.0) - 1);
     float3 worldPos = worldRaw.rgb;
 
     //light attenuation with distance
     float scaling = attenuate_no_cusp(distance(worldPos, lightPosition), radius, 3, 6);
-    
+
     return float4(getPixelColorNoAmbient(worldPos, normal, KD, KS, shininess) * scaling, 1);
 }
 
@@ -172,7 +172,7 @@ VertexShaderOutput PostVS(VertexShaderInput input)
     VertexShaderOutput output = (VertexShaderOutput) 0;
     output.Position = input.Position;
     output.TextureCoordinates = input.TextureCoordinates;
-    
+
     return output;
 }
 float3 getPixelAmbient(float3 worldPos, float3 normal, float KD, float KS, float shininess)
@@ -181,7 +181,7 @@ float3 getPixelAmbient(float3 worldPos, float3 normal, float KD, float KS, float
     float3 lightDirection = normalize(lightPosition - float3(0, 0, 0));
     float3 viewDirection = normalize(cameraPosition - worldPos);
     float3 halfVector = normalize(lightDirection + viewDirection);
-    
+
     float NdotL = saturate(dot(normal, lightDirection));
     float3 diffuseLight = KA * lightDiffuseColor + KD * lightDiffuseColor * NdotL;
     float NdotH = dot(normal, halfVector);
@@ -192,23 +192,23 @@ float3 getPixelAmbient(float3 worldPos, float3 normal, float KD, float KS, float
 float4 AmbientPS(VertexShaderOutput input) : COLOR
 {
     float4 materialRaw = tex2D(materialMapSampler, input.TextureCoordinates);
-    
+
     float KD = materialRaw.r;
-    
+
     float4 normalRaw = tex2D(normalMapSampler, input.TextureCoordinates);
-    
+
     if (KD == 0)
     {
         return float4(1,1,1, 1);
     }
-    
+
     float KS = materialRaw.g;
     float4 worldRaw = tex2D(positionMapSampler, input.TextureCoordinates);
     float shininess = materialRaw.b * 60;
-    
+
     float3 normal = normalize((normalRaw.rgb * 2.0) - 1);
     float3 worldPos = worldRaw.rgb;
-    
+
     return float4(getPixelAmbient(worldPos, normal, KD, KS, shininess), 1);
 }
 
@@ -216,7 +216,7 @@ float4 IntegratePS(VertexShaderOutput input) : COLOR
 {
     float4 color = tex2D(colorSampler, input.TextureCoordinates);
     float4 light = tex2D(lightMapSampler, input.TextureCoordinates);
-   
+
     return color * light;
 }
 

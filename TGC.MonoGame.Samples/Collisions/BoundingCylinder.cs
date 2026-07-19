@@ -1,15 +1,13 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
+
+using Microsoft.Xna.Framework;
 
 namespace TGC.MonoGame.Samples.Collisions
 {
-
     /// <summary>
-    ///     Represents a Bounding Cylinder to test for intersections
+    ///     Represents a Bounding Cylinder to test for intersections.
     /// </summary>
-    class BoundingCylinder
+    public class BoundingCylinder
     {
         // The center of the Cylinder in World Space
         private Vector3 _center;
@@ -23,10 +21,8 @@ namespace TGC.MonoGame.Samples.Collisions
         // A matrix describing the Cylinder rotation
         private Matrix _rotation;
 
-
         // Matrices
         // These are used to test for intersections, and serve to transform points to the Cylinder space or vice versa
-
 
         // The opposite of the translation matrix, to calculate the InverseTransform
         private Matrix _oppositeTranslation;
@@ -43,9 +39,8 @@ namespace TGC.MonoGame.Samples.Collisions
         // An internal translation matrix to calculate the final Transform matrix
         private Matrix _translation;
 
-
         /// <summary>
-        ///     The center of the Cylinder in World Space
+        ///     The center of the Cylinder in World Space.
         /// </summary>
         public Vector3 Center
         {
@@ -60,7 +55,7 @@ namespace TGC.MonoGame.Samples.Collisions
         }
 
         /// <summary>
-        ///     The radius of the Cylinder
+        ///     The radius of the Cylinder.
         /// </summary>
         public float Radius
         {
@@ -74,7 +69,7 @@ namespace TGC.MonoGame.Samples.Collisions
         }
 
         /// <summary>
-        ///     The distance from the Cylinder center to either its top or bottom
+        ///     The distance from the Cylinder center to either its top or bottom.
         /// </summary>
         public float HalfHeight
         {
@@ -88,7 +83,7 @@ namespace TGC.MonoGame.Samples.Collisions
         }
 
         /// <summary>
-        ///     A matrix describing the Cylinder rotation
+        ///     A matrix describing the Cylinder rotation.
         /// </summary>
         public Matrix Rotation
         {
@@ -102,16 +97,13 @@ namespace TGC.MonoGame.Samples.Collisions
             }
         }
 
-
         // An internal matrix to transform points from local space to Cylinder space
         public Matrix Transform { get; private set; }
 
         /// <summary>
-        ///     True if this Cylinder has no rotation, and its circular shape is aligned to the XZ plane
+        ///     True if this Cylinder has no rotation, and its circular shape is aligned to the XZ plane.
         /// </summary>
         public bool IsXZAligned { get; private set; }
-
-
 
         /// <summary>
         ///     Creates a Bounding Cylinder with a center, radius and half-length. Note that it is XZ aligned.
@@ -136,7 +128,7 @@ namespace TGC.MonoGame.Samples.Collisions
         /// <summary>
         ///     Moves the Cylinder center by a delta offset, and updates the internal values of the Cylinder.
         /// </summary>
-        /// <param name="delta">The amount of translation on each axis</param>
+        /// <param name="delta">The amount of translation on each axis.</param>
         public void Move(Vector3 delta)
         {
             _center += delta;
@@ -150,7 +142,7 @@ namespace TGC.MonoGame.Samples.Collisions
         ///     Rotates the Cylinder using a rotation matrix. Considers the previous rotation and applies the new one.
         ///     Then it updates the internal values of the Cylinder.
         /// </summary>
-        /// <param name="rotation">The rotation matrix to apply to the Cylinder</param>
+        /// <param name="rotation">The rotation matrix to apply to the Cylinder.</param>
         public void Rotate(Matrix rotation)
         {
             _rotation *= rotation;
@@ -159,23 +151,22 @@ namespace TGC.MonoGame.Samples.Collisions
             UpdateTransform();
         }
 
-        /// <summary> 
+        /// <summary>
         ///     Rotates the Cylinder using a quaternion. Considers the previous rotation and applies the new one.
         ///     Then it updates the internal values of the Cylinder.
         /// </summary>
-        /// <param name="rotation">The rotation quaternion to apply to the Cylinder</param>
+        /// <param name="rotation">The rotation quaternion to apply to the Cylinder.</param>
         public void Rotate(Quaternion rotation)
         {
             Rotate(Matrix.CreateFromQuaternion(rotation));
         }
-
 
         /// <summary>
         ///   Check if this <see cref="BoundingCylinder"/> intersects a <see cref="Ray"/>.
         /// </summary>
         /// <param name="ray">The <see cref="Ray"/> to test for intersection.</param>
         /// <returns>
-        ///   <code>true</code> if this <see cref="BoundingCylinder"/> intersects <paramref name="ray"/>,
+        ///   <code>true</code> if this <see cref="BoundingCylinder"/> intersects <paramref name="ray"/>.
         ///   <code>false</code> if it does not.
         /// </returns>
         public bool Intersects(Ray ray)
@@ -193,13 +184,20 @@ namespace TGC.MonoGame.Samples.Collisions
             // Note: This solution is based on these equations
             // x^2 + z^2 = 1, -1 <= y <= 1 | For the cylinder
             // (x, y, z) = (x0, y0, z0) + t * (xt, yt, zt) | For the ray
-
             float t1, t2;
 
             if (yt == 0)
             {
-                if (y0 > 1) return false;
-                if (y0 < -1) return false;
+                if (y0 > 1)
+                {
+                    return false;
+                }
+
+                if (y0 < -1)
+                {
+                    return false;
+                }
+
                 t1 = float.MinValue;
                 t2 = float.MaxValue;
             }
@@ -209,18 +207,23 @@ namespace TGC.MonoGame.Samples.Collisions
                 t2 = (1 - y0) / yt;
             }
 
-            float a = xt * xt + zt * zt,
-                b = 2 * x0 * xt + 2 * z0 * zt,
-                c = x0 * x0 + z0 * z0 - 1;
+            float a = (xt * xt) + (zt * zt);
+            float b = (2 * x0 * xt) + (2 * z0 * zt);
+            float c = (x0 * x0) + (z0 * z0) - 1;
 
-            var root = b * b - 4 * a * c;
+            var root = (b * b) - (4 * a * c);
 
-            if (root < 0) return false;
+            if (root < 0)
+            {
+                return false;
+            }
+
             if (root == 0)
             {
                 var t = -b / (2 * a);
                 return t >= t1 && t <= t2;
             }
+
             var up = -b;
             var down = 2 * a;
             var sqrt = MathF.Sqrt(root);
@@ -229,9 +232,21 @@ namespace TGC.MonoGame.Samples.Collisions
             t3 = (up - sqrt) / down;
             t4 = (up + sqrt) / down;
 
-            if (t3 <= t1 && t4 >= t2) return true;
-            if (t3 >= t1 && t3 <= t2) return true;
-            if (t4 >= t1 && t4 <= t2) return true;
+            if (t3 <= t1 && t4 >= t2)
+            {
+                return true;
+            }
+
+            if (t3 >= t1 && t3 <= t2)
+            {
+                return true;
+            }
+
+            if (t4 >= t1 && t4 <= t2)
+            {
+                return true;
+            }
+
             return false;
         }
 
@@ -247,8 +262,10 @@ namespace TGC.MonoGame.Samples.Collisions
         {
             var transformedPoint = Vector3.Transform(point, _inverseRotation);
 
-            if (MathF.Abs(_center.Y - transformedPoint.Y) > _halfHeight) 
+            if (MathF.Abs(_center.Y - transformedPoint.Y) > _halfHeight)
+            {
                 return ContainmentType.Disjoint;
+            }
 
             var centerToPoint = transformedPoint - _center;
 
@@ -259,19 +276,17 @@ namespace TGC.MonoGame.Samples.Collisions
             return ((squaredPointX + squaredPointZ) <= squaredRadius) ? ContainmentType.Contains : ContainmentType.Disjoint;
         }
 
-
         /// <summary>
         ///     Gets the closest point in a cylinder from a point.
         /// </summary>
         /// <param name="point">The point from which to find the closest position.</param>
-        /// <returns>A position in the cylinder that is the closest to <paramref name="point"/></returns>
+        /// <returns>A position in the cylinder that is the closest to <paramref name="point"/>.</returns>
         private Vector3 ClosestPoint(Vector3 point)
         {
             // Transform the point to cylindrical UVW coordinates
             var uvwPoint = Vector3.Transform(point, _inverseRotation);
 
             // Find the closest point in UVW coordinates
-
             var direction = uvwPoint - _center;
             direction.Y = 0;
             if (direction.LengthSquared() > (_radius * _radius))
@@ -282,41 +297,39 @@ namespace TGC.MonoGame.Samples.Collisions
 
             var distanceY = uvwPoint.Y - _center.Y;
             if (MathF.Abs(distanceY) > _halfHeight)
-                return _center + new Vector3(0, _halfHeight, 0) * Math.Sign(distanceY) + direction;
+            {
+                return _center + (new Vector3(0, _halfHeight, 0) * Math.Sign(distanceY)) + direction;
+            }
 
             var uvwResult = _center + new Vector3(0, distanceY, 0) + direction;
-
-
-
 
             // Transform that result back to world coordinates
             var translatedRotation = Matrix.Invert(_inverseRotation);
             return Vector3.Transform(uvwResult, translatedRotation);
         }
 
-
-
         /// <summary>
         ///   Check if this <see cref="BoundingCylinder"/> intersects a <see cref="BoundingSphere"/>.
         /// </summary>
         /// <param name="sphere">The <see cref="BoundingSphere"/> to test for intersection.</param>
         /// <returns>
-        ///   <code>true</code> if this <see cref="BoundingCylinder"/> intersects <paramref name="sphere"/>,
+        ///   <code>true</code> if this <see cref="BoundingCylinder"/> intersects <paramref name="sphere"/>.
         ///   <code>false</code> if it does not.
         /// </returns>
         public bool Intersects(BoundingSphere sphere)
         {
             // Transform the sphere center to cylindrical UVW coordinates
             var uvwSphereCenter = Vector3.Transform(sphere.Center, _inverseRotation);
-          
-            // We check if there is intersection in UVW space
 
+            // We check if there is intersection in UVW space
             var sphereRadius = sphere.Radius;
             var distanceY = MathF.Abs(uvwSphereCenter.Y - _center.Y);
 
             // If the sphere is way too high or too low there is no intersection
             if (distanceY > _halfHeight + sphereRadius)
+            {
                 return false;
+            }
 
             var centerToCenter = uvwSphereCenter - _center;
             centerToCenter.Y = 0;
@@ -324,12 +337,16 @@ namespace TGC.MonoGame.Samples.Collisions
             var addedRadius = _radius + sphereRadius;
 
             // If the sphere is too far in the XZ plane there is no intersection
-            if (centerToCenter.LengthSquared() > (addedRadius * addedRadius)) 
+            if (centerToCenter.LengthSquared() > (addedRadius * addedRadius))
+            {
                 return false;
+            }
 
             // If the sphere's center is inside the Y coordinates of the cylinder, there is an intersection
-            if (distanceY < _halfHeight) 
+            if (distanceY < _halfHeight)
+            {
                 return true;
+            }
 
             // Check if the closest point to the center of the sphere belongs to the cylinder
             centerToCenter.Normalize();
@@ -340,14 +357,13 @@ namespace TGC.MonoGame.Samples.Collisions
             return (centerToCenter - uvwSphereCenter).LengthSquared() <= (sphereRadius * sphereRadius);
         }
 
-
         /// <summary>
         ///   Check if this <see cref="BoundingCylinder"/> intersects a Line Segment.
         /// </summary>
         /// <param name="pointA">The start point of the Line Segment to test for intersection.</param>
         /// <param name="pointB">The end point of the Line Segment to test for intersection.</param>
         /// <returns>
-        ///   <code>true</code> if this <see cref="BoundingCylinder"/> intersects with the Line Segment,
+        ///   <code>true</code> if this <see cref="BoundingCylinder"/> intersects with the Line Segment.
         ///   <code>false</code> if it does not.
         /// </returns>
         public Vector3? Intersects(Vector3 pointA, Vector3 pointB)
@@ -365,67 +381,106 @@ namespace TGC.MonoGame.Samples.Collisions
             var dd = Vector3.Dot(d, d);
 
             // Test if segment fully outside either endcap of cylinder
-            if (md < 0.0f && md + nd < 0.0f) return null; // Segment outside ’p’ side of cylinder
-            if (md > dd && md + nd > dd) return null; // Segment outside ’q’ side of cylinder
+            if (md < 0.0f && md + nd < 0.0f)
+            {
+                return null; // Segment outside ’p’ side of cylinder
+            }
+
+            if (md > dd && md + nd > dd)
+            {
+                return null; // Segment outside ’q’ side of cylinder
+            }
+
             var nn = Vector3.Dot(n, n);
             var mn = Vector3.Dot(m, n);
-            var a = dd * nn - nd * nd;
-            var k = Vector3.Dot(m, m) - _radius * _radius;
-            var c = dd * k - md * md;
+            var a = (dd * nn) - (nd * nd);
+            var k = Vector3.Dot(m, m) - (_radius * _radius);
+            var c = (dd * k) - (md * md);
             if (MathF.Abs(a) < float.Epsilon)
             {
                 // Segment runs parallel to cylinder axis
-                if (c > 0.0f) 
+                if (c > 0.0f)
+                {
                     return null; // 'a' and thus the segment lie outside cylinder
+                }
+
                 // Now known that segment intersects cylinder; figure out how it intersects
                 if (md < 0.0f)
+                {
                     t = -mn / nn; // Intersect segment against 'p' endcap
-                else if (md > dd) 
+                }
+                else if (md > dd)
+                {
                     t = (nd - mn) / nn; // Intersect segment against ’q’ endcap
-                else 
+                }
+                else
+                {
                     t = 0.0f; // 'a' lies inside cylinder
-                q = pointA + t * n;
+                }
+
+                q = pointA + (t * n);
                 return q;
             }
-            var b = dd * mn - nd * md;
-            var discr = b * b - a * c;
-            if (discr < 0.0f) 
-                return null; // No real roots; no intersection
-            t = (-b - MathF.Sqrt(discr)) / a;
-            if (t < 0.0f || t > 1.0f) 
-                return null; // Intersection lies outside segment
 
-            if (md + t * nd < 0.0f)
+            var b = (dd * mn) - (nd * md);
+            var discr = (b * b) - (a * c);
+            if (discr < 0.0f)
+            {
+                return null; // No real roots; no intersection
+            }
+
+            t = (-b - MathF.Sqrt(discr)) / a;
+            if (t < 0.0f || t > 1.0f)
+            {
+                return null; // Intersection lies outside segment
+            }
+
+            if (md + (t * nd) < 0.0f)
             {
                 // Intersection outside cylinder on 'p' side
-                if (nd <= 0.0f) 
+                if (nd <= 0.0f)
+                {
                     return null; // Segment pointing away from endcap
+                }
+
                 t = -md / nd;
+
                 // Keep intersection if Dot(S(t) - p, S(t) - p) <= r^2
-                if (k + t * (2.0f * mn + t * nn) <= 0.0f)
+                if (k + (t * ((2.0f * mn) + (t * nn))) <= 0.0f)
+                {
                     return q;
+                }
                 else
+                {
                     return null;
+                }
             }
-            if (md + t * nd > dd)
+
+            if (md + (t * nd) > dd)
             {
                 // Intersection outside cylinder on 'q' side
-                if (nd >= 0.0f) 
+                if (nd >= 0.0f)
+                {
                     return null; // Segment pointing away from endcap
+                }
+
                 t = (dd - md) / nd;
+
                 // Keep intersection if Dot(S(t) - q, S(t) - q) <= r^2
-                if (k + dd - 2.0f * md + t * (2.0f * (mn - nd) + t * nn) <= 0.0f)
+                if (k + dd - (2.0f * md) + (t * ((2.0f * (mn - nd)) + (t * nn))) <= 0.0f)
+                {
                     return q;
+                }
                 else
+                {
                     return null;
+                }
             }
 
             // Segment intersects cylinder between the endcaps; t is correct
-            q = pointA + t * n;
+            q = pointA + (t * n);
             return q;
         }
-
-
 
         /// <summary>
         ///     Check if this <see cref="BoundingCylinder"/> intersects a <see cref="BoundingBox"/>.
@@ -435,11 +490,15 @@ namespace TGC.MonoGame.Samples.Collisions
         public BoxCylinderIntersection Intersects(BoundingBox box)
         {
             if (IsXZAligned)
+            {
                 return IntersectsXZAligned(box);
+            }
             else
+            {
                 // TODO: Implement the method from
                 // https://github.com/teikitu/teikitu_release/blob/master/teikitu/src/TgS%20COLLISION/TgS%20Collision%20-%20F%20-%20Cylinder-Box.c_inc
                 throw new NotImplementedException();
+            }
         }
 
         /// <summary>
@@ -455,37 +514,46 @@ namespace TGC.MonoGame.Samples.Collisions
             // Is closest point the same as the center?
             // This means that the center is inside the box
             if (closestPoint.Equals(_center))
+            {
                 return BoxCylinderIntersection.Intersecting;
+            }
 
             // Distance in Y, is it greater, less, or in the center?
             var differenceInY = MathF.Abs(closestPoint.Y - _center.Y);
 
             // If the absolute of the distance is greater than half the height, we are not intersecting
             if (differenceInY > _halfHeight)
+            {
                 return BoxCylinderIntersection.None;
-            
+            }
+
             var radiusSquared = _radius * _radius;
             var centerDistance = new Vector2(_center.X - closestPoint.X, _center.Z - closestPoint.Z);
             var differenceInRadius = centerDistance.LengthSquared() - radiusSquared;
 
             // If the distance is equal, this means that we are on the top/bottom faces
-            // We are colliding on the top or bottom, so check if we are in the radius. 
+            // We are colliding on the top or bottom, so check if we are in the radius.
             // We are either on the edge or not colliding
             if (differenceInY == _halfHeight)
+            {
                 return (differenceInRadius <= 0f) ? BoxCylinderIntersection.Edge : BoxCylinderIntersection.None;
+            }
 
             // If we got here, the closest point is not at the top/bottom
             // It depends on our distance to classify the intersection
-
             if (differenceInRadius == 0f)
+            {
                 return BoxCylinderIntersection.Edge;
+            }
             else if (differenceInRadius < 0f)
+            {
                 return BoxCylinderIntersection.Intersecting;
+            }
             else
+            {
                 return BoxCylinderIntersection.None;
+            }
         }
-
-
 
         /// <summary>
         ///     Updates the Translation matrix and the Opposite Translation matrix as well,
@@ -506,7 +574,7 @@ namespace TGC.MonoGame.Samples.Collisions
         }
 
         /// <summary>
-        ///     Updates the Inverse Rotation matrix, used in intersection tests, based on the values of <see cref="_rotation"/>, 
+        ///     Updates the Inverse Rotation matrix, used in intersection tests, based on the values of <see cref="_rotation"/>,
         ///     <see cref="_translation"/> and <see cref="_oppositeTranslation"/>.
         /// </summary>
         private void UpdateInverseRotation()
@@ -527,18 +595,18 @@ namespace TGC.MonoGame.Samples.Collisions
         }
     }
 
-
     /// <summary>
     ///     Describes the type of intersection a <see cref="BoundingCylinder"/> and a <see cref="BoundingBox"/> had.
     /// </summary>
     public enum BoxCylinderIntersection
     {
-        ///<summary>The box touches the cylinder at an edge. Penetration is zero.</summary>
+        /// <summary>The box touches the cylinder at an edge. Penetration is zero.</summary>
         Edge,
-        ///<summary>The box touches the cylinder. Penetration is more than zero.</summary>
+
+        /// <summary>The box touches the cylinder. Penetration is more than zero.</summary>
         Intersecting,
-        ///<summary>The box and the cylinder do not intersect.</summary>
+
+        /// <summary>The box and the cylinder do not intersect.</summary>
         None,
     }
-
 }

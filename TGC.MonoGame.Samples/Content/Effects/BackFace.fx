@@ -38,7 +38,7 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
     output.Position = mul(input.Position, WorldViewProjection);
     output.InsideCylinder = step(length(input.Position.xy), 0.2);
     output.Normal = input.Normal;
-	
+
     return output;
 }
 
@@ -49,7 +49,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
     float inside = 1.0 - step(input.InsideCylinder, 0.0);
     if (inside * facesForward)
         discard;
-    
+
     return float4(input.Normal + 0.5, 1.0);
 }
 

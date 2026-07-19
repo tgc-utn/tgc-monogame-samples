@@ -1,6 +1,8 @@
 ﻿using System.Linq;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
@@ -12,7 +14,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         private const int EnvironmentMapSize = 2048;
 
         /// <inheritdoc />
-        public EnvironmentMap(TGCViewer game) : base(game)
+        public EnvironmentMap(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.PostProcessing;
             Name = "Environment Map";
@@ -39,7 +42,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
         private readonly Vector3 _robotPosition = Vector3.UnitX * -500f;
 
-        private readonly Vector3 _spherePosition = Vector3.UnitX * -500f + Vector3.UnitZ * -500f;
+        private readonly Vector3 _spherePosition = (Vector3.UnitX * -500f) + (Vector3.UnitZ * -500f);
 
         /// <inheritdoc />
         public override void Initialize()
@@ -49,7 +52,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             _cubeMapCamera = new StaticCamera(1f, _robotPosition, Vector3.UnitX, Vector3.Up);
             _cubeMapCamera.BuildProjection(1f, 1f, 3000f, MathHelper.PiOver2);
-            
+
             base.Initialize();
         }
 
@@ -67,7 +70,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             // Load the shadowmap effect
             _effect = Game.Content.Load<Effect>(ContentFolderEffects + "EnvironmentMap");
 
-            _basicEffect = (BasicEffect) _robot.Meshes.FirstOrDefault().Effects[0];
+            _basicEffect = (BasicEffect)_robot.Meshes.FirstOrDefault().Effects[0];
             _basicEffect.LightingEnabled = false;
             _sphere.Effect.LightingEnabled = false;
 
@@ -91,12 +94,12 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         }
 
         /// <summary>
-        ///     Processes the toggling of the Effect
+        ///     Processes the toggling of the Effect.
         /// </summary>
-        /// <param name="enabled">A boolean indicating if the Effect is on</param>
+        /// <param name="enabled">A boolean indicating if the Effect is on.</param>
         private void OnEffectEnable(bool enabled)
         {
-            var effectToAssign = enabled ? _effect : _basicEffect;            
+            var effectToAssign = enabled ? _effect : _basicEffect;
             foreach (var modelMesh in _robot.Meshes)
             {
                 foreach (var part in modelMesh.MeshParts)
@@ -134,7 +137,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             }
 
             GraphicsDevice.DepthStencilState = DepthStencilState.None;
-            
+
             base.Draw(gameTime);
         }
 
@@ -161,6 +164,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             #region Pass 1-6
 
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+
             // Draw to our cubemap from the robot position
             for (var face = CubeMapFace.PositiveX; face <= CubeMapFace.NegativeZ; face++)
             {
@@ -171,7 +175,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
                 SetCubemapCameraForOrientation(face);
                 _cubeMapCamera.BuildView();
 
-                // Draw our scene. Do not draw our tank as it would be occluded by itself 
+                // Draw our scene. Do not draw our tank as it would be occluded by itself
                 // (if it has backface culling on)
                 _scene.Draw(Matrix.Identity, _cubeMapCamera.View, _cubeMapCamera.Projection);
             }
@@ -184,12 +188,10 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             GraphicsDevice.SetRenderTarget(null);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1f, 0);
 
-
             // Draw our scene with the default effect and default camera
             _scene.Draw(Matrix.Identity, _camera.View, _camera.Projection);
 
             // Draw our sphere
-
             #region Draw Sphere
 
             _effect.CurrentTechnique = _effect.Techniques["EnvironmentMapSphere"];
@@ -200,15 +202,16 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             // World is used to transform from model space to world space
             _effect.Parameters["World"].SetValue(sphereWorld);
+
             // InverseTransposeWorld is used to rotate normals
             _effect.Parameters["InverseTransposeWorld"]?.SetValue(Matrix.Transpose(Matrix.Invert(sphereWorld)));
+
             // WorldViewProjection is used to transform from model space to clip space
             _effect.Parameters["WorldViewProjection"].SetValue(sphereWorld * _camera.View * _camera.Projection);
 
             _sphere.Draw(_effect);
 
             #endregion
-
 
             #region Draw Robot
 
@@ -221,8 +224,10 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             _robot.CopyAbsoluteBoneTransformsTo(modelMeshesBaseTransforms);
 
             var worldMatrix = Matrix.CreateTranslation(_robotPosition);
+
             // World is used to transform from model space to world space
             _effect.Parameters["World"].SetValue(worldMatrix);
+
             // InverseTransposeWorld is used to rotate normals
             _effect.Parameters["InverseTransposeWorld"]?.SetValue(Matrix.Transpose(Matrix.Invert(worldMatrix)));
 
@@ -244,7 +249,6 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             switch (face)
             {
                 default:
-                case CubeMapFace.PositiveX:
                     _cubeMapCamera.FrontDirection = -Vector3.UnitX;
                     _cubeMapCamera.UpDirection = Vector3.Down;
                     break;

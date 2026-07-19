@@ -16,7 +16,7 @@ sampler2D textureSampler = sampler_state
     AddressU = Clamp;
     AddressV = Clamp;
 };
-    
+
 static const int kernel_r = 6;
 static const int kernel_size = 13;
 static const float Kernel[kernel_size] =
@@ -68,7 +68,7 @@ float4 BlurHorizontal(in VertexShaderOutput input) : COLOR
         float2 scaledTextureCoordinates = input.TextureCoordinates + float2((float) (i - kernel_r) / screenSize.x, 0);
         finalColor += tex2D(textureSampler, scaledTextureCoordinates) * Kernel[i];
     }
-    return finalColor;    
+    return finalColor;
 }
 
 float4 BlurVertical(in VertexShaderOutput input) : COLOR

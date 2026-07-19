@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using TGC.MonoGame.Samples.Viewer;
 
 namespace TGC.MonoGame.Samples.Samples.Tutorials
@@ -13,7 +14,8 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
     public class Tutorial1 : TGCSample
     {
         /// <inheritdoc />
-        public Tutorial1(TGCViewer game) : base(game)
+        public Tutorial1(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.Tutorials;
             Name = "Tutorial 1";
@@ -27,7 +29,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         private VertexBuffer _vertices;
 
         /// <summary>
-        ///     A index array pointing to the vertices to conform triangles
+        ///     A index array pointing to the vertices to conform triangles.
         /// </summary>
         private IndexBuffer _indices;
 
@@ -51,7 +53,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
                 World = worldMatrix,
                 View = viewMatrix,
                 Projection = projectionMatrix,
-                VertexColorEnabled = true
+                VertexColorEnabled = true,
             };
 
             // Array of vertex positions and colors.
@@ -59,7 +61,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             {
                 new VertexPositionColor(new Vector3(-15f, -5f, 0f), Color.Blue),
                 new VertexPositionColor(new Vector3(0f, 10f, 0f), Color.Red),
-                new VertexPositionColor(new Vector3(15f, -5f, 0f), Color.Green)
+                new VertexPositionColor(new Vector3(15f, -5f, 0f), Color.Green),
             };
 
             _vertices = new VertexBuffer(GraphicsDevice, VertexPositionColor.VertexDeclaration, triangleVertices.Length,
@@ -69,7 +71,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             // Array of indices
             var triangleIndices = new ushort[]
             {
-                0, 1, 2
+                0, 1, 2,
             };
 
             _indices = new IndexBuffer(GraphicsDevice, IndexElementSize.SixteenBits, 3, BufferUsage.None);
@@ -85,7 +87,6 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         {
             Game.Background = Color.CornflowerBlue;
 
-
             // Set our vertex buffer.
             GraphicsDevice.SetVertexBuffer(_vertices);
 
@@ -97,12 +98,16 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
                 pass.Apply();
 
                 GraphicsDevice.DrawIndexedPrimitives(
+
                     // We’ll be rendering one triangles.
                     PrimitiveType.TriangleList,
+
                     // The offset, which is 0 since we want to start at the beginning of the Vertices array.
                     0,
+
                     // The start index in the Vertices array.
                     0,
+
                     // The number of triangles to draw.
                     1);
             }

@@ -6,12 +6,12 @@
 // Microsoft XNA Community Game Platform
 // Copyright (C) Microsoft Corporation. All rights reserved.
 //-----------------------------------------------------------------------------
-
 #endregion File Description
 
 #region Using Statements
 
 using System;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -31,7 +31,9 @@ namespace TGC.MonoGame.Samples.Geometries
             int tessellation = 32)
         {
             if (tessellation < 3)
+            {
                 throw new ArgumentOutOfRangeException(nameof(tessellation));
+            }
 
             // First we loop around the main ring of the torus.
             for (var i = 0; i < tessellation; i++)
@@ -46,8 +48,8 @@ namespace TGC.MonoGame.Samples.Geometries
                 {
                     var innerAngle = j * MathHelper.TwoPi / tessellation;
 
-                    var dx = (float) Math.Cos(innerAngle);
-                    var dy = (float) Math.Sin(innerAngle);
+                    var dx = (float)Math.Cos(innerAngle);
+                    var dy = (float)Math.Sin(innerAngle);
 
                     // Create a vertex.
                     var normal = new Vector3(dx, dy, 0);
@@ -62,13 +64,13 @@ namespace TGC.MonoGame.Samples.Geometries
                     var nextI = (i + 1) % tessellation;
                     var nextJ = (j + 1) % tessellation;
 
-                    AddIndex(i * tessellation + j);
-                    AddIndex(i * tessellation + nextJ);
-                    AddIndex(nextI * tessellation + j);
+                    AddIndex((i * tessellation) + j);
+                    AddIndex((i * tessellation) + nextJ);
+                    AddIndex((nextI * tessellation) + j);
 
-                    AddIndex(i * tessellation + nextJ);
-                    AddIndex(nextI * tessellation + nextJ);
-                    AddIndex(nextI * tessellation + j);
+                    AddIndex((i * tessellation) + nextJ);
+                    AddIndex((nextI * tessellation) + nextJ);
+                    AddIndex((nextI * tessellation) + j);
                 }
             }
 

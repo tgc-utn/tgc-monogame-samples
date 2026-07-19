@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
+
 using TGC.MonoGame.Samples.Animations.DataTypes;
 
 namespace TGC.MonoGame.Samples.Animations.PipelineExtension;
@@ -50,6 +52,7 @@ public class AnimationProcessor : ModelProcessor
     /// <summary>
     ///     The function to process a model from original content into model content for export.
     /// </summary>
+    /// <returns>The processed model content, with skeleton, skinning, and animation data attached in <see cref="ModelContent.Tag"/>.</returns>
     public override ModelContent Process(NodeContent input, ContentProcessorContext context)
     {
         // Skeleton Support.
@@ -208,8 +211,8 @@ public class AnimationProcessor : ModelProcessor
     {
         // It has to be a MeshContent node.
         if (node is MeshContent mesh)
-            // In the geometry we have to find a vertex channel that has a bone weight collection.
         {
+            // In the geometry we have to find a vertex channel that has a bone weight collection.
             foreach (var geometry in mesh.Geometry)
             {
                 foreach (var vertexChannel in geometry.Vertices.Channels)
@@ -233,8 +236,8 @@ public class AnimationProcessor : ModelProcessor
     {
         // It has to be a MeshContent node.
         if (node is MeshContent mesh)
-            // In the geometry we have to find a vertex channel that has a bone weight collection.
         {
+            // In the geometry we have to find a vertex channel that has a bone weight collection.
             foreach (var geometry in mesh.Geometry)
             {
                 var swap = false;
@@ -383,7 +386,6 @@ public class AnimationProcessor : ModelProcessor
             }
 
             // For each channel, determine the bone and then process all of the keyframes for that bone.
-
             foreach (var channel in animation.Value.Channels)
             {
                 // What is the bone index?

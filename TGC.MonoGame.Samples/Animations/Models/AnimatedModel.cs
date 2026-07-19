@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+
 using TGC.MonoGame.Samples.Animations.DataTypes;
 
 namespace TGC.MonoGame.Samples.Animations.Models;
@@ -146,6 +148,8 @@ public class AnimatedModel
     /// <summary>
     ///     Find a bone in this Model by name.
     /// </summary>
+    /// <param name="name">The name of the Bone to find.</param>
+    /// <returns>The Bone with the given name, or null if none was found.</returns>
     public Bone FindBone(string name)
     {
         foreach (var bone in _bones)

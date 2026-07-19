@@ -14,10 +14,10 @@ float4x4 InverseTransposeWorld;
 float3 ambientColor; // Light's Ambient Color
 float3 diffuseColor; // Light's Diffuse Color
 float3 specularColor; // Light's Specular Color
-float KAmbient; 
-float KDiffuse; 
+float KAmbient;
+float KDiffuse;
 float KSpecular;
-float shininess; 
+float shininess;
 float3 lightPosition;
 float3 eyePosition; // Camera position
 
@@ -43,7 +43,7 @@ struct VertexShaderOutput
 	float4 Position : SV_POSITION;
     float2 TextureCoordinates : TEXCOORD0;
     float4 WorldPosition : TEXCOORD1;
-    float4 Normal : TEXCOORD2;    
+    float4 Normal : TEXCOORD2;
 };
 
 VertexShaderOutput MainVS(in VertexShaderInput input)
@@ -54,7 +54,7 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
     output.WorldPosition = mul(input.Position, World);
     output.Normal = mul(input.Normal, InverseTransposeWorld);
     output.TextureCoordinates = input.TextureCoordinates;
-	
+
 	return output;
 }
 
@@ -67,7 +67,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 
 	// Get the texture texel
     float4 texelColor = tex2D(textureSampler, input.TextureCoordinates);
-    
+
 	// Calculate the diffuse light
     float NdotL = saturate(dot(input.Normal.xyz, lightDirection));
     float3 diffuseLight = KDiffuse * diffuseColor * NdotL;
@@ -75,7 +75,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 	// Calculate the specular light
     float NdotH = dot(input.Normal.xyz, halfVector);
     float3 specularLight = sign(NdotL) * KSpecular * specularColor * pow(saturate(NdotH), shininess);
-    
+
     // Final calculation
     float4 finalColor = float4(saturate(ambientColor * KAmbient + diffuseLight) * texelColor.rgb + specularLight, texelColor.a);
     return finalColor;

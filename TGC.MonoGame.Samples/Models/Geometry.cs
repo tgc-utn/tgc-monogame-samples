@@ -1,25 +1,26 @@
 ﻿using System;
+
 using Microsoft.Xna.Framework.Graphics;
 
 namespace TGC.MonoGame.Samples.Models;
 
 /// <summary>
-/// A representation of a simple triangle-based geometry that can be drawn. 
+/// A representation of a simple triangle-based geometry that can be drawn.
 /// </summary>
 public class Geometry : IDisposable
 {
     protected VertexBuffer VertexBuffer;
-    
+
     protected IndexBuffer IndexBuffer;
 
     protected int VertexOffset;
 
     protected int StartIndex;
-    
+
     protected int PrimitiveCount;
-    
+
     protected bool OwnsVertexBuffer;
-    
+
     protected bool OwnsIndexBuffer;
 
     internal static Geometry FromMeshPart(ModelMeshPart part)
@@ -28,7 +29,8 @@ public class Geometry : IDisposable
     }
 
     internal Geometry()
-    { }
+    {
+    }
 
     internal Geometry(VertexBuffer vertexBuffer, IndexBuffer indexBuffer)
     {
@@ -40,7 +42,7 @@ public class Geometry : IDisposable
         OwnsVertexBuffer = true;
         OwnsIndexBuffer = true;
     }
-    
+
     private Geometry(ModelMeshPart part)
     {
         VertexBuffer = part.VertexBuffer;
@@ -51,8 +53,8 @@ public class Geometry : IDisposable
         OwnsVertexBuffer = false;
         OwnsIndexBuffer = false;
     }
-    
-    internal Geometry(VertexBuffer vertexBuffer, IndexBuffer indexBuffer, 
+
+    internal Geometry(VertexBuffer vertexBuffer, IndexBuffer indexBuffer,
         int vertexOffset, int startIndex, int primitiveCount,
         bool ownsVertexBuffer, bool ownsIndexBuffer)
     {
@@ -64,22 +66,24 @@ public class Geometry : IDisposable
         OwnsVertexBuffer = ownsVertexBuffer;
         OwnsIndexBuffer = ownsIndexBuffer;
     }
-    
+
     public void Draw(Effect effect)
     {
         var graphicsDevice = effect.GraphicsDevice;
-        
+
         graphicsDevice.SetVertexBuffer(VertexBuffer);
         graphicsDevice.Indices = IndexBuffer;
-        
+
         foreach (var pass in effect.CurrentTechnique.Passes)
         {
             pass.Apply();
-            graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 
+            graphicsDevice.DrawIndexedPrimitives(
+                PrimitiveType.TriangleList,
                 VertexOffset, StartIndex, PrimitiveCount);
         }
     }
 
+    /// <inheritdoc/>
     public void Dispose()
     {
         if (OwnsVertexBuffer)

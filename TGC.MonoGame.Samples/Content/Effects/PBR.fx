@@ -197,17 +197,17 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 
 	float3 F0 = float3(0.04, 0.04, 0.04);
 	F0 = lerp(F0, albedo, metallic);
-	
+
 	// Reflectance equation
 	float3 Lo = float3(0.0, 0.0, 0.0);
-	
+
 	for (int index = 0; index < 4; index++)
 	{
 		float3 light = lightPositions[index] - input.WorldPosition.xyz;
 		float distance = length(light);
 		// Normalize our light vector after using its length
 		light = normalize(light);
-		float3 halfVector = normalize(view + light);		
+		float3 halfVector = normalize(view + light);
 		float attenuation = 1.0 / (distance);
 		float3 radiance = lightColors[index] * attenuation;
 
@@ -222,9 +222,9 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 		float3 specular = nominator / denominator;
 
 		float3 kS = F;
-        
+
 		float3 kD = float3(1.0, 1.0, 1.0) - kS;
-        
+
 		kD *= 1.0 - metallic;
 
 		// Scale light by NdotL
@@ -240,7 +240,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 
 	// HDR tonemapping
 	color = color / (color + float3(1, 1, 1));
-    
+
 	float exponent = 1.0 / 2.2;
 	// Gamma correct
 	color = pow(color, float3(exponent, exponent, exponent));

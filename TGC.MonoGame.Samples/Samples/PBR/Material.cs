@@ -6,6 +6,6 @@
         Grass,
         Gold,
         Marble,
-        Metal
+        Metal,
     }
 }

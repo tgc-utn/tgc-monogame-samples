@@ -1,13 +1,15 @@
 ﻿using System.Collections.Generic;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+
 using TGC.MonoGame.Samples.Viewer.Gizmos.Geometries;
 
 namespace TGC.MonoGame.Samples.Viewer.Gizmos
 {
     /// <summary>
-    ///     Renders Gizmos
+    ///     Renders Gizmos.
     /// </summary>
     public class Gizmos
     {
@@ -32,7 +34,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         private CylinderGizmoGeometry _cylinder;
         private DiskGizmoGeometry _disk;
 
-        private readonly Dictionary<GizmoGeometry, Dictionary<Color, List<Matrix>>> _drawInstances = new ();
+        private readonly Dictionary<GizmoGeometry, Dictionary<Color, List<Matrix>>> _drawInstances = new();
 
         private Effect _effect;
         private EffectPass _foregroundPass;
@@ -43,7 +45,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
 
         private readonly DepthStencilState _noDepth;
         private PolyLineGizmoGeometry _polyLine;
-        private readonly Dictionary<Color, List<Vector3[]>> _polyLinesToDraw = new ();
+        private readonly Dictionary<Color, List<Vector3[]>> _polyLinesToDraw = new();
         private Matrix _projection;
         private SphereGizmoGeometry _sphere;
 
@@ -320,7 +322,9 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         public void Draw()
         {
             if (!Enabled)
+            {
                 return;
+            }
 
             // Save our depth state, then use ours
             var depth = _graphicsDevice.DepthStencilState;

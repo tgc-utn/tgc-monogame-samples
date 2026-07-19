@@ -51,36 +51,36 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
     float z = input.Position.z;
     input.Position.y = y * cos(Time) - z * sin(Time);
     input.Position.z = z * cos(Time) + y * sin(Time);
-    
+
     float4 pos = mul(input.Position, WorldViewProjection);
     output.Position = pos;
     output.Normal = mul(input.Normal, World);
     output.TextureCoordinates = input.TextureCoordinates;
-	
+
     return output;
 }
 
 // Instead of just a float4, we output a struct with up to 4 float4 in our PS
-// if transparency is not required, its possible to use the alpha value to 
+// if transparency is not required, its possible to use the alpha value to
 // output more data
 
 PixelShaderOutput MainPS(VertexShaderOutput input)
 {
     PixelShaderOutput output = (PixelShaderOutput) 0;
-    
+
     float3 color = tex2D(textureSampler, input.TextureCoordinates).rgb;
-    
+
     output.Color = float4(color, 1);
-    
+
     output.Inverse = float4(1 - color, 1);
-    
+
     output.Normal = input.Normal;
 
     float r = color.r * abs(sin(Time));
     float g = color.g * abs(cos(Time));
-    
+
     output.Animation = float4(r, g, color.b, 1);
-    
+
     return output;
 }
 

@@ -1,7 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries.Textures;
 using TGC.MonoGame.Samples.Viewer;
@@ -23,41 +24,42 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             NoMipMapping,
             Debug,
         }
-        
+
         private const string Texture = "Texture";
 
         /// <summary>
-        /// A camera to draw geometry
+        /// A camera to draw geometry.
         /// </summary>
         private Camera _camera;
 
         /// <summary>
-        /// A quad to draw the floor and transparent geometry
+        /// A quad to draw the floor and transparent geometry.
         /// </summary>
         private QuadPrimitive _quad;
 
         /// <summary>
-        /// A world matrix for the floor quad
+        /// A world matrix for the floor quad.
         /// </summary>
         private Matrix _floorWorld;
 
         /// <summary>
-        /// A Tiling Texture Effect to draw the floor
+        /// A Tiling Texture Effect to draw the floor.
         /// </summary>
         private Effect _tilingFloorEffect;
 
         /// <summary>
-        /// A Texture with Mip-Mapping enabled
+        /// A Texture with Mip-Mapping enabled.
         /// </summary>
         private Texture2D _textureWithMipMapping;
 
         /// <summary>
-        /// A Texture with Mip-Mapping disabled
+        /// A Texture with Mip-Mapping disabled.
         /// </summary>
         private Texture2D _textureWithoutMipMapping;
-        
+
         /// <inheritdoc />
-        public MipMapping(TGCViewer game) : base(game)
+        public MipMapping(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.RenderPipeline;
             Name = "MipMapping";
@@ -105,8 +107,8 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         /// <summary>
         /// Creates a <see cref="Texture2D"/> with no mip-mapping from another texture.
         /// </summary>
-        /// <param name="mipMappingTexture">The original texture to get the texel data</param>
-        /// <returns>A texture with no mip-mapping</returns>
+        /// <param name="mipMappingTexture">The original texture to get the texel data.</param>
+        /// <returns>A texture with no mip-mapping.</returns>
         private Texture2D CreateNoMipMappingTexture(Texture2D mipMappingTexture)
         {
             var width = mipMappingTexture.Width;
@@ -130,7 +132,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         /// <summary>
         /// Processes a change in the MipMapping type used.
         /// </summary>
-        /// <param name="type">The new mip-mapping type to be used</param>
+        /// <param name="type">The new mip-mapping type to be used.</param>
         private void OnMipMappingTypeChange(MipMappingType type)
         {
             switch (type)
@@ -185,7 +187,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             // Draw the floor
             _tilingFloorEffect.Parameters["WorldViewProjection"].SetValue(_floorWorld * viewProjection);
             _quad.Draw(_tilingFloorEffect);
-            
+
             base.Draw(gameTime);
         }
     }

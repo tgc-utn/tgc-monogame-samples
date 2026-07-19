@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using ImGuiNET;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using TGC.MonoGame.Samples.Samples;
 using TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET;
+
 using NumericVector2 = System.Numerics.Vector2;
 
 namespace TGC.MonoGame.Samples.Viewer.Models
@@ -95,10 +99,10 @@ namespace TGC.MonoGame.Samples.Viewer.Models
                 {
                     continue;
                 }
-                
+
                 try
                 {
-                    var sample = (TGCSample) Activator.CreateInstance(type, _game);
+                    var sample = (TGCSample)Activator.CreateInstance(type, _game);
                     sample.Visible = false;
                     sample.Enabled = false;
 
@@ -110,7 +114,7 @@ namespace TGC.MonoGame.Samples.Viewer.Models
                         }
                         else
                         {
-                            _samplesByCategory.Add(sample.Category, new List<TGCSample> {sample});
+                            _samplesByCategory.Add(sample.Category, new List<TGCSample> { sample });
                         }
                     }
 
@@ -201,13 +205,14 @@ namespace TGC.MonoGame.Samples.Viewer.Models
 
         /// <summary>
         ///     Create the GUI components.
-        ///     Example at https://github.com/ocornut/imgui/blob/master/imgui_demo.cpp
+        ///     Example at https://github.com/ocornut/imgui/blob/master/imgui_demo.cpp.
         /// </summary>
         /// <param name="samplesByCategory">Sample ordered list to load into sample tree.</param>
         private void ImGuiLayout(SortedList<string, List<TGCSample>> samplesByCategory)
         {
             ImGui.SetNextWindowPos(new NumericVector2(0, 0));
-            ImGui.SetNextWindowSize(new NumericVector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 6f,
+            ImGui.SetNextWindowSize(new NumericVector2(
+                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 6f,
                 GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 100));
 
             ImGui.Begin("TGC samples explorer", ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoMove);
@@ -344,7 +349,7 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         }
 
         /// <summary>
-        ///     Draws the Modifiers for the current sample
+        ///     Draws the Modifiers for the current sample.
         /// </summary>
         private void DrawModifiers()
         {
@@ -352,11 +357,12 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         }
 
         /// <summary>
-        ///     About Window / ShowAboutWindow()
+        ///     About Window / ShowAboutWindow().
         /// </summary>
         private void ShowAboutWindow()
         {
-            ImGui.Begin("About",
+            ImGui.Begin(
+                "About",
                 ImGuiWindowFlags.Modal | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoCollapse);
             ImGui.Text("MonoGame samples made by TGC UTN Group.");
             ImGui.Text("With <3 from Argentine.");

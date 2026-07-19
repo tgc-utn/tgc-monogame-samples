@@ -1,7 +1,8 @@
-﻿using ImGuiNET;
-using System;
+﻿using System;
 using System.IO;
 using System.Numerics;
+
+using ImGuiNET;
 
 namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
 {
@@ -9,7 +10,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     {
         private const int ModalFlags = 0;
 
-        private string _title;
+        private readonly string _title;
 
         private bool _oldVisibility;
 
@@ -29,6 +30,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
             _title = title;
         }
 
+        /// <inheritdoc/>
         public void Draw()
         {
             var result = Draw(true, out P);
@@ -37,25 +39,25 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         private bool Draw(bool isVisible, out string outPath)
         {
             bool result = false;
-            outPath = "";
+            outPath = string.Empty;
             if (_oldVisibility != isVisible)
             {
                 _oldVisibility = isVisible;
-                //Visiblity has changed.
 
+                // Visibility has changed.
                 if (isVisible)
                 {
-                    //Only run when the visibility state changes to visible.
+                    // Only run when the visibility state changes to visible.
 
-                    //Reset the path to the initial path.
+                    // Reset the path to the initial path.
                     _currentPath = Directory.GetCurrentDirectory();
                     _currentPathIsDir = true;
 
-                    //Update paths based on current path
+                    // Update paths based on current path
                     PopulateItems();
 
-                    //Make the modal visible.
-                    //ImGui::OpenPopup(m_title);
+                    // Make the modal visible.
+                    // ImGui::OpenPopup(m_title);
                     ImGui.OpenPopup(_title);
                 }
             }
@@ -65,18 +67,18 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
             {
                 if (ImGui.ListBox("##", ref _selection, _itemsInScope, _itemsInScope.Length, 10))
                 {
-                    //Update current path to the selected list item.
+                    // Update current path to the selected list item.
                     _currentPath = _itemsInScope[_selection];
                     _currentPathIsDir = _selection < _firstFileIndex;
 
-                    //If the selection is a directory, repopulate the list with the contents of that directory.
+                    // If the selection is a directory, repopulate the list with the contents of that directory.
                     if (_currentPathIsDir)
                     {
                         PopulateItems();
                     }
                 }
 
-                //Auto resize text wrap to popup width.
+                // Auto resize text wrap to popup width.
                 ImGui.PushItemWidth(-1f);
                 ImGui.TextWrapped(_currentPath + "        ");
                 ImGui.PopItemWidth();
@@ -111,12 +113,13 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
 
                 ImGui.EndPopup();
             }
+
             return result;
         }
 
         private void PopulateItems()
         {
-            //Update paths based on current path
+            // Update paths based on current path
             var directories = Directory.GetDirectories(_currentPath);
             var files = Directory.GetFiles(_currentPath);
 

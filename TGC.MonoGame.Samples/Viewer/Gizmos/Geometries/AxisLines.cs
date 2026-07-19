@@ -1,13 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 
 namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
 {
     /// <summary>
     ///     Gizmo for drawing the Axis Lines of an application.
     /// </summary>
-    class AxisLines
+    public class AxisLines
     {
         private const float AxisScreenOffset = 20f;
         private const float AxisScreenDistance = 40f;
@@ -36,9 +35,11 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
             _effect.View = Matrix.Identity;
             _effect.World = Matrix.Identity;
 
-            _baseScaleTranslation = 
+            _baseScaleTranslation =
+
                 // Scale the arrows
                 Matrix.CreateScale(0.02f) *
+
                 // Translate them to the bottom left of the screen, and add a Z value to prevent clipping
                 Matrix.CreateTranslation(0.87f, -0.9f, 0.2f);
 
@@ -53,13 +54,14 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
         {
             view.Translation = Vector3.Zero;
             _effect.World =
+
                 // Use the View matrix, with no translation, to make the arrows face where the camera is pointing at
                 // Then multiply by the base Scale and Translation
-                view * _baseScaleTranslation;            
+                view * _baseScaleTranslation;
         }
-        
+
         /// <summary>
-        ///     Draws the AxisLines
+        ///     Draws the AxisLines.
         /// </summary>
         public virtual void Draw()
         {

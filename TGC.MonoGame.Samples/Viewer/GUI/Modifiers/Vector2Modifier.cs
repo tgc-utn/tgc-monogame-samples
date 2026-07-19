@@ -1,12 +1,14 @@
-﻿using ImGuiNET;
-using System;
+﻿using System;
 using System.Numerics;
+
+using ImGuiNET;
+
 using MonoGameVector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
 {
     /// <summary>
-    ///     A Vector2 Modifier that allows for changing a Vector2 value in real time
+    ///     A Vector2 Modifier that allows for changing a Vector2 value in real time.
     /// </summary>
     public class Vector2Modifier : IModifier
     {
@@ -17,8 +19,8 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <summary>
         ///     Creates a Vector2 Modifier with a given name and action.
         /// </summary>
-        /// <param name="name">The name that will show in the GUI</param>
-        /// <param name="onChange">The action that will be called when the Vector2 changes</param>
+        /// <param name="name">The name that will show in the GUI.</param>
+        /// <param name="onChange">The action that will be called when the Vector2 changes.</param>
         public Vector2Modifier(string name, Action<MonoGameVector2> onChange)
         {
             _name = name;
@@ -28,9 +30,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <summary>
         ///     Creates a Vector2 Modifier with a given name, action and default value.
         /// </summary>
-        /// <param name="name">The name that will show in the GUI</param>
-        /// <param name="onChange">The action that will be called when the Vector2 changes</param>
-        /// <param name="defaultValue">The Vector2 default value</param>
+        /// <param name="name">The name that will show in the GUI.</param>
+        /// <param name="onChange">The action that will be called when the Vector2 changes.</param>
+        /// <param name="defaultValue">The Vector2 default value.</param>
         public Vector2Modifier(string name, Action<MonoGameVector2> onChange, MonoGameVector2 defaultValue)
             : this(name, onChange)
         {
@@ -39,20 +41,20 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         }
 
         /// <summary>
-        ///     Converts a MonoGame Vector2 to a Microsoft Vector2
+        ///     Converts a MonoGame Vector2 to a Microsoft Vector2.
         /// </summary>
-        /// <param name="vector">A MonoGame Vector2 to convert</param>
-        /// <returns>The Vector2 converted to the Microsoft format</returns>
+        /// <param name="vector">A MonoGame Vector2 to convert.</param>
+        /// <returns>The Vector2 converted to the Microsoft format.</returns>
         private Vector2 Convert(MonoGameVector2 vector)
         {
             return new Vector2(vector.X, vector.Y);
         }
 
         /// <summary>
-        ///     Converts a Microsoft Vector2 to a MonoGame Vector2
+        ///     Converts a Microsoft Vector2 to a MonoGame Vector2.
         /// </summary>
-        /// <param name="vector">A Microsoft Vector2 to convert</param>
-        /// <returns>The Vector2 converted to the MonoGame format</returns>
+        /// <param name="vector">A Microsoft Vector2 to convert.</param>
+        /// <returns>The Vector2 converted to the MonoGame format.</returns>
         private MonoGameVector2 Convert(Vector2 vector)
         {
             return new MonoGameVector2(vector.X, vector.Y);
@@ -65,7 +67,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         {
             var valueChanged = ImGui.DragFloat2(_name, ref _vectorValue);
             if (valueChanged)
+            {
                 _onChange.Invoke(Convert(_vectorValue));
+            }
         }
     }
 }

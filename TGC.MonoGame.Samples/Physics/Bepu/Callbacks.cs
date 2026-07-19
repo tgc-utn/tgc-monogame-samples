@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+
 using BepuPhysics;
 using BepuPhysics.Collidables;
 using BepuPhysics.CollisionDetection;
 using BepuPhysics.Constraints;
+
 using BepuUtilities;
 
 namespace TGC.MonoGame.Samples.Physics.Bepu;
@@ -53,7 +55,8 @@ public struct PoseIntegratorCallbacks : IPoseIntegratorCallbacks
     /// </summary>
     public readonly bool IntegrateVelocityForKinematics => false;
 
-    public PoseIntegratorCallbacks(Vector3 gravity, float linearDamping = .03f, float angularDamping = .03f) : this()
+    public PoseIntegratorCallbacks(Vector3 gravity, float linearDamping = .03f, float angularDamping = .03f)
+        : this()
     {
         Gravity = gravity;
         LinearDamping = linearDamping;
@@ -66,8 +69,8 @@ public struct PoseIntegratorCallbacks : IPoseIntegratorCallbacks
     /// <param name="simulation">Simulation that owns these callbacks.</param>
     public void Initialize(Simulation simulation)
     {
-        //In this demo, we don't need to initialize anything.
-        //If you had a simulation with per body gravity stored in a CollidableProperty<T> or something similar, having the simulation provided in a callback can be helpful.
+        // In this demo, we don't need to initialize anything.
+        // If you had a simulation with per body gravity stored in a CollidableProperty<T> or something similar, having the simulation provided in a callback can be helpful.
     }
 
     /// <summary>
@@ -83,8 +86,8 @@ public struct PoseIntegratorCallbacks : IPoseIntegratorCallbacks
     /// <remarks>This is typically used for precomputing anything expensive that will be used across velocity integration.</remarks>
     public void PrepareForIntegration(float dt)
     {
-        //No reason to recalculate gravity * dt for every body; just cache it ahead of time.
-        //Since these callbacks don't use per-body damping values, we can precalculate everything.
+        // No reason to recalculate gravity * dt for every body; just cache it ahead of time.
+        // Since these callbacks don't use per-body damping values, we can precalculate everything.
         LinearDampingDt = new Vector<float>(MathF.Pow(MathHelper.Clamp(1 - LinearDamping, 0, 1), dt));
         AngularDampingDt = new Vector<float>(MathF.Pow(MathHelper.Clamp(1 - AngularDamping, 0, 1), dt));
         GravityWideDt = Vector3Wide.Broadcast(Gravity * dt);
@@ -111,12 +114,12 @@ public struct PoseIntegratorCallbacks : IPoseIntegratorCallbacks
         BodyInertiaWide localInertia, Vector<int> integrationMask, int workerIndex, Vector<float> dt,
         ref BodyVelocityWide velocity)
     {
-        //This is a handy spot to implement things like position dependent gravity or per-body damping.
-        //This implementation uses a single damping value for all bodies that allows it to be precomputed.
-        //We don't have to check for kinematics; IntegrateVelocityForKinematics returns false, so we'll never see them in this callback.
-        //Note that these are SIMD operations and "Wide" types. There are Vector<float>.Count lanes of execution being evaluated simultaneously.
-        //The types are laid out in array-of-structures-of-arrays (AOSOA) format. That's because this function is frequently called from vectorized contexts within the solver.
-        //Transforming to "array of structures" (AOS) format for the callback and then back to AOSOA would involve a lot of overhead, so instead the callback works on the AOSOA representation directly.
+        // This is a handy spot to implement things like position dependent gravity or per-body damping.
+        // This implementation uses a single damping value for all bodies that allows it to be precomputed.
+        // We don't have to check for kinematics; IntegrateVelocityForKinematics returns false, so we'll never see them in this callback.
+        // Note that these are SIMD operations and "Wide" types. There are Vector<float>.Count lanes of execution being evaluated simultaneously.
+        // The types are laid out in array-of-structures-of-arrays (AOSOA) format. That's because this function is frequently called from vectorized contexts within the solver.
+        // Transforming to "array of structures" (AOS) format for the callback and then back to AOSOA would involve a lot of overhead, so instead the callback works on the AOSOA representation directly.
         velocity.Linear = (velocity.Linear + GravityWideDt) * LinearDampingDt;
         velocity.Angular *= AngularDampingDt;
     }
@@ -125,10 +128,13 @@ public struct PoseIntegratorCallbacks : IPoseIntegratorCallbacks
 public struct NarrowPhaseCallbacks : INarrowPhaseCallbacks
 {
     private SpringSettings ContactSpringiness { get; set; }
+
     private float MaximumRecoveryVelocity { get; set; }
+
     private float FrictionCoefficient { get; set; }
 
-    public NarrowPhaseCallbacks(SpringSettings contactSpringiness) : this(contactSpringiness, 2f, 1f)
+    public NarrowPhaseCallbacks(SpringSettings contactSpringiness)
+        : this(contactSpringiness, 2f, 1f)
     {
     }
 
@@ -140,9 +146,10 @@ public struct NarrowPhaseCallbacks : INarrowPhaseCallbacks
         FrictionCoefficient = frictionCoefficient;
     }
 
+    /// <inheritdoc/>
     public void Initialize(Simulation simulation)
     {
-        //Use a default if the springiness value wasn't initialized... at least until struct field initializers are supported outside of previews.
+        // Use a default if the springiness value wasn't initialized... at least until struct field initializers are supported outside of previews.
         if (ContactSpringiness.AngularFrequency == 0 && ContactSpringiness.TwiceDampingRatio == 0)
         {
             ContactSpringiness = new SpringSettings(30, 1);
@@ -151,25 +158,29 @@ public struct NarrowPhaseCallbacks : INarrowPhaseCallbacks
         }
     }
 
+    /// <inheritdoc/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool AllowContactGeneration(int workerIndex, CollidableReference a, CollidableReference b,
         ref float speculativeMargin)
     {
-        //While the engine won't even try creating pairs between statics at all, it will ask about kinematic-kinematic pairs.
-        //Those pairs cannot emit constraints since both involved bodies have infinite inertia. Since most of the demos don't need
-        //to collect information about kinematic-kinematic pairs, we'll require that at least one of the bodies needs to be dynamic.
+        // While the engine won't even try creating pairs between statics at all, it will ask about kinematic-kinematic pairs.
+        // Those pairs cannot emit constraints since both involved bodies have infinite inertia. Since most of the demos don't need
+        // to collect information about kinematic-kinematic pairs, we'll require that at least one of the bodies needs to be dynamic.
         return a.Mobility == CollidableMobility.Dynamic || b.Mobility == CollidableMobility.Dynamic;
     }
 
+    /// <inheritdoc/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool AllowContactGeneration(int workerIndex, CollidablePair pair, int childIndexA, int childIndexB)
     {
         return true;
     }
 
+    /// <inheritdoc/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool ConfigureContactManifold<TManifold>(int workerIndex, CollidablePair pair, ref TManifold manifold,
-        out PairMaterialProperties pairMaterial) where TManifold : unmanaged, IContactManifold<TManifold>
+        out PairMaterialProperties pairMaterial)
+        where TManifold : unmanaged, IContactManifold<TManifold>
     {
         pairMaterial.FrictionCoefficient = FrictionCoefficient;
         pairMaterial.MaximumRecoveryVelocity = MaximumRecoveryVelocity;
@@ -177,6 +188,7 @@ public struct NarrowPhaseCallbacks : INarrowPhaseCallbacks
         return true;
     }
 
+    /// <inheritdoc/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool ConfigureContactManifold(int workerIndex, CollidablePair pair, int childIndexA, int childIndexB,
         ref ConvexContactManifold manifold)
@@ -184,8 +196,9 @@ public struct NarrowPhaseCallbacks : INarrowPhaseCallbacks
         return true;
     }
 
+    /// <inheritdoc/>
     public void Dispose()
     {
-        //Something to be dispose.
+        // Something to be dispose.
     }
 }

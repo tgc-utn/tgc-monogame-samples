@@ -104,3 +104,12 @@ dotnet run --project TGC.MonoGame.Samples
       PATH environment variable.
   - Some systems may require you to restart your terminal or IDE
       to recognize the new tool.
+
+- `semgrep` fails during `pre-commit` with `Cannot allocate memory`.
+  - Caused by `io_uring_queue_init` failing inside a sandboxed or
+      containerized Linux environment (for example WSL2, Docker, or a
+      locked-down CI container) with a restricted `memlock` limit.
+      Check it with `ulimit -l`.
+  - Workaround: export `EIO_BACKEND=posix` before running `pre-commit`
+      or `git commit`, to force semgrep's OCaml runtime to use the
+      POSIX backend instead of `io_uring`.
