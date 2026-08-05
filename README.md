@@ -18,4 +18,5 @@ for your operating system.
 
 #### [MGCB Editor](https://docs.monogame.net/articles/getting_started/tools/mgcb_editor.html)
 
-- Open Asset Import Library with Obj and Dae fails, you have to change it to Fbx importer.
+- Open Asset Import Library with Obj and Dae fails, you have to change it
+  to Fbx importer.

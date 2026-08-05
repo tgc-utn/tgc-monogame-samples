@@ -1,6 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Viewer;
 using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
@@ -17,82 +19,83 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
     public class QuaternionComparison : TGCSample
     {
         /// <summary>
-        /// A camera to draw geometry
+        /// A camera to draw geometry.
         /// </summary>
         private Camera _camera;
 
         /// <summary>
-        /// The euler rotation matrix for the model
+        /// The euler rotation matrix for the model.
         /// </summary>
         private Matrix _eulerRotation;
 
         /// <summary>
-        /// The resulting quaternion rotation matrix for the model
+        /// The resulting quaternion rotation matrix for the model.
         /// </summary>
         private Matrix _quaternionRotation;
 
         /// <summary>
-        /// The model to draw using both quaternions and euler rotations
+        /// The model to draw using both quaternions and euler rotations.
         /// </summary>
         private Model _model;
 
         /// <summary>
-        /// The first position in world space of the model
+        /// The first position in world space of the model.
         /// </summary>
         private Vector3 _firstPosition;
 
         /// <summary>
-        /// The second position in world space of the model
+        /// The second position in world space of the model.
         /// </summary>
         private Vector3 _secondPosition;
 
         /// <summary>
-        /// The position in screen space of the first banner
+        /// The position in screen space of the first banner.
         /// </summary>
         private Vector2 _firstBannerScreenPosition;
 
         /// <summary>
-        /// The position in screen space of the second banner
+        /// The position in screen space of the second banner.
         /// </summary>
         private Vector2 _secondTankBannerScreenPosition;
 
         /// <summary>
-        /// The first translation matrix that indicates where to place the model when drawing
+        /// The first translation matrix that indicates where to place the model when drawing.
         /// </summary>
         private Matrix _firstTranslationMatrix;
 
         /// <summary>
-        /// The second translation matrix that indicates where to place the model when drawing
+        /// The second translation matrix that indicates where to place the model when drawing.
         /// </summary>
         private Matrix _secondTranslationMatrix;
 
         /// <summary>
-        /// The base scale of the model
+        /// The base scale of the model.
         /// </summary>
         private Matrix _baseScale;
 
         /// <summary>
-        /// A font to draw text into the screen
+        /// A font to draw text into the screen.
         /// </summary>
         private SpriteFont _spriteFont;
 
         /// <summary>
-        /// The rotation for the X axis in degrees
+        /// The rotation for the X axis in degrees.
         /// </summary>
         private float _pitch;
 
         /// <summary>
-        /// The rotation for the Y axis in degrees
+        /// The rotation for the Y axis in degrees.
         /// </summary>
         private float _yaw;
 
         /// <summary>
-        /// The rotation for the Z axis in degrees
+        /// The rotation for the Z axis in degrees.
         /// </summary>
         private float _roll;
 
         /// <inheritdoc />
-        public QuaternionComparison(TGCViewer game) : base(game)
+        public QuaternionComparison(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.Transformations;
             Name = "Quaternion Comparison";
@@ -105,7 +108,8 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         {
             Game.Background = Color.Black;
 
-            _camera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, 
+            _camera = new TargetCamera(
+                GraphicsDevice.Viewport.AspectRatio,
                 new Vector3(0, 30, 30), Vector3.Zero, 1,
                 3000);
 
@@ -130,9 +134,9 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
             ModifierController.AddFloat("Y Axis (Yaw)", OnYawChange, 0f, 0f, twoPI);
             ModifierController.AddFloat("Z Axis (Roll)", OnRollChange, 0f, 0f, twoPI);
 
-            var firstTankBannerWorldPosition = _firstPosition + Vector3.Up * 10f;
-            var secondTankBannerWorldPosition = _secondPosition + Vector3.Up * 10f;
-            
+            var firstTankBannerWorldPosition = _firstPosition + (Vector3.Up * 10f);
+            var secondTankBannerWorldPosition = _secondPosition + (Vector3.Up * 10f);
+
             _firstBannerScreenPosition = ToVector2(GraphicsDevice.Viewport.Project(
                 firstTankBannerWorldPosition, _camera.Projection, _camera.View, Matrix.Identity));
 
@@ -145,8 +149,8 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         /// <summary>
         /// Returns a <see cref="Vector2"/> containing the XY components of a <see cref="Vector3"/>.
         /// </summary>
-        /// <param name="vector">The <see cref="Vector3"/> to obtain its XY components</param>
-        /// <returns>A <see cref="Vector2"/> containing the XY components of the given vector</returns>
+        /// <param name="vector">The <see cref="Vector3"/> to obtain its XY components.</param>
+        /// <returns>A <see cref="Vector2"/> containing the XY components of the given vector.</returns>
         private Vector2 ToVector2(Vector3 vector)
         {
             return new Vector2(vector.X, vector.Y);
@@ -160,17 +164,17 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
 
             // Set the depth state to default
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            
+
             // Load the Sprite Font to draw text
             _spriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
 
             base.LoadContent();
         }
-        
+
         /// <summary>
-        /// Processes a change in the Pitch
+        /// Processes a change in the Pitch.
         /// </summary>
-        /// <param name="newPitch">The new value of the Pitch in radians</param>
+        /// <param name="newPitch">The new value of the Pitch in radians.</param>
         private void OnPitchChange(float newPitch)
         {
             _pitch = newPitch;
@@ -178,9 +182,9 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         }
 
         /// <summary>
-        /// Processes a change in the Yaw
+        /// Processes a change in the Yaw.
         /// </summary>
-        /// <param name="newYaw">The new value of the Yaw in radians</param>
+        /// <param name="newYaw">The new value of the Yaw in radians.</param>
         private void OnYawChange(float newYaw)
         {
             _yaw = newYaw;
@@ -188,9 +192,9 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         }
 
         /// <summary>
-        /// Processes a change in the Roll
+        /// Processes a change in the Roll.
         /// </summary>
-        /// <param name="newRoll">The new value of the Roll in radians</param>
+        /// <param name="newRoll">The new value of the Roll in radians.</param>
         private void OnRollChange(float newRoll)
         {
             _roll = newRoll;
@@ -201,14 +205,14 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         /// Converts an angle in degrees to radians.
         /// </summary>
         /// <param name="angleInDegrees">The angle to convert to degrees.</param>
-        /// <returns>The converted angle in radians</returns>
-        float ToRadians(float angleInDegrees)
+        /// <returns>The converted angle in radians.</returns>
+        private float ToRadians(float angleInDegrees)
         {
             return angleInDegrees * MathF.PI / 180f;
         }
 
         /// <summary>
-        /// Update the matrices for each type of chair
+        /// Update the matrices for each type of chair.
         /// </summary>
         private void UpdateMatrices()
         {
@@ -242,22 +246,24 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         {
             // Draw the models
             // Note that they contain their own world transforms before applying the passed
-            _model.Draw(_baseScale * _eulerRotation * _firstTranslationMatrix,
+            _model.Draw(
+                _baseScale * _eulerRotation * _firstTranslationMatrix,
                 _camera.View, _camera.Projection);
-            _model.Draw(_baseScale * _quaternionRotation * _secondTranslationMatrix,
+            _model.Draw(
+                _baseScale * _quaternionRotation * _secondTranslationMatrix,
                 _camera.View, _camera.Projection);
 
             // Draw Right vectors
-            Game.Gizmos.DrawLine(_firstPosition, _firstPosition + Vector3.Right * 5f, Color.Red);
-            Game.Gizmos.DrawLine(_secondPosition, _secondPosition + Vector3.Right * 5f, Color.Red);
+            Game.Gizmos.DrawLine(_firstPosition, _firstPosition + (Vector3.Right * 5f), Color.Red);
+            Game.Gizmos.DrawLine(_secondPosition, _secondPosition + (Vector3.Right * 5f), Color.Red);
 
             // Draw Up vectors
-            Game.Gizmos.DrawLine(_firstPosition, _firstPosition + Vector3.Up * 5f, Color.Green);
-            Game.Gizmos.DrawLine(_secondPosition, _secondPosition + Vector3.Up * 5f, Color.Green);
+            Game.Gizmos.DrawLine(_firstPosition, _firstPosition + (Vector3.Up * 5f), Color.Green);
+            Game.Gizmos.DrawLine(_secondPosition, _secondPosition + (Vector3.Up * 5f), Color.Green);
 
             // Draw Left vectors
-            Game.Gizmos.DrawLine(_firstPosition, _firstPosition + Vector3.Backward * 5f, Color.Blue);
-            Game.Gizmos.DrawLine(_secondPosition, _secondPosition + Vector3.Backward * 5f, Color.Blue);
+            Game.Gizmos.DrawLine(_firstPosition, _firstPosition + (Vector3.Backward * 5f), Color.Blue);
+            Game.Gizmos.DrawLine(_secondPosition, _secondPosition + (Vector3.Backward * 5f), Color.Blue);
 
             // Draw labels
             Game.SpriteBatch.Begin(
@@ -266,7 +272,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
                 SamplerState.LinearClamp,
                 DepthStencilState.Default,
                 RasterizerState.CullNone);
-            
+
             Game.SpriteBatch.DrawString(_spriteFont, "Euler", _firstBannerScreenPosition, Color.White);
             Game.SpriteBatch.DrawString(_spriteFont, "Quaternion", _secondTankBannerScreenPosition, Color.White);
 

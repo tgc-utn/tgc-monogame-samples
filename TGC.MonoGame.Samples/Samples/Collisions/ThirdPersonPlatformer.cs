@@ -1,11 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.Linq;
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Collisions;
 using TGC.MonoGame.Samples.Geometries.Textures;
@@ -14,7 +13,7 @@ using TGC.MonoGame.Samples.Viewer;
 namespace TGC.MonoGame.Samples.Samples.Collisions
 {
     /// <summary>
-    ///     Shows how to make a third person platformer with custom physics
+    ///     Shows how to make a third person platformer with custom physics.
     /// </summary>
     public class ThirdPersonPlatformer : TGCSample
     {
@@ -41,7 +40,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         private Vector3 _robotVelocity;
         private Vector3 _robotAcceleration;
         private Vector3 _robotFrontDirection;
-        
+
         // A boolean indicating if the Robot is on the ground
         private bool _onGround;
 
@@ -55,7 +54,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         private Texture2D _stonesTexture;
         private Texture2D _woodenTexture;
         private Texture2D _cobbleTexture;
-        
+
         // Effects
 
         // Tiling Effect for the floor
@@ -63,22 +62,23 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
         // Effect for the stairs and boxes
         private BasicEffect _boxesEffect;
-        
+
         // Colliders
 
         // Bounding Boxes representing our colliders (floor, stairs, boxes)
         private BoundingBox[] _colliders;
 
         private BoundingCylinder _robotCylinder;
-        
+
         /// <inheritdoc />
-        public ThirdPersonPlatformer(TGCViewer game) : base(game)
+        public ThirdPersonPlatformer(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.Collisions;
             Name = "Third Person Platformer";
             Description = "Shows an example of a third person platformer game with different type of interactions.";
         }
-        
+
         /// <inheritdoc />
         public override void Initialize()
         {
@@ -129,6 +129,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             // Instantiate a BoundingBox for the Box
             _colliders[index] = BoundingVolumesExtensions.FromMatrix(_boxWorld);
             index++;
+
             // Instantiate a BoundingBox for the Floor. Note that the height is almost zero
             _colliders[index] = new BoundingBox(new Vector3(-200f, -0.001f, -200f), new Vector3(200f, 0f, 200f));
 
@@ -168,16 +169,15 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
             // Create our Quad (to draw the Floor)
             _quad = new QuadPrimitive(GraphicsDevice);
-            
+
             // Create our Box Model
             _boxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, _woodenTexture);
-            
+
             // Calculate the height of the Model of the Robot
             // Create a Bounding Box from it, then subtract the max and min Y to get the height
 
-            // Use the height to set the Position of the robot 
+            // Use the height to set the Position of the robot
             // (it is half the height, multiplied by its scale in Y -RobotScale.M22-)
-
             var extents = BoundingVolumesExtensions.CreateAABBFrom(_robot);
             var height = extents.Max.Y - extents.Min.Y;
 
@@ -196,7 +196,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         }
 
         /// <summary>
-        ///     Updates the internal values of the Camera
+        ///     Updates the internal values of the Camera.
         /// </summary>
         private void UpdateCamera()
         {
@@ -204,13 +204,14 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
             // Create a normalized vector that points to the back of the Robot
             var robotBackDirection = Vector3.Transform(Vector3.Forward, _robotRotation);
+
             // Then scale the vector by a radius, to set an horizontal distance between the Camera and the Robot
             var orbitalPosition = robotBackDirection * CameraFollowRadius;
-            
+
             // We will move the Camera in the Y axis by a given distance, relative to the Robot
             var upDistance = Vector3.Up * CameraUpDistance;
 
-            // Calculate the new Camera Position by using the Robot Position, then adding the vector orbitalPosition that sends 
+            // Calculate the new Camera Position by using the Robot Position, then adding the vector orbitalPosition that sends
             // the camera further in the back of the Robot, and then we move it up by a given distance
             _camera.Position = _robotPosition + orbitalPosition + upDistance;
 
@@ -220,13 +221,13 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             // Build the View matrix from the Position and TargetPosition
             _camera.BuildView();
         }
-        
+
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
             // The time that passed between the last loop
             var deltaTime = Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
-            
+
             // Check for key presses and rotate accordingly
             // We can stack rotations in a given axis by multiplying our past matrix
             // By a new matrix containing a new rotation to apply
@@ -268,13 +269,13 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
             // Solve the Vertical Movement first (could be done in other order)
             SolveVerticalMovement(scaledVelocity);
-            
+
             // Take only the horizontal components of the velocity
             scaledVelocity = new Vector3(scaledVelocity.X, 0f, scaledVelocity.Z);
 
             // Solve the Horizontal Movement
             SolveHorizontalMovementSliding(scaledVelocity);
-            
+
             // Update the RobotPosition based on the updated Cylinder center
             _robotPosition = _robotCylinder.Center;
 
@@ -286,7 +287,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
             // Update the Camera accordingly, as it follows the Robot
             UpdateCamera();
-            
+
             // Update Gizmos with the View Projection matrices
             Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
 
@@ -294,9 +295,9 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         }
 
         /// <summary>
-        ///     Apply horizontal movement, detecting and solving collisions
+        ///     Apply horizontal movement, detecting and solving collisions.
         /// </summary>
-        /// <param name="scaledVelocity">The current velocity scaled by deltaTime</param>
+        /// <param name="scaledVelocity">The current velocity scaled by deltaTime.</param>
         private void SolveVerticalMovement(Vector3 scaledVelocity)
         {
             // If the Robot has vertical velocity
@@ -307,9 +308,10 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
             // Start by moving the Cylinder
             _robotCylinder.Center += Vector3.Up * scaledVelocity.Y;
+
             // Set the OnGround flag on false, update it later if we find a collision
             _onGround = false;
-            
+
             // Collision detection
             var collided = false;
             var foundIndex = -1;
@@ -329,7 +331,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
                 foundIndex = index;
                 break;
             }
-            
+
             // We correct based on differences in Y until we don't collide anymore
             // Not usual to iterate here more than once, but could happen
             while (collided)
@@ -340,6 +342,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
                 var extents = BoundingVolumesExtensions.GetExtents(collider);
 
                 float penetration;
+
                 // If we are on top of the collider, push up
                 // Also, set the OnGround flag to true
                 if (cylinderY > colliderY)
@@ -375,9 +378,9 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         }
 
         /// <summary>
-        ///     Apply horizontal movement, detecting and solving collisions with sliding
+        ///     Apply horizontal movement, detecting and solving collisions with sliding.
         /// </summary>
-        /// <param name="scaledVelocity">The current velocity scaled by deltaTime</param>
+        /// <param name="scaledVelocity">The current velocity scaled by deltaTime.</param>
         private void SolveHorizontalMovementSliding(Vector3 scaledVelocity)
         {
             // Has horizontal movement?
@@ -430,16 +433,16 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
                 // Push the center out of the box
                 // Normalize our Normal Vector using its length first
-                _robotCylinder.Center += (normalVector / normalVectorLength * penetration);
+                _robotCylinder.Center += normalVector / normalVectorLength * penetration;
             }
         }
 
         /// <summary>
         ///     Solves the intersection between the Robot and a collider.
         /// </summary>
-        /// <param name="collider">The collider the Robot intersected with</param>
-        /// <param name="colliderIndex">The index of the collider in the collider array the Robot intersected with</param>
-        /// <returns>True if the collider was a step and it was climbed, False otherwise</returns>
+        /// <param name="collider">The collider the Robot intersected with.</param>
+        /// <param name="colliderIndex">The index of the collider in the collider array the Robot intersected with.</param>
+        /// <returns>True if the collider was a step and it was climbed, False otherwise.</returns>
         private bool SolveStepCollision(BoundingBox collider, int colliderIndex)
         {
             // Get the collider properties to check if it's a step
@@ -482,7 +485,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             // (And the Robot position was already updated)
             return true;
         }
-        
+
         /// <inheritdoc />
         public override void Draw(GameTime gameTime)
         {
@@ -493,25 +496,30 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             _robot.Draw(_robotWorld, _camera.View, _camera.Projection);
 
             // Floor drawing
-            
+
             // Set the Technique inside the TilingEffect to "BaseTiling", we want to control the tiling on the floor
             // Using its original Texture Coordinates
             _tilingEffect.CurrentTechnique = _tilingEffect.Techniques["BaseTiling"];
+
             // Set the Tiling value
             _tilingEffect.Parameters["Tiling"].SetValue(new Vector2(10f, 10f));
+
             // Set the WorldViewProjection matrix
             _tilingEffect.Parameters["WorldViewProjection"].SetValue(_floorWorld * viewProjection);
+
             // Set the Texture that the Floor will use
             _tilingEffect.Parameters["Texture"].SetValue(_stonesTexture);
             _quad.Draw(_tilingEffect);
-            
+
             // Steps drawing
 
             // Set the Technique inside the TilingEffect to "WorldTiling"
             // We want to use the world position of the steps to define how to sample the Texture
             _tilingEffect.CurrentTechnique = _tilingEffect.Techniques["WorldTiling"];
+
             // Set the Texture that the Steps will use
             _tilingEffect.Parameters["Texture"].SetValue(_cobbleTexture);
+
             // Set the Tiling value
             _tilingEffect.Parameters["Tiling"].SetValue(Vector2.One * 0.05f);
 
@@ -520,13 +528,15 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             {
                 // Get the World Matrix
                 var matrix = _stairsWorld[index];
+
                 // Set the World Matrix
                 _tilingEffect.Parameters["World"].SetValue(matrix);
+
                 // Set the WorldViewProjection Matrix
                 _tilingEffect.Parameters["WorldViewProjection"].SetValue(matrix * viewProjection);
                 _boxPrimitive.Draw(_tilingEffect);
             }
-            
+
             // Draw the Box, setting every matrix and its Texture
             _boxesEffect.World = _boxWorld;
             _boxesEffect.View = _camera.View;
@@ -534,7 +544,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
             _boxesEffect.Texture = _woodenTexture;
             _boxPrimitive.Draw(_boxesEffect);
-            
+
             // Gizmos Drawing
             for (int index = 0; index < _colliders.Length; index++)
             {

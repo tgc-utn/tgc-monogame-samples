@@ -1,7 +1,9 @@
 ﻿using System.Linq;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Collisions;
 using TGC.MonoGame.Samples.Geometries.Textures;
@@ -62,7 +64,8 @@ public class CameraCollision : TGCSample
     private Matrix[] _wallWorldMatrices;
 
     /// <inheritdoc />
-    public CameraCollision(TGCViewer game) : base(game)
+    public CameraCollision(TGCViewer game)
+        : base(game)
     {
         Category = TGCSampleCategory.Collisions;
         Name = "Camera Collision";
@@ -90,29 +93,33 @@ public class CameraCollision : TGCSample
         _wallWorldMatrices = new Matrix[5];
         var scale = new Vector3(200f, 1f, 200f);
         _wallWorldMatrices[0] = Matrix.CreateScale(scale) * Matrix.CreateRotationX(MathHelper.PiOver2) *
-                                Matrix.CreateTranslation(-Vector3.UnitZ * 200f + Vector3.UnitY * 200f);
+                                Matrix.CreateTranslation((-Vector3.UnitZ * 200f) + (Vector3.UnitY * 200f));
         _wallWorldMatrices[1] = Matrix.CreateScale(scale) * Matrix.CreateRotationX(-MathHelper.PiOver2) *
-                                Matrix.CreateTranslation(Vector3.UnitZ * 200f + Vector3.UnitY * 200f);
+                                Matrix.CreateTranslation((Vector3.UnitZ * 200f) + (Vector3.UnitY * 200f));
         _wallWorldMatrices[2] = Matrix.CreateScale(scale) * Matrix.CreateRotationZ(MathHelper.PiOver2) *
-                                Matrix.CreateTranslation(Vector3.UnitX * 200f + Vector3.UnitY * 200f);
+                                Matrix.CreateTranslation((Vector3.UnitX * 200f) + (Vector3.UnitY * 200f));
         _wallWorldMatrices[3] = Matrix.CreateScale(scale) * Matrix.CreateRotationZ(-MathHelper.PiOver2) *
-                                Matrix.CreateTranslation(-Vector3.UnitX * 200f + Vector3.UnitY * 200f);
+                                Matrix.CreateTranslation((-Vector3.UnitX * 200f) + (Vector3.UnitY * 200f));
         _wallWorldMatrices[4] = Matrix.CreateScale(new Vector3(100f, 1f, 100f)) *
                                 Matrix.CreateRotationZ(MathHelper.PiOver2) *
-                                Matrix.CreateTranslation(Vector3.UnitZ * 100f + Vector3.UnitY * 100f);
+                                Matrix.CreateTranslation((Vector3.UnitZ * 100f) + (Vector3.UnitY * 100f));
 
         // Create Bounding Boxes to enclose the Walls,
         // and to test the Robot and Camera against them
         _wallBoxes = new BoundingBox[5];
 
         var minVector = Vector3.One * 0.25f;
-        _wallBoxes[0] = new BoundingBox(new Vector3(-200f, 0f, -200f) - minVector,
+        _wallBoxes[0] = new BoundingBox(
+            new Vector3(-200f, 0f, -200f) - minVector,
             new Vector3(200f, 200f, -200f) + minVector);
-        _wallBoxes[1] = new BoundingBox(new Vector3(-200f, 0f, 200f) - minVector,
+        _wallBoxes[1] = new BoundingBox(
+            new Vector3(-200f, 0f, 200f) - minVector,
             new Vector3(200f, 200f, 200f) + minVector);
-        _wallBoxes[2] = new BoundingBox(new Vector3(200f, 0f, -200f) - minVector,
+        _wallBoxes[2] = new BoundingBox(
+            new Vector3(200f, 0f, -200f) - minVector,
             new Vector3(200f, 200f, 200f) + minVector);
-        _wallBoxes[3] = new BoundingBox(new Vector3(-200f, 0f, -200f) - minVector,
+        _wallBoxes[3] = new BoundingBox(
+            new Vector3(-200f, 0f, -200f) - minVector,
             new Vector3(-200f, 200f, 200f) + minVector);
         _wallBoxes[4] = new BoundingBox(new Vector3(0f, 0f, 0f) - minVector, new Vector3(0f, 200f, 200f) + minVector);
 
@@ -145,9 +152,8 @@ public class CameraCollision : TGCSample
         // Calculate the height of the Model of the Robot
         // Create a Bounding Box from it, then subtract the max and min Y to get the height
 
-        // Use the height to set the Position of the robot 
+        // Use the height to set the Position of the robot
         // (it is half the height, multiplied by its scale in Y -RobotScale.M22-)
-
         var extents = BoundingVolumesExtensions.CreateAABBFrom(_robot);
         var height = extents.Max.Y - extents.Min.Y;
 
@@ -166,7 +172,7 @@ public class CameraCollision : TGCSample
     }
 
     /// <summary>
-    ///     Updates the internal values of the Camera, performing collision testing and correction with the scene
+    ///     Updates the internal values of the Camera, performing collision testing and correction with the scene.
     /// </summary>
     private void UpdateCamera()
     {
@@ -174,13 +180,14 @@ public class CameraCollision : TGCSample
 
         // Create a normalized vector that points to the back of the Robot
         var robotBackDirection = Vector3.Transform(Vector3.Forward, _robotRotation);
+
         // Then scale the vector by a radius, to set an horizontal distance between the Camera and the Robot
         var orbitalPosition = robotBackDirection * CameraFollowRadius;
 
         // We will move the Camera in the Y axis by a given distance, relative to the Robot
         var upDistance = Vector3.Up * CameraUpDistance;
 
-        // Calculate the new Camera Position by using the Robot Position, then adding the vector orbitalPosition that sends 
+        // Calculate the new Camera Position by using the Robot Position, then adding the vector orbitalPosition that sends
         // the camera further in the back of the Robot, and then we move it up by a given distance
         var newCameraPosition = _robotPosition + orbitalPosition + upDistance;
 
@@ -202,6 +209,7 @@ public class CameraCollision : TGCSample
             // Set our new position. Up is unaffected
             _camera.Position = _robotPosition + recalculatedPosition + upDistance;
         }
+
         // If the Camera didn't collide with the scene
         else
         {
@@ -216,10 +224,10 @@ public class CameraCollision : TGCSample
     }
 
     /// <summary>
-    ///     Tests the Camera against the scene and checks if it collides with any wall
+    ///     Tests the Camera against the scene and checks if it collides with any wall.
     /// </summary>
-    /// <param name="cameraPosition">The Camera Position to test</param>
-    /// <returns>No value if there was no collision, the scalar distance to a wall otherwise</returns>
+    /// <param name="cameraPosition">The Camera Position to test.</param>
+    /// <returns>No value if there was no collision, the scalar distance to a wall otherwise.</returns>
     private float? CameraCollided(Vector3 cameraPosition)
     {
         // Create a Ray that goes from the Robot Position to the Camera
@@ -233,7 +241,7 @@ public class CameraCollision : TGCSample
         // Test our ray against every wall Bounding Box
         foreach (var t in _wallBoxes)
         {
-            // If there was an intersection 
+            // If there was an intersection
             // And this intersection happened between the Robot and the Camera (and not further away)
             // Return the distance of collision
             var distance = cameraToPlayerRay.Intersects(t);
@@ -263,7 +271,7 @@ public class CameraCollision : TGCSample
             _robotRotation *= Matrix.CreateRotationY(-RobotRotatingVelocity);
             rotated = true;
         }
-        
+
         if (Game.CurrentKeyboardState.IsKeyDown(Keys.Left))
         {
             _robotRotation *= Matrix.CreateRotationY(RobotRotatingVelocity);
@@ -276,7 +284,7 @@ public class CameraCollision : TGCSample
             advanceAmount = RobotVelocity;
             moved = true;
         }
-        
+
         if (Game.CurrentKeyboardState.IsKeyDown(Keys.Down))
         {
             advanceAmount = -RobotVelocity;
@@ -286,9 +294,9 @@ public class CameraCollision : TGCSample
         // If there was any movement
         if (moved)
         {
-            // Calculate the Robot new Position using the last Position, 
+            // Calculate the Robot new Position using the last Position,
             // And adding an increment in the Robot Direction (calculated by rotating a vector by its rotation)
-            var newPosition = _robotPosition + Vector3.Transform(Vector3.Backward, _robotRotation) * advanceAmount;
+            var newPosition = _robotPosition + (Vector3.Transform(Vector3.Backward, _robotRotation) * advanceAmount);
 
             // Set the Center of the Cylinder as our calculated position
             _robotCylinder.Center = newPosition;
@@ -348,6 +356,7 @@ public class CameraCollision : TGCSample
         {
             // Set the WorldViewProjection matrix for each Wall
             _tilingEffect.Parameters["WorldViewProjection"].SetValue(_wallWorldMatrices[index] * viewProjection);
+
             // Draw the Wall
             _quad.Draw(_tilingEffect);
         }
@@ -369,7 +378,6 @@ public class CameraCollision : TGCSample
         GraphicsDevice.RasterizerState = rasterizerState;
 
         // Draw Gizmos for Bounding Boxes and Robot Cylinder
-
         foreach (var box in _wallBoxes)
         {
             var center = BoundingVolumesExtensions.GetCenter(box);

@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+
 using TGC.MonoGame.Samples.Viewer.Models;
 
 namespace TGC.MonoGame.Samples.Viewer
@@ -23,12 +24,14 @@ namespace TGC.MonoGame.Samples.Viewer
         public TGCViewer()
         {
             Graphics = new GraphicsDeviceManager(this);
-            //Graphics.IsFullScreen = true;
+
+            // Graphics.IsFullScreen = true;
             Graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width - 100;
             Graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 100;
             Graphics.GraphicsProfile = GraphicsProfile.HiDef;
+
             // Commented because of https://github.com/MonoGame/MonoGame/issues/7914
-            //Graphics.PreferMultiSampling = true;
+            // Graphics.PreferMultiSampling = true;
             Content.RootDirectory = ContentFolder;
             IsMouseVisible = true;
             Gizmos = new Gizmos.Gizmos();
@@ -62,7 +65,7 @@ namespace TGC.MonoGame.Samples.Viewer
         private readonly TGCViewerModel _model;
 
         /// <summary>
-        ///     Gizmos are used to debug and visualize boundaries and vectors
+        ///     Gizmos are used to debug and visualize boundaries and vectors.
         /// </summary>
         public Gizmos.Gizmos Gizmos { get; }
 
@@ -70,7 +73,7 @@ namespace TGC.MonoGame.Samples.Viewer
         ///     Enables a group of sprites to be drawn using the same settings.
         /// </summary>
         public SpriteBatch SpriteBatch { get; set; }
-        
+
         /// <summary>
         ///     This method is called after the constructor, but before the main game loop (Update/Draw).
         ///     Allows the game to perform any initialization it needs to before starting to run.
@@ -141,7 +144,10 @@ namespace TGC.MonoGame.Samples.Viewer
             CurrentMouseState = Mouse.GetState();
 
             // Check for exit.
-            if (CurrentKeyboardState.IsKeyDown(Keys.Escape)) Exit();
+            if (CurrentKeyboardState.IsKeyDown(Keys.Escape))
+            {
+                Exit();
+            }
         }
     }
 }

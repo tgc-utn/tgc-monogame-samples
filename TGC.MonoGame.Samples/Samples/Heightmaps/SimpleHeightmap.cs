@@ -1,6 +1,8 @@
 ﻿using System;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Viewer;
 
@@ -25,7 +27,8 @@ public class SimpleHeightMap : TGCSample
     private Texture2D _terrainTexture;
     private VertexBuffer _terrainVertexBuffer;
 
-    public SimpleHeightMap(TGCViewer game) : base(game)
+    public SimpleHeightMap(TGCViewer game)
+        : base(game)
     {
         Category = TGCSampleCategory.Heightmaps;
         Name = "Simple Heightmap";
@@ -58,7 +61,7 @@ public class SimpleHeightMap : TGCSample
         {
             World = Matrix.Identity,
             TextureEnabled = true,
-            Texture = _terrainTexture
+            Texture = _terrainTexture,
         };
         _effect.EnableDefaultLighting();
 
@@ -99,9 +102,9 @@ public class SimpleHeightMap : TGCSample
     /// <summary>
     ///     Create and load the VertexBuffer based on a Heightmap texture.
     /// </summary>
-    /// <param name="texture">The Heightmap texture</param>
-    /// <param name="scaleXZ">ScaleXZ is the distance between the vertices in the XZ plane, where the terrain does not rise</param>
-    /// <param name="scaleY">ScaleY is the distance by variability of gray in the heightmap</param>
+    /// <param name="texture">The Heightmap texture.</param>
+    /// <param name="scaleXZ">ScaleXZ is the distance between the vertices in the XZ plane, where the terrain does not rise.</param>
+    /// <param name="scaleY">ScaleY is the distance by variability of gray in the heightmap.</param>
     private void CreateHeightMapMesh(Texture2D texture, float scaleXZ, float scaleY)
     {
         var heightMap = new HeightMap(texture.Width, texture.Height);
@@ -122,9 +125,8 @@ public class SimpleHeightMap : TGCSample
     /// <summary>
     ///     Load Bitmap and get the grayscale value of Y for each coordinate (x, z).
     /// </summary>
-    /// <param name="texture">The Heightmap texture</param>
-    /// <param name="heightMap">The filled heightmap data</param>
-    /// <returns>The height of each vertex from zero to one</returns>
+    /// <param name="texture">The Heightmap texture.</param>
+    /// <param name="heightMap">The filled heightmap data.</param>
     private void LoadHeightMap(Texture2D texture, ref HeightMap heightMap)
     {
         var texels = new Color[texture.Width * texture.Height];
@@ -138,7 +140,7 @@ public class SimpleHeightMap : TGCSample
             {
                 // Get the color.
                 // (j, i) inverted to sweep rows first and then columns.
-                var texel = texels[y * texture.Width + x];
+                var texel = texels[(y * texture.Width) + x];
                 heightMap[x, y] = texel.R;
             }
         }
@@ -147,9 +149,9 @@ public class SimpleHeightMap : TGCSample
     /// <summary>
     ///     Create a Vertex Buffer from a HeightMap.
     /// </summary>
-    /// <param name="heightMap">The Heightmap which specifies height for each vertex</param>
-    /// <param name="scaleXZ">The distance between the vertices in both the X and Z axis</param>
-    /// <param name="scaleY">The scale in the Y axis for the vertices of the HeightMap</param>
+    /// <param name="heightMap">The Heightmap which specifies height for each vertex.</param>
+    /// <param name="scaleXZ">The distance between the vertices in both the X and Z axis.</param>
+    /// <param name="scaleY">The scale in the Y axis for the vertices of the HeightMap.</param>
     private void CreateVertexBuffer(in HeightMap heightMap, float scaleXZ, float scaleY)
     {
         var offsetX = heightMap.Width * scaleXZ * 0.5f;
@@ -167,7 +169,7 @@ public class SimpleHeightMap : TGCSample
         {
             for (var z = 0; z < heightMap.Length; z++)
             {
-                var position = new Vector3(x * scaleXZ - offsetX, heightMap[x, z] * scaleY, z * scaleXZ - offsetZ);
+                var position = new Vector3((x * scaleXZ) - offsetX, heightMap[x, z] * scaleY, (z * scaleXZ) - offsetZ);
                 var textureCoordinates = new Vector2((float)x / heightMap.Width, (float)z / heightMap.Length);
                 var normal = CalculateNormal(heightMap, x, z, scaleXZ, scaleY);
                 vertices[index] = new VertexPositionNormalTexture(position, normal, textureCoordinates);
@@ -184,8 +186,8 @@ public class SimpleHeightMap : TGCSample
     /// <summary>
     ///     Create an Index Buffer for a tessellated plane.
     /// </summary>
-    /// <param name="quadsInX">The amount of quads in the X axis</param>
-    /// <param name="quadsInZ">The amount of quads in the Z axis</param>
+    /// <param name="quadsInX">The amount of quads in the X axis.</param>
+    /// <param name="quadsInZ">The amount of quads in the Z axis.</param>
     private void CreateIndexBuffer(int quadsInX, int quadsInZ)
     {
         var indexCount = 3 * 2 * quadsInX * quadsInZ;
@@ -202,11 +204,10 @@ public class SimpleHeightMap : TGCSample
                 var bottom = z * vertexCountX;
                 var top = (z + 1) * vertexCountX;
 
-                //  d __ c  
+                // d __ c
                 //   | /|
                 //   |/_|
                 //  a    b
-
                 var a = (ushort)(x + bottom);
                 var b = (ushort)(right + bottom);
                 var c = (ushort)(right + top);
@@ -238,12 +239,12 @@ public class SimpleHeightMap : TGCSample
     /// <summary>
     ///     Calculate the normal vector for a vertex at the specified position in the heightmap.
     /// </summary>
-    /// <param name="heightMap">The heightmap data</param>
-    /// <param name="x">X coordinate in the heightmap</param>
-    /// <param name="z">Z coordinate in the heightmap</param>
-    /// <param name="scaleXZ">Scale factor for XZ plane</param>
-    /// <param name="scaleY">Scale factor for Y axis</param>
-    /// <returns>Normalized normal vector</returns>
+    /// <param name="heightMap">The heightmap data.</param>
+    /// <param name="x">X coordinate in the heightmap.</param>
+    /// <param name="z">Z coordinate in the heightmap.</param>
+    /// <param name="scaleXZ">Scale factor for XZ plane.</param>
+    /// <param name="scaleY">Scale factor for Y axis.</param>
+    /// <returns>Normalized normal vector.</returns>
     private Vector3 CalculateNormal(in HeightMap heightMap, int x, int z, float scaleXZ, float scaleY)
     {
         // Get neighboring heights (clamp at edges).
@@ -275,8 +276,8 @@ public class SimpleHeightMap : TGCSample
     /// <summary>
     ///     Struct holding heightmap data on a 2D grid (Width x Length).
     /// </summary>
-    /// <param name="width">Sample count in X</param>
-    /// <param name="length">Sample count in Z</param>
+    /// <param name="width">Sample count in X.</param>
+    /// <param name="length">Sample count in Z.</param>
     private readonly struct HeightMap(int width, int length)
     {
         public readonly int Width = width;
@@ -284,13 +285,13 @@ public class SimpleHeightMap : TGCSample
 
         private readonly float[] _samples = new float[width * length];
 
-        /// <summary>Gets or sets the height at (x, z)</summary>
-        /// <param name="x">X in range [0, Width)</param>
-        /// <param name="z">Z in range [0, Length)</param>
+        /// <summary>Gets or sets the height at (x, z).</summary>
+        /// <param name="x">X in range [0, Width).</param>
+        /// <param name="z">Z in range [0, Length).</param>
         public float this[int x, int z]
         {
-            get => _samples[x + z * Width];
-            set => _samples[x + z * Width] = value;
+            get => _samples[x + (z * Width)];
+            set => _samples[x + (z * Width)] = value;
         }
     }
 }

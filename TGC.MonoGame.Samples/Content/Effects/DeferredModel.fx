@@ -17,7 +17,7 @@ float3 color;
 struct VSI
 {
     float4 Position : SV_POSITION;
-    float3 Normal : NORMAL0; 
+    float3 Normal : NORMAL0;
     float2 TexCoord: TEXCOORD;
 };
 
@@ -64,16 +64,16 @@ PSO PS(VSO input)
 {
     PSO output;
     float3 n = normalize(input.Normal.xyz);
-  
+
     float3 normal = (n + 1.0) * 0.5;
 
     float3 texColor = tex2D(colorSampler, input.TexCoord).rgb;
-    
+
     output.color = float4(texColor, 1);
     output.normal = float4(normal, 1);
     output.position = float4(input.WorldPos.xyz, 1);
     output.material = float4(KD,KS,shininess, 1);
-    
+
     return output;
 }
 
@@ -81,14 +81,14 @@ PSO ColorPS(VSO input)
 {
     PSO output;
     float3 n = normalize(input.Normal.xyz);
-  
+
     float3 normal = (n + 1.0) * 0.5;
-    
+
     output.color = float4(color, 1);
     output.normal = float4(normal, 1);
     output.position = float4(input.WorldPos.xyz, 1);
     output.material = float4(0, KS, shininess, 1);
-    
+
     return output;
 }
 

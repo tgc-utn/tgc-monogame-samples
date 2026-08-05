@@ -29,7 +29,7 @@ namespace TGC.MonoGame.Samples.Cameras
         /// <param name="position">Initial world-space position of the camera.</param>
         /// <param name="screenCenter">Screen point where the mouse will be recentered.</param>
         public FreeCamera(float aspectRatio, Vector3 position, Point screenCenter)
-        : this(aspectRatio, position)
+            : this(aspectRatio, position)
         {
             _lockMouse = true;
             this._screenCenter = screenCenter;
@@ -42,7 +42,7 @@ namespace TGC.MonoGame.Samples.Cameras
         /// <param name="aspectRatio">The viewport aspect ratio (width divided by height).</param>
         /// <param name="position">Initial world-space position of the camera.</param>
         public FreeCamera(float aspectRatio, Vector3 position)
-        : base(aspectRatio)
+            : base(aspectRatio)
         {
             Position = position;
             _pastMousePosition = Mouse.GetState().Position.ToVector2();
@@ -59,7 +59,7 @@ namespace TGC.MonoGame.Samples.Cameras
         /// <param name="pitch">Initial pitch angle in degrees (rotation around the horizontal axis).</param>
         /// <param name="screenCenter">Screen point where the mouse will be recentered.</param>
         public FreeCamera(float aspectRatio, Vector3 position, float yaw, float pitch, Point screenCenter)
-        : this(aspectRatio, position, screenCenter)
+            : this(aspectRatio, position, screenCenter)
         {
             _yaw = yaw;
             _pitch = pitch;
@@ -77,6 +77,11 @@ namespace TGC.MonoGame.Samples.Cameras
         /// </summary>
         public float MouseSensitivity { get; set; } = 5f;
 
+        private void CalculateView()
+        {
+            View = Matrix.CreateLookAt(Position, Position + FrontDirection, UpDirection);
+        }
+
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
@@ -89,11 +94,6 @@ namespace TGC.MonoGame.Samples.Cameras
             {
                 CalculateView();
             }
-        }
-
-        private void CalculateView()
-        {
-            View = Matrix.CreateLookAt(Position, Position + FrontDirection, UpDirection);
         }
 
         private void ProcessKeyboard(float elapsedTime)
@@ -141,7 +141,6 @@ namespace TGC.MonoGame.Samples.Cameras
                 Position -= Vector3.Up * currentMovementSpeed * elapsedTime;
                 _changed = true;
             }
-
         }
 
         private void ProcessMouseMovement(float elapsedTime)

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
 
@@ -24,7 +26,8 @@ public class ShaderVisualizer : TGCSample
     private ShaderReloader _shaderReloader;
 
     /// <inheritdoc />
-    public ShaderVisualizer(TGCViewer game) : base(game)
+    public ShaderVisualizer(TGCViewer game)
+        : base(game)
     {
         Category = TGCSampleCategory.Shaders;
         Name = "Shader Visualizer";

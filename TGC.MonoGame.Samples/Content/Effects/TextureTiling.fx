@@ -89,7 +89,7 @@ float4 WorldTilingPS(WorldVertexShaderOutput input) : COLOR
     // Same for the Y plane
     float yAlignment = abs(dot(input.Normal, float3(0, 1, 0)));
 
-    // Use the world position as texture coordinates 
+    // Use the world position as texture coordinates
     // Choose which coordinates we will use based on our normal
     float2 yPlane = lerp(input.WorldPosition.xy, input.WorldPosition.xz, yAlignment);
     float2 resultPlane = lerp(yPlane, input.WorldPosition.yz, xAlignment);
@@ -118,4 +118,3 @@ technique WorldTiling
         PixelShader = compile PS_SHADERMODEL WorldTilingPS();
     }
 };
-

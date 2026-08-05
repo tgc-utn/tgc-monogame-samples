@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Microsoft.Xna.Framework;
 
 namespace TGC.MonoGame.Samples.Mathematics;
@@ -51,21 +52,25 @@ public struct Vector3I : IEquatable<Vector3I>
         return new Vector3I((int)vector.X, (int)vector.Y, (int)vector.Z);
     }
 
+    /// <inheritdoc/>
     public bool Equals(Vector3I other)
     {
         return X == other.X && Y == other.Y && Z == other.Z;
     }
 
+    /// <inheritdoc/>
     public override bool Equals(object obj)
     {
         return obj is Vector3I other && Equals(other);
     }
 
+    /// <inheritdoc/>
     public override int GetHashCode()
     {
         return HashCode.Combine(X, Y, Z);
     }
 
+    /// <inheritdoc/>
     public override string ToString()
     {
         return $"{{{X}, {Y}, {Z}}}";

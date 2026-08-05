@@ -6,7 +6,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
     /// <summary>
     ///     Gizmo for drawing Wire Cubes.
     /// </summary>
-    class CubeGizmoGeometry : GizmoGeometry
+    public class CubeGizmoGeometry : GizmoGeometry
     {
         private static readonly Matrix PrecalculatedFrustumTransform = Matrix.CreateTranslation(Vector3.Backward * 0.5f) * Matrix.CreateScale(new Vector3(2f, 2f, 1f));
 
@@ -14,7 +14,8 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
         ///     Creates a Wire Cube.
         /// </summary>
         /// <param name="graphicsDevice">A GraphicsDevice to bind the geometry.</param>
-        public CubeGizmoGeometry(GraphicsDevice graphicsDevice) : base(graphicsDevice)
+        public CubeGizmoGeometry(GraphicsDevice graphicsDevice)
+            : base(graphicsDevice)
         {
             var vertices = new VertexPosition[8]
             {
@@ -25,24 +26,24 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
                 new VertexPosition(new Vector3(0.5f, 0.5f, -0.5f)),
                 new VertexPosition(new Vector3(-0.5f, 0.5f, -0.5f)),
                 new VertexPosition(new Vector3(0.5f, -0.5f, -0.5f)),
-                new VertexPosition(new Vector3(-0.5f, -0.5f, -0.5f))
+                new VertexPosition(new Vector3(-0.5f, -0.5f, -0.5f)),
             };
-            var indices = new ushort[24] 
-            { 
-                0, 1, 
-                0, 2,  
+            var indices = new ushort[24]
+            {
+                0, 1,
+                0, 2,
                 1, 3,
-                3, 2, 
+                3, 2,
 
-                4, 5, 
-                4, 6, 
-                5, 7,  
-                7, 6,   
+                4, 5,
+                4, 6,
+                5, 7,
+                7, 6,
 
                 0, 4,
                 1, 5,
                 2, 6,
-                3, 7
+                3, 7,
             };
             InitializeVertices(vertices);
             InitializeIndices(indices);
@@ -58,7 +59,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
         {
             return Matrix.CreateScale(size) * Matrix.CreateTranslation(origin);
         }
-        
+
         /// <summary>
         ///     Calculates a World matrix for a frustum.
         /// </summary>

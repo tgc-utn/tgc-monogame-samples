@@ -1,6 +1,8 @@
 ﻿using System;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Viewer;
 
@@ -23,12 +25,13 @@ namespace TGC.MonoGame.Samples.Samples
         ///     Default constructor.
         /// </summary>
         /// <param name="game">The game.</param>
-        public TGCLogoSample(TGCViewer game) : base(game)
+        public TGCLogoSample(TGCViewer game)
+            : base(game)
         {
             Name = GetType().Name;
             Description = Description = "Time to explore the samples :)";
         }
-        
+
         /// <inheritdoc />
         public override void Initialize()
         {
@@ -42,7 +45,7 @@ namespace TGC.MonoGame.Samples.Samples
         {
             // Load mesh.
             _model = Game.Content.Load<Model>(ContentFolder3D + "tgc-logo/tgc-logo");
-            var modelEffect = (BasicEffect) _model.Meshes[0].Effects[0];
+            var modelEffect = (BasicEffect)_model.Meshes[0].Effects[0];
             modelEffect.DiffuseColor = Color.DarkBlue.ToVector3();
             modelEffect.EnableDefaultLighting();
             _world = Matrix.Identity;

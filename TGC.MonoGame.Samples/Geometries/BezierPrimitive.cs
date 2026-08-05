@@ -6,13 +6,13 @@
 // Microsoft XNA Community Game Platform
 // Copyright (C) Microsoft Corporation. All rights reserved.
 //-----------------------------------------------------------------------------
-
 #endregion File Description
 
 #region Using Statements
 
 using System;
 using System.Diagnostics;
+
 using Microsoft.Xna.Framework;
 
 #endregion Using Statements
@@ -33,25 +33,33 @@ namespace TGC.MonoGame.Samples.Geometries
             var stride = tessellation + 1;
 
             for (var i = 0; i < tessellation; i++)
-            for (var j = 0; j < tessellation; j++)
             {
-                // Make a list of six index values (two triangles).
-                int[] indices =
+                for (var j = 0; j < tessellation; j++)
                 {
-                    i * stride + j,
-                    (i + 1) * stride + j,
-                    (i + 1) * stride + j + 1,
+                    // Make a list of six index values (two triangles).
+                    int[] indices =
+                    {
+                    (i * stride) + j,
+                    ((i + 1) * stride) + j,
+                    ((i + 1) * stride) + j + 1,
 
-                    i * stride + j,
-                    (i + 1) * stride + j + 1,
-                    i * stride + j + 1
-                };
+                    (i * stride) + j,
+                    ((i + 1) * stride) + j + 1,
+                    (i * stride) + j + 1,
+                    };
 
-                // If this patch is mirrored, reverse the indices to keep the correct winding order.
-                if (isMirrored) Array.Reverse(indices);
+                    // If this patch is mirrored, reverse the indices to keep the correct winding order.
+                    if (isMirrored)
+                    {
+                        Array.Reverse(indices);
+                    }
 
-                // Create the indices.
-                foreach (var index in indices) AddIndex(CurrentVertex + index);
+                    // Create the indices.
+                    foreach (var index in indices)
+                    {
+                        AddIndex(CurrentVertex + index);
+                    }
+                }
             }
         }
 
@@ -64,11 +72,11 @@ namespace TGC.MonoGame.Samples.Geometries
 
             for (var i = 0; i <= tessellation; i++)
             {
-                var ti = (float) i / tessellation;
+                var ti = (float)i / tessellation;
 
                 for (var j = 0; j <= tessellation; j++)
                 {
-                    var tj = (float) j / tessellation;
+                    var tj = (float)j / tessellation;
 
                     // Perform four horizontal bezier interpolations between the control points of this patch.
                     var p1 = Bezier(patch[0], patch[1], patch[2], patch[3], ti);
@@ -98,7 +106,9 @@ namespace TGC.MonoGame.Samples.Geometries
 
                         // If this patch is mirrored, we must invert the normal.
                         if (isMirrored)
+                        {
                             normal = -normal;
+                        }
                     }
                     else
                     {
@@ -110,11 +120,14 @@ namespace TGC.MonoGame.Samples.Geometries
                         // depending on whether we are on the top or bottom of the teapot.
                         // This is not a robust solution for all possible degenerate bezier patches, but hey,
                         // it's good enough to make the teapot work correctly!
-
                         if (position.Y > 0)
+                        {
                             normal = Vector3.Up;
+                        }
                         else
+                        {
                             normal = Vector3.Down;
+                        }
                     }
 
                     // Create the vertex.
@@ -129,10 +142,10 @@ namespace TGC.MonoGame.Samples.Geometries
         /// </summary>
         private static float Bezier(float p1, float p2, float p3, float p4, float t)
         {
-            return p1 * (1 - t) * (1 - t) * (1 - t) +
-                   p2 * 3 * t * (1 - t) * (1 - t) +
-                   p3 * 3 * t * t * (1 - t) +
-                   p4 * t * t * t;
+            return (p1 * (1 - t) * (1 - t) * (1 - t)) +
+                   (p2 * 3 * t * (1 - t) * (1 - t)) +
+                   (p3 * 3 * t * t * (1 - t)) +
+                   (p4 * t * t * t);
         }
 
         /// <summary>
@@ -155,10 +168,10 @@ namespace TGC.MonoGame.Samples.Geometries
         /// </summary>
         private static float BezierTangent(float p1, float p2, float p3, float p4, float t)
         {
-            return p1 * (-1 + 2 * t - t * t) +
-                   p2 * (1 - 4 * t + 3 * t * t) +
-                   p3 * (2 * t - 3 * t * t) +
-                   p4 * (t * t);
+            return (p1 * (-1 + (2 * t) - (t * t))) +
+                   (p2 * (1 - (4 * t) + (3 * t * t))) +
+                   (p3 * ((2 * t) - (3 * t * t))) +
+                   (p4 * (t * t));
         }
 
         /// <summary>

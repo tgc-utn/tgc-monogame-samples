@@ -1,6 +1,8 @@
 using System.Linq;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries.Textures;
 using TGC.MonoGame.Samples.Viewer;
@@ -25,16 +27,18 @@ public class PlanarReflections : TGCSample
     private BoxPrimitive _box;
     private Matrix _frameTop;
     private Matrix _frameBottom;
-    private Matrix _frameLeft; 
+    private Matrix _frameLeft;
     private Matrix _frameRight;
 
-    public PlanarReflections(TGCViewer game) : base(game)
+    public PlanarReflections(TGCViewer game)
+        : base(game)
     {
         Category = TGCSampleCategory.PostProcessing;
         Name = "Planar Reflections";
         Description = "Reflections on a flat surface";
     }
 
+    /// <inheritdoc/>
     public override void Initialize()
     {
         var screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
@@ -72,6 +76,7 @@ public class PlanarReflections : TGCSample
         base.Initialize();
     }
 
+    /// <inheritdoc/>
     protected override void LoadContent()
     {
         _robotModel = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
@@ -85,7 +90,7 @@ public class PlanarReflections : TGCSample
         _planarReflectionEffect = Game.Content.Load<Effect>(ContentFolderEffects + "PlanarReflections");
 
         ModifierController.AddTexture("Reflection Render Target", _reflectionRenderTarget);
-        
+
         base.LoadContent();
     }
 
@@ -98,11 +103,13 @@ public class PlanarReflections : TGCSample
         var quadNormal = Vector3.Backward;
         var viewDirection = _camera.Position - _quadWorld.Translation;
         var projLength = Vector3.Dot(quadNormal, viewDirection);
-        var reflectionCamPos = _camera.Position - 2 * quadNormal * projLength;
-        var reflectionCamForward = Vector3.Reflect(_camera.FrontDirection,
+        var reflectionCamPos = _camera.Position - (2 * quadNormal * projLength);
+        var reflectionCamForward = Vector3.Reflect(
+            _camera.FrontDirection,
             quadNormal);
         var reflectionCamUp = Vector3.Reflect(_camera.UpDirection, quadNormal);
-        var reflectionCamView = Matrix.CreateLookAt(reflectionCamPos,
+        var reflectionCamView = Matrix.CreateLookAt(
+            reflectionCamPos,
             reflectionCamPos + reflectionCamForward, reflectionCamUp);
 
         // Draw the scene from the reflection camera point of view
@@ -138,6 +145,7 @@ public class PlanarReflections : TGCSample
         _chairModel.Draw(_chairWorld, view, projection);
     }
 
+    /// <inheritdoc/>
     public override void Draw(GameTime gameTime)
     {
         GraphicsDevice.DepthStencilState = DepthStencilState.Default;
@@ -150,6 +158,7 @@ public class PlanarReflections : TGCSample
         base.Draw(gameTime);
     }
 
+    /// <inheritdoc/>
     public override void Update(GameTime gameTime)
     {
         _camera.Update(gameTime);
@@ -157,10 +166,11 @@ public class PlanarReflections : TGCSample
         base.Update(gameTime);
     }
 
+    /// <inheritdoc/>
     protected override void UnloadContent()
     {
         _reflectionRenderTarget.Dispose();
-        
+
         base.UnloadContent();
     }
 }

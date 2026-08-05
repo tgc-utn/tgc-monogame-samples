@@ -400,7 +400,6 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
                     Game.Gizmos.DrawLine(Vector3.Transform(arr.Position, world), Vector3.Transform(arr.Target, world), arr.Color);
                 }
             }
-
         }
 
         /// <summary>

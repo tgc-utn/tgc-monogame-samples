@@ -1,6 +1,8 @@
 ﻿using System;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Models;
 using TGC.MonoGame.Samples.Viewer;
@@ -16,7 +18,8 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
     /// </summary>
     public class Tutorial6 : TGCSample
     {
-        public Tutorial6(TGCViewer game) : base(game)
+        public Tutorial6(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.Tutorials;
             Name = "Tutorial 6";
@@ -57,11 +60,11 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             // Update the animation properties on the tank object. In a real game you would probably take this data from user inputs
             // or the physics system, rather than just making everything rotate like this!
             _tankModel.WheelRotation = time * 5;
-            _tankModel.SteerRotation = (float) Math.Sin(time * 0.75f) * 0.5f;
-            _tankModel.TurretRotation = (float) Math.Sin(time * 0.333f) * 1.25f;
-            _tankModel.CannonRotation = (float) Math.Sin(time * 0.25f) * 0.333f - 0.333f;
-            _tankModel.HatchRotation = MathHelper.Clamp((float) Math.Sin(time * 2) * 2, -1, 0);
-            
+            _tankModel.SteerRotation = (float)Math.Sin(time * 0.75f) * 0.5f;
+            _tankModel.TurretRotation = (float)Math.Sin(time * 0.333f) * 1.25f;
+            _tankModel.CannonRotation = ((float)Math.Sin(time * 0.25f) * 0.333f) - 0.333f;
+            _tankModel.HatchRotation = MathHelper.Clamp((float)Math.Sin(time * 2) * 2, -1, 0);
+
             Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
 
             base.Update(gameTime);
@@ -72,7 +75,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         {
             Game.Background = Color.CornflowerBlue;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            
+
             // Calculate the camera matrices.
             var time = Convert.ToSingle(gameTime.TotalGameTime.TotalSeconds);
 

@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+
 using Microsoft.Xna.Framework.Graphics;
 
 namespace TGC.MonoGame.Samples.Samples.Shaders.ShaderReloader;
@@ -80,7 +81,7 @@ public class ShaderReloader
             CreateNoWindow = true,
             UseShellExecute = false,
             RedirectStandardError = true,
-            RedirectStandardOutput = true
+            RedirectStandardOutput = true,
         };
     }
 
@@ -91,7 +92,8 @@ public class ShaderReloader
         var pProcess = new Process();
         pProcess.StartInfo = _processStartInfo;
         pProcess.EnableRaisingEvents = true;
-        //Get program output.
+
+        // Get program output.
         var stdError = new StringBuilder();
         var stdOutput = new StringBuilder();
 

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Viewer;
 
@@ -12,14 +14,15 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
     ///     Units Involved:
     ///     # Unit 8 - Video Adapters - Shaders.
     ///     It's the hello world of shaders.
-    ///     Author: Mariano Banquiero
+    ///     Author: Mariano Banquiero.
     /// </summary>
     public class BasicShader : TGCSample
     {
         private float _time;
 
         /// <inheritdoc />
-        public BasicShader(TGCViewer game) : base(game)
+        public BasicShader(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.Shaders;
             Name = "Basic Shader";
@@ -43,8 +46,9 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         protected override void LoadContent()
         {
             _model = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
+
             // From the effect of the model I keep the texture.
-            _texture = ((BasicEffect) _model.Meshes.FirstOrDefault()?.MeshParts.FirstOrDefault()?.Effect)?.Texture;
+            _texture = ((BasicEffect)_model.Meshes.FirstOrDefault()?.MeshParts.FirstOrDefault()?.Effect)?.Texture;
 
             // Load a shader in runtime, outside the Content pipeline.
             // First you must run "mgfxc <SourceFile> <OutputFile> [/Debug] [/Profile:<DirectX_11,OpenGL>]"

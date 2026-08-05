@@ -50,7 +50,7 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 
 	float4x4 reflectProjectWorld = mul(ReflectionView, Projection);
 	reflectProjectWorld = mul(World, reflectProjectWorld);
-    
+
 	output.ReflectionPosition = mul(input.Position, reflectProjectWorld);
 
     return output;
@@ -70,7 +70,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 	float4 reflectionColor = tex2D(reflectionSampler, reflectionTexCoord.xy);
 
 	return reflectionColor;
-	
+
 	//return float4(input.Normal.x, input.Normal.y, input.Normal.z, 1.0f);
 }
 

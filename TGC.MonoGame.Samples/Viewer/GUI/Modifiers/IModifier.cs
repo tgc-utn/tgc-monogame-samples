@@ -6,7 +6,7 @@
     public interface IModifier
     {
         /// <summary>
-        ///     Draws the Modifier
+        ///     Draws the Modifier.
         /// </summary>
         void Draw();
     }

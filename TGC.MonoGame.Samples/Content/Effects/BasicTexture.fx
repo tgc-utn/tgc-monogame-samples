@@ -39,7 +39,7 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 
     float4 worldPosition = mul(input.Position, World);
     float4 viewPosition = mul(worldPosition, View);
-	
+
 	// Project position
     output.Position = mul(viewPosition, Projection);
 

@@ -1,6 +1,8 @@
 ﻿using System;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries.Textures;
 using TGC.MonoGame.Samples.Viewer;
@@ -17,7 +19,8 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
     public class Tutorial4 : TGCSample
     {
         /// <inheritdoc />
-        public Tutorial4(TGCViewer game) : base(game)
+        public Tutorial4(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.Tutorials;
             Name = "Tutorial 4";
@@ -47,7 +50,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             _quad.Effect.Texture = texture;
 
             _quadWorld = Matrix.CreateScale(10f) * Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateTranslation(Vector3.UnitX * 14);
-             
+
             _box = new BoxPrimitive(GraphicsDevice, Vector3.One * 20, texture);
             _boxWorld = Matrix.CreateTranslation(Vector3.UnitX * -14);
 
@@ -70,7 +73,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
         {
             Game.Background = Color.CornflowerBlue;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            
+
             _box.Draw(Matrix.CreateRotationY(_boxRotation) * _boxWorld, _camera.View, _camera.Projection);
             _quad.Draw(_quadWorld, _camera.View, _camera.Projection);
 

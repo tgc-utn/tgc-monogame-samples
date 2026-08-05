@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -27,7 +28,8 @@ namespace TGC.MonoGame.Samples.Cameras
         /// <param name="position">The position of the camera.</param>
         /// <param name="speed">The speed of movement.</param>
         /// <param name="angle">The angle of movement.</param>
-        public SimpleCamera(float aspectRatio, Vector3 position, float speed, float angle) : base(aspectRatio)
+        public SimpleCamera(float aspectRatio, Vector3 position, float speed, float angle)
+            : base(aspectRatio)
         {
             BuildView(position, speed, angle);
         }
@@ -43,7 +45,8 @@ namespace TGC.MonoGame.Samples.Cameras
         /// <param name="nearPlaneDistance">Distance to the near view plane.</param>
         /// <param name="farPlaneDistance">Distance to the far view plane.</param>
         public SimpleCamera(float aspectRatio, Vector3 position, float speed, float angle, float nearPlaneDistance,
-            float farPlaneDistance) : base(aspectRatio, nearPlaneDistance, farPlaneDistance)
+            float farPlaneDistance)
+            : base(aspectRatio, nearPlaneDistance, farPlaneDistance)
         {
             BuildView(position, speed, angle);
         }
@@ -84,16 +87,24 @@ namespace TGC.MonoGame.Samples.Cameras
             var turn = 0f;
 
             if (keyboardState.IsKeyDown(Keys.Up))
+            {
                 pitch += time * Angle;
+            }
 
             if (keyboardState.IsKeyDown(Keys.Down))
+            {
                 pitch -= time * Angle;
+            }
 
             if (keyboardState.IsKeyDown(Keys.Left))
+            {
                 turn += time * Angle;
+            }
 
             if (keyboardState.IsKeyDown(Keys.Right))
+            {
                 turn -= time * Angle;
+            }
 
             RightDirection = Vector3.Cross(DefaultWorldUpVector, FrontDirection);
             var flatFront = Vector3.Cross(RightDirection, DefaultWorldUpVector);
@@ -104,20 +115,31 @@ namespace TGC.MonoGame.Samples.Cameras
             var tiltedFront = Vector3.TransformNormal(FrontDirection, pitchMatrix * turnMatrix);
 
             // Check angle so we can't flip over.
-            if (Vector3.Dot(tiltedFront, flatFront) > 0.001f) FrontDirection = Vector3.Normalize(tiltedFront);
+            if (Vector3.Dot(tiltedFront, flatFront) > 0.001f)
+            {
+                FrontDirection = Vector3.Normalize(tiltedFront);
+            }
 
             // Check for input to move the camera around.
             if (keyboardState.IsKeyDown(Keys.W))
+            {
                 Position += FrontDirection * time * Speed;
+            }
 
             if (keyboardState.IsKeyDown(Keys.S))
+            {
                 Position -= FrontDirection * time * Speed;
+            }
 
             if (keyboardState.IsKeyDown(Keys.A))
+            {
                 Position += RightDirection * time * Speed;
+            }
 
             if (keyboardState.IsKeyDown(Keys.D))
+            {
                 Position -= RightDirection * time * Speed;
+            }
 
             View = Matrix.CreateLookAt(Position, Position + FrontDirection, DefaultWorldUpVector);
         }

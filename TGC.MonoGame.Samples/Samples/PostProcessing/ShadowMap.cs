@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
@@ -39,7 +41,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         private BasicEffect _basicEffect;
 
         /// <inheritdoc />
-        public ShadowMap(TGCViewer game) : base(game)
+        public ShadowMap(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.PostProcessing;
             Name = "Shadow Map";
@@ -152,6 +155,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             #region Pass 1
 
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+
             // Set the render target as our shadow map, we are drawing the depth into this texture
             GraphicsDevice.SetRenderTarget(_shadowMapRenderTarget);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1f, 0);
@@ -164,7 +168,9 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             foreach (var modelMesh in _model.Meshes)
             {
                 foreach (var part in modelMesh.MeshParts)
+                {
                     part.Effect = _effect;
+                }
 
                 // We set the main matrices for each mesh to draw
                 var worldMatrix = modelMeshesBaseTransforms[modelMesh.ParentBone.Index];
@@ -194,7 +200,9 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             foreach (var modelMesh in _model.Meshes)
             {
                 foreach (var part in modelMesh.MeshParts)
+                {
                     part.Effect = _effect;
+                }
 
                 // We set the main matrices for each mesh to draw
                 var worldMatrix = modelMeshesBaseTransforms[modelMesh.ParentBone.Index];

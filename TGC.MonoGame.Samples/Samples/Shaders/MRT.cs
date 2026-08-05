@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Viewer;
-using TGC.MonoGame.Samples.Viewer.GUI;
 using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
 namespace TGC.MonoGame.Samples.Samples.Shaders
@@ -13,17 +13,19 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
     /// <summary>
     ///     Multiple render target technique:
     ///     Allows drawing to up to 4 render targets at the same time with a modified shader
-    ///     
-    ///     Author: Leandro Osuna
+    ///
+    ///     Author: Leandro Osuna.
     /// </summary>
     public class MRT : TGCSample
     {
-        public MRT(TGCViewer game) : base(game)
+        public MRT(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.Shaders;
             Name = "Multiple Render Target";
             Description = "Draw to up to 4 render targets at the same time";
         }
+
         private float _time;
 
         private Camera _camera;
@@ -47,23 +49,24 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         {
             _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0f, 0f, 300f));
             _time = 0;
-            
+
             base.Initialize();
         }
-        
+
         /// <inheritdoc />
         protected override void LoadContent()
         {
             _model = Game.Content.Load<Model>(ContentFolder3D + "tgcito-classic/tgcito-classic");
+
             // From the effect of the model I keep the texture.
-            _texture = ((BasicEffect) _model.Meshes.FirstOrDefault()?.MeshParts.FirstOrDefault()?.Effect)?.Texture;
+            _texture = ((BasicEffect)_model.Meshes.FirstOrDefault()?.MeshParts.FirstOrDefault()?.Effect)?.Texture;
 
             // Load a shader using Content pipeline.
             _effect = Game.Content.Load<Effect>(ContentFolderEffects + "MRT");
 
             // Set the texture of the model in the shader
             _effect.Parameters["ModelTexture"].SetValue(_texture);
-            
+
             // For faster access in draw
             _effectWorld = _effect.Parameters["World"];
             _effectWorldViewProjection = _effect.Parameters["WorldViewProjection"];
@@ -94,8 +97,8 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 
             // To easily draw render targets
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            
-            ModifierController.AddOptions("Choose Target", new []
+
+            ModifierController.AddOptions("Choose Target", new[]
             {
                 "All targets",
                 "Color",
@@ -114,6 +117,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             _renderTargetToShow = renderTargetToShow;
         }
 
+        /// <inheritdoc/>
         public override void Update(GameTime gameTime)
         {
             _camera.Update(gameTime);
@@ -123,20 +127,20 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             base.Update(gameTime);
         }
 
+        /// <inheritdoc/>
         public override void Draw(GameTime gameTime)
         {
             // Set Time value in effect
             _time += Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
             _effectTime.SetValue(_time);
-            
+
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             // Set the render targets we are going to be drawing to, in the correct order
             GraphicsDevice.SetRenderTargets(_colorTarget, _inverseColorTarget, _normalTarget, _animatedTarget);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1f, 0);
-           
-            // Draw our model or models, keep in mind that all of them must have MRT effect assigned
 
+            // Draw our model or models, keep in mind that all of them must have MRT effect assigned
             var mesh = _model.Meshes.FirstOrDefault();
             if (mesh != null)
             {
@@ -150,7 +154,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             // Now we can draw any target, or send them as textures to another shader
             GraphicsDevice.SetRenderTarget(null);
             GraphicsDevice.Clear(Color.White);
-            
+
             var width = GraphicsDevice.Viewport.Width;
             var height = GraphicsDevice.Viewport.Height;
             var halfWidth = width / 2;
@@ -164,13 +168,12 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             var scale = 0.5f;
 
             _spriteBatch.Begin();
-            
+
             // Verify default begin options in your project (RasterizerState, DepthStencil...)
             // Draw selected target
             switch (_renderTargetToShow)
             {
                 default:
-                case RenderTargetType.AllTargets:
                     _spriteBatch.Draw(_colorTarget, topLeft,
                         null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
                     _spriteBatch.Draw(_inverseColorTarget, topRight,
@@ -195,9 +198,10 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             }
 
             _spriteBatch.End();
-            
+
             base.Draw(gameTime);
         }
+
         private enum RenderTargetType
         {
             AllTargets,
