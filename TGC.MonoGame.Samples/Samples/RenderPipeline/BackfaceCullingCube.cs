@@ -59,6 +59,8 @@ public class BackfaceCullingCube : TGCSample
     public override void Update(GameTime gameTime)
     {
         var totalTime = (float)gameTime.TotalGameTime.TotalSeconds;
+
+        // A simple repeating rotation cycle to show all faces of the cube.
         _rotation = Quaternion.CreateFromYawPitchRoll(MathF.Sin(totalTime), MathF.Cos(totalTime), MathF.Sin(MathF.Abs(totalTime)));
         Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
 
@@ -72,11 +74,25 @@ public class BackfaceCullingCube : TGCSample
         _effect.Parameters["ViewProjection"].SetValue(_camera.View * _camera.Projection);
 
         var existingRasterizerState = GraphicsDevice.RasterizerState;
+
+        // Draw the cube with different culling modes, separated by a <step> offset along the X-axis.
         var step = 35f;
         var offset = -step;
         foreach (var cullMode in _cullModes)
         {
-            GraphicsDevice.RasterizerState = new RasterizerState { CullMode = cullMode, FillMode = _wireframeEnabled ? FillMode.WireFrame : FillMode.Solid };
+            /*
+                Create a new rasterizer state and set the desired values for this draw call.
+                we need to have a different RasterizerState because once it has been binded to the gpu it cannot be modified.
+                in a real application you would want to cache the different rasterizer states and reuse them instead of creating new ones every frame.
+                Reference:
+                    https://docs.monogame.net/articles/getting_to_know/whatis/graphics/WhatIs_Rasterizer.html
+                    https://www.tgcutn.com.ar/material/notes/unit3
+            */
+            GraphicsDevice.RasterizerState = new RasterizerState
+            {
+                CullMode = cullMode,    // Set the culling mode for this draw call
+                FillMode = _wireframeEnabled ? FillMode.WireFrame : FillMode.Solid,
+            };
             var world = Matrix.CreateFromQuaternion(_rotation) * Matrix.CreateTranslation(offset, 0f, 0f);
             _effect.Parameters["World"].SetValue(world);
             _cube.Draw(_effect);
@@ -105,12 +121,14 @@ public class BackfaceCullingCube : TGCSample
     protected override void UnloadContent()
     {
         _cube.Dispose();
-
         _effect.Dispose();
         _spriteFont.Texture.Dispose();
         base.UnloadContent();
     }
 
+    /// <summary>
+    /// Draws the labels for each culling mode.
+    /// </summary>
     private void DrawLabels()
     {
         // Draw labels
