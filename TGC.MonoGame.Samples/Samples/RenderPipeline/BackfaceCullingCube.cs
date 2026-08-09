@@ -15,12 +15,12 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline;
 /// </summary>
 public class BackfaceCullingCube : TGCSample
 {
-    private readonly List<RasterizerState> _rasterizerStates = new List<RasterizerState>
-    {
-        new RasterizerState { CullMode = CullMode.CullClockwiseFace },
-        new RasterizerState { CullMode = CullMode.None },
-        new RasterizerState { CullMode = CullMode.CullCounterClockwiseFace },
-    };
+    private readonly List<CullMode> _cullModes =
+    [
+        CullMode.CullClockwiseFace,
+        CullMode.None,
+        CullMode.CullCounterClockwiseFace,
+    ];
 
     private Quaternion _rotation = Quaternion.Identity;
 
@@ -32,6 +32,8 @@ public class BackfaceCullingCube : TGCSample
     private Effect _effect = null!;
 
     private SpriteFont _spriteFont = null!;
+
+    private bool _wireframeEnabled;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BackfaceCullingCube"/> class.
@@ -54,31 +56,6 @@ public class BackfaceCullingCube : TGCSample
     }
 
     /// <inheritdoc />
-    protected override void LoadContent()
-    {
-        // Load mesh.
-        _cube = new CubePrimitive(GraphicsDevice, 10f, Color.Red, Color.Green, Color.Blue, Color.Yellow, Color.Cyan, Color.Magenta);
-        _effect = Game.Content.Load<Effect>(ContentFolderEffects + "ExplodeColored");
-        _spriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
-        ModifierController.AddToggle("Show Wireframe", (enabled) => HandleWireframeToggle(enabled), false);
-        base.LoadContent();
-    }
-
-    /// <inheritdoc />
-    protected override void UnloadContent()
-    {
-        _cube.Dispose();
-        foreach (var rs in _rasterizerStates)
-        {
-            rs.Dispose();
-        }
-
-        _effect.Dispose();
-        _spriteFont.Texture.Dispose();
-        base.UnloadContent();
-    }
-
-    /// <inheritdoc />
     public override void Update(GameTime gameTime)
     {
         var totalTime = (float)gameTime.TotalGameTime.TotalSeconds;
@@ -97,9 +74,9 @@ public class BackfaceCullingCube : TGCSample
         var existingRasterizerState = GraphicsDevice.RasterizerState;
         var step = 35f;
         var offset = -step;
-        foreach (var rs in _rasterizerStates)
+        foreach (var cullMode in _cullModes)
         {
-            GraphicsDevice.RasterizerState = rs;
+            GraphicsDevice.RasterizerState = new RasterizerState { CullMode = cullMode, FillMode = _wireframeEnabled ? FillMode.WireFrame : FillMode.Solid };
             var world = Matrix.CreateFromQuaternion(_rotation) * Matrix.CreateTranslation(offset, 0f, 0f);
             _effect.Parameters["World"].SetValue(world);
             _cube.Draw(_effect);
@@ -113,18 +90,25 @@ public class BackfaceCullingCube : TGCSample
         base.Draw(gameTime);
     }
 
-    private void HandleWireframeToggle(bool enabled)
+    /// <inheritdoc />
+    protected override void LoadContent()
     {
-        for (int i = 0; i < _rasterizerStates.Count; i++)
-        {
-            var oldRs = _rasterizerStates[i];
-            var newRs = new RasterizerState
-            {
-                CullMode = oldRs.CullMode,
-                FillMode = enabled ? FillMode.WireFrame : FillMode.Solid,
-            };
-            _rasterizerStates[i] = newRs;
-        }
+        // Load mesh.
+        _cube = new CubePrimitive(GraphicsDevice, 10f, Color.Red, Color.Green, Color.Blue, Color.Yellow, Color.Cyan, Color.Magenta);
+        _effect = Game.Content.Load<Effect>(ContentFolderEffects + "ExplodeColored");
+        _spriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
+        ModifierController.AddToggle("Show Wireframe", (enabled) => _wireframeEnabled = enabled, false);
+        base.LoadContent();
+    }
+
+    /// <inheritdoc />
+    protected override void UnloadContent()
+    {
+        _cube.Dispose();
+
+        _effect.Dispose();
+        _spriteFont.Texture.Dispose();
+        base.UnloadContent();
     }
 
     private void DrawLabels()
@@ -139,9 +123,9 @@ public class BackfaceCullingCube : TGCSample
 
         var step = 35f;
         var offset = -step;
-        foreach (var rs in _rasterizerStates)
+        foreach (var cm in _cullModes)
         {
-            string label = rs.CullMode switch
+            string label = cm switch
             {
                 CullMode.CullClockwiseFace => "Cull Clockwise",
                 CullMode.None => "No Culling",
