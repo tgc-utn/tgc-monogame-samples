@@ -12,17 +12,6 @@
 
 
 #---------------------------------- Content ---------------------------------#
-#begin Effects/Deferred.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:Effects/Deferred.fx
-
-#begin Effects/DeferredModel.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:Effects/DeferredModel.fx
 
 #begin 3D/chair/chair.fbx
 /importer:FbxImporter
@@ -268,11 +257,30 @@
 /processorParam:DebugMode=Auto
 /build:Effects/DebugTexture.fx
 
+#begin Effects/Deferred.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/Deferred.fx
+
+#begin Effects/DeferredModel.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/DeferredModel.fx
+
 #begin Effects/EnvironmentMap.fx
 /importer:EffectImporter
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:Effects/EnvironmentMap.fx
+
+#begin Effects/ExplodeColored.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/processorParam:Defines=
+/build:Effects/ExplodeColored.fx
 
 #begin Effects/GaussianBlur.fx
 /importer:EffectImporter
@@ -1103,3 +1111,4 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/wood/caja-madera-4.jpg
+
