@@ -23,6 +23,7 @@ public class BackfaceCullingCube : TGCSample
     ];
 
     private Quaternion _rotation = Quaternion.Identity;
+    private bool _wireframeEnabled;
 
     // The following fields are initialized in LoadContent, so they are marked as non-nullable with the null-forgiving operator (!).
     private Camera _camera = null!;
@@ -32,8 +33,6 @@ public class BackfaceCullingCube : TGCSample
     private Effect _effect = null!;
 
     private SpriteFont _spriteFont = null!;
-
-    private bool _wireframeEnabled;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BackfaceCullingCube"/> class.
@@ -71,8 +70,11 @@ public class BackfaceCullingCube : TGCSample
     public override void Draw(GameTime gameTime)
     {
         Game.Background = Color.Black;
+        DrawLabels();
         _effect.Parameters["ViewProjection"].SetValue(_camera.View * _camera.Projection);
 
+        // Save current rasterizer state to restore it later.
+        // We don't know if there's other code that assumes a default rasterizer state down the line.
         var existingRasterizerState = GraphicsDevice.RasterizerState;
 
         // Draw the cube with different culling modes, separated by a <step> offset along the X-axis.
@@ -93,16 +95,21 @@ public class BackfaceCullingCube : TGCSample
                 CullMode = cullMode,    // Set the culling mode for this draw call
                 FillMode = _wireframeEnabled ? FillMode.WireFrame : FillMode.Solid,
             };
+
             var world = Matrix.CreateFromQuaternion(_rotation) * Matrix.CreateTranslation(offset, 0f, 0f);
             _effect.Parameters["World"].SetValue(world);
             _cube.Draw(_effect);
             offset += step;
         }
 
-        // Always restore the previous rasterizer state after drawing
+        /*
+            Always restore the previous rasterizer state after drawing.
+            To see an example of what happens if you don't restore it,
+            uncomment the following line, run the sample, check "Show wireframes"
+            and look at what happens to the gizmos.
+        */
         GraphicsDevice.RasterizerState = existingRasterizerState;
 
-        DrawLabels();
         base.Draw(gameTime);
     }
 
@@ -131,7 +138,6 @@ public class BackfaceCullingCube : TGCSample
     /// </summary>
     private void DrawLabels()
     {
-        // Draw labels
         Game.SpriteBatch.Begin(
             SpriteSortMode.Immediate,
             BlendState.AlphaBlend,
