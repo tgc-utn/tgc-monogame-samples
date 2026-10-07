@@ -291,7 +291,7 @@ namespace TGC.MonoGame.Samples.Geometries
 
             public TeapotPatch(bool mirrorZ, int[] indices)
             {
-                Debug.Assert(indices.Length == 16);
+                Debug.Assert(indices.Length == 16, "A teapot patch must have exactly 16 control point indices.");
 
                 Indices = indices;
                 MirrorZ = mirrorZ;
