@@ -68,7 +68,7 @@ namespace TGC.MonoGame.Samples.Geometries
         /// </summary>
         protected void CreatePatchVertices(Vector3[] patch, int tessellation, bool isMirrored)
         {
-            Debug.Assert(patch.Length == 16);
+            Debug.Assert(patch.Length == 16, "A bezier patch must have exactly 16 control points.");
 
             for (var i = 0; i <= tessellation; i++)
             {
