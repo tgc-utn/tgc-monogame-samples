@@ -39,7 +39,7 @@ public class BackfaceCullingCube : TGCSample
 
     private CubePrimitive _translucentCube = null!;
 
-    private bool _translucentEnabled = false;
+    private bool _translucentEnabled;
 
     private Effect _effect = null!;
 
