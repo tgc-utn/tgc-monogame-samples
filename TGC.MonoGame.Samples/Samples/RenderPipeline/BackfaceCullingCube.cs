@@ -132,6 +132,19 @@ public class BackfaceCullingCube : TGCSample
         base.Draw(gameTime);
     }
 
+    /// <inheritdoc />
+    protected override void LoadContent()
+    {
+        // Load mesh.
+        _cube = new CubePrimitive(GraphicsDevice, 10f, Color.Red, Color.Green, Color.Blue, Color.Yellow, Color.Cyan, Color.Magenta);
+        _translucentCube = new CubePrimitive(GraphicsDevice, 10f, new Color(Color.White, 0.4f));
+        _effect = Game.Content.Load<Effect>(ContentFolderEffects + "ExplodeColored");
+        _spriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
+        ModifierController.AddToggle("Show Wireframe", (enabled) => _wireframeEnabled = enabled, false);
+        ModifierController.AddToggle("Show Translucent Cube", (enabled) => _translucentEnabled = enabled, false);
+        base.LoadContent();
+    }
+
     private void DrawTranslucent(Matrix rotationMatrix)
     {
         // Draw the cube with different culling modes, separated by a <step> offset along the X-axis.
@@ -166,19 +179,6 @@ public class BackfaceCullingCube : TGCSample
 
             offset += step;
         }
-    }
-
-    /// <inheritdoc />
-    protected override void LoadContent()
-    {
-        // Load mesh.
-        _cube = new CubePrimitive(GraphicsDevice, 10f, Color.Red, Color.Green, Color.Blue, Color.Yellow, Color.Cyan, Color.Magenta);
-        _translucentCube = new CubePrimitive(GraphicsDevice, 10f, new Color(Color.White, 0.4f));
-        _effect = Game.Content.Load<Effect>(ContentFolderEffects + "ExplodeColored");
-        _spriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
-        ModifierController.AddToggle("Show Wireframe", (enabled) => _wireframeEnabled = enabled, false);
-        ModifierController.AddToggle("Show Translucent Cube", (enabled) => _translucentEnabled = enabled, false);
-        base.LoadContent();
     }
 
     /// <inheritdoc />
