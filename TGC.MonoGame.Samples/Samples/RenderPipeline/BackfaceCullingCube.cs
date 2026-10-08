@@ -22,6 +22,13 @@ public class BackfaceCullingCube : TGCSample
         CullMode.CullCounterClockwiseFace,
     ];
 
+    private readonly RasterizerState[] _rasterizerStates =
+    [
+        new RasterizerState { CullMode = CullMode.CullClockwiseFace },
+        new RasterizerState { CullMode = CullMode.None },
+        new RasterizerState { CullMode = CullMode.CullCounterClockwiseFace },
+    ];
+
     private Quaternion _rotation = Quaternion.Identity;
     private bool _wireframeEnabled;
 
@@ -29,6 +36,10 @@ public class BackfaceCullingCube : TGCSample
     private Camera _camera = null!;
 
     private CubePrimitive _cube = null!;
+
+    private CubePrimitive _translucentCube = null!;
+
+    private bool _translucentEnabled = false;
 
     private Effect _effect = null!;
 
@@ -77,29 +88,37 @@ public class BackfaceCullingCube : TGCSample
         // We don't know if there's other code that assumes a default rasterizer state down the line.
         var existingRasterizerState = GraphicsDevice.RasterizerState;
 
-        // Draw the cube with different culling modes, separated by a <step> offset along the X-axis.
-        var step = 35f;
-        var offset = -step;
-        foreach (var cullMode in _cullModes)
+        var rotationMatrix = Matrix.CreateFromQuaternion(_rotation);
+        if (_translucentEnabled)
         {
-            /*
-                Create a new rasterizer state and set the desired values for this draw call.
-                we need to have a different RasterizerState because once it has been binded to the gpu it cannot be modified.
-                in a real application you would want to cache the different rasterizer states and reuse them instead of creating new ones every frame.
-                Reference:
-                    https://docs.monogame.net/articles/getting_to_know/whatis/graphics/WhatIs_Rasterizer.html
-                    https://www.tgcutn.com.ar/material/notes/unit3
-            */
-            GraphicsDevice.RasterizerState = new RasterizerState
+            DrawTranslucent(rotationMatrix);
+        }
+        else
+        {
+            // Draw the cube with different culling modes, separated by a <step> offset along the X-axis.
+            var step = 35f;
+            var offset = -step;
+            foreach (var cullMode in _cullModes)
             {
-                CullMode = cullMode,    // Set the culling mode for this draw call
-                FillMode = _wireframeEnabled ? FillMode.WireFrame : FillMode.Solid,
-            };
+                /*
+                    Create a new rasterizer state and set the desired values for this draw call.
+                    we need to have a different RasterizerState because once it has been binded to the gpu it cannot be modified.
+                    in a real application you would want to cache the different rasterizer states and reuse them instead of creating new ones every frame.
+                    Reference:
+                        https://docs.monogame.net/articles/getting_to_know/whatis/graphics/WhatIs_Rasterizer.html
+                        https://www.tgcutn.com.ar/material/notes/unit3
+                */
+                GraphicsDevice.RasterizerState = new RasterizerState
+                {
+                    CullMode = cullMode,    // Set the culling mode for this draw call
+                    FillMode = _wireframeEnabled ? FillMode.WireFrame : FillMode.Solid,
+                };
 
-            var world = Matrix.CreateFromQuaternion(_rotation) * Matrix.CreateTranslation(offset, 0f, 0f);
-            _effect.Parameters["World"].SetValue(world);
-            _cube.Draw(_effect);
-            offset += step;
+                var world = rotationMatrix * Matrix.CreateTranslation(offset, 0f, 0f);
+                _effect.Parameters["World"].SetValue(world);
+                _cube.Draw(_effect);
+                offset += step;
+            }
         }
 
         /*
@@ -113,14 +132,52 @@ public class BackfaceCullingCube : TGCSample
         base.Draw(gameTime);
     }
 
+    private void DrawTranslucent(Matrix rotationMatrix)
+    {
+        // Draw the cube with different culling modes, separated by a <step> offset along the X-axis.
+        var step = 35f;
+        var offset = -step;
+
+        GraphicsDevice.BlendState = BlendState.NonPremultiplied;
+
+        foreach (var state in _rasterizerStates)
+        {
+            var world = rotationMatrix * Matrix.CreateTranslation(offset, 0f, 0f);
+            _effect.Parameters["World"].SetValue(world);
+
+            if (state.CullMode == CullMode.CullClockwiseFace || state.CullMode == CullMode.None)
+            {
+                GraphicsDevice.RasterizerState = _rasterizerStates[0]; // CullClockwiseFace
+                _cube.Draw(_effect);
+            }
+
+            GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
+            _effect.CurrentTechnique = _effect.Techniques["AlphaTechnique"];
+            GraphicsDevice.RasterizerState = _rasterizerStates[1]; // CullNone
+            _translucentCube.Draw(_effect);
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+
+            _effect.CurrentTechnique = _effect.Techniques["DefaultTechnique"];
+            if (state.CullMode == CullMode.CullCounterClockwiseFace || state.CullMode == CullMode.None)
+            {
+                GraphicsDevice.RasterizerState = _rasterizerStates[2];  // CullCounterClockwiseFace
+                _cube.Draw(_effect);
+            }
+
+            offset += step;
+        }
+    }
+
     /// <inheritdoc />
     protected override void LoadContent()
     {
         // Load mesh.
         _cube = new CubePrimitive(GraphicsDevice, 10f, Color.Red, Color.Green, Color.Blue, Color.Yellow, Color.Cyan, Color.Magenta);
+        _translucentCube = new CubePrimitive(GraphicsDevice, 10f, new Color(Color.White, 0.4f));
         _effect = Game.Content.Load<Effect>(ContentFolderEffects + "ExplodeColored");
         _spriteFont = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
         ModifierController.AddToggle("Show Wireframe", (enabled) => _wireframeEnabled = enabled, false);
+        ModifierController.AddToggle("Show Translucent Cube", (enabled) => _translucentEnabled = enabled, false);
         base.LoadContent();
     }
 
@@ -128,6 +185,7 @@ public class BackfaceCullingCube : TGCSample
     protected override void UnloadContent()
     {
         _cube.Dispose();
+        _translucentCube.Dispose();
         _effect.Dispose();
         _spriteFont.Texture.Dispose();
         base.UnloadContent();
