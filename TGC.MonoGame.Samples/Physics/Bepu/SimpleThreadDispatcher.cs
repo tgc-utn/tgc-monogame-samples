@@ -10,7 +10,7 @@ namespace TGC.MonoGame.Samples.Physics.Bepu;
 /// <summary>
 ///     Provides a <see cref="IThreadDispatcher" /> implementation. Not reentrant.
 /// </summary>
-public class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
+public sealed class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
 {
     private readonly BufferPool[] bufferPools;
     private readonly AutoResetEvent finished;

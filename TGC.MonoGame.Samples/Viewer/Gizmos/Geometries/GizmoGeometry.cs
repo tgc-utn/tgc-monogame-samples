@@ -1,11 +1,13 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using System;
+
+using Microsoft.Xna.Framework.Graphics;
 
 namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
 {
     /// <summary>
     ///     Gizmo that is drawn using non-user indexed line lists.
     /// </summary>
-    public abstract class GizmoGeometry
+    public abstract class GizmoGeometry : IDisposable
     {
         private readonly GraphicsDevice _graphicsDevice;
 
@@ -22,6 +24,32 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
         protected GizmoGeometry(GraphicsDevice device)
         {
             _graphicsDevice = device;
+        }
+
+        /// <summary>
+        ///     Binds the geometry to the Graphics Device.
+        /// </summary>
+        public virtual void Bind()
+        {
+            _graphicsDevice.SetVertexBuffer(_vertexBuffer);
+            _graphicsDevice.Indices = _indexBuffer;
+        }
+
+        /// <summary>
+        ///     Draws the geometry. Bind must be called first.
+        /// </summary>
+        public virtual void Draw()
+        {
+            _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.LineList, 0, 0, _primitiveCount);
+        }
+
+        /// <summary>
+        ///     Disposes the created geometry.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -47,29 +75,16 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
         }
 
         /// <summary>
-        ///     Binds the geometry to the Graphics Device.
+        ///     Releases the vertex and index buffers of this gizmo geometry.
         /// </summary>
-        public virtual void Bind()
+        /// <param name="disposing">True when called from <see cref="Dispose()"/>.</param>
+        protected virtual void Dispose(bool disposing)
         {
-            _graphicsDevice.SetVertexBuffer(_vertexBuffer);
-            _graphicsDevice.Indices = _indexBuffer;
-        }
-
-        /// <summary>
-        ///     Draws the geometry. Bind must be called first.
-        /// </summary>
-        public virtual void Draw()
-        {
-            _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.LineList, 0, 0, _primitiveCount);
-        }
-
-        /// <summary>
-        ///     Disposes the created geometry.
-        /// </summary>
-        public void Dispose()
-        {
-            _vertexBuffer.Dispose();
-            _indexBuffer.Dispose();
+            if (disposing)
+            {
+                _vertexBuffer.Dispose();
+                _indexBuffer.Dispose();
+            }
         }
     }
 }
