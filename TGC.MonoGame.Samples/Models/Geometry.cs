@@ -23,11 +23,6 @@ public class Geometry : IDisposable
 
     protected bool OwnsIndexBuffer;
 
-    internal static Geometry FromMeshPart(ModelMeshPart part)
-    {
-        return new Geometry(part);
-    }
-
     internal Geometry()
     {
     }
@@ -43,6 +38,24 @@ public class Geometry : IDisposable
         OwnsIndexBuffer = true;
     }
 
+    internal Geometry(
+        VertexBuffer vertexBuffer,
+        IndexBuffer indexBuffer,
+        int vertexOffset,
+        int startIndex,
+        int primitiveCount,
+        bool ownsVertexBuffer,
+        bool ownsIndexBuffer)
+    {
+        VertexBuffer = vertexBuffer;
+        IndexBuffer = indexBuffer;
+        VertexOffset = vertexOffset;
+        StartIndex = startIndex;
+        PrimitiveCount = primitiveCount;
+        OwnsVertexBuffer = ownsVertexBuffer;
+        OwnsIndexBuffer = ownsIndexBuffer;
+    }
+
     private Geometry(ModelMeshPart part)
     {
         VertexBuffer = part.VertexBuffer;
@@ -52,19 +65,6 @@ public class Geometry : IDisposable
         PrimitiveCount = part.PrimitiveCount;
         OwnsVertexBuffer = false;
         OwnsIndexBuffer = false;
-    }
-
-    internal Geometry(VertexBuffer vertexBuffer, IndexBuffer indexBuffer,
-        int vertexOffset, int startIndex, int primitiveCount,
-        bool ownsVertexBuffer, bool ownsIndexBuffer)
-    {
-        VertexBuffer = vertexBuffer;
-        IndexBuffer = indexBuffer;
-        VertexOffset = vertexOffset;
-        StartIndex = startIndex;
-        PrimitiveCount = primitiveCount;
-        OwnsVertexBuffer = ownsVertexBuffer;
-        OwnsIndexBuffer = ownsIndexBuffer;
     }
 
     public void Draw(Effect effect)
@@ -79,21 +79,41 @@ public class Geometry : IDisposable
             pass.Apply();
             graphicsDevice.DrawIndexedPrimitives(
                 PrimitiveType.TriangleList,
-                VertexOffset, StartIndex, PrimitiveCount);
+                VertexOffset,
+                StartIndex,
+                PrimitiveCount);
         }
     }
 
     /// <inheritdoc/>
     public void Dispose()
     {
-        if (OwnsVertexBuffer)
-        {
-            VertexBuffer.Dispose();
-        }
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
 
-        if (OwnsIndexBuffer)
+    internal static Geometry FromMeshPart(ModelMeshPart part)
+    {
+        return new Geometry(part);
+    }
+
+    /// <summary>
+    ///     Releases the buffers owned by this geometry.
+    /// </summary>
+    /// <param name="disposing">True when called from <see cref="Dispose()"/>.</param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
         {
-            IndexBuffer.Dispose();
+            if (OwnsVertexBuffer)
+            {
+                VertexBuffer.Dispose();
+            }
+
+            if (OwnsIndexBuffer)
+            {
+                IndexBuffer.Dispose();
+            }
         }
     }
 }

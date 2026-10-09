@@ -16,18 +16,8 @@ namespace TGC.MonoGame.Samples.Viewer.Models
     /// <summary>
     ///     The model has the logic for creating the sample explorer and also load them.
     /// </summary>
-    public class TGCViewerModel
+    public class TGCViewerModel : IDisposable
     {
-        /// <summary>
-        ///     Default constructor.
-        /// </summary>
-        /// <param name="game">The game where the explorer is going to be drawn.</param>
-        public TGCViewerModel(TGCViewer game)
-        {
-            _game = game;
-            _activeSampleTreeNode = -1;
-        }
-
         /// <summary>
         ///     The viewer where the samples are going to be shown.
         /// </summary>
@@ -49,11 +39,6 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         private Dictionary<string, TGCSample> _samplesByName;
 
         /// <summary>
-        ///     Samples that have already been loaded.
-        /// </summary>
-        public Dictionary<string, TGCSample> AlreadyLoadedSamples { get; set; }
-
-        /// <summary>
         ///     The active sample.
         /// </summary>
         private TGCSample _activeSample;
@@ -72,6 +57,21 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         ///     If the About modal in visible or not.
         /// </summary>
         private bool _aboutVisible;
+
+        /// <summary>
+        ///     Default constructor.
+        /// </summary>
+        /// <param name="game">The game where the explorer is going to be drawn.</param>
+        public TGCViewerModel(TGCViewer game)
+        {
+            _game = game;
+            _activeSampleTreeNode = -1;
+        }
+
+        /// <summary>
+        ///     Samples that have already been loaded.
+        /// </summary>
+        public Dictionary<string, TGCSample> AlreadyLoadedSamples { get; set; }
 
         /// <summary>
         ///     Initialize imgui to be able to build the menu.
@@ -172,22 +172,6 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         }
 
         /// <summary>
-        ///     Binds the Modifiers from the current sample to be used by ImGUI.
-        /// </summary>
-        private void BindModifiers()
-        {
-            _activeSample.BindModifiers(_imGuiRenderer);
-        }
-
-        /// <summary>
-        ///     Releases the Modifier bindings from the current sample.
-        /// </summary>
-        private void UnbindModifiers()
-        {
-            _activeSample.UnbindModifiers(_imGuiRenderer);
-        }
-
-        /// <summary>
         ///     Draw the sample explorer.
         /// </summary>
         /// <param name="gameTime">Holds the time state of a <see cref="_game" />.</param>
@@ -201,6 +185,49 @@ namespace TGC.MonoGame.Samples.Viewer.Models
 
             // Call AfterLayout now to finish up and draw all the things
             _imGuiRenderer.AfterLayout();
+        }
+
+        /// <summary>
+        ///     Unloads every sample.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        ///     Disposes every sample currently registered as a game component.
+        /// </summary>
+        /// <param name="disposing">True when called from <see cref="Dispose()"/>.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                foreach (var sample in _samplesByName)
+                {
+                    if (_game.Components.Contains(sample.Value))
+                    {
+                        sample.Value.Dispose();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Binds the Modifiers from the current sample to be used by ImGUI.
+        /// </summary>
+        private void BindModifiers()
+        {
+            _activeSample.BindModifiers(_imGuiRenderer);
+        }
+
+        /// <summary>
+        ///     Releases the Modifier bindings from the current sample.
+        /// </summary>
+        private void UnbindModifiers()
+        {
+            _activeSample.UnbindModifiers(_imGuiRenderer);
         }
 
         /// <summary>
@@ -374,20 +401,6 @@ namespace TGC.MonoGame.Samples.Viewer.Models
             }
 
             ImGui.End();
-        }
-
-        /// <summary>
-        ///     Unloads every sample.
-        /// </summary>
-        public void Dispose()
-        {
-            foreach (var sample in _samplesByName)
-            {
-                if (_game.Components.Contains(sample.Value))
-                {
-                    sample.Value.Dispose();
-                }
-            }
         }
     }
 }
