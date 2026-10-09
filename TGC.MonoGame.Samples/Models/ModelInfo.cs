@@ -4,19 +4,32 @@ namespace TGC.MonoGame.Samples.Models;
 
 public class ModelInfo : IDisposable
 {
-    public GeometryData[] GeometryData { get; private set; }
-
     internal ModelInfo(GeometryData[] geometryData)
     {
         GeometryData = geometryData;
     }
 
+    public GeometryData[] GeometryData { get; private set; }
+
     /// <inheritdoc/>
     public void Dispose()
     {
-        foreach (var geometryData in GeometryData)
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    ///     Releases every geometry of this model.
+    /// </summary>
+    /// <param name="disposing">True when called from <see cref="Dispose()"/>.</param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
         {
-            geometryData.Geometry.Dispose();
+            foreach (var geometryData in GeometryData)
+            {
+                geometryData.Geometry.Dispose();
+            }
         }
     }
 }
