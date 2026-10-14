@@ -24,7 +24,12 @@ namespace TGC.MonoGame.Samples.Geometries
     /// </summary>
     internal class TeapotPatch
     {
-        public TeapotPatch(bool mirrorZ, int[] indices)
+        /// <summary>
+        ///     Creates a patch from its 16 control point indices.
+        /// </summary>
+        /// <param name="mirrorZ">Whether the patch is also mirrored in the Z axis.</param>
+        /// <param name="indices">The 16 indices into the TeapotControlPoints array.</param>
+        internal TeapotPatch(bool mirrorZ, int[] indices)
         {
             Debug.Assert(indices.Length == 16, "A teapot patch must have exactly 16 control point indices.");
 
@@ -32,8 +37,14 @@ namespace TGC.MonoGame.Samples.Geometries
             MirrorZ = mirrorZ;
         }
 
-        public int[] Indices { get; }
+        /// <summary>
+        ///     Gets the 16 indices into the TeapotControlPoints array.
+        /// </summary>
+        internal int[] Indices { get; }
 
-        public bool MirrorZ { get; }
+        /// <summary>
+        ///     Gets a value indicating whether the patch is also mirrored in the Z axis.
+        /// </summary>
+        internal bool MirrorZ { get; }
     }
 }
