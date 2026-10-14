@@ -26,18 +26,18 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
         public const int ST_STAGE_5 = 5;
         public const int ST_GAME_OVER = 99;
         public const int ST_CAMBIO_NIVEL = 98;
-        public CubePrimitive Box;
-        public Effect Effect;
-        public SpriteFont Font;
 
+        // Uncomment along with the debug block in Draw.
+        // private CubePrimitive _box;
+        private Effect _effect;
+        private SpriteFont _font;
         private bool _godMode;
-        public SpriteBatch SpriteBatch;
-
+        private SpriteBatch _spriteBatch;
         private int _status = ST_PRESENTACION;
         private Texture2D _texture;
         private Texture2D _textureAux;
         private float _timerLevel;
-        public TunelMesh Tunel;
+        private TunelMesh _tunel;
 
         /// <inheritdoc />
         public ComboRata(TGCViewer game)
@@ -51,31 +51,8 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
         /// <inheritdoc />
         public override void Initialize()
         {
-            Box = new CubePrimitive(GraphicsDevice);
+            // _box = new CubePrimitive(GraphicsDevice);
             base.Initialize();
-        }
-
-        /// <inheritdoc />
-        protected override void LoadContent()
-        {
-            _texture = Game.Content.Load<Texture2D>(ContentFolderTextures + "tunel/metal");
-            _textureAux = Game.Content.Load<Texture2D>(ContentFolderTextures + "tunel/level2");
-
-            // Load a shader using Content pipeline.
-            Effect = Game.Content.Load<Effect>(ContentFolderEffects + "ComboRata");
-            Tunel = new TunelMesh();
-            Effect.Parameters["World"].SetValue(Matrix.Identity);
-            var projectionMatrix =
-                Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 50, 50000);
-
-            Game.Gizmos.UpdateViewProjection(Matrix.Identity, projectionMatrix);
-
-            Effect.Parameters["Projection"].SetValue(projectionMatrix);
-            Effect.Parameters["ModelTexture"].SetValue(_texture);
-            Font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
-            SpriteBatch = new SpriteBatch(GraphicsDevice);
-            Effect.CurrentTechnique = Effect.Techniques["ColorDrawing"];
-            base.LoadContent();
         }
 
         /// <inheritdoc />
@@ -115,14 +92,14 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
                             }
                         }
 
-                        Tunel.Update(elapsedTime, Game.CurrentKeyboardState);
-                        if (Tunel.Colision && !_godMode)
+                        _tunel.Update(elapsedTime, Game.CurrentKeyboardState);
+                        if (_tunel.Colision && !_godMode)
                         {
                             _status = ST_GAME_OVER;
                         }
 
-                        var p_ant = 1 + (int)Tunel.Ant_pos;
-                        var p = 1 + (int)Tunel.Pos;
+                        var p_ant = 1 + (int)_tunel.PreviousPosition;
+                        var p = 1 + (int)_tunel.Pos;
                         if (p_ant != p && p % 50 == 0)
                         {
                             // paso al siguiente stage
@@ -137,51 +114,20 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
             base.Update(gameTime);
         }
 
-        private void AdvanceStage()
-        {
-            switch (_status)
-            {
-                case ST_STAGE_2:
-                    Effect.CurrentTechnique = Effect.Techniques["EdgeDectect"];
-                    break;
-                case ST_STAGE_3:
-                    Effect.CurrentTechnique = Effect.Techniques["TexCoordsDrawing"];
-                    break;
-                case ST_STAGE_4:
-                    Effect.CurrentTechnique = Effect.Techniques["TextureDrawing"];
-                    break;
-                case ST_STAGE_5:
-                    Effect.Parameters["ModelTexture"].SetValue(_textureAux);
-                    break;
-                case 6:
-                    // paso al siguiente nivel
-                    _status = ST_CAMBIO_NIVEL;
-                    Tunel.Level = 1 - Tunel.Level;
-                    Tunel.FillVertices();
-                    Effect.CurrentTechnique = Effect.Techniques["ColorDrawing"];
-                    Effect.Parameters["ModelTexture"].SetValue(_texture);
-                    _timerLevel = 2;
-                    break;
-                default:
-                    Debug.WriteLine($"Unexpected Status value: {_status}", "ComboRata");
-                    break;
-            }
-        }
-
         /// <inheritdoc />
         public override void Draw(GameTime gameTime)
         {
-            Game.Background = Tunel.Colision ? Color.GreenYellow : Color.Gray;
+            Game.Background = _tunel.Colision ? Color.GreenYellow : Color.Gray;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            Tunel.Draw(GraphicsDevice, Effect);
+            _tunel.Draw(GraphicsDevice, _effect);
 
             // Debug
-            // var world = Matrix.CreateScale(Vector3.One * 40) * Matrix.CreateTranslation(Tunel.PosGamer);
-            // var world = Matrix.CreateScale(Vector3.One * 10) * Matrix.CreateTranslation(Tunel.PosGamer - Tunel.ViewDir * 50);
-            // var world = Matrix.CreateScale(Vector3.One * 10) * Matrix.CreateTranslation(Tunel.PosGamer + Tunel.ViewDir * 50);
-            // Effect.Parameters["World"].SetValue(world);
-            // Box.Draw(Effect);
+            // var world = Matrix.CreateScale(Vector3.One * 40) * Matrix.CreateTranslation(_tunel.PosGamer);
+            // var world = Matrix.CreateScale(Vector3.One * 10) * Matrix.CreateTranslation(_tunel.PosGamer - _tunel.ViewDir * 50);
+            // var world = Matrix.CreateScale(Vector3.One * 10) * Matrix.CreateTranslation(_tunel.PosGamer + _tunel.ViewDir * 50);
+            // _effect.Parameters["World"].SetValue(world);
+            // _box.Draw(_effect);
             switch (_status)
             {
                 case ST_CAMBIO_NIVEL:
@@ -197,14 +143,17 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
                     break;
 
                 case ST_GAME_OVER:
-                    DrawCenterTextY("Distancia Recorrida = " + Math.Round(Tunel.Pos, 1), 50, 1);
+                    DrawCenterTextY("Distancia Recorrida = " + Math.Round(_tunel.Pos, 1), 50, 1);
                     DrawCenterText("GAME OVER", 5);
                     break;
                 default:
-                    SpriteBatch.Begin();
-                    SpriteBatch.DrawString(Font, "Distancia:" + Math.Round(Tunel.Pos, 1), new Vector2(10, 10),
+                    _spriteBatch.Begin();
+                    _spriteBatch.DrawString(
+                        _font,
+                        "Distancia:" + Math.Round(_tunel.Pos, 1),
+                        new Vector2(10, 10),
                         Color.White);
-                    SpriteBatch.End();
+                    _spriteBatch.End();
                     if (_godMode)
                     {
                         DrawRightText("GODMODE", 10, 1);
@@ -220,31 +169,103 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
         {
             var w = GraphicsDevice.Viewport.Width;
             var h = GraphicsDevice.Viewport.Height;
-            var size = Font.MeasureString(msg) * escala;
-            SpriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null,
+            var size = _font.MeasureString(msg) * escala;
+            _spriteBatch.Begin(
+                SpriteSortMode.Deferred,
+                null,
+                null,
+                null,
+                null,
+                null,
                 Matrix.CreateScale(escala) * Matrix.CreateTranslation((w - size.X) / 2, (h - size.Y) / 2, 0));
-            SpriteBatch.DrawString(Font, msg, new Vector2(0, 0), Color.YellowGreen);
-            SpriteBatch.End();
+            _spriteBatch.DrawString(_font, msg, new Vector2(0, 0), Color.YellowGreen);
+            _spriteBatch.End();
         }
 
         public void DrawCenterTextY(string msg, float y, float escala)
         {
             var w = GraphicsDevice.Viewport.Width;
-            var size = Font.MeasureString(msg) * escala;
-            SpriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null,
+            var size = _font.MeasureString(msg) * escala;
+            _spriteBatch.Begin(
+                SpriteSortMode.Deferred,
+                null,
+                null,
+                null,
+                null,
+                null,
                 Matrix.CreateScale(escala) * Matrix.CreateTranslation((w - size.X) / 2, y, 0));
-            SpriteBatch.DrawString(Font, msg, new Vector2(0, 0), Color.YellowGreen);
-            SpriteBatch.End();
+            _spriteBatch.DrawString(_font, msg, new Vector2(0, 0), Color.YellowGreen);
+            _spriteBatch.End();
         }
 
         public void DrawRightText(string msg, float y, float escala)
         {
             var w = GraphicsDevice.Viewport.Width;
-            var size = Font.MeasureString(msg) * escala;
-            SpriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null,
+            var size = _font.MeasureString(msg) * escala;
+            _spriteBatch.Begin(
+                SpriteSortMode.Deferred,
+                null,
+                null,
+                null,
+                null,
+                null,
                 Matrix.CreateScale(escala) * Matrix.CreateTranslation(w - size.X - 20, y, 0));
-            SpriteBatch.DrawString(Font, msg, new Vector2(0, 0), Color.YellowGreen);
-            SpriteBatch.End();
+            _spriteBatch.DrawString(_font, msg, new Vector2(0, 0), Color.YellowGreen);
+            _spriteBatch.End();
+        }
+
+        /// <inheritdoc />
+        protected override void LoadContent()
+        {
+            _texture = Game.Content.Load<Texture2D>(ContentFolderTextures + "tunel/metal");
+            _textureAux = Game.Content.Load<Texture2D>(ContentFolderTextures + "tunel/level2");
+
+            // Load a shader using Content pipeline.
+            _effect = Game.Content.Load<Effect>(ContentFolderEffects + "ComboRata");
+            _tunel = new TunelMesh();
+            _effect.Parameters["World"].SetValue(Matrix.Identity);
+            var projectionMatrix =
+                Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 50, 50000);
+
+            Game.Gizmos.UpdateViewProjection(Matrix.Identity, projectionMatrix);
+
+            _effect.Parameters["Projection"].SetValue(projectionMatrix);
+            _effect.Parameters["ModelTexture"].SetValue(_texture);
+            _font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            _effect.CurrentTechnique = _effect.Techniques["ColorDrawing"];
+            base.LoadContent();
+        }
+
+        private void AdvanceStage()
+        {
+            switch (_status)
+            {
+                case ST_STAGE_2:
+                    _effect.CurrentTechnique = _effect.Techniques["EdgeDectect"];
+                    break;
+                case ST_STAGE_3:
+                    _effect.CurrentTechnique = _effect.Techniques["TexCoordsDrawing"];
+                    break;
+                case ST_STAGE_4:
+                    _effect.CurrentTechnique = _effect.Techniques["TextureDrawing"];
+                    break;
+                case ST_STAGE_5:
+                    _effect.Parameters["ModelTexture"].SetValue(_textureAux);
+                    break;
+                case 6:
+                    // paso al siguiente nivel
+                    _status = ST_CAMBIO_NIVEL;
+                    _tunel.Level = 1 - _tunel.Level;
+                    _tunel.FillVertices();
+                    _effect.CurrentTechnique = _effect.Techniques["ColorDrawing"];
+                    _effect.Parameters["ModelTexture"].SetValue(_texture);
+                    _timerLevel = 2;
+                    break;
+                default:
+                    Debug.WriteLine($"Unexpected Status value: {_status}", "ComboRata");
+                    break;
+            }
         }
     }
 }
