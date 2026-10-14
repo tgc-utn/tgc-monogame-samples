@@ -11,10 +11,11 @@ namespace TGC.MonoGame.Samples.Cameras
         public const float DefaultNearPlaneDistance = 0.1f;
         public const float DefaultFarPlaneDistance = 2000;
 
-        public Camera(float aspectRatio, float nearPlaneDistance = DefaultNearPlaneDistance,
+        public Camera(
+            float aspectRatio,
+            float nearPlaneDistance = DefaultNearPlaneDistance,
             float farPlaneDistance = DefaultFarPlaneDistance)
-            : this(aspectRatio, nearPlaneDistance, farPlaneDistance,
-            DefaultFieldOfViewDegrees)
+            : this(aspectRatio, nearPlaneDistance, farPlaneDistance, DefaultFieldOfViewDegrees)
         {
         }
 
@@ -69,6 +70,11 @@ namespace TGC.MonoGame.Samples.Cameras
         public Vector3 UpDirection { get; set; }
 
         /// <summary>
+        ///     The direction that is "up" in the world, used as reference to orient the camera.
+        /// </summary>
+        public Vector3 DefaultWorldUpVector { get; } = Vector3.Up;
+
+        /// <summary>
         ///     The created view matrix.
         /// </summary>
         public Matrix View { get; set; }
@@ -81,10 +87,16 @@ namespace TGC.MonoGame.Samples.Cameras
         /// <param name="nearPlaneDistance">The distance to the near view plane.</param>
         /// <param name="farPlaneDistance">The distance to the far view plane.</param>
         /// <param name="fieldOfViewDegrees">The field of view in the y direction, in degrees.</param>
-        public void BuildProjection(float aspectRatio, float nearPlaneDistance, float farPlaneDistance,
+        public void BuildProjection(
+            float aspectRatio,
+            float nearPlaneDistance,
+            float farPlaneDistance,
             float fieldOfViewDegrees)
         {
-            Projection = Matrix.CreatePerspectiveFieldOfView(fieldOfViewDegrees, aspectRatio, nearPlaneDistance,
+            Projection = Matrix.CreatePerspectiveFieldOfView(
+                fieldOfViewDegrees,
+                aspectRatio,
+                nearPlaneDistance,
                 farPlaneDistance);
         }
 
