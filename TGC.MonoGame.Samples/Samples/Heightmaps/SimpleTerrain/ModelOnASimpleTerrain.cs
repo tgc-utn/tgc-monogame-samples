@@ -18,13 +18,13 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
     /// </summary>
     public class ModelOnASimpleTerrain : TGCSample
     {
-        public float Angle;
-        public Vector3 DesiredLookAt;
+        private float _angle;
+        private Vector3 _desiredLookAt;
         private bool _hayLookAt;
-        public Vector3 LookAt;
+        private Vector3 _lookAt;
 
         private Model model;
-        public Vector2 Pos;
+        private Vector2 _pos;
         private Vector3 _tgcitoPos;
         private SimpleTerrain _terrain;
 
@@ -45,37 +45,16 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
         /// <inheritdoc />
         public override void Initialize()
         {
-            DesiredLookAt = Vector3.Zero;
-            Pos = Vector2.Zero;
-            Camera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(5000, 1300, 5000), DesiredLookAt,
-                5, 50000);
+            _desiredLookAt = Vector3.Zero;
+            _pos = Vector2.Zero;
+            Camera = new TargetCamera(
+                GraphicsDevice.Viewport.AspectRatio,
+                new Vector3(5000, 1300, 5000),
+                _desiredLookAt,
+                5,
+                50000);
 
             base.Initialize();
-        }
-
-        /// <inheritdoc/>
-        protected override void LoadContent()
-        {
-            var terrainEffect = Game.Content.Load<Effect>(ContentFolderEffects + "Terrain");
-
-            // heights
-            var terrainHeigthmap = Game.Content.Load<Texture2D>(ContentFolderTextures + "Heightmaps/heightmap");
-
-            // basic color
-            var terrainColorMap = Game.Content.Load<Texture2D>(ContentFolderTextures + "Heightmaps/colormap");
-
-            // blend texture 1
-            var terrainGrass = Game.Content.Load<Texture2D>(ContentFolderTextures + "grass");
-
-            // blend texture 2
-            var terrainGround = Game.Content.Load<Texture2D>(ContentFolderTextures + "ground");
-            _terrain = new SimpleTerrain(GraphicsDevice, terrainHeigthmap, terrainColorMap, terrainGrass, terrainGround, terrainEffect);
-
-            model = Game.Content.Load<Model>("3D/tgcito-classic/tgcito-classic");
-
-            offSet = model.Meshes[0].BoundingSphere.Radius;
-
-            base.LoadContent();
         }
 
         /// <inheritdoc/>
@@ -84,50 +63,50 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
             var da = 0.01f;
             if (Game.CurrentKeyboardState.IsKeyDown(Keys.Left))
             {
-                Angle -= da;
+                _angle -= da;
             }
 
             if (Game.CurrentKeyboardState.IsKeyDown(Keys.Right))
             {
-                Angle += da;
+                _angle += da;
             }
 
-            var dir = new Vector2(MathF.Cos(Angle), MathF.Sin(Angle));
+            var dir = new Vector2(MathF.Cos(_angle), MathF.Sin(_angle));
             float vel_lineal = 10;
             if (Game.CurrentKeyboardState.IsKeyDown(Keys.Up))
             {
-                Pos += dir * vel_lineal;
+                _pos += dir * vel_lineal;
             }
 
             if (Game.CurrentKeyboardState.IsKeyDown(Keys.Down))
             {
-                Pos -= dir * vel_lineal;
+                _pos -= dir * vel_lineal;
             }
 
-            var x = Pos.X;
-            var z = Pos.Y;
+            var x = _pos.X;
+            var z = _pos.Y;
 
             _tgcitoPos = new Vector3(x, _terrain.Height(x, z) + offSet, z);
-            DesiredLookAt = new Vector3(x, _terrain.Height(x, z), z);
+            _desiredLookAt = new Vector3(x, _terrain.Height(x, z), z);
             if (!_hayLookAt)
             {
-                LookAt = DesiredLookAt;
+                _lookAt = _desiredLookAt;
                 _hayLookAt = true;
             }
             else
             {
                 var lamda = 0.05f;
-                LookAt = (DesiredLookAt * lamda) + (LookAt * (1 - lamda));
+                _lookAt = (_desiredLookAt * lamda) + (_lookAt * (1 - lamda));
             }
 
-            var pos2 = Pos - (dir * 800);
+            var pos2 = _pos - (dir * 800);
 
             // I get the maximum height from the camera to tgcito.
             float h = 0;
             for (var i = 0; i < 10; ++i)
             {
                 var t = i / 10.0f;
-                var p = (pos2 * t) + (Pos * (1 - t));
+                var p = (pos2 * t) + (_pos * (1 - t));
                 var hi = _terrain.Height(p.X, p.Y) + 50;
                 if (hi > h)
                 {
@@ -135,8 +114,8 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
                 }
             }
 
-            var position = new Vector3(pos2.X, DesiredLookAt.Y + h, pos2.Y);
-            Camera.View = Matrix.CreateLookAt(position, LookAt, new Vector3(0, 1, 0));
+            var position = new Vector3(pos2.X, _desiredLookAt.Y + h, pos2.Y);
+            Camera.View = Matrix.CreateLookAt(position, _lookAt, new Vector3(0, 1, 0));
 
             Game.Gizmos.UpdateViewProjection(Camera.View, Camera.Projection);
 
@@ -156,10 +135,10 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
             GraphicsDevice.RasterizerState = oldRasterizerState;
 
             // compute 3 points on the heightmap surface
-            var dir = new Vector2(MathF.Cos(Angle), MathF.Sin(Angle));
-            var tan = new Vector2(-MathF.Sin(Angle), MathF.Cos(Angle));
-            var pos_ade = Pos + (dir * 100);
-            var pos_der = Pos + (tan * 100);
+            var dir = new Vector2(MathF.Cos(_angle), MathF.Sin(_angle));
+            var tan = new Vector2(-MathF.Sin(_angle), MathF.Cos(_angle));
+            var pos_ade = _pos + (dir * 100);
+            var pos_der = _pos + (tan * 100);
             var posAdelante = new Vector3(pos_ade.X, _terrain.Height(pos_ade.X, pos_ade.Y) + offSet, pos_ade.Y);
             var posDerecha = new Vector3(pos_der.X, _terrain.Height(pos_der.X, pos_der.Y) + offSet, pos_der.Y);
 
@@ -226,6 +205,31 @@ namespace TGC.MonoGame.Samples.Samples.Heightmaps.SimpleTerrain
             // transfer
             matWorld = matWorld * Matrix.CreateTranslation(p0);
             return matWorld;
+        }
+
+        /// <inheritdoc/>
+        protected override void LoadContent()
+        {
+            var terrainEffect = Game.Content.Load<Effect>(ContentFolderEffects + "Terrain");
+
+            // heights
+            var terrainHeigthmap = Game.Content.Load<Texture2D>(ContentFolderTextures + "Heightmaps/heightmap");
+
+            // basic color
+            var terrainColorMap = Game.Content.Load<Texture2D>(ContentFolderTextures + "Heightmaps/colormap");
+
+            // blend texture 1
+            var terrainGrass = Game.Content.Load<Texture2D>(ContentFolderTextures + "grass");
+
+            // blend texture 2
+            var terrainGround = Game.Content.Load<Texture2D>(ContentFolderTextures + "ground");
+            _terrain = new SimpleTerrain(GraphicsDevice, terrainHeigthmap, terrainColorMap, terrainGrass, terrainGround, terrainEffect);
+
+            model = Game.Content.Load<Model>("3D/tgcito-classic/tgcito-classic");
+
+            offSet = model.Meshes[0].BoundingSphere.Radius;
+
+            base.LoadContent();
         }
     }
 }

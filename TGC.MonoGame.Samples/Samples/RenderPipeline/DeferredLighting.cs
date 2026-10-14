@@ -11,15 +11,19 @@ using TGC.MonoGame.Samples.Viewer.GUI.Modifiers;
 
 namespace TGC.MonoGame.Samples.Samples.RenderPipeline.DeferredLighting
 {
+    internal enum Target
+    {
+        Scene,
+        Color,
+        Normal,
+        Position,
+        Material,
+        Light,
+    }
+
     public class DeferredLighting : TGCSample
     {
-        public DeferredLighting(TGCViewer game)
-            : base(game)
-        {
-            Category = TGCSampleCategory.RenderPipeline;
-            Name = "Deferred Lighting";
-            Description = "technique for rendering scenes with multiple lights.";
-        }
+        private readonly List<PointLight> _pointLights = new List<PointLight>();
 
         private Camera _camera;
         private Model _cityModel;
@@ -41,8 +45,16 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline.DeferredLighting
         private Vector3 _lightCursorPosition = new Vector3(-345f, -20f, 80f);
         private Vector3 _lightCursorColor = Color.White.ToVector3();
         private float _pointRadius = 50f;
-        private readonly List<PointLight> _pointLights = new List<PointLight>();
+
         private Model _sphere;
+
+        public DeferredLighting(TGCViewer game)
+            : base(game)
+        {
+            Category = TGCSampleCategory.RenderPipeline;
+            Name = "Deferred Lighting";
+            Description = "technique for rendering scenes with multiple lights.";
+        }
 
         /// <inheritdoc/>
         public override void Initialize()
@@ -50,47 +62,6 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline.DeferredLighting
             _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(-280f, 190f, 660f));
 
             base.Initialize();
-        }
-
-        /// <inheritdoc/>
-        protected override void LoadContent()
-        {
-            _cityModel = Game.Content.Load<Model>(ContentFolder3D + "scene/city");
-
-            // From the effect of the model I keep the texture.
-            _cityTexture = ((BasicEffect)_cityModel.Meshes.FirstOrDefault()?.MeshParts.FirstOrDefault()?.Effect)?.Texture;
-
-            // Load model drawer shader using Content pipeline.
-            _effectModel = Game.Content.Load<Effect>(ContentFolderEffects + "DeferredModel");
-
-            // Load deferred shader using Content pipeline.
-            _effectDeferred = Game.Content.Load<Effect>(ContentFolderEffects + "Deferred");
-
-            _sphere = Game.Content.Load<Model>(ContentFolder3D + "geometries/sphere");
-
-            // Asign the effect to the meshes
-            AssignEffectToModel(_effectModel, _cityModel);
-
-            // Create the targets we are going to use
-            InitializeRenderTargets();
-
-            // To draw any render target
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
-            _fullScreenQuad = new FullScreenQuad(GraphicsDevice);
-
-            ModifierController.AddVector("Ambient position", OnAmbientPositionChange, _ambientLightPosition);
-            ModifierController.AddColor("Ambient color", OnAmbientColorChange, new Color(_ambientLightDiffuseColor));
-            ModifierController.AddVector("Light position", OnPointPositionChange, new Vector3(-345f, -20f, 80f));
-            ModifierController.AddColor("Light color", OnPointColorChange, Color.White);
-            ModifierController.AddFloat("Point radius", OnPointRadiusChange, 20f);
-            ModifierController.AddButton("Add point", OnPointAddClick);
-            ModifierController.AddButton("Remove point", OnPointRemoveClick);
-            ModifierController.AddOptions("Show Target", ["Scene", "Color", "Normal", "Position", "Material", "Light"], Target.Scene, OnTargetChange);
-
-            // Base scene lights
-            GeneratePointLights();
-
-            base.LoadContent();
         }
 
         /// <inheritdoc/>
@@ -175,6 +146,47 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline.DeferredLighting
             base.Draw(gameTime);
         }
 
+        /// <inheritdoc/>
+        protected override void LoadContent()
+        {
+            _cityModel = Game.Content.Load<Model>(ContentFolder3D + "scene/city");
+
+            // From the effect of the model I keep the texture.
+            _cityTexture = ((BasicEffect)_cityModel.Meshes.FirstOrDefault()?.MeshParts.FirstOrDefault()?.Effect)?.Texture;
+
+            // Load model drawer shader using Content pipeline.
+            _effectModel = Game.Content.Load<Effect>(ContentFolderEffects + "DeferredModel");
+
+            // Load deferred shader using Content pipeline.
+            _effectDeferred = Game.Content.Load<Effect>(ContentFolderEffects + "Deferred");
+
+            _sphere = Game.Content.Load<Model>(ContentFolder3D + "geometries/sphere");
+
+            // Asign the effect to the meshes
+            AssignEffectToModel(_effectModel, _cityModel);
+
+            // Create the targets we are going to use
+            InitializeRenderTargets();
+
+            // To draw any render target
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            _fullScreenQuad = new FullScreenQuad(GraphicsDevice);
+
+            ModifierController.AddVector("Ambient position", OnAmbientPositionChange, _ambientLightPosition);
+            ModifierController.AddColor("Ambient color", OnAmbientColorChange, new Color(_ambientLightDiffuseColor));
+            ModifierController.AddVector("Light position", OnPointPositionChange, new Vector3(-345f, -20f, 80f));
+            ModifierController.AddColor("Light color", OnPointColorChange, Color.White);
+            ModifierController.AddFloat("Point radius", OnPointRadiusChange, 20f);
+            ModifierController.AddButton("Add point", OnPointAddClick);
+            ModifierController.AddButton("Remove point", OnPointRemoveClick);
+            ModifierController.AddOptions("Show Target", ["Scene", "Color", "Normal", "Position", "Material", "Light"], Target.Scene, OnTargetChange);
+
+            // Base scene lights
+            GeneratePointLights();
+
+            base.LoadContent();
+        }
+
         private void DrawCity()
         {
             _effectModel.CurrentTechnique = _effectModel.Techniques["textured"];
@@ -252,20 +264,50 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline.DeferredLighting
             // A high SurfaceFormat is recommended in position and light targets, as they can drastically
             // improve the quality of the lighting, but there is a significant performance cost at
             // high resolutions.
-            _colorTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
-               GraphicsDevice.Viewport.Height, false, SurfaceFormat.Vector4, DepthFormat.Depth24Stencil8, 0,
-               RenderTargetUsage.DiscardContents);
-            _positionTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
-                GraphicsDevice.Viewport.Height, false, SurfaceFormat.Vector4, DepthFormat.Depth24Stencil8, 0,
+            _colorTarget = new RenderTarget2D(
+                GraphicsDevice,
+                GraphicsDevice.Viewport.Width,
+                GraphicsDevice.Viewport.Height,
+                false,
+                SurfaceFormat.Vector4,
+                DepthFormat.Depth24Stencil8,
+                0,
                 RenderTargetUsage.DiscardContents);
-            _normalTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
-                GraphicsDevice.Viewport.Height, false, SurfaceFormat.Vector4, DepthFormat.Depth24Stencil8, 0,
+            _positionTarget = new RenderTarget2D(
+                GraphicsDevice,
+                GraphicsDevice.Viewport.Width,
+                GraphicsDevice.Viewport.Height,
+                false,
+                SurfaceFormat.Vector4,
+                DepthFormat.Depth24Stencil8,
+                0,
                 RenderTargetUsage.DiscardContents);
-            _materialTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
-                GraphicsDevice.Viewport.Height, false, SurfaceFormat.Vector4, DepthFormat.Depth24Stencil8, 0,
+            _normalTarget = new RenderTarget2D(
+                GraphicsDevice,
+                GraphicsDevice.Viewport.Width,
+                GraphicsDevice.Viewport.Height,
+                false,
+                SurfaceFormat.Vector4,
+                DepthFormat.Depth24Stencil8,
+                0,
                 RenderTargetUsage.DiscardContents);
-            _lightTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width,
-                GraphicsDevice.Viewport.Height, false, SurfaceFormat.Vector4, DepthFormat.Depth24Stencil8, 0,
+            _materialTarget = new RenderTarget2D(
+                GraphicsDevice,
+                GraphicsDevice.Viewport.Width,
+                GraphicsDevice.Viewport.Height,
+                false,
+                SurfaceFormat.Vector4,
+                DepthFormat.Depth24Stencil8,
+                0,
+                RenderTargetUsage.DiscardContents);
+            _lightTarget = new RenderTarget2D(
+                GraphicsDevice,
+                GraphicsDevice.Viewport.Width,
+                GraphicsDevice.Viewport.Height,
+                false,
+                SurfaceFormat.Vector4,
+                DepthFormat.Depth24Stencil8,
+                0,
                 RenderTargetUsage.DiscardContents);
         }
 
@@ -411,32 +453,6 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline.DeferredLighting
         private void AddLampLight(Vector3 pos)
         {
             _pointLights.Add(new PointLight(pos, Vector3.One, Vector3.One, 60f));
-        }
-    }
-
-    internal enum Target
-    {
-        Scene,
-        Color,
-        Normal,
-        Position,
-        Material,
-        Light,
-    }
-
-    internal class PointLight
-    {
-        internal Vector3 Position;
-        internal Vector3 DiffuseColor;
-        internal Vector3 SpecularColor;
-        internal float Radius;
-
-        internal PointLight(Vector3 position, Vector3 diffuseColor, Vector3 specularColor, float radius)
-        {
-            Position = position;
-            DiffuseColor = diffuseColor;
-            SpecularColor = specularColor;
-            Radius = radius;
         }
     }
 }

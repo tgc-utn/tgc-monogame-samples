@@ -9,20 +9,6 @@ namespace TGC.MonoGame.Samples.Models;
 /// </summary>
 public class Geometry : IDisposable
 {
-    protected VertexBuffer VertexBuffer;
-
-    protected IndexBuffer IndexBuffer;
-
-    protected int VertexOffset;
-
-    protected int StartIndex;
-
-    protected int PrimitiveCount;
-
-    protected bool OwnsVertexBuffer;
-
-    protected bool OwnsIndexBuffer;
-
     internal Geometry()
     {
     }
@@ -66,6 +52,20 @@ public class Geometry : IDisposable
         OwnsVertexBuffer = false;
         OwnsIndexBuffer = false;
     }
+
+    protected VertexBuffer VertexBuffer { get; set; }
+
+    protected IndexBuffer IndexBuffer { get; set; }
+
+    protected int VertexOffset { get; set; }
+
+    protected int StartIndex { get; set; }
+
+    protected int PrimitiveCount { get; set; }
+
+    protected bool OwnsVertexBuffer { get; set; }
+
+    protected bool OwnsIndexBuffer { get; set; }
 
     public void Draw(Effect effect)
     {

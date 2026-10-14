@@ -11,16 +11,6 @@ namespace TGC.MonoGame.Samples.Cameras
     public class SimpleCamera : Camera
     {
         /// <summary>
-        ///     Forward direction of the camera.
-        /// </summary>
-        public readonly Vector3 DefaultWorldFrontVector = Vector3.Forward;
-
-        /// <summary>
-        ///     The direction that is "up" from the camera's point of view.
-        /// </summary>
-        public readonly Vector3 DefaultWorldUpVector = Vector3.Up;
-
-        /// <summary>
         ///     Camera with simple movement to be able to move in the 3D world, which has the up vector in (0,1,0) and the forward
         ///     vector in (0,0,-1).
         /// </summary>
@@ -44,12 +34,22 @@ namespace TGC.MonoGame.Samples.Cameras
         /// <param name="angle">The angle of movement.</param>
         /// <param name="nearPlaneDistance">Distance to the near view plane.</param>
         /// <param name="farPlaneDistance">Distance to the far view plane.</param>
-        public SimpleCamera(float aspectRatio, Vector3 position, float speed, float angle, float nearPlaneDistance,
+        public SimpleCamera(
+            float aspectRatio,
+            Vector3 position,
+            float speed,
+            float angle,
+            float nearPlaneDistance,
             float farPlaneDistance)
             : base(aspectRatio, nearPlaneDistance, farPlaneDistance)
         {
             BuildView(position, speed, angle);
         }
+
+        /// <summary>
+        ///     Forward direction of the camera.
+        /// </summary>
+        public Vector3 DefaultWorldFrontVector { get; } = Vector3.Forward;
 
         /// <summary>
         ///     Value with which the camera is going to move.
@@ -60,21 +60,6 @@ namespace TGC.MonoGame.Samples.Cameras
         ///     Value with which the camera is going to move the angle.
         /// </summary>
         public float Angle { get; set; }
-
-        /// <summary>
-        ///     Build view matrix and update the internal directions.
-        /// </summary>
-        /// <param name="position">The position of the camera.</param>
-        /// <param name="speed">The speed of movement.</param>
-        /// <param name="angle">The angle of movement.</param>
-        private void BuildView(Vector3 position, float speed, float angle)
-        {
-            Position = position;
-            FrontDirection = DefaultWorldFrontVector;
-            Speed = speed;
-            Angle = angle;
-            View = Matrix.CreateLookAt(Position, Position + FrontDirection, DefaultWorldUpVector);
-        }
 
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
@@ -141,6 +126,21 @@ namespace TGC.MonoGame.Samples.Cameras
                 Position -= RightDirection * time * Speed;
             }
 
+            View = Matrix.CreateLookAt(Position, Position + FrontDirection, DefaultWorldUpVector);
+        }
+
+        /// <summary>
+        ///     Build view matrix and update the internal directions.
+        /// </summary>
+        /// <param name="position">The position of the camera.</param>
+        /// <param name="speed">The speed of movement.</param>
+        /// <param name="angle">The angle of movement.</param>
+        private void BuildView(Vector3 position, float speed, float angle)
+        {
+            Position = position;
+            FrontDirection = DefaultWorldFrontVector;
+            Speed = speed;
+            Angle = angle;
             View = Matrix.CreateLookAt(Position, Position + FrontDirection, DefaultWorldUpVector);
         }
     }
