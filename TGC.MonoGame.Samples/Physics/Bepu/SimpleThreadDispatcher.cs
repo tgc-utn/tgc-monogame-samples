@@ -13,14 +13,12 @@ namespace TGC.MonoGame.Samples.Physics.Bepu;
 public class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
 {
     private readonly BufferPool[] bufferPools;
+    private readonly AutoResetEvent finished;
+    private readonly Worker[] workers;
 
     private volatile bool disposed;
-    private readonly AutoResetEvent finished;
     private int remainingWorkerCounter;
-
     private volatile Action<int> workerBody;
-
-    private readonly Worker[] workers;
 
     /// <summary>
     ///     Creates a new thread dispatcher with the given number of threads. With default value in
@@ -57,6 +55,11 @@ public class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
     }
 
     /// <summary>
+    ///     Gets the number of threads to dispatch work on.
+    /// </summary>
+    public int ThreadCount { get; }
+
+    /// <summary>
     ///     Waits for all pending work to complete and then disposes all workers.
     /// </summary>
     public void Dispose()
@@ -78,17 +81,12 @@ public class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
         }
     }
 
-    /// <summary>
-    ///     Gets the number of threads to dispatch work on.
-    /// </summary>
-    public int ThreadCount { get; }
-
     /// <inheritdoc/>
     public void DispatchWorkers(Action<int> workerBody, int maximumWorkerCount = int.MaxValue)
     {
         if (maximumWorkerCount > 1)
         {
-            Debug.Assert(this.workerBody == null);
+            Debug.Assert(this.workerBody == null, "A dispatch is already in progress.");
             this.workerBody = workerBody;
             SignalThreads(maximumWorkerCount);
 
@@ -111,7 +109,7 @@ public class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
 
     private void DispatchThread(int workerIndex)
     {
-        Debug.Assert(workerBody != null);
+        Debug.Assert(workerBody != null, "DispatchThread should only be called while a dispatch is in progress.");
         workerBody(workerIndex);
 
         if (Interlocked.Decrement(ref remainingWorkerCounter) == -1)
