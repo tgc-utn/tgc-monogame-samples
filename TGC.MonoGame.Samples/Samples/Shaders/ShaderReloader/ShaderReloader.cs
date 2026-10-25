@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TGC.MonoGame.Samples.Samples.Shaders.ShaderReloader;
 
-public class ShaderReloader
+public class ShaderReloader : IDisposable
 {
     private static readonly string MgfxcTool = "mgfxc";
 
@@ -33,6 +33,25 @@ public class ShaderReloader
     }
 
     public event Action<Effect> OnCompile;
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    ///     Releases the file watcher owned by this reloader.
+    /// </summary>
+    /// <param name="disposing">True when called from <see cref="Dispose()"/>.</param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _fileWatcher.Dispose();
+        }
+    }
 
     private void ConfigureWatcher()
     {
@@ -111,10 +130,5 @@ public class ShaderReloader
             Debug.WriteLine(stdError.ToString(), "Shader-Error");
             _compileError = true;
         }
-    }
-
-    public void Dispose()
-    {
-        _fileWatcher.Dispose();
     }
 }

@@ -5,25 +5,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TGC.MonoGame.Samples.Geometries
 {
-    public class Arrow
+    public class Arrow : IDisposable
     {
         private readonly Vector3 ORIGINAL_DIR = Vector3.Up;
-
-        private VertexBuffer VertexBuffer { get; set; }
-
-        public Color BodyColor { get; set; }
-
-        public Color HeadColor { get; set; }
-
-        public float Thickness { get; set; }
-
-        public Vector2 HeadSize { get; set; }
-
-        private BasicEffect Effect { get; set; }
-
-        public Vector3 FromPosition { get; set; }
-
-        public Vector3 ToPosition { get; set; }
 
         public Arrow(GraphicsDevice device)
         {
@@ -38,6 +22,22 @@ namespace TGC.MonoGame.Samples.Geometries
             Effect.VertexColorEnabled = true;
             Effect.TextureEnabled = false;
         }
+
+        public Color BodyColor { get; set; }
+
+        public Color HeadColor { get; set; }
+
+        public float Thickness { get; set; }
+
+        public Vector2 HeadSize { get; set; }
+
+        public Vector3 FromPosition { get; set; }
+
+        public Vector3 ToPosition { get; set; }
+
+        private VertexBuffer VertexBuffer { get; set; }
+
+        private BasicEffect Effect { get; set; }
 
         /// <summary>
         ///     Actualizar parámetros de la flecha en base a los valores configurados.
@@ -165,10 +165,24 @@ namespace TGC.MonoGame.Samples.Geometries
             }
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
-            Effect.Dispose();
-            VertexBuffer.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        ///     Releases the effect and vertex buffer owned by this arrow.
+        /// </summary>
+        /// <param name="disposing">True when called from <see cref="Dispose()"/>.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                Effect.Dispose();
+                VertexBuffer.Dispose();
+            }
         }
     }
 }
