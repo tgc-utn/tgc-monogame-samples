@@ -113,7 +113,7 @@ public static class ModelExtensions
 
         int vertexCount = 0;
 
-        var device = model.Meshes.First().Effects.First().GraphicsDevice;
+        var device = model.Meshes[0].Effects[0].GraphicsDevice;
 
         List<VertexBuffer> vertexBuffers = new();
 
@@ -202,7 +202,7 @@ public static class ModelExtensions
 
         int vertexCount = 0;
 
-        var device = model.Meshes.First().Effects.First().GraphicsDevice;
+        var device = model.Meshes[0].Effects[0].GraphicsDevice;
 
         List<VertexBuffer> vertexBuffers = new();
 
@@ -366,7 +366,7 @@ public static class ModelExtensions
         var absoluteMatrices = new Matrix[model.Bones.Count];
         model.CopyAbsoluteBoneTransformsTo(absoluteMatrices);
 
-        var device = model.Meshes.First().Effects.First().GraphicsDevice;
+        var device = model.Meshes[0].Effects[0].GraphicsDevice;
 
         var vertices = new VertexPositionColorNormalTexture[vertexCount];
 

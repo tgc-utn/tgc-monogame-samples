@@ -60,7 +60,7 @@ namespace TGC.MonoGame.Samples.Samples.PBR
         private void OnMaterialChange(Material material)
         {
             _current = material;
-            SwitchMaterial();
+            LoadMaterialTextures();
         }
 
         /// <inheritdoc />
@@ -68,7 +68,7 @@ namespace TGC.MonoGame.Samples.Samples.PBR
         {
             InitializeLights();
             InitializeEffect();
-            InitializeTextures();
+            LoadMaterialTextures();
             InitializeSphere();
             InitializeLightBox();
 
@@ -187,8 +187,9 @@ namespace TGC.MonoGame.Samples.Samples.PBR
             _lights = _lights.ConvertAll(light => light.GenerateShowColor());
         }
 
-        private void InitializeTextures()
+        private void LoadMaterialTextures()
         {
+            // We do not dispose textures, as they cannot be loaded again
             UpdateMaterialPath();
             LoadTextures();
         }
@@ -233,13 +234,6 @@ namespace TGC.MonoGame.Samples.Samples.PBR
             }
 
             _texturePath += "/";
-        }
-
-        private void SwitchMaterial()
-        {
-            // We do not dispose textures, as they cannot be loaded again
-            UpdateMaterialPath();
-            LoadTextures();
         }
     }
 }

@@ -10,6 +10,8 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     {
         private const int ModalFlags = 0;
 
+        private readonly Action<string> _onSelect;
+
         private readonly string _title;
 
         private bool _oldVisibility;
@@ -20,20 +22,27 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
 
         private bool _currentPathIsDir;
 
-        public string P;
-
         private string[] _itemsInScope;
         private int _firstFileIndex;
 
-        public DragFile(string title)
+        /// <summary>
+        ///     Creates a file picker that notifies the selected file path.
+        /// </summary>
+        /// <param name="title">The title of the file picker popup.</param>
+        /// <param name="onSelect">Called with the selected file path.</param>
+        public DragFile(string title, Action<string> onSelect)
         {
             _title = title;
+            _onSelect = onSelect;
         }
 
         /// <inheritdoc/>
         public void Draw()
         {
-            var result = Draw(true, out P);
+            if (Draw(true, out var path))
+            {
+                _onSelect(path);
+            }
         }
 
         private bool Draw(bool isVisible, out string outPath)
@@ -128,11 +137,5 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
             Array.Copy(files, 0, _itemsInScope, directories.Length, files.Length);
             _firstFileIndex = directories.Length;
         }
-    }
-
-    internal struct File
-    {
-        private string alias;
-        private string path;
     }
 }
