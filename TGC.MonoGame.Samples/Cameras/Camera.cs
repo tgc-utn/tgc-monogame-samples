@@ -7,20 +7,51 @@ namespace TGC.MonoGame.Samples.Cameras
     /// </summary>
     public abstract class Camera
     {
-        public const float DefaultFieldOfViewDegrees = MathHelper.PiOver4;
+        /// <summary>
+        ///     Default field of view in the y direction, in radians.
+        /// </summary>
+        public const float DefaultFieldOfView = MathHelper.PiOver4;
+
+        /// <summary>
+        ///     Default distance to the near view plane.
+        /// </summary>
         public const float DefaultNearPlaneDistance = 0.1f;
+
+        /// <summary>
+        ///     Default distance to the far view plane.
+        /// </summary>
         public const float DefaultFarPlaneDistance = 2000;
 
-        public Camera(float aspectRatio, float nearPlaneDistance = DefaultNearPlaneDistance,
-            float farPlaneDistance = DefaultFarPlaneDistance)
-            : this(aspectRatio, nearPlaneDistance, farPlaneDistance,
-            DefaultFieldOfViewDegrees)
+        /// <summary>
+        ///     Creates a camera with the default near plane, far plane, and field of view.
+        /// </summary>
+        /// <param name="aspectRatio">Aspect ratio, defined as view space width divided by height.</param>
+        protected Camera(float aspectRatio)
+            : this(aspectRatio, DefaultNearPlaneDistance, DefaultFarPlaneDistance)
         {
         }
 
-        public Camera(float aspectRatio, float nearPlaneDistance, float farPlaneDistance, float fieldOfViewDegrees)
+        /// <summary>
+        ///     Creates a camera with the default field of view.
+        /// </summary>
+        /// <param name="aspectRatio">Aspect ratio, defined as view space width divided by height.</param>
+        /// <param name="nearPlaneDistance">Distance to the near view plane.</param>
+        /// <param name="farPlaneDistance">Distance to the far view plane.</param>
+        protected Camera(float aspectRatio, float nearPlaneDistance, float farPlaneDistance)
+            : this(aspectRatio, nearPlaneDistance, farPlaneDistance, DefaultFieldOfView)
         {
-            BuildProjection(aspectRatio, nearPlaneDistance, farPlaneDistance, fieldOfViewDegrees);
+        }
+
+        /// <summary>
+        ///     Creates a camera and builds its perspective projection matrix.
+        /// </summary>
+        /// <param name="aspectRatio">Aspect ratio, defined as view space width divided by height.</param>
+        /// <param name="nearPlaneDistance">Distance to the near view plane.</param>
+        /// <param name="farPlaneDistance">Distance to the far view plane.</param>
+        /// <param name="fieldOfView">Field of view in the y direction, in radians.</param>
+        protected Camera(float aspectRatio, float nearPlaneDistance, float farPlaneDistance, float fieldOfView)
+        {
+            BuildProjection(aspectRatio, nearPlaneDistance, farPlaneDistance, fieldOfView);
         }
 
         /// <summary>
@@ -69,6 +100,11 @@ namespace TGC.MonoGame.Samples.Cameras
         public Vector3 UpDirection { get; set; }
 
         /// <summary>
+        ///     The direction that is "up" in the world, used as reference to orient the camera.
+        /// </summary>
+        public Vector3 DefaultWorldUpVector { get; } = Vector3.Up;
+
+        /// <summary>
         ///     The created view matrix.
         /// </summary>
         public Matrix View { get; set; }
@@ -80,11 +116,17 @@ namespace TGC.MonoGame.Samples.Cameras
         /// <param name="aspectRatio">The aspect ratio, defined as view space width divided by height.</param>
         /// <param name="nearPlaneDistance">The distance to the near view plane.</param>
         /// <param name="farPlaneDistance">The distance to the far view plane.</param>
-        /// <param name="fieldOfViewDegrees">The field of view in the y direction, in degrees.</param>
-        public void BuildProjection(float aspectRatio, float nearPlaneDistance, float farPlaneDistance,
-            float fieldOfViewDegrees)
+        /// <param name="fieldOfView">The field of view in the y direction, in radians.</param>
+        public void BuildProjection(
+            float aspectRatio,
+            float nearPlaneDistance,
+            float farPlaneDistance,
+            float fieldOfView)
         {
-            Projection = Matrix.CreatePerspectiveFieldOfView(fieldOfViewDegrees, aspectRatio, nearPlaneDistance,
+            Projection = Matrix.CreatePerspectiveFieldOfView(
+                fieldOfView,
+                aspectRatio,
+                nearPlaneDistance,
                 farPlaneDistance);
         }
 
