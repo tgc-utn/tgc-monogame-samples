@@ -5,7 +5,7 @@ namespace TGC.MonoGame.Samples.Collisions
     /// <summary>
     ///     Utilidades para hacer detección de colisiones.
     /// </summary>
-    public class TGCCollisionUtils
+    public static class TGCCollisionUtils
     {
         /// <summary>
         ///     Detecta colision entre un segmento pq y un triangulo abc.

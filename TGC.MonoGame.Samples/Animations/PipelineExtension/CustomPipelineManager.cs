@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Xna.Framework.Content.Pipeline;
@@ -46,7 +45,7 @@ public class CustomPipelineManager : PipelineManager
         var projectDirectoryParts = projectDirectory.Split(new[] { binFolder }, StringSplitOptions.None);
         var intermediatePath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(
             projectContentDirectory,
-            "../" + objFolder + projectDirectoryParts.Last())));
+            "../" + objFolder + projectDirectoryParts[^1])));
 
         return new CustomPipelineManager(projectContentDirectory, outputPath, intermediatePath, configuration);
     }

@@ -8,12 +8,13 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
     /// <summary>
     ///     An Options Modifier that allows for selecting a value from a list.
     /// </summary>
-    public class OptionsModifier<EnumType> : IModifier
-        where EnumType : Enum
+    /// <typeparam name="TEnumType">The enum whose values are the selectable options.</typeparam>
+    public class OptionsModifier<TEnumType> : IModifier
+        where TEnumType : Enum
     {
         private int _currentOptionIndex;
 
-        private readonly Action<EnumType> _onChange;
+        private readonly Action<TEnumType> _onChange;
 
         private readonly string _name;
 
@@ -26,8 +27,8 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// </summary>
         /// <param name="name">The name of the modifier that will show on the GUI.</param>
         /// <param name="onChange">An action to be called when the option value changes.</param>
-        public OptionsModifier(string name, Action<EnumType> onChange)
-            : this(name, Enum.GetNames(typeof(EnumType)), default(EnumType), onChange)
+        public OptionsModifier(string name, Action<TEnumType> onChange)
+            : this(name, Enum.GetNames(typeof(TEnumType)), default(TEnumType), onChange)
         {
         }
 
@@ -38,8 +39,8 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <param name="name">The name of the modifier that will show on the GUI.</param>
         /// <param name="defaultValue">The default option value.</param>
         /// <param name="onChange">An action to be called when the option value changes.</param>
-        public OptionsModifier(string name, EnumType defaultValue, Action<EnumType> onChange)
-            : this(name, Enum.GetNames(typeof(EnumType)), defaultValue, onChange)
+        public OptionsModifier(string name, TEnumType defaultValue, Action<TEnumType> onChange)
+            : this(name, Enum.GetNames(typeof(TEnumType)), defaultValue, onChange)
         {
         }
 
@@ -50,7 +51,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <param name="optionNames">The sorted option names list.</param>
         /// <param name="defaultValue">The default option value.</param>
         /// <param name="onChange">An action to be called when the option value changes.</param>
-        public OptionsModifier(string name, List<string> optionNames, EnumType defaultValue, Action<EnumType> onChange)
+        public OptionsModifier(string name, List<string> optionNames, TEnumType defaultValue, Action<TEnumType> onChange)
             : this(name, optionNames.ToArray(), defaultValue, onChange)
         {
         }
@@ -62,7 +63,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <param name="optionNames">The sorted option names array.</param>
         /// <param name="defaultValue">The default option value.</param>
         /// <param name="onChange">An action to be called when the option value changes.</param>
-        public OptionsModifier(string name, string[] optionNames, EnumType defaultValue, Action<EnumType> onChange)
+        public OptionsModifier(string name, string[] optionNames, TEnumType defaultValue, Action<TEnumType> onChange)
         {
             _name = name;
             _options = optionNames;
@@ -78,7 +79,7 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         {
             if (ImGui.Combo(_name, ref _currentOptionIndex, _options, _options.Length))
             {
-                _onChange.Invoke((EnumType)Enum.ToObject(typeof(EnumType), _currentOptionIndex));
+                _onChange.Invoke((TEnumType)Enum.ToObject(typeof(TEnumType), _currentOptionIndex));
             }
         }
     }
