@@ -1,6 +1,8 @@
 ﻿using System;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
@@ -30,7 +32,8 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         private readonly Vector3 _sunScale = new Vector3(12, 12, 12);
 
         /// <inheritdoc />
-        public SolarSystem(TGCViewer game) : base(game)
+        public SolarSystem(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.Transformations;
             Name = "Solar System";
@@ -67,10 +70,13 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         public override void Update(GameTime gameTime)
         {
             _camera.Update(gameTime);
+
             // Update transformation of the sun.
             _sunTranslation = GetSunTransform();
+
             // Update transformation of the earth.
             _earthTranslation = GetEarthTransform();
+
             // Update transformation of the moon.
             _moonTranslation = GetMoonTransform(_earthTranslation);
 

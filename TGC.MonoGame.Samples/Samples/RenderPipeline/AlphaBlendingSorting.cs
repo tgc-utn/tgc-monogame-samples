@@ -1,7 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
+
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries.Textures;
 using TGC.MonoGame.Samples.Viewer;
@@ -14,69 +16,70 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
     public class AlphaBlendingSorting : TGCSample
     {
         private const string WorldViewProjection = "WorldViewProjection";
-        
+
         /// <summary>
-        /// A camera to draw geometry
+        /// A camera to draw geometry.
         /// </summary>
         private Camera _camera;
 
         /// <summary>
-        /// A quad to draw the floor and transparent geometry
+        /// A quad to draw the floor and transparent geometry.
         /// </summary>
         private QuadPrimitive _quad;
 
         /// <summary>
-        /// An Alpha Blending Effect to draw transparent geometry
+        /// An Alpha Blending Effect to draw transparent geometry.
         /// </summary>
         private Effect _alphaBlendingEffect;
 
         /// <summary>
-        /// A Tiling Texture Effect to draw the floor
+        /// A Tiling Texture Effect to draw the floor.
         /// </summary>
         private Effect _tilingFloorEffect;
 
         /// <summary>
-        /// A list containing quad world matrices that should be drawn from further to nearest
+        /// A list containing quad world matrices that should be drawn from further to nearest.
         /// </summary>
         private List<Matrix> _backToFrontQuadWorlds;
 
         /// <summary>
-        /// A list containing quad world matrices that should be drawn from nearest to furthest
+        /// A list containing quad world matrices that should be drawn from nearest to furthest.
         /// </summary>
         private List<Matrix> _frontToBackQuadWorlds;
 
         /// <summary>
-        /// A list containing quad world matrices that should be drawn from further to nearest but without depth testing
+        /// A list containing quad world matrices that should be drawn from further to nearest but without depth testing.
         /// </summary>
         private List<Matrix> _depthNoneQuadWorlds;
 
         /// <summary>
-        /// Colors per quad
+        /// Colors per quad.
         /// </summary>
         private List<Color> _quadColors;
 
         /// <summary>
-        /// A list of the screen positions for the texts, modified on each update
+        /// A list of the screen positions for the texts, modified on each update.
         /// </summary>
         private List<Vector2> _textScreenPositions;
 
         /// <summary>
-        /// A list of the positions for the texts
+        /// A list of the positions for the texts.
         /// </summary>
         private List<Vector3> _textWorldPositions;
 
         /// <summary>
-        /// A list of texts to display
+        /// A list of texts to display.
         /// </summary>
         private List<string> _texts;
 
         /// <summary>
-        /// A font to draw text into the screen
+        /// A font to draw text into the screen.
         /// </summary>
         private SpriteFont _spriteFont;
 
         /// <inheritdoc />
-        public AlphaBlendingSorting(TGCViewer game) : base(game)
+        public AlphaBlendingSorting(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.RenderPipeline;
             Name = "Alpha Blending Sorting";
@@ -125,14 +128,14 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
 
             _textScreenPositions = new List<Vector2>
             {
-                Vector2.Zero, 
-                Vector2.Zero, 
+                Vector2.Zero,
+                Vector2.Zero,
                 Vector2.Zero,
             };
 
             _quad = new QuadPrimitive(GraphicsDevice);
 
-            _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0,20,110));
+            _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 20, 110));
 
             _texts = new List<string>
             {
@@ -147,8 +150,8 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         /// <summary>
         /// Returns a <see cref="Vector2"/> containing the XY components of a <see cref="Vector3"/>.
         /// </summary>
-        /// <param name="vector">The <see cref="Vector3"/> to obtain its XY components</param>
-        /// <returns>A <see cref="Vector2"/> containing the XY components of the given vector</returns>
+        /// <param name="vector">The <see cref="Vector3"/> to obtain its XY components.</param>
+        /// <returns>A <see cref="Vector2"/> containing the XY components of the given vector.</returns>
         private Vector2 ToVector2(Vector3 vector)
         {
             return new Vector2(vector.X, vector.Y);
@@ -164,7 +167,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             _tilingFloorEffect = Game.Content.Load<Effect>(ContentFolderEffects + "TextureTiling");
             _tilingFloorEffect.Parameters["Texture"].SetValue(floorTexture);
             _tilingFloorEffect.Parameters["Tiling"].SetValue(Vector2.One * 10f);
-            
+
             // Load the texture for the quads
             var quadsTexture = Game.Content.Load<Texture2D>(ContentFolderTextures + "floor/tierra");
 
@@ -194,10 +197,10 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
         }
 
         /// <summary>
-        /// Updates a text position in screen space to face the camera, 
+        /// Updates a text position in screen space to face the camera,
         /// based on the world space position and the camera values.
         /// </summary>
-        /// <param name="index">The index of the text to update</param>
+        /// <param name="index">The index of the text to update.</param>
         private void UpdateTextPosition(int index)
         {
             var size = _spriteFont.MeasureString(_texts[index]) / 2f;
@@ -216,12 +219,12 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
             GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.BlendState = BlendState.Opaque;
-            
+
             // Draw the floor
             _tilingFloorEffect.Parameters[WorldViewProjection].SetValue(Matrix.CreateScale(100f) * viewProjection);
             _quad.Draw(_tilingFloorEffect);
 
-            // Set the blend state as alpha blend, 
+            // Set the blend state as alpha blend,
             // we are doing this operation when writing on the ColorBuffer:
             // ColorBuffer.rgb = lerp(ColorBuffer.rgb, FragmentColor.rgb, Alpha)
 
@@ -256,7 +259,7 @@ namespace TGC.MonoGame.Samples.Samples.RenderPipeline
                 _alphaBlendingEffect.Parameters[WorldViewProjection].SetValue(_depthNoneQuadWorlds[index] * viewProjection);
                 _quad.Draw(_alphaBlendingEffect);
             }
-            
+
             // Draw labels
             Game.SpriteBatch.Begin(
                 SpriteSortMode.Deferred,

@@ -68,7 +68,7 @@ float4 TrilinearPS(VertexShaderOutput input) : COLOR
 
 float4 LinearPS(VertexShaderOutput input) : COLOR
 {
-    // Sample the texture using our scaled Texture Coordinates    
+    // Sample the texture using our scaled Texture Coordinates
     return tex2D(textureSamplerBilinear, input.TextureCoordinate);
 }
 
@@ -88,7 +88,7 @@ float4 DebugPS(VertexShaderOutput input) : COLOR
     float mip = MipMapLevel(input.TextureCoordinate, TextureSize.xy);
     mip = round(mip);
     mip /= MipLevelCount;
-    
+
     return mip;
 }
 
@@ -122,4 +122,3 @@ technique Debug
         PixelShader = compile PS_SHADERMODEL DebugPS();
     }
 };
-

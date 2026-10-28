@@ -1,16 +1,18 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace TGC.MonoGame.Samples.Geometries
 {
-    public class FullScreenQuad
+    public class FullScreenQuad : IDisposable
     {
         private readonly GraphicsDevice _device;
         private IndexBuffer _indexBuffer;
         private VertexBuffer _vertexBuffer;
 
         /// <summary>
-        ///     Create a quad used in clip space
+        ///     Create a quad used in clip space.
         /// </summary>
         /// <param name="device">Used to initialize and control the presentation of the graphics device.</param>
         public FullScreenQuad(GraphicsDevice device)
@@ -18,6 +20,38 @@ namespace TGC.MonoGame.Samples.Geometries
             this._device = device;
             CreateVertexBuffer();
             CreateIndexBuffer();
+        }
+
+        public void Draw(Effect effect)
+        {
+            _device.SetVertexBuffer(_vertexBuffer);
+            _device.Indices = _indexBuffer;
+
+            foreach (var pass in effect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+                _device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 2);
+            }
+        }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        ///     Releases the vertex and index buffers owned by this quad.
+        /// </summary>
+        /// <param name="disposing">True when called from <see cref="Dispose()"/>.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _vertexBuffer.Dispose();
+                _indexBuffer.Dispose();
+            }
         }
 
         private void CreateVertexBuffer()
@@ -32,7 +66,10 @@ namespace TGC.MonoGame.Samples.Geometries
             vertices[3].Position = new Vector3(1f, 1f, 0f);
             vertices[3].TextureCoordinate = new Vector2(1f, 0f);
 
-            _vertexBuffer = new VertexBuffer(_device, VertexPositionTexture.VertexDeclaration, 4,
+            _vertexBuffer = new VertexBuffer(
+                _device,
+                VertexPositionTexture.VertexDeclaration,
+                4,
                 BufferUsage.WriteOnly);
             _vertexBuffer.SetData(vertices);
         }
@@ -50,25 +87,6 @@ namespace TGC.MonoGame.Samples.Geometries
 
             _indexBuffer = new IndexBuffer(_device, IndexElementSize.SixteenBits, 6, BufferUsage.WriteOnly);
             _indexBuffer.SetData(indices);
-        }
-
-
-        public void Draw(Effect effect)
-        {
-            _device.SetVertexBuffer(_vertexBuffer);
-            _device.Indices = _indexBuffer;
-
-            foreach (var pass in effect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-                _device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 2);
-            }
-        }
-
-        public void Dispose()
-        {
-            _vertexBuffer.Dispose();
-            _indexBuffer.Dispose();
         }
     }
 }

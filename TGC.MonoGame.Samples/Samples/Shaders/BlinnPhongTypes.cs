@@ -1,6 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Geometries.Textures;
@@ -10,72 +12,73 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
 {
     /// <summary>
     /// Shows how to draw meshes with various types of Blinn-Phong techniques.
-    /// Author: Ronan Vinitzca
+    /// Author: Ronan Vinitzca.
     /// </summary>
     public class BlinnPhongTypes : TGCSample
     {
         /// <summary>
-        /// A Camera to draw models in space
+        /// A Camera to draw models in space.
         /// </summary>
         private Camera _camera;
 
         /// <summary>
-        /// A model to draw in the center of the scene
+        /// A model to draw in the center of the scene.
         /// </summary>
         private Model _model;
 
         /// <summary>
-        /// Geometry to draw a floor
+        /// Geometry to draw a floor.
         /// </summary>
         private QuadPrimitive _floor;
 
         /// <summary>
-        /// A box to draw where the light is
+        /// A box to draw where the light is.
         /// </summary>
         private CubePrimitive _lightBox;
 
         /// <summary>
-        /// An effect to draw using blinn-phong techniques
+        /// An effect to draw using blinn-phong techniques.
         /// </summary>
         private Effect _effect;
 
         /// <summary>
-        /// Floor color texture
+        /// Floor color texture.
         /// </summary>
         private Texture2D _floorTexture;
 
         /// <summary>
-        /// Floor normal map
+        /// Floor normal map.
         /// </summary>
         private Texture2D _floorNormalMap;
 
         /// <summary>
-        /// Model color texture
+        /// Model color texture.
         /// </summary>
         private Texture2D _modelTexture;
 
         /// <summary>
-        /// Model normal map
+        /// Model normal map.
         /// </summary>
         private Texture2D _modelNormal;
 
         /// <summary>
-        /// The world matrix for the light box
+        /// The world matrix for the light box.
         /// </summary>
         private Matrix _lightBoxWorld = Matrix.Identity;
 
         /// <summary>
-        /// The world matrix for the model
+        /// The world matrix for the model.
         /// </summary>
         private Matrix _modelWorld;
 
         /// <summary>
-        /// The world matrix for the floor
+        /// The world matrix for the floor.
         /// </summary>
         private Matrix _floorWorld;
-        
+
         /// <inheritdoc />
-        public BlinnPhongTypes(TGCViewer game) : base(game)
+        public BlinnPhongTypes(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.Shaders;
             Name = "Blinn Phong Types";
@@ -116,8 +119,8 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             foreach (var modelMesh in _model.Meshes)
             {
                 foreach (var meshPart in modelMesh.MeshParts)
-                { 
-                    meshPart.Effect = _effect; 
+                {
+                    meshPart.Effect = _effect;
                 }
             }
 
@@ -126,7 +129,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             {
                 "Default",
                 "Gouraud",
-                "Normal Mapping"
+                "Normal Mapping",
             }, BlinnPhongType.Default, BlinnPhongTypeChange);
 
             // Add mappings for modifiers to control values
@@ -139,7 +142,7 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             ModifierController.AddFloat("KD", _effect.Parameters["KDiffuse"], 0.7f, 0f, 1f);
             ModifierController.AddFloat("KS", _effect.Parameters["KSpecular"], 0.4f, 0f, 1f);
             ModifierController.AddFloat("Shininess", _effect.Parameters["shininess"], 4.0f, 1f, 64f);
-            
+
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             base.LoadContent();
@@ -148,10 +151,10 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         /// <summary>
         /// Sets the light position from the modifier.
         /// </summary>
-        /// <param name="position">The new light position in world space</param>
+        /// <param name="position">The new light position in world space.</param>
         private void SetLightPosition(Vector3 position)
         {
-            _lightBoxWorld = Matrix.CreateScale(3f) *  Matrix.CreateTranslation(position);
+            _lightBoxWorld = Matrix.CreateScale(3f) * Matrix.CreateTranslation(position);
             _effect.Parameters["lightPosition"].SetValue(position);
         }
 
@@ -186,8 +189,8 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             _effect.Parameters["Tiling"].SetValue(Vector2.One);
 
             foreach (var modelMesh in _model.Meshes)
-            { 
-                modelMesh.Draw(); 
+            {
+                modelMesh.Draw();
             }
 
             _effect.Parameters["ModelTexture"].SetValue(_floorTexture);
@@ -200,17 +203,17 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
             _floor.Draw(_effect);
 
             _lightBox.Draw(_lightBoxWorld, _camera.View, _camera.Projection);
-          
+
             base.Draw(gameTime);
         }
 
         /// <summary>
         /// Processes a change in the blinn-phong type.
         /// </summary>
-        /// <param name="type">The new blinn-phong type to use</param>
+        /// <param name="type">The new blinn-phong type to use.</param>
         private void BlinnPhongTypeChange(BlinnPhongType type)
         {
-            switch(type)
+            switch (type)
             {
                 case BlinnPhongType.Gouraud:
                     _effect.CurrentTechnique = _effect.Techniques["Gouraud"];
@@ -225,13 +228,13 @@ namespace TGC.MonoGame.Samples.Samples.Shaders
         }
 
         /// <summary>
-        /// The different types of blinn-phong illumination
+        /// The different types of blinn-phong illumination.
         /// </summary>
         private enum BlinnPhongType
         {
             Default,
             Gouraud,
-            NormalMapping
+            NormalMapping,
         }
     }
 }

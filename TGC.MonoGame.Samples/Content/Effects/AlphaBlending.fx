@@ -38,7 +38,7 @@ struct VertexShaderOutput
 VertexShaderOutput MainVS(in VertexShaderInput input)
 {
     VertexShaderOutput output;
-    
+
     output.Position = mul(input.Position, WorldViewProjection);
 
     // Propagate Texture Coordinates
@@ -53,7 +53,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
     // Alpha blending in this case is the texture alpha channel with a factor
     // Color is the texture color with a tint
     float4 color = tex2D(textureSampler, input.TextureCoordinate);
-    
+
     return float4(color.rgb * Tint, color.a * AlphaFactor);
 }
 

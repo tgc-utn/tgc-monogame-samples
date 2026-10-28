@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Xna.Framework;
+
 using TGC.MonoGame.Samples.Animations.Models;
 using TGC.MonoGame.Samples.Animations.PipelineExtension;
 using TGC.MonoGame.Samples.Cameras;
@@ -18,7 +20,8 @@ namespace TGC.MonoGame.Samples.Samples.Animations;
 /// </summary>
 public class SkinnedAnimation : TGCSample
 {
-    public SkinnedAnimation(TGCViewer game) : base(game)
+    public SkinnedAnimation(TGCViewer game)
+        : base(game)
     {
         Category = TGCSampleCategory.Animations;
         Name = "Skinned Skeletal Animation";
@@ -78,7 +81,7 @@ public class SkinnedAnimation : TGCSample
             skeletonFolder + "Idle",
             skeletonFolder + "Idle-2",
             skeletonFolder + "Standard-Run",
-            skeletonFolder + "Standard-Walk"
+            skeletonFolder + "Standard-Walk",
         };
 
         // Build content.

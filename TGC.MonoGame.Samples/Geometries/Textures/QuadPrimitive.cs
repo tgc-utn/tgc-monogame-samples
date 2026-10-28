@@ -33,7 +33,6 @@ namespace TGC.MonoGame.Samples.Geometries.Textures
         /// </summary>
         private IndexBuffer Indices { get; set; }
 
-
         /// <summary>
         ///     Built-in effect that supports optional texturing, vertex coloring, fog, and lighting.
         /// </summary>
@@ -47,7 +46,6 @@ namespace TGC.MonoGame.Samples.Geometries.Textures
         {
             // Set the position and texture coordinate for each vertex
             // Normals point Up as the Quad is originally XZ aligned
-
             var textureCoordinateLowerLeft = Vector2.Zero;
             var textureCoordinateLowerRight = Vector2.UnitX;
             var textureCoordinateUpperLeft = Vector2.UnitY;
@@ -57,12 +55,15 @@ namespace TGC.MonoGame.Samples.Geometries.Textures
             {
                 // Possitive X, Possitive Z
                 new VertexPositionNormalTexture(Vector3.UnitX + Vector3.UnitZ, Vector3.Up, textureCoordinateUpperRight),
+
                 // Possitive X, Negative Z
                 new VertexPositionNormalTexture(Vector3.UnitX - Vector3.UnitZ, Vector3.Up, textureCoordinateLowerRight),
+
                 // Negative X, Possitive Z
                 new VertexPositionNormalTexture(Vector3.UnitZ - Vector3.UnitX, Vector3.Up, textureCoordinateUpperLeft),
+
                 // Negative X, Negative Z
-                new VertexPositionNormalTexture(-Vector3.UnitX - Vector3.UnitZ, Vector3.Up, textureCoordinateLowerLeft)
+                new VertexPositionNormalTexture(-Vector3.UnitX - Vector3.UnitZ, Vector3.Up, textureCoordinateLowerLeft),
             };
 
             Vertices = new VertexBuffer(graphicsDevice, VertexPositionNormalTexture.VertexDeclaration, vertices.Length,
@@ -75,7 +76,7 @@ namespace TGC.MonoGame.Samples.Geometries.Textures
             // Set the index buffer for each vertex, using clockwise winding
             var indices = new ushort[]
             {
-                3, 1, 0, 
+                3, 1, 0,
                 3, 0, 2,
             };
 

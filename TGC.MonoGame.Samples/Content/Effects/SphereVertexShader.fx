@@ -39,11 +39,11 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 
     // Local to World
     float4 worldPosition = mul(input.Position, World);
-        
+
     // World to View
     float4 viewPosition = mul(worldPosition, View);
 
-    // View to Projection 
+    // View to Projection
     output.Position = mul(viewPosition, Projection);
 
     return output;
@@ -62,4 +62,3 @@ technique BaseTechnique
         PixelShader = compile PS_SHADERMODEL MainPS();
     }
 };
-

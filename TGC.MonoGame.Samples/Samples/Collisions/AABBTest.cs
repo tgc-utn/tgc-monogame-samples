@@ -1,7 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Linq;
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System.Linq;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Collisions;
 using TGC.MonoGame.Samples.Viewer;
@@ -9,12 +11,13 @@ using TGC.MonoGame.Samples.Viewer;
 namespace TGC.MonoGame.Samples.Samples.Collisions
 {
     /// <summary>
-    ///     Shows how to test collision for two AABBs
+    ///     Shows how to test collision for two AABBs.
     /// </summary>
     public class AABBTest : TGCSample
     {
         /// <inheritdoc />
-        public AABBTest(TGCViewer game) : base(game)
+        public AABBTest(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.Collisions;
             Name = "AABB Test";
@@ -29,19 +32,19 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
 
         // The World Matrix for the first Robot
         private Matrix _robotOneWorld;
-        
+
         // The World Matrix for the second Robot
         private Matrix _robotTwoWorld;
 
         // The BoundingBox for the first Robot
         private BoundingBox _robotOneBox;
-        
+
         // The BoundingBox for the second Robot
         private BoundingBox _robotTwoBox;
 
         // The first Robot's position
         private Vector3 _robotOnePosition;
-        
+
         // The second Robot's position
         private Vector3 _robotTwoPosition;
 
@@ -52,7 +55,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
         public override void Initialize()
         {
             Game.Background = Color.CornflowerBlue;
-            
+
             // Creates a Static Camera looking at the origin
             _camera = new StaticCamera(GraphicsDevice.Viewport.AspectRatio, Vector3.One * 250f, -Vector3.Normalize(Vector3.One), Vector3.Up);
 
@@ -61,7 +64,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             _robotOnePosition = new Vector3(60f, 0f, 0f);
 
             // Set the World Matrices for each Robot
-            _robotOneWorld = Matrix.CreateTranslation(_robotOnePosition);           
+            _robotOneWorld = Matrix.CreateTranslation(_robotOnePosition);
             _robotTwoWorld = Matrix.CreateTranslation(_robotTwoPosition);
 
             // Initialize AABB touching value as false
@@ -80,7 +83,7 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             // Create AABBs
             // This gets an AABB with the bounds of the robot model
             _robotOneBox = BoundingVolumesExtensions.CreateAABBFrom(_robot);
-            
+
             // This moves the min and max points to the world position of each robot (one and two)
             _robotTwoBox = new BoundingBox(_robotOneBox.Min + _robotTwoPosition, _robotOneBox.Max + _robotTwoPosition);
             _robotOneBox = new BoundingBox(_robotOneBox.Min + _robotOnePosition, _robotOneBox.Max + _robotOnePosition);
@@ -144,7 +147,6 @@ namespace TGC.MonoGame.Samples.Samples.Collisions
             // Center is half the average between min and max
             // Size is the difference between max and min
             // Also draw red if they touch
-
             var colorOne = _areAABBsTouching ? Color.Red : Color.Yellow;
             var colorTwo = _areAABBsTouching ? Color.Red : Color.Green;
 

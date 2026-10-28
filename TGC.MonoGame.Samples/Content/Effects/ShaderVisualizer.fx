@@ -26,10 +26,10 @@ struct VertexShaderOutput
 VertexShaderOutput MainVS(in VertexShaderInput input)
 {
 	VertexShaderOutput output = (VertexShaderOutput)0;
-	
+
 	// Propagate position
     output.Position = input.Position;
-	
+
 	// Propagate texture coordinates
     output.TextureCoordinate = input.TextureCoordinate;
 

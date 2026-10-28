@@ -1,0 +1,119 @@
+﻿using System;
+
+using Microsoft.Xna.Framework.Graphics;
+
+namespace TGC.MonoGame.Samples.Models;
+
+/// <summary>
+/// A representation of a simple triangle-based geometry that can be drawn.
+/// </summary>
+public class Geometry : IDisposable
+{
+    internal Geometry()
+    {
+    }
+
+    internal Geometry(VertexBuffer vertexBuffer, IndexBuffer indexBuffer)
+    {
+        VertexBuffer = vertexBuffer;
+        IndexBuffer = indexBuffer;
+        VertexOffset = 0;
+        StartIndex = 0;
+        PrimitiveCount = indexBuffer.IndexCount / 3;
+        OwnsVertexBuffer = true;
+        OwnsIndexBuffer = true;
+    }
+
+    internal Geometry(
+        VertexBuffer vertexBuffer,
+        IndexBuffer indexBuffer,
+        int vertexOffset,
+        int startIndex,
+        int primitiveCount,
+        bool ownsVertexBuffer,
+        bool ownsIndexBuffer)
+    {
+        VertexBuffer = vertexBuffer;
+        IndexBuffer = indexBuffer;
+        VertexOffset = vertexOffset;
+        StartIndex = startIndex;
+        PrimitiveCount = primitiveCount;
+        OwnsVertexBuffer = ownsVertexBuffer;
+        OwnsIndexBuffer = ownsIndexBuffer;
+    }
+
+    private Geometry(ModelMeshPart part)
+    {
+        VertexBuffer = part.VertexBuffer;
+        IndexBuffer = part.IndexBuffer;
+        VertexOffset = part.VertexOffset;
+        StartIndex = part.StartIndex;
+        PrimitiveCount = part.PrimitiveCount;
+        OwnsVertexBuffer = false;
+        OwnsIndexBuffer = false;
+    }
+
+    protected VertexBuffer VertexBuffer { get; set; }
+
+    protected IndexBuffer IndexBuffer { get; set; }
+
+    protected int VertexOffset { get; set; }
+
+    protected int StartIndex { get; set; }
+
+    protected int PrimitiveCount { get; set; }
+
+    protected bool OwnsVertexBuffer { get; set; }
+
+    protected bool OwnsIndexBuffer { get; set; }
+
+    public void Draw(Effect effect)
+    {
+        var graphicsDevice = effect.GraphicsDevice;
+
+        graphicsDevice.SetVertexBuffer(VertexBuffer);
+        graphicsDevice.Indices = IndexBuffer;
+
+        foreach (var pass in effect.CurrentTechnique.Passes)
+        {
+            pass.Apply();
+            graphicsDevice.DrawIndexedPrimitives(
+                PrimitiveType.TriangleList,
+                VertexOffset,
+                StartIndex,
+                PrimitiveCount);
+        }
+    }
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    internal static Geometry FromMeshPart(ModelMeshPart part)
+    {
+        return new Geometry(part);
+    }
+
+    /// <summary>
+    ///     Releases the buffers owned by this geometry.
+    /// </summary>
+    /// <param name="disposing">True when called from <see cref="Dispose()"/>.</param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            if (OwnsVertexBuffer)
+            {
+                VertexBuffer.Dispose();
+            }
+
+            if (OwnsIndexBuffer)
+            {
+                IndexBuffer.Dispose();
+            }
+        }
+    }
+}

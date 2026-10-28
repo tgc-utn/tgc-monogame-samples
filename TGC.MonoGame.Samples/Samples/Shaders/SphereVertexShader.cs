@@ -1,6 +1,8 @@
 ﻿using System;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
@@ -12,29 +14,32 @@ namespace TGC.MonoGame.Samples.Samples.Shaders;
 ///     Units Involved:
 ///     # Unit 8 - Video Adapters - Shaders.
 ///     A basic vertex shader on a sphere.
-///     Author: Ronán Vinitzca
+///     Author: Ronán Vinitzca.
 /// </summary>
 public class SphereVertexShader : TGCSample
 {
     private Camera _camera;
 
     private Effect _effect;
-    
+
     private SpherePrimitive _sphere;
 
-    public SphereVertexShader(TGCViewer game) : base(game)
+    public SphereVertexShader(TGCViewer game)
+        : base(game)
     {
         Category = TGCSampleCategory.Shaders;
         Name = "SphereVertexShader";
         Description = "Basic Sample for demonstrating Vertex Shaders.";
     }
 
+    /// <inheritdoc/>
     public override void Initialize()
     {
-        _camera = new StaticCamera(GraphicsDevice.Viewport.AspectRatio,  Vector3.Forward * 4f, Vector3.Backward, Vector3.Up);
+        _camera = new StaticCamera(GraphicsDevice.Viewport.AspectRatio, Vector3.Forward * 4f, Vector3.Backward, Vector3.Up);
         base.Initialize();
     }
 
+    /// <inheritdoc/>
     protected override void LoadContent()
     {
         _sphere = new SpherePrimitive(GraphicsDevice, 2f, 32);
@@ -45,6 +50,7 @@ public class SphereVertexShader : TGCSample
         base.LoadContent();
     }
 
+    /// <inheritdoc/>
     public override void Update(GameTime gameTime)
     {
         _camera.Update(gameTime);
@@ -54,6 +60,7 @@ public class SphereVertexShader : TGCSample
         base.Update(gameTime);
     }
 
+    /// <inheritdoc/>
     public override void Draw(GameTime gameTime)
     {
         Game.Background = Color.CornflowerBlue;
@@ -64,7 +71,7 @@ public class SphereVertexShader : TGCSample
         rasterizerState.CullMode = CullMode.None;
         rasterizerState.FillMode = FillMode.WireFrame;
         GraphicsDevice.RasterizerState = rasterizerState;
-        
+
         var time = Convert.ToSingle(gameTime.TotalGameTime.TotalSeconds);
 
         _effect.Parameters["Time"]?.SetValue(time);
@@ -73,10 +80,10 @@ public class SphereVertexShader : TGCSample
         _effect.Parameters["Projection"].SetValue(_camera.Projection);
 
         _sphere.Draw(_effect);
-        
+
         // Restore old rasterizer state
         GraphicsDevice.RasterizerState = oldRasterizerState;
-        
+
         base.Draw(gameTime);
     }
 }

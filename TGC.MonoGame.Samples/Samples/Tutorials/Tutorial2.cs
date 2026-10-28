@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Viewer;
 
@@ -14,7 +15,8 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
     public class Tutorial2 : TGCSample
     {
         /// <inheritdoc />
-        public Tutorial2(TGCViewer game) : base(game)
+        public Tutorial2(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.Tutorials;
             Name = "Tutorial 2";
@@ -132,20 +134,27 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             {
                 // Bottom-Left Front.
                 new VertexPositionColor(new Vector3(-x + center.X, -y + center.Y, -z + center.Z), color1),
+
                 // Bottom-Left Back.
                 new VertexPositionColor(new Vector3(-x + center.X, -y + center.Y, z + center.Z), color2),
+
                 // Bottom-Right Back.
                 new VertexPositionColor(new Vector3(x + center.X, -y + center.Y, z + center.Z), color3),
+
                 // Bottom-Right Front.
                 new VertexPositionColor(new Vector3(x + center.X, -y + center.Y, -z + center.Z), color4),
+
                 // Top-Left Front.
                 new VertexPositionColor(new Vector3(-x + center.X, y + center.Y, -z + center.Z), color5),
+
                 // Top-Left Back.
                 new VertexPositionColor(new Vector3(-x + center.X, y + center.Y, z + center.Z), color6),
+
                 // Top-Right Back.
                 new VertexPositionColor(new Vector3(x + center.X, y + center.Y, z + center.Z), color7),
+
                 // Top-Right Front.
-                new VertexPositionColor(new Vector3(x + center.X, y + center.Y, -z + center.Z), color8)
+                new VertexPositionColor(new Vector3(x + center.X, y + center.Y, -z + center.Z), color8),
             };
 
             _vertices = new VertexBuffer(GraphicsDevice, VertexPositionColor.VertexDeclaration, cubeVertices.Length,
@@ -163,16 +172,21 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
             {
                 // Bottom face.
                 0, 2, 3, 0, 1, 2,
+
                 // Top face.
                 4, 6, 5, 4, 7, 6,
+
                 // Front face.
                 5, 2, 1, 5, 6, 2,
+
                 // Back face.
                 0, 7, 4, 0, 3, 7,
+
                 // Left face.
                 0, 4, 1, 1, 4, 5,
+
                 // Right face.
-                2, 6, 3, 3, 6, 7
+                2, 6, 3, 3, 6, 7,
             };
 
             _indices = new IndexBuffer(device, IndexElementSize.SixteenBits, cubeIndices.Length, BufferUsage.WriteOnly);

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
+
 using MonoGame.Framework.Content.Pipeline.Builder;
 
 namespace TGC.MonoGame.Samples.Animations.PipelineExtension;
@@ -18,7 +19,8 @@ public class CustomPipelineManager : PipelineManager
     private readonly IConfigurationRoot _configuration;
 
     public CustomPipelineManager(string projectDir, string outputDir, string intermediateDir,
-        IConfigurationRoot configuration) : base(projectDir, outputDir, intermediateDir)
+        IConfigurationRoot configuration)
+        : base(projectDir, outputDir, intermediateDir)
     {
         _configuration = configuration;
     }
@@ -41,20 +43,15 @@ public class CustomPipelineManager : PipelineManager
             PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, "../../../" + contentFolder)));
         var outputPath = PathHelper.Normalize(Path.Combine(projectDirectory, contentFolder));
         var projectDirectoryParts = projectDirectory.Split(new[] { binFolder }, StringSplitOptions.None);
-        var intermediatePath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectContentDirectory,
-            "../" + objFolder + projectDirectoryParts.Last())));
+        var intermediatePath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(
+            projectContentDirectory,
+            "../" + objFolder + projectDirectoryParts[^1])));
 
         return new CustomPipelineManager(projectContentDirectory, outputPath, intermediatePath, configuration);
     }
 
     public void BuildAnimationContent(string modelFilename)
     {
-        var importContext = new PipelineImporterContext(this);
-        var importer = new FbxImporter();
-        var nodeContent =
-            importer.Import(ProjectDirectory + modelFilename + _configuration["FbxExtension"], importContext);
-        var animationProcessor = new AnimationProcessor();
-
         var parameters = new OpaqueDataDictionary
         {
             { "ColorKeyColor", "0,0,0,0" },
@@ -70,7 +67,7 @@ public class CustomPipelineManager : PipelineManager
             { "RotationZ", "0" },
             { "Scale", "1" },
             { "SwapWindingOrder", "False" },
-            { "TextureFormat", "Compressed" }
+            { "TextureFormat", "Compressed" },
         };
 
         // Record what we're building and how.
@@ -80,8 +77,14 @@ public class CustomPipelineManager : PipelineManager
             DestFile = OutputDirectory + modelFilename + _configuration["ContentExtension"],
             Importer = _configuration["FbxImporterName"],
             Processor = _configuration["ProcessorName"],
-            Parameters = ValidateProcessorParameters(_configuration["ProcessorName"], parameters)
+            Parameters = ValidateProcessorParameters(_configuration["ProcessorName"], parameters),
         };
+
+        var importContext = new PipelineImporterContext(this, pipelineEvent);
+        var importer = new FbxImporter();
+        var nodeContent =
+            importer.Import(ProjectDirectory + modelFilename + _configuration["FbxExtension"], importContext);
+        var animationProcessor = new AnimationProcessor();
 
         var processContext = new PipelineProcessorContext(this, pipelineEvent);
         var modelContent = animationProcessor.Process(nodeContent, processContext);

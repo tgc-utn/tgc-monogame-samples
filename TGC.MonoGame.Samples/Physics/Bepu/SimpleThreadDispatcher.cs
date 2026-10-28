@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading;
+
 using BepuUtilities;
 using BepuUtilities.Memory;
 
@@ -9,24 +10,23 @@ namespace TGC.MonoGame.Samples.Physics.Bepu;
 /// <summary>
 ///     Provides a <see cref="IThreadDispatcher" /> implementation. Not reentrant.
 /// </summary>
-public class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
+public sealed class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
 {
     private readonly BufferPool[] bufferPools;
+    private readonly AutoResetEvent finished;
+    private readonly Worker[] workers;
 
     private volatile bool disposed;
-    private readonly AutoResetEvent finished;
     private int remainingWorkerCounter;
-
     private volatile Action<int> workerBody;
-
-    private readonly Worker[] workers;
 
     /// <summary>
     ///     Creates a new thread dispatcher with the given number of threads. With default value in
-    ///     threadPoolBlockAllocationSize = 16384
+    ///     threadPoolBlockAllocationSize = 16384.
     /// </summary>
     /// <param name="threadCount">Number of threads to dispatch on each invocation.</param>
-    public SimpleThreadDispatcher(int threadCount) : this(threadCount, 16384)
+    public SimpleThreadDispatcher(int threadCount)
+        : this(threadCount, 16384)
     {
     }
 
@@ -55,6 +55,11 @@ public class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
     }
 
     /// <summary>
+    ///     Gets the number of threads to dispatch work on.
+    /// </summary>
+    public int ThreadCount { get; }
+
+    /// <summary>
     ///     Waits for all pending work to complete and then disposes all workers.
     /// </summary>
     public void Dispose()
@@ -76,19 +81,16 @@ public class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
         }
     }
 
-    /// <summary>
-    ///     Gets the number of threads to dispatch work on.
-    /// </summary>
-    public int ThreadCount { get; }
-
+    /// <inheritdoc/>
     public void DispatchWorkers(Action<int> workerBody, int maximumWorkerCount = int.MaxValue)
     {
         if (maximumWorkerCount > 1)
         {
-            Debug.Assert(this.workerBody == null);
+            Debug.Assert(this.workerBody == null, "A dispatch is already in progress.");
             this.workerBody = workerBody;
             SignalThreads(maximumWorkerCount);
-            //Calling thread does work. No reason to spin up another worker and block this one!
+
+            // Calling thread does work. No reason to spin up another worker and block this one!
             DispatchThread(0);
             finished.WaitOne();
             this.workerBody = null;
@@ -99,6 +101,7 @@ public class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
         }
     }
 
+    /// <inheritdoc/>
     public BufferPool GetThreadMemoryPool(int workerIndex)
     {
         return bufferPools[workerIndex];
@@ -106,7 +109,7 @@ public class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
 
     private void DispatchThread(int workerIndex)
     {
-        Debug.Assert(workerBody != null);
+        Debug.Assert(workerBody != null, "DispatchThread should only be called while a dispatch is in progress.");
         workerBody(workerIndex);
 
         if (Interlocked.Decrement(ref remainingWorkerCounter) == -1)
@@ -125,14 +128,15 @@ public class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
             {
                 return;
             }
+
             DispatchThread(workerIndex);
         }
     }
 
     private void SignalThreads(int maximumWorkerCount)
     {
-        //Worker 0 is not signalled; it's the executing thread.
-        //So if we want 4 total executing threads, we should signal 3 workers.
+        // Worker 0 is not signalled; it's the executing thread.
+        // So if we want 4 total executing threads, we should signal 3 workers.
         var maximumWorkersToSignal = maximumWorkerCount - 1;
         var workersToSignal = maximumWorkersToSignal < workers.Length ? maximumWorkersToSignal : workers.Length;
         remainingWorkerCounter = workersToSignal;

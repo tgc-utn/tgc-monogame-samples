@@ -1,6 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Collisions;
 using TGC.MonoGame.Samples.Viewer;
@@ -14,47 +16,48 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
     public class FrustumCulling : TGCSample
     {
         /// <summary>
-        /// The index of the box Bounding Volume model to update
+        /// The index of the box Bounding Volume model to update.
         /// </summary>
         private const int BoxIndexToUpdate = 1;
 
         /// <summary>
-        /// The index of the sphere Bounding Volume model to update
+        /// The index of the sphere Bounding Volume model to update.
         /// </summary>
         private const int SphereIndexToUpdate = 2;
 
         /// <summary>
-        /// A Camera to check against bounding volumes
+        /// A Camera to check against bounding volumes.
         /// </summary>
         private Camera _testCamera;
 
         /// <summary>
-        /// A Camera to view the optimization technique
+        /// A Camera to view the optimization technique.
         /// </summary>
         private Camera _camera;
 
         /// <summary>
-        /// A Bounding Frustum to check visibility
+        /// A Bounding Frustum to check visibility.
         /// </summary>
         private BoundingFrustum _boundingFrustum;
 
         /// <summary>
-        /// A collection of models to draw with World matrices and AABBs for visibility testing
+        /// A collection of models to draw with World matrices and AABBs for visibility testing.
         /// </summary>
         private DrawInstanceBox[] _boxModels;
 
         /// <summary>
-        /// A collection of models to draw with World matrices and spheres for visibility testing
+        /// A collection of models to draw with World matrices and spheres for visibility testing.
         /// </summary>
         private DrawInstanceSphere[] _sphereModels;
 
         /// <summary>
-        /// A font to draw text
+        /// A font to draw text.
         /// </summary>
         private SpriteFont _font;
 
         /// <inheritdoc />
-        public FrustumCulling(TGCViewer game) : base(game)
+        public FrustumCulling(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.Optimizations;
             Name = "Frustum Culling";
@@ -70,14 +73,14 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
 
             // Create a camera not to render objects but to test them against its frustum
             _testCamera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 50, 1000), size);
-            
+
             // Create a camera to render the scene and visualize the frustum culling technique
             var cameraPosition = Vector3.One * 1000f;
             _camera = new StaticCamera(
                 GraphicsDevice.Viewport.AspectRatio,
-                cameraPosition, Vector3.Normalize(Vector3.Backward * 500f - cameraPosition), Vector3.Up);
+                cameraPosition, Vector3.Normalize((Vector3.Backward * 500f) - cameraPosition), Vector3.Up);
             _camera.BuildProjection(GraphicsDevice.Viewport.AspectRatio, 60.0f, 30000f, MathF.PI / 2.5f);
-          
+
             // Create a bounding frustum to check bounding volumes against it
             _boundingFrustum = new BoundingFrustum(_testCamera.View * _testCamera.Projection);
 
@@ -105,60 +108,60 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
             var logoAABB = BoundingVolumesExtensions.CreateAABBFrom(logo);
 
             // Create draw instances for models that use AABBs for bounding volumes
-            _boxModels = new []
+            _boxModels = new[]
             {
                 new DrawInstanceBox
                 {
-                    Model = logo, 
-                    Box = logoAABB, 
-                    World = Matrix.CreateTranslation(Vector3.Right * 500f)
+                    Model = logo,
+                    Box = logoAABB,
+                    World = Matrix.CreateTranslation(Vector3.Right * 500f),
                 },
                 new DrawInstanceBox
                 {
                     Model = robot,
                     Box = robotAABB,
-                    World = Matrix.CreateTranslation(Vector3.Left * 300f)
+                    World = Matrix.CreateTranslation(Vector3.Left * 300f),
                 },
                 new DrawInstanceBox
                 {
                     Model = robot,
                     Box = robotAABB,
-                    World = Matrix.CreateTranslation(Vector3.Up * 700f)
+                    World = Matrix.CreateTranslation(Vector3.Up * 700f),
                 },
                 new DrawInstanceBox
                 {
                     Model = chair,
                     Box = chairAABB,
-                    World = Matrix.CreateTranslation(Vector3.Backward * 600f)
+                    World = Matrix.CreateTranslation(Vector3.Backward * 600f),
                 },
             };
 
             // Update the AABBs
             for (var index = 0; index < _boxModels.Length; index++)
             {
-                _boxModels[index].UpdateAABB();
+                _boxModels[index].UpdateAabb();
             }
 
             // Create draw instances for models that use spheres for bounding volumes
-            _sphereModels = new []
+            _sphereModels = new[]
             {
                 new DrawInstanceSphere
                 {
                     Model = chair,
                     Sphere = chairSphere,
-                    World = Matrix.CreateTranslation(Vector3.Right * 100f)
+                    World = Matrix.CreateTranslation(Vector3.Right * 100f),
                 },
                 new DrawInstanceSphere
                 {
                     Model = robot,
                     Sphere = robotSphere,
-                    World = Matrix.CreateTranslation(new Vector3(-300f, 40f, 150f))
+                    World = Matrix.CreateTranslation(new Vector3(-300f, 40f, 150f)),
                 },
                 new DrawInstanceSphere
                 {
                     Model = chair,
                     Sphere = chairSphere,
-                    World = Matrix.CreateTranslation(new Vector3(-300f, 120f, -700f))
+                    World = Matrix.CreateTranslation(new Vector3(-300f, 120f, -700f)),
                 },
             };
 
@@ -186,7 +189,7 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
             var time = Convert.ToSingle(gameTime.TotalGameTime.TotalSeconds);
 
             _boxModels[BoxIndexToUpdate].World = Matrix.CreateTranslation(Vector3.Right * MathF.Sin(time) * 400f);
-            _boxModels[BoxIndexToUpdate].UpdateAABB();
+            _boxModels[BoxIndexToUpdate].UpdateAabb();
             _sphereModels[SphereIndexToUpdate].World = Matrix.CreateTranslation(Vector3.Up * MathF.Cos(time) * 400f);
             _sphereModels[SphereIndexToUpdate].UpdateSphere();
 
@@ -218,7 +221,7 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
                 drawn = false;
                 if (_boundingFrustum.Intersects(boxModel.BoxWorldSpace))
                 {
-                    boxModel.Model.Draw(boxModel.World, _camera.View, _camera.Projection);                    
+                    boxModel.Model.Draw(boxModel.World, _camera.View, _camera.Projection);
                     drawCallCount++;
                     drawn = true;
                 }
@@ -261,17 +264,17 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
         /// <summary>
         /// Renders the draw call count into the screen.
         /// </summary>
-        /// <param name="drawCallCount">The amount of draw calls for this frame</param>
+        /// <param name="drawCallCount">The amount of draw calls for this frame.</param>
         private void DisplayDrawCallCount(int drawCallCount)
         {
             Game.SpriteBatch.Begin();
 
             var textToShow = "Draw Calls: " + drawCallCount.ToString();
             var textPosition = new Vector2(GraphicsDevice.Viewport.Width / 2f, 20) -
-                                    _font.MeasureString(textToShow) / 2;
+                                    (_font.MeasureString(textToShow) / 2);
 
             Game.SpriteBatch.DrawString(_font, textToShow, textPosition, Color.Black);
-            
+
             Game.SpriteBatch.End();
         }
     }
@@ -279,32 +282,32 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
     /// <summary>
     /// Represents a model to draw with a world matrix to place it in the world, and an AABB for visibility testing.
     /// </summary>
-    struct DrawInstanceBox : IEquatable<DrawInstanceBox>
+    internal struct DrawInstanceBox : IEquatable<DrawInstanceBox>
     {
         /// <summary>
-        /// A model to draw
+        /// A model to draw.
         /// </summary>
-        public Model Model;
-        
-        /// <summary>
-        /// A box to get its max and min positions in local coordinates
-        /// </summary>
-        public BoundingBox Box;
-        
-        /// <summary>
-        /// The actual box to perform intersection tests
-        /// </summary>
-        public BoundingBox BoxWorldSpace;
+        internal Model Model;
 
         /// <summary>
-        /// A world matrix to transform the model into world space
+        /// A box to get its max and min positions in local coordinates.
         /// </summary>
-        public Matrix World;
+        internal BoundingBox Box;
+
+        /// <summary>
+        /// The actual box to perform intersection tests.
+        /// </summary>
+        internal BoundingBox BoxWorldSpace;
+
+        /// <summary>
+        /// A world matrix to transform the model into world space.
+        /// </summary>
+        internal Matrix World;
 
         /// <summary>
         /// Updates the AABB by using the world matrix and the original box min and max positions (in local coordinates).
         /// </summary>
-        public void UpdateAABB()
+        internal void UpdateAabb()
         {
             var translation = World.Translation;
             BoxWorldSpace.Min = Box.Min + translation;
@@ -321,27 +324,27 @@ namespace TGC.MonoGame.Samples.Samples.Optimizations
     /// <summary>
     /// Represents a model to draw with a world matrix to place it in the world, and a sphere for visibility testing.
     /// </summary>
-    struct DrawInstanceSphere : IEquatable<DrawInstanceSphere>
+    internal struct DrawInstanceSphere : IEquatable<DrawInstanceSphere>
     {
         /// <summary>
-        /// A model to draw
+        /// A model to draw.
         /// </summary>
-        public Model Model;
+        internal Model Model;
 
         /// <summary>
-        /// A sphere to perform intersection tests
+        /// A sphere to perform intersection tests.
         /// </summary>
-        public BoundingSphere Sphere;
+        internal BoundingSphere Sphere;
 
         /// <summary>
-        /// A world matrix to transform the model into world space
+        /// A world matrix to transform the model into world space.
         /// </summary>
-        public Matrix World;
+        internal Matrix World;
 
         /// <summary>
-        /// Updates the sphere by using the world matrix
+        /// Updates the sphere by using the world matrix.
         /// </summary>
-        public void UpdateSphere()
+        internal void UpdateSphere()
         {
             Sphere.Center = World.Translation;
         }

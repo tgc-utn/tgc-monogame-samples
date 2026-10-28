@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -7,7 +8,7 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos.Geometries
     /// <summary>
     ///     Gizmo for drawing Poly-Lines.
     /// </summary>
-    class PolyLineGizmoGeometry
+    public class PolyLineGizmoGeometry
     {
         private readonly GraphicsDevice _graphicsDevice;
         private readonly short[] _indices;

@@ -1,5 +1,5 @@
-float plot(float originalY, float functionResult) 
-{    
+float plot(float originalY, float functionResult)
+{
     return smoothstep(0.02, 0.0, abs(functionResult - originalY));
 }
 
@@ -26,12 +26,12 @@ float2x2 rotation2D(float angle)
 {
     float sinAngle = sin(angle);
     float cosAngle = cos(angle);
-    
+
     return float2x2(cosAngle, -sinAngle,
                 sinAngle, cosAngle);
 }
 
-float2 random2(float2 p) 
+float2 random2(float2 p)
 {
     return frac(sin(float2(dot(p,float2(127.1,311.7)),dot(p,float2(269.5,183.3))))*43758.5453);
 }

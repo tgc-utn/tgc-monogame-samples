@@ -6,13 +6,13 @@
 // Microsoft XNA Community Game Platform
 // Copyright (C) Microsoft Corporation. All rights reserved.
 //-----------------------------------------------------------------------------
-
 #endregion File Description
 
 #region Using Statements
 
 using System;
 using System.Collections.Generic;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -39,6 +39,7 @@ namespace TGC.MonoGame.Samples.Geometries
         private VertexBuffer VertexBuffer { get; set; }
 
         private IndexBuffer IndexBuffer { get; set; }
+
         public BasicEffect Effect { get; set; }
 
         #endregion Fields
@@ -61,9 +62,11 @@ namespace TGC.MonoGame.Samples.Geometries
         protected void AddIndex(int index)
         {
             if (index > ushort.MaxValue)
+            {
                 throw new ArgumentOutOfRangeException(nameof(index));
+            }
 
-            Indices.Add((ushort) index);
+            Indices.Add((ushort)index);
         }
 
         /// <summary>
@@ -80,12 +83,12 @@ namespace TGC.MonoGame.Samples.Geometries
             // Create a vertex declaration, describing the format of our vertex data.
 
             // Create a vertex buffer, and copy our vertex data into it.
-            VertexBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionColorNormal), Vertices.Count,
+            VertexBuffer = new VertexBuffer(graphicsDevice, VertexPositionColorNormal.VertexDeclaration, Vertices.Count,
                 BufferUsage.None);
             VertexBuffer.SetData(Vertices.ToArray());
 
             // Create an index buffer, and copy our index data into it.
-            IndexBuffer = new IndexBuffer(graphicsDevice, typeof(ushort), Indices.Count, BufferUsage.None);
+            IndexBuffer = new IndexBuffer(graphicsDevice, IndexElementSize.SixteenBits, Indices.Count, BufferUsage.None);
 
             IndexBuffer.SetData(Indices.ToArray());
 
@@ -117,7 +120,11 @@ namespace TGC.MonoGame.Samples.Geometries
         /// </summary>
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposing) return;
+            if (!disposing)
+            {
+                return;
+            }
+
             VertexBuffer?.Dispose();
             IndexBuffer?.Dispose();
             Effect?.Dispose();

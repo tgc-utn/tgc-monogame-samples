@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
@@ -9,7 +10,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
     public class TextureMerge : TGCSample
     {
         /// <inheritdoc />
-        public TextureMerge(TGCViewer game) : base(game)
+        public TextureMerge(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.PostProcessing;
             Name = "Texture Merge";
@@ -38,7 +40,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             base.Initialize();
         }
-        
+
         /// <inheritdoc />
         protected override void LoadContent()
         {
@@ -64,7 +66,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             base.LoadContent();
         }
-        
+
         /// <inheritdoc />
         public override void Update(GameTime gameTime)
         {
@@ -78,13 +80,14 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             base.Update(gameTime);
         }
-        
+
         /// <inheritdoc />
         public override void Draw(GameTime gameTime)
         {
             #region Pass 1
 
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+
             // Set the render target as our shadow map, we are drawing the depth into this texture
             GraphicsDevice.SetRenderTarget(_sceneRenderTarget);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1f, 0);
@@ -92,11 +95,12 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             _model.Draw(Matrix.Identity, _camera.View, _camera.Projection);
 
             #endregion
-            
+
             #region Pass 2
 
             // No depth needed
             GraphicsDevice.DepthStencilState = DepthStencilState.None;
+
             // Set the render target to null, we are drawing to the screen
             GraphicsDevice.SetRenderTarget(null);
 
@@ -104,10 +108,11 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             _fullScreenQuad.Draw(_effect);
 
             #endregion
-            
+
             base.Draw(gameTime);
         }
 
+        /// <inheritdoc/>
         protected override void UnloadContent()
         {
             base.UnloadContent();

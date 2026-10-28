@@ -1,6 +1,8 @@
 ﻿using System;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
@@ -15,7 +17,8 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
     public class Tutorial3 : TGCSample
     {
         /// <inheritdoc />
-        public Tutorial3(TGCViewer game) : base(game)
+        public Tutorial3(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.Tutorials;
             Name = "Tutorial 3";
@@ -82,6 +85,7 @@ namespace TGC.MonoGame.Samples.Samples.Tutorials
 
             // Save the past RasterizerState
             var oldRasterizerState = GraphicsDevice.RasterizerState;
+
             // Use a RasterizerState which has Back-Face Culling disabled
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 

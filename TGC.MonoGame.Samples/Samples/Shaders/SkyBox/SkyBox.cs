@@ -9,17 +9,18 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.SkyBox
     public class SkyBox
     {
         /// <summary>
-        ///     Creates a new SkyBox
+        ///     Creates a new SkyBox.
         /// </summary>
         /// <param name="model">The geometry to use for SkyBox.</param>
         /// <param name="texture">The SkyBox texture to use.</param>
         /// <param name="effect">The size of the cube.</param>
-        public SkyBox(Model model, TextureCube texture, Effect effect) : this(model, texture, effect, 50)
+        public SkyBox(Model model, TextureCube texture, Effect effect)
+            : this(model, texture, effect, 50)
         {
         }
 
         /// <summary>
-        ///     Creates a new SkyBox
+        ///     Creates a new SkyBox.
         /// </summary>
         /// <param name="model">The geometry to use for SkyBox.</param>
         /// <param name="texture">The SkyBox texture to use.</param>
@@ -40,17 +41,17 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.SkyBox
         private readonly float _size;
 
         /// <summary>
-        ///     The effect file that the SkyBox will use to render
+        ///     The effect file that the SkyBox will use to render.
         /// </summary>
         private readonly Effect _effect;
 
         /// <summary>
-        ///     The actual SkyBox texture
+        ///     The actual SkyBox texture.
         /// </summary>
         private readonly TextureCube _texture;
 
         /// <summary>
-        ///     The SkyBox model, which will just be a cube
+        ///     The SkyBox model, which will just be a cube.
         /// </summary>
         private readonly Model _model;
 
@@ -60,9 +61,9 @@ namespace TGC.MonoGame.Samples.Samples.Shaders.SkyBox
         ///     be moved around.  The size of the SkyBox can be changed with the size
         ///     variable.
         /// </summary>
-        /// <param name="view">The view matrix for the effect</param>
-        /// <param name="projection">The projection matrix for the effect</param>
-        /// <param name="cameraPosition">The position of the camera</param>
+        /// <param name="view">The view matrix for the effect.</param>
+        /// <param name="projection">The projection matrix for the effect.</param>
+        /// <param name="cameraPosition">The position of the camera.</param>
         public void Draw(Matrix view, Matrix projection, Vector3 cameraPosition)
         {
             // Go through each pass in the effect, but we know there is only one...

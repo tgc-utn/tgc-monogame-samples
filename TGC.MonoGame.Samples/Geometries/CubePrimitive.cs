@@ -6,7 +6,6 @@
 // Microsoft XNA Community Game Platform
 // Copyright (C) Microsoft Corporation. All rights reserved.
 //-----------------------------------------------------------------------------
-
 #endregion File Description
 
 #region Using Statements
@@ -23,12 +22,14 @@ namespace TGC.MonoGame.Samples.Geometries
     /// </summary>
     public class CubePrimitive : GeometricPrimitive
     {
-        public CubePrimitive(GraphicsDevice graphicsDevice) : this(graphicsDevice, 1, Color.White, Color.White,
+        public CubePrimitive(GraphicsDevice graphicsDevice)
+            : this(graphicsDevice, 1, Color.White, Color.White,
             Color.White, Color.White, Color.White, Color.White)
         {
         }
 
-        public CubePrimitive(GraphicsDevice graphicsDevice, float size, Color color) : this(graphicsDevice, size, color,
+        public CubePrimitive(GraphicsDevice graphicsDevice, float size, Color color)
+            : this(graphicsDevice, size, color,
             color, color, color, color, color)
         {
         }
@@ -44,24 +45,30 @@ namespace TGC.MonoGame.Samples.Geometries
             {
                 // front normal
                 Vector3.UnitZ,
+
                 // back normal
                 -Vector3.UnitZ,
+
                 // right normal
                 Vector3.UnitX,
+
                 // left normal
                 -Vector3.UnitX,
+
                 // top normal
                 Vector3.UnitY,
+
                 // bottom normal
-                -Vector3.UnitY
+                -Vector3.UnitY,
             };
 
             Color[] colors =
             {
-                color1, color2, color3, color4, color5, color6
+                color1, color2, color3, color4, color5, color6,
             };
 
             var i = 0;
+
             // Create each face in turn.
             foreach (var normal in normals)
             {

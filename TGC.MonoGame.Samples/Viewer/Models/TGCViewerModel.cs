@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using ImGuiNET;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using TGC.MonoGame.Samples.Samples;
 using TGC.MonoGame.Samples.Viewer.GUI.ImGuiNET;
+
 using NumericVector2 = System.Numerics.Vector2;
 
 namespace TGC.MonoGame.Samples.Viewer.Models
@@ -12,18 +16,8 @@ namespace TGC.MonoGame.Samples.Viewer.Models
     /// <summary>
     ///     The model has the logic for creating the sample explorer and also load them.
     /// </summary>
-    public class TGCViewerModel
+    public class TGCViewerModel : IDisposable
     {
-        /// <summary>
-        ///     Default constructor.
-        /// </summary>
-        /// <param name="game">The game where the explorer is going to be drawn.</param>
-        public TGCViewerModel(TGCViewer game)
-        {
-            _game = game;
-            _activeSampleTreeNode = -1;
-        }
-
         /// <summary>
         ///     The viewer where the samples are going to be shown.
         /// </summary>
@@ -45,11 +39,6 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         private Dictionary<string, TGCSample> _samplesByName;
 
         /// <summary>
-        ///     Samples that have already been loaded.
-        /// </summary>
-        public Dictionary<string, TGCSample> AlreadyLoadedSamples { get; set; }
-
-        /// <summary>
         ///     The active sample.
         /// </summary>
         private TGCSample _activeSample;
@@ -68,6 +57,21 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         ///     If the About modal in visible or not.
         /// </summary>
         private bool _aboutVisible;
+
+        /// <summary>
+        ///     Default constructor.
+        /// </summary>
+        /// <param name="game">The game where the explorer is going to be drawn.</param>
+        public TGCViewerModel(TGCViewer game)
+        {
+            _game = game;
+            _activeSampleTreeNode = -1;
+        }
+
+        /// <summary>
+        ///     Samples that have already been loaded.
+        /// </summary>
+        public Dictionary<string, TGCSample> AlreadyLoadedSamples { get; set; }
 
         /// <summary>
         ///     Initialize imgui to be able to build the menu.
@@ -95,10 +99,10 @@ namespace TGC.MonoGame.Samples.Viewer.Models
                 {
                     continue;
                 }
-                
+
                 try
                 {
-                    var sample = (TGCSample) Activator.CreateInstance(type, _game);
+                    var sample = (TGCSample)Activator.CreateInstance(type, _game);
                     sample.Visible = false;
                     sample.Enabled = false;
 
@@ -110,7 +114,7 @@ namespace TGC.MonoGame.Samples.Viewer.Models
                         }
                         else
                         {
-                            _samplesByCategory.Add(sample.Category, new List<TGCSample> {sample});
+                            _samplesByCategory.Add(sample.Category, new List<TGCSample> { sample });
                         }
                     }
 
@@ -168,22 +172,6 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         }
 
         /// <summary>
-        ///     Binds the Modifiers from the current sample to be used by ImGUI.
-        /// </summary>
-        private void BindModifiers()
-        {
-            _activeSample.BindModifiers(_imGuiRenderer);
-        }
-
-        /// <summary>
-        ///     Releases the Modifier bindings from the current sample.
-        /// </summary>
-        private void UnbindModifiers()
-        {
-            _activeSample.UnbindModifiers(_imGuiRenderer);
-        }
-
-        /// <summary>
         ///     Draw the sample explorer.
         /// </summary>
         /// <param name="gameTime">Holds the time state of a <see cref="_game" />.</param>
@@ -200,14 +188,58 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         }
 
         /// <summary>
+        ///     Unloads every sample.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        ///     Disposes every sample currently registered as a game component.
+        /// </summary>
+        /// <param name="disposing">True when called from <see cref="Dispose()"/>.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                foreach (var sample in _samplesByName)
+                {
+                    if (_game.Components.Contains(sample.Value))
+                    {
+                        sample.Value.Dispose();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Binds the Modifiers from the current sample to be used by ImGUI.
+        /// </summary>
+        private void BindModifiers()
+        {
+            _activeSample.BindModifiers(_imGuiRenderer);
+        }
+
+        /// <summary>
+        ///     Releases the Modifier bindings from the current sample.
+        /// </summary>
+        private void UnbindModifiers()
+        {
+            _activeSample.UnbindModifiers(_imGuiRenderer);
+        }
+
+        /// <summary>
         ///     Create the GUI components.
-        ///     Example at https://github.com/ocornut/imgui/blob/master/imgui_demo.cpp
+        ///     Example at https://github.com/ocornut/imgui/blob/master/imgui_demo.cpp.
         /// </summary>
         /// <param name="samplesByCategory">Sample ordered list to load into sample tree.</param>
         private void ImGuiLayout(SortedList<string, List<TGCSample>> samplesByCategory)
         {
             ImGui.SetNextWindowPos(new NumericVector2(0, 0));
-            ImGui.SetNextWindowSize(new NumericVector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 6f,
+            ImGui.SetNextWindowSize(new NumericVector2(
+                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 6f,
                 GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 100));
 
             ImGui.Begin("TGC samples explorer", ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoMove);
@@ -344,7 +376,7 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         }
 
         /// <summary>
-        ///     Draws the Modifiers for the current sample
+        ///     Draws the Modifiers for the current sample.
         /// </summary>
         private void DrawModifiers()
         {
@@ -352,11 +384,12 @@ namespace TGC.MonoGame.Samples.Viewer.Models
         }
 
         /// <summary>
-        ///     About Window / ShowAboutWindow()
+        ///     About Window / ShowAboutWindow().
         /// </summary>
         private void ShowAboutWindow()
         {
-            ImGui.Begin("About",
+            ImGui.Begin(
+                "About",
                 ImGuiWindowFlags.Modal | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoCollapse);
             ImGui.Text("MonoGame samples made by TGC UTN Group.");
             ImGui.Text("With <3 from Argentine.");
@@ -368,20 +401,6 @@ namespace TGC.MonoGame.Samples.Viewer.Models
             }
 
             ImGui.End();
-        }
-
-        /// <summary>
-        ///     Unloads every sample.
-        /// </summary>
-        public void Dispose()
-        {
-            foreach (var sample in _samplesByName)
-            {
-                if (_game.Components.Contains(sample.Value))
-                {
-                    sample.Value.Dispose();
-                }
-            }
         }
     }
 }

@@ -44,13 +44,13 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 	// Animate position
     float atenuacion = 0.8;
     float y = input.Position.y;
-    float z = input.Position.z;    
+    float z = input.Position.z;
     input.Position.y = y * cos(Time * atenuacion) - z * sin(Time * atenuacion);
     input.Position.z = z * cos(Time * atenuacion) + y * sin(Time * atenuacion);
 
     float4 worldPosition = mul(input.Position, World);
     float4 viewPosition = mul(worldPosition, View);
-	
+
 	// Project position
     output.Position = mul(viewPosition, Projection);
 

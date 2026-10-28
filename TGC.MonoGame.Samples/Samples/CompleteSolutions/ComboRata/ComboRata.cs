@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
 
@@ -23,20 +26,22 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
         public const int ST_STAGE_5 = 5;
         public const int ST_GAME_OVER = 99;
         public const int ST_CAMBIO_NIVEL = 98;
-        public CubePrimitive Box;
-        public Effect Effect;
-        public SpriteFont font;
 
-        public bool god_mode;
-        public SpriteBatch spriteBatch;
-
-        public int status = ST_PRESENTACION;
-        public Texture2D Texture, TextureAux;
-        public float timer_level;
-        public TunelMesh Tunel;
+        // Uncomment along with the debug block in Draw.
+        // private CubePrimitive _box;
+        private Effect _effect;
+        private SpriteFont _font;
+        private bool _godMode;
+        private SpriteBatch _spriteBatch;
+        private int _status = ST_PRESENTACION;
+        private Texture2D _texture;
+        private Texture2D _textureAux;
+        private float _timerLevel;
+        private TunelMesh _tunel;
 
         /// <inheritdoc />
-        public ComboRata(TGCViewer game) : base(game)
+        public ComboRata(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.CompleteSolutions;
             Name = "Combo Rata";
@@ -46,30 +51,8 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
         /// <inheritdoc />
         public override void Initialize()
         {
-            Box = new CubePrimitive(GraphicsDevice);
+            // _box = new CubePrimitive(GraphicsDevice);
             base.Initialize();
-        }
-
-        /// <inheritdoc />
-        protected override void LoadContent()
-        {
-            Texture = Game.Content.Load<Texture2D>(ContentFolderTextures + "tunel/metal");
-            TextureAux = Game.Content.Load<Texture2D>(ContentFolderTextures + "tunel/level2");
-            // Load a shader using Content pipeline.
-            Effect = Game.Content.Load<Effect>(ContentFolderEffects + "ComboRata");
-            Tunel = new TunelMesh();
-            Effect.Parameters["World"].SetValue(Matrix.Identity);
-            var projectionMatrix =
-                Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 50, 50000);
-
-            Game.Gizmos.UpdateViewProjection(Matrix.Identity, projectionMatrix);
-
-            Effect.Parameters["Projection"].SetValue(projectionMatrix);
-            Effect.Parameters["ModelTexture"].SetValue(Texture);
-            font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-            Effect.CurrentTechnique = Effect.Techniques["ColorDrawing"];
-            base.LoadContent();
         }
 
         /// <inheritdoc />
@@ -77,11 +60,15 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
         {
             var elapsedTime = gameTime.ElapsedGameTime.Milliseconds / 1000f;
 
-            switch (status)
+            switch (_status)
             {
                 case ST_CAMBIO_NIVEL:
-                    timer_level -= elapsedTime;
-                    if (timer_level < 0) status = ST_STAGE_1;
+                    _timerLevel -= elapsedTime;
+                    if (_timerLevel < 0)
+                    {
+                        _status = ST_STAGE_1;
+                    }
+
                     break;
 
                 case ST_GAME_OVER:
@@ -89,54 +76,40 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
 
                 case ST_PRESENTACION:
                     if (Game.CurrentKeyboardState.IsKeyDown(Keys.Space))
-                        status = ST_STAGE_1;
+                    {
+                        _status = ST_STAGE_1;
+                    }
+
                     break;
                 default:
-                {
-                    var keys = Game.CurrentKeyboardState.GetPressedKeys();
-                    if (keys.Length > 0)
-                        if (keys[0] == Keys.G)
-                            god_mode = !god_mode;
-
-                    Tunel.Update(elapsedTime, Game.CurrentKeyboardState);
-                    if (Tunel.colision && !god_mode)
-                        status = ST_GAME_OVER;
-
-                    var p_ant = 1 + (int) Tunel.ant_pos;
-                    var p = 1 + (int) Tunel.pos;
-                    if (p_ant != p && p % 50 == 0)
                     {
-                        // paso al siguiente stage
-                        status++;
-                        switch (status)
+                        var keys = Game.CurrentKeyboardState.GetPressedKeys();
+                        if (keys.Length > 0)
                         {
-                            case ST_STAGE_2:
-                                Effect.CurrentTechnique = Effect.Techniques["EdgeDectect"];
-                                break;
-                            case ST_STAGE_3:
-                                Effect.CurrentTechnique = Effect.Techniques["TexCoordsDrawing"];
-                                break;
-                            case ST_STAGE_4:
-                                Effect.CurrentTechnique = Effect.Techniques["TextureDrawing"];
-                                break;
-                            case ST_STAGE_5:
-                                Effect.Parameters["ModelTexture"].SetValue(TextureAux);
-                                break;
-                            case 6:
-                                // paso al siguiente nivel
-                                status = ST_CAMBIO_NIVEL;
-                                Tunel.level = 1 - Tunel.level;
-                                Tunel.FillVertices();
-                                Effect.CurrentTechnique = Effect.Techniques["ColorDrawing"];
-                                Effect.Parameters["ModelTexture"].SetValue(Texture);
-                                timer_level = 2;
-                                break;
+                            if (keys[0] == Keys.G)
+                            {
+                                _godMode = !_godMode;
+                            }
+                        }
+
+                        _tunel.Update(elapsedTime, Game.CurrentKeyboardState);
+                        if (_tunel.Colision && !_godMode)
+                        {
+                            _status = ST_GAME_OVER;
+                        }
+
+                        var p_ant = 1 + (int)_tunel.PreviousPosition;
+                        var p = 1 + (int)_tunel.Pos;
+                        if (p_ant != p && p % 50 == 0)
+                        {
+                            // paso al siguiente stage
+                            _status++;
+                            AdvanceStage();
                         }
                     }
-                }
+
                     break;
             }
-
 
             base.Update(gameTime);
         }
@@ -144,20 +117,18 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
         /// <inheritdoc />
         public override void Draw(GameTime gameTime)
         {
-            Game.Background = Tunel.colision ? Color.GreenYellow : Color.Gray;
+            Game.Background = _tunel.Colision ? Color.GreenYellow : Color.Gray;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            //
 
-            Tunel.Draw(GraphicsDevice, Effect);
-            
+            _tunel.Draw(GraphicsDevice, _effect);
+
             // Debug
-            //var world = Matrix.CreateScale(Vector3.One * 40) * Matrix.CreateTranslation(Tunel.PosGamer);
-            //var world = Matrix.CreateScale(Vector3.One * 10) * Matrix.CreateTranslation(Tunel.PosGamer - Tunel.ViewDir * 50);
-            //var world = Matrix.CreateScale(Vector3.One * 10) * Matrix.CreateTranslation(Tunel.PosGamer + Tunel.ViewDir * 50);
-            //Effect.Parameters["World"].SetValue(world);
-            //Box.Draw(Effect);
-
-            switch (status)
+            // var world = Matrix.CreateScale(Vector3.One * 40) * Matrix.CreateTranslation(_tunel.PosGamer);
+            // var world = Matrix.CreateScale(Vector3.One * 10) * Matrix.CreateTranslation(_tunel.PosGamer - _tunel.ViewDir * 50);
+            // var world = Matrix.CreateScale(Vector3.One * 10) * Matrix.CreateTranslation(_tunel.PosGamer + _tunel.ViewDir * 50);
+            // _effect.Parameters["World"].SetValue(world);
+            // _box.Draw(_effect);
+            switch (_status)
             {
                 case ST_CAMBIO_NIVEL:
                     DrawCenterText("NEXT LEVEL!!!!", 5);
@@ -172,16 +143,21 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
                     break;
 
                 case ST_GAME_OVER:
-                    DrawCenterTextY("Distancia Recorrida = " + Math.Round(Tunel.pos, 1), 50, 1);
+                    DrawCenterTextY("Distancia Recorrida = " + Math.Round(_tunel.Pos, 1), 50, 1);
                     DrawCenterText("GAME OVER", 5);
                     break;
                 default:
-                    spriteBatch.Begin();
-                    spriteBatch.DrawString(font, "Distancia:" + Math.Round(Tunel.pos, 1), new Vector2(10, 10),
+                    _spriteBatch.Begin();
+                    _spriteBatch.DrawString(
+                        _font,
+                        "Distancia:" + Math.Round(_tunel.Pos, 1),
+                        new Vector2(10, 10),
                         Color.White);
-                    spriteBatch.End();
-                    if (god_mode)
+                    _spriteBatch.End();
+                    if (_godMode)
+                    {
                         DrawRightText("GODMODE", 10, 1);
+                    }
 
                     break;
             }
@@ -191,35 +167,105 @@ namespace TGC.MonoGame.Samples.Samples.CompleteSolutions.ComboRata
 
         public void DrawCenterText(string msg, float escala)
         {
-            var W = GraphicsDevice.Viewport.Width;
-            var H = GraphicsDevice.Viewport.Height;
-            var size = font.MeasureString(msg) * escala;
-            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null,
-                Matrix.CreateScale(escala) * Matrix.CreateTranslation((W - size.X) / 2, (H - size.Y) / 2, 0));
-            spriteBatch.DrawString(font, msg, new Vector2(0, 0), Color.YellowGreen);
-            spriteBatch.End();
+            var w = GraphicsDevice.Viewport.Width;
+            var h = GraphicsDevice.Viewport.Height;
+            var size = _font.MeasureString(msg) * escala;
+            _spriteBatch.Begin(
+                SpriteSortMode.Deferred,
+                null,
+                null,
+                null,
+                null,
+                null,
+                Matrix.CreateScale(escala) * Matrix.CreateTranslation((w - size.X) / 2, (h - size.Y) / 2, 0));
+            _spriteBatch.DrawString(_font, msg, new Vector2(0, 0), Color.YellowGreen);
+            _spriteBatch.End();
         }
 
-        public void DrawCenterTextY(string msg, float Y, float escala)
+        public void DrawCenterTextY(string msg, float y, float escala)
         {
-            var W = GraphicsDevice.Viewport.Width;
-            var H = GraphicsDevice.Viewport.Height;
-            var size = font.MeasureString(msg) * escala;
-            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null,
-                Matrix.CreateScale(escala) * Matrix.CreateTranslation((W - size.X) / 2, Y, 0));
-            spriteBatch.DrawString(font, msg, new Vector2(0, 0), Color.YellowGreen);
-            spriteBatch.End();
+            var w = GraphicsDevice.Viewport.Width;
+            var size = _font.MeasureString(msg) * escala;
+            _spriteBatch.Begin(
+                SpriteSortMode.Deferred,
+                null,
+                null,
+                null,
+                null,
+                null,
+                Matrix.CreateScale(escala) * Matrix.CreateTranslation((w - size.X) / 2, y, 0));
+            _spriteBatch.DrawString(_font, msg, new Vector2(0, 0), Color.YellowGreen);
+            _spriteBatch.End();
         }
 
-        public void DrawRightText(string msg, float Y, float escala)
+        public void DrawRightText(string msg, float y, float escala)
         {
-            var W = GraphicsDevice.Viewport.Width;
-            var H = GraphicsDevice.Viewport.Height;
-            var size = font.MeasureString(msg) * escala;
-            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null,
-                Matrix.CreateScale(escala) * Matrix.CreateTranslation(W - size.X - 20, Y, 0));
-            spriteBatch.DrawString(font, msg, new Vector2(0, 0), Color.YellowGreen);
-            spriteBatch.End();
+            var w = GraphicsDevice.Viewport.Width;
+            var size = _font.MeasureString(msg) * escala;
+            _spriteBatch.Begin(
+                SpriteSortMode.Deferred,
+                null,
+                null,
+                null,
+                null,
+                null,
+                Matrix.CreateScale(escala) * Matrix.CreateTranslation(w - size.X - 20, y, 0));
+            _spriteBatch.DrawString(_font, msg, new Vector2(0, 0), Color.YellowGreen);
+            _spriteBatch.End();
+        }
+
+        /// <inheritdoc />
+        protected override void LoadContent()
+        {
+            _texture = Game.Content.Load<Texture2D>(ContentFolderTextures + "tunel/metal");
+            _textureAux = Game.Content.Load<Texture2D>(ContentFolderTextures + "tunel/level2");
+
+            // Load a shader using Content pipeline.
+            _effect = Game.Content.Load<Effect>(ContentFolderEffects + "ComboRata");
+            _tunel = new TunelMesh();
+            _effect.Parameters["World"].SetValue(Matrix.Identity);
+            var projectionMatrix =
+                Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 50, 50000);
+
+            Game.Gizmos.UpdateViewProjection(Matrix.Identity, projectionMatrix);
+
+            _effect.Parameters["Projection"].SetValue(projectionMatrix);
+            _effect.Parameters["ModelTexture"].SetValue(_texture);
+            _font = Game.Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            _effect.CurrentTechnique = _effect.Techniques["ColorDrawing"];
+            base.LoadContent();
+        }
+
+        private void AdvanceStage()
+        {
+            switch (_status)
+            {
+                case ST_STAGE_2:
+                    _effect.CurrentTechnique = _effect.Techniques["EdgeDectect"];
+                    break;
+                case ST_STAGE_3:
+                    _effect.CurrentTechnique = _effect.Techniques["TexCoordsDrawing"];
+                    break;
+                case ST_STAGE_4:
+                    _effect.CurrentTechnique = _effect.Techniques["TextureDrawing"];
+                    break;
+                case ST_STAGE_5:
+                    _effect.Parameters["ModelTexture"].SetValue(_textureAux);
+                    break;
+                case 6:
+                    // paso al siguiente nivel
+                    _status = ST_CAMBIO_NIVEL;
+                    _tunel.Level = 1 - _tunel.Level;
+                    _tunel.FillVertices();
+                    _effect.CurrentTechnique = _effect.Techniques["ColorDrawing"];
+                    _effect.Parameters["ModelTexture"].SetValue(_texture);
+                    _timerLevel = 2;
+                    break;
+                default:
+                    Debug.WriteLine($"Unexpected Status value: {_status}", "ComboRata");
+                    break;
+            }
         }
     }
 }

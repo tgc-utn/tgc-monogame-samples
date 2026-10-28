@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+
 using TGC.MonoGame.Samples.Animations.DataTypes;
 
 namespace TGC.MonoGame.Samples.Animations.Models;

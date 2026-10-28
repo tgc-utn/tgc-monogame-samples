@@ -1,15 +1,16 @@
-﻿using ImGuiNET;
-using System;
+﻿using System;
 using System.Numerics;
+
+using ImGuiNET;
 
 namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
 {
     /// <summary>
-    ///     A Button Modifier that calls an action when is pressed
+    ///     A Button Modifier that calls an action when is pressed.
     /// </summary>
     public class ButtonModifier : IModifier
     {
-        private static readonly Vector4 DisabledColor = new (0.2f);
+        private static readonly Vector4 DisabledColor = new(0.2f);
 
         private readonly string _name;
 
@@ -20,9 +21,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <summary>
         ///     Creates a Button Modifier.
         /// </summary>
-        /// <param name="text">The text to display in the button</param>
-        /// <param name="onPress">The action to execute when the button is pressed</param>
-        /// <param name="enabled">If the button is enabled</param>
+        /// <param name="text">The text to display in the button.</param>
+        /// <param name="onPress">The action to execute when the button is pressed.</param>
+        /// <param name="enabled">If the button is enabled.</param>
         public ButtonModifier(string text, Action onPress, bool enabled)
         {
             _name = text;
@@ -33,14 +34,15 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         /// <summary>
         ///     Creates a Button Modifier, enabled by default.
         /// </summary>
-        /// <param name="text">The text to display in the button</param>
-        /// <param name="onPress">The action to execute when the button is pressed</param>
-        public ButtonModifier(string text, Action onPress) : this(text, onPress, true)
+        /// <param name="text">The text to display in the button.</param>
+        /// <param name="onPress">The action to execute when the button is pressed.</param>
+        public ButtonModifier(string text, Action onPress)
+            : this(text, onPress, true)
         {
         }
 
         /// <summary>
-        ///     Draws the Button Modifier
+        ///     Draws the Button Modifier.
         /// </summary>
         public void Draw()
         {
@@ -65,9 +67,9 @@ namespace TGC.MonoGame.Samples.Viewer.GUI.Modifiers
         }
 
         /// <summary>
-        ///     Sets the enabled state of the button
+        ///     Sets the enabled state of the button.
         /// </summary>
-        /// <param name="enabled">A boolean indicating if the button is enabled or not</param>
+        /// <param name="enabled">A boolean indicating if the button is enabled or not.</param>
         public void SetEnabled(bool enabled)
         {
             _enabled = enabled;

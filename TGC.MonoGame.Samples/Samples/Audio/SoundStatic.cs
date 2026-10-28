@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+
 using TGC.MonoGame.Samples.Viewer;
 
 namespace TGC.MonoGame.Samples.Samples.Audio
@@ -16,7 +17,8 @@ namespace TGC.MonoGame.Samples.Samples.Audio
     public class SoundStatic : TGCSample
     {
         /// <inheritdoc />
-        public SoundStatic(TGCViewer game) : base(game)
+        public SoundStatic(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.Audio;
             Name = "Sound Effect";
@@ -79,10 +81,10 @@ namespace TGC.MonoGame.Samples.Samples.Audio
             Game.SpriteBatch.Begin();
 
             var soundNamePosition = new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2f, 20) -
-                                    _font.MeasureString(_soundName) / 2;
+                                    (_font.MeasureString(_soundName) / 2);
             Game.SpriteBatch.DrawString(_font, "Playing: " + _soundName, soundNamePosition, Color.DarkMagenta);
             var instructionsPosition = new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2f, 60) -
-                                       _instructionsSize / 2;
+                                       (_instructionsSize / 2);
             Game.SpriteBatch.DrawString(_font, _instructions, instructionsPosition, Color.DarkGreen);
 
             Game.SpriteBatch.End();

@@ -1,6 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries.Textures;
 using TGC.MonoGame.Samples.Viewer;
@@ -16,7 +18,8 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
     public class Spaces : TGCSample
     {
         /// <inheritdoc />
-        public Spaces(TGCViewer game) : base(game)
+        public Spaces(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.Transformations;
             Name = "Spaces";
@@ -24,57 +27,57 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         }
 
         /// <summary>
-        ///     A camera to draw geometry into the screen
+        ///     A camera to draw geometry into the screen.
         /// </summary>
         private Camera _mainCamera;
 
         /// <summary>
-        ///     Simulates a camera to transform a model and show the different spaces a vertex can be in
+        ///     Simulates a camera to transform a model and show the different spaces a vertex can be in.
         /// </summary>
         private Camera _viewerCamera;
 
         /// <summary>
-        ///     A box to be drawn in different spaces
+        ///     A box to be drawn in different spaces.
         /// </summary>
         private BoxPrimitive _box;
 
         /// <summary>
-        ///     A quaternion that describes the box rotation
+        ///     A quaternion that describes the box rotation.
         /// </summary>
         private Quaternion _quaternion;
 
         /// <summary>
-        ///     A vector containing the position of the box
+        ///     A vector containing the position of the box.
         /// </summary>
         private Vector3 _position = Vector3.Zero;
 
         /// <summary>
-        ///     A vector containing the scale of the box
+        ///     A vector containing the scale of the box.
         /// </summary>
         private Vector3 _scale = Vector3.One;
 
         /// <summary>
-        ///     The world matrix of the box
+        ///     The world matrix of the box.
         /// </summary>
         private Matrix _boxWorld;
 
         /// <summary>
-        ///     The aspect ratio of the window, needed to recalculate the projection matrix
+        ///     The aspect ratio of the window, needed to recalculate the projection matrix.
         /// </summary>
         private float _aspectRatio;
 
         /// <summary>
-        ///     The current space we are drawing the box in
+        ///     The current space we are drawing the box in.
         /// </summary>
         private SpaceType _space = SpaceType.Local;
 
         /// <summary>
-        ///     A value between zero and one to interpolate between spaces
+        ///     A value between zero and one to interpolate between spaces.
         /// </summary>
         private float _interpolator;
 
         /// <summary>
-        ///     The current field of view angle in degrees
+        ///     The current field of view angle in degrees.
         /// </summary>
         private float _fov = 60f;
 
@@ -111,7 +114,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         /// <summary>
         ///     Processes a change in the interpolation value used to blend spaces.
         /// </summary>
-        /// <param name="interpolator">The new interpolator value, with range [0, 1]</param>
+        /// <param name="interpolator">The new interpolator value, with range [0, 1].</param>
         private void OnInterpolatorChange(float interpolator)
         {
             _interpolator = interpolator;
@@ -120,7 +123,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         /// <summary>
         ///     Processes a change in the FOV of the projection matrix.
         /// </summary>
-        /// <param name="fieldOfView">The new FOV value in degrees</param>
+        /// <param name="fieldOfView">The new FOV value in degrees.</param>
         private void OnFOVChange(float fieldOfView)
         {
             // Prevent FOV to reach 0 or 180
@@ -133,7 +136,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         /// <summary>
         ///     Processes a change in the space of the box.
         /// </summary>
-        /// <param name="space">The new space to draw the box in</param>
+        /// <param name="space">The new space to draw the box in.</param>
         private void OnSpaceChange(SpaceType space)
         {
             _space = space;
@@ -143,7 +146,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         /// <summary>
         ///     Processes a change in the position of the box.
         /// </summary>
-        /// <param name="position">The position o</param>
+        /// <param name="position">The position o.</param>
         private void OnPositionChange(Vector3 position)
         {
             _position = position;
@@ -154,7 +157,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         ///     Converts an angle in degrees to radians.
         /// </summary>
         /// <param name="angleInDegrees">The angle to convert to degrees.</param>
-        /// <returns>The converted angle in radians</returns>
+        /// <returns>The converted angle in radians.</returns>
         private float ToRadians(float angleInDegrees)
         {
             return angleInDegrees * MathF.PI / 180f;
@@ -163,7 +166,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         /// <summary>
         ///     Processes a change in the rotation of the box.
         /// </summary>
-        /// <param name="rotation">The new rotation angle in degrees for each axis</param>
+        /// <param name="rotation">The new rotation angle in degrees for each axis.</param>
         private void OnRotationChange(Vector3 rotation)
         {
             var rotationInRadians = new Vector3(ToRadians(rotation.X), ToRadians(rotation.Y), ToRadians(rotation.Z));
@@ -177,7 +180,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
         /// <summary>
         ///     Processes a change in the scale of the box.
         /// </summary>
-        /// <param name="scale">The new scale for each axis</param>
+        /// <param name="scale">The new scale for each axis.</param>
         private void OnScaleChange(Vector3 scale)
         {
             _scale = scale;
@@ -219,6 +222,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
 
             // Save the past RasterizerState
             var oldRasterizerState = GraphicsDevice.RasterizerState;
+
             // Use a RasterizerState which has Back-Face Culling disabled
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
@@ -235,13 +239,15 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
 
                 case SpaceType.World:
                     interpolated = Matrix.Lerp(_boxWorld, _boxWorld * _viewerCamera.View, _interpolator);
-                    Game.Gizmos.DrawFrustum(_viewerCamera.View * _viewerCamera.Projection,
+                    Game.Gizmos.DrawFrustum(
+                        _viewerCamera.View * _viewerCamera.Projection,
                         Color.Yellow * (1f - _interpolator));
                     Game.Gizmos.DrawFrustum(_viewerCamera.Projection, Color.Green * _interpolator);
                     break;
 
                 case SpaceType.View:
-                    interpolated = Matrix.Lerp(_boxWorld * _viewerCamera.View,
+                    interpolated = Matrix.Lerp(
+                        _boxWorld * _viewerCamera.View,
                         _boxWorld * _viewerCamera.View * _viewerCamera.Projection, _interpolator);
                     Game.Gizmos.DrawFrustum(_viewerCamera.Projection, Color.Green * (1f - _interpolator));
                     Game.Gizmos.DrawCube(new Vector3(0f, 0f, 0.5f), new Vector3(1f, 1f, 1f),
@@ -278,7 +284,7 @@ namespace TGC.MonoGame.Samples.Samples.Transformations
             Local = 0,
             World = 1,
             View = 2,
-            Projection = 3
+            Projection = 3,
         }
     }
 }

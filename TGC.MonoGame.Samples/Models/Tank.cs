@@ -6,7 +6,6 @@
 // Microsoft XNA Community Game Platform
 // Copyright (C) Microsoft Corporation. All rights reserved.
 //-----------------------------------------------------------------------------
-
 #endregion File Description
 
 #region Using Statements
@@ -137,7 +136,6 @@ namespace TGC.MonoGame.Samples.Models
         private Matrix[] _boneTransforms;
 
         // Current animation positions.
-
         #endregion Fields
 
         #region Properties

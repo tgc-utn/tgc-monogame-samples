@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+
 using Microsoft.Xna.Framework;
 
 namespace TGC.MonoGame.Samples.Animations.Models;
@@ -105,13 +106,13 @@ public class Bone
                         Matrix.CreateTranslation(_translation) * _bindTransform;
 
         if (_parent != null)
-            // This bone has a Parent bone.
         {
+            // This bone has a Parent bone.
             AbsoluteTransform = transform * _parent.AbsoluteTransform;
         }
         else
-            // The root bone.
         {
+            // The root bone.
             AbsoluteTransform = transform;
         }
     }
@@ -120,7 +121,7 @@ public class Bone
     ///     This sets the Rotation and Translation such that the Rotation times the Translation times the bind after set equals
     ///     this matrix. This is used to set animation values.
     /// </summary>
-    /// <param name="m">A matrix include Translation and Rotation</param>
+    /// <param name="m">A matrix include Translation and Rotation.</param>
     public void SetCompleteTransform(Matrix m)
     {
         var setTo = m * Matrix.Invert(_bindTransform);

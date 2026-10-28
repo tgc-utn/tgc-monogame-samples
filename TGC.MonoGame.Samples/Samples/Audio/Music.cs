@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+
 using TGC.MonoGame.Samples.Viewer;
 
 namespace TGC.MonoGame.Samples.Samples.Audio
@@ -16,7 +17,8 @@ namespace TGC.MonoGame.Samples.Samples.Audio
     public class Music : TGCSample
     {
         /// <inheritdoc />
-        public Music(TGCViewer game) : base(game)
+        public Music(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.Audio;
             Name = "Music";
@@ -57,17 +59,25 @@ namespace TGC.MonoGame.Samples.Samples.Audio
         public override void Update(GameTime gameTime)
         {
             if (Game.CurrentKeyboardState.IsKeyDown(Keys.Y) && MediaPlayer.State == MediaState.Stopped)
-                //Start and Stop the MP3
+            {
+                // Start and Stop the MP3
                 MediaPlayer.Play(_song);
+            }
             else if (Game.CurrentKeyboardState.IsKeyDown(Keys.U) && MediaPlayer.State == MediaState.Playing)
-                //Pause the MP3
+            {
+                // Pause the MP3
                 MediaPlayer.Pause();
+            }
             else if (Game.CurrentKeyboardState.IsKeyDown(Keys.I) && MediaPlayer.State == MediaState.Paused)
-                //Resume the MP3
+            {
+                // Resume the MP3
                 MediaPlayer.Resume();
+            }
             else if (Game.CurrentKeyboardState.IsKeyDown(Keys.O) && MediaPlayer.State == MediaState.Playing)
-                //Stop the MP3
+            {
+                // Stop the MP3
                 MediaPlayer.Stop();
+            }
 
             Game.Gizmos.UpdateViewProjection(Matrix.Identity, Matrix.Identity);
 
@@ -79,14 +89,14 @@ namespace TGC.MonoGame.Samples.Samples.Audio
         {
             Game.Background = Color.CornflowerBlue;
 
-            //TODO add magic of Song.FromUri when we have controller to do file explorer.
+            // TODO add magic of Song.FromUri when we have controller to do file explorer.
             Game.SpriteBatch.Begin();
 
             var songNamePosition = new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2f, 20) -
-                                   _font.MeasureString(_songName) / 2;
+                                   (_font.MeasureString(_songName) / 2);
             Game.SpriteBatch.DrawString(_font, "Playing: " + _songName, songNamePosition, Color.DarkMagenta);
             var instructionsPosition = new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2f, 60) -
-                                       _instructionsSize / 2;
+                                       (_instructionsSize / 2);
             Game.SpriteBatch.DrawString(_font, _instructions, instructionsPosition, Color.DarkGreen);
 
             Game.SpriteBatch.End();

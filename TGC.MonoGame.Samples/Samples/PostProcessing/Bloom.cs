@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using TGC.MonoGame.Samples.Cameras;
 using TGC.MonoGame.Samples.Geometries;
 using TGC.MonoGame.Samples.Viewer;
@@ -23,7 +24,8 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         private RenderTarget2D _secondPassBloomRenderTarget;
 
         /// <inheritdoc />
-        public Bloom(TGCViewer game) : base(game)
+        public Bloom(TGCViewer game)
+            : base(game)
         {
             Category = TGCSampleCategory.PostProcessing;
             Name = "Bloom";
@@ -41,7 +43,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         {
             var screenSize = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
             _camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(-350, 50, 400), screenSize);
-            
+
             base.Initialize();
         }
 
@@ -63,7 +65,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             // Create a full screen quad to post-process
             _fullScreenQuad = new FullScreenQuad(GraphicsDevice);
 
-            // Create render targets. 
+            // Create render targets.
             // MainRenderTarget is used to store the scene color
             // BloomRenderTarget is used to store the bloom color and switches with MultipassBloomRenderTarget
             // depending on the pass count, to blur the bloom color
@@ -89,7 +91,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
         {
             // Update the state of the camera
             _camera.Update(gameTime);
-            
+
             Game.Gizmos.UpdateViewProjection(_camera.View, _camera.Projection);
 
             base.Update(gameTime);
@@ -172,7 +174,9 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             foreach (var modelMesh in _model.Meshes)
             {
                 foreach (var part in modelMesh.MeshParts)
+                {
                     part.Effect = _effect;
+                }
 
                 // We set the main matrices for each mesh to draw
                 var worldMatrix = modelMeshesBaseTransforms[modelMesh.ParentBone.Index];
@@ -199,7 +203,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
 
             for (var index = 0; index < PassCount; index++)
             {
-                //Exchange(ref SecondaPassBloomRenderTarget, ref FirstPassBloomRenderTarget);
+                // Exchange(ref SecondaPassBloomRenderTarget, ref FirstPassBloomRenderTarget);
 
                 // Set the render target as null, we are drawing into the screen now!
                 GraphicsDevice.SetRenderTarget(finalBloomRenderTarget);
@@ -238,6 +242,7 @@ namespace TGC.MonoGame.Samples.Samples.PostProcessing
             #endregion
         }
 
+        /// <inheritdoc/>
         protected override void UnloadContent()
         {
             base.UnloadContent();

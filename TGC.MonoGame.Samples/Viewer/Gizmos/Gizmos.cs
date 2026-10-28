@@ -1,25 +1,24 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+
 using TGC.MonoGame.Samples.Viewer.Gizmos.Geometries;
 
 namespace TGC.MonoGame.Samples.Viewer.Gizmos
 {
     /// <summary>
-    ///     Renders Gizmos
+    ///     Renders Gizmos.
     /// </summary>
-    public class Gizmos
+    public class Gizmos : IDisposable
     {
-        /// <summary>
-        ///     Creates a GizmosRenderer.
-        /// </summary>
-        public Gizmos()
-        {
-            _noDepth = new DepthStencilState();
-            _noDepth.DepthBufferEnable = false;
-            _noDepth.DepthBufferFunction = CompareFunction.Always;
-        }
+        private readonly Dictionary<GizmoGeometry, Dictionary<Color, List<Matrix>>> _drawInstances = new();
+
+        private readonly DepthStencilState _noDepth;
+
+        private readonly Dictionary<Color, List<Vector3[]>> _polyLinesToDraw = new();
 
         private AxisLines _axisLines;
 
@@ -32,8 +31,6 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         private CylinderGizmoGeometry _cylinder;
         private DiskGizmoGeometry _disk;
 
-        private readonly Dictionary<GizmoGeometry, Dictionary<Color, List<Matrix>>> _drawInstances = new ();
-
         private Effect _effect;
         private EffectPass _foregroundPass;
 
@@ -41,15 +38,24 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
 
         private LineSegmentGizmoGeometry _lineSegment;
 
-        private readonly DepthStencilState _noDepth;
         private PolyLineGizmoGeometry _polyLine;
-        private readonly Dictionary<Color, List<Vector3[]>> _polyLinesToDraw = new ();
+
         private Matrix _projection;
         private SphereGizmoGeometry _sphere;
 
         private Matrix _view;
         private Matrix _viewProjection;
         private EffectParameter _worldViewProjectionParameter;
+
+        /// <summary>
+        ///     Creates a GizmosRenderer.
+        /// </summary>
+        public Gizmos()
+        {
+            _noDepth = new DepthStencilState();
+            _noDepth.DepthBufferEnable = false;
+            _noDepth.DepthBufferFunction = CompareFunction.Always;
+        }
 
         public bool Enabled { get; set; } = true;
 
@@ -84,19 +90,6 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
             _drawInstances[_cube] = new Dictionary<Color, List<Matrix>>();
             _drawInstances[_disk] = new Dictionary<Color, List<Matrix>>();
             _drawInstances[_cylinder] = new Dictionary<Color, List<Matrix>>();
-        }
-
-        /// <summary>
-        ///     Adds a draw instance specifying the geometry, its color and the world matrix to use when drawing.
-        /// </summary>
-        /// <param name="type">The GizmoGeometry to be drawn.</param>
-        /// <param name="color">The color of the geometry.</param>
-        /// <param name="world">The world matrix to be used when drawing.</param>
-        private void AddDrawInstance(GizmoGeometry type, Color color, Matrix world)
-        {
-            var instancesByType = _drawInstances[type];
-            instancesByType.TryAdd(color, new List<Matrix>());
-            instancesByType[color].Add(world * _viewProjection);
         }
 
         /// <summary>
@@ -320,7 +313,9 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
         public void Draw()
         {
             if (!Enabled)
+            {
                 return;
+            }
 
             // Save our depth state, then use ours
             var depth = _graphicsDevice.DepthStencilState;
@@ -339,6 +334,46 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
             _axisLines.Draw();
 
             CleanDrawInstances();
+        }
+
+        /// <summary>
+        ///     Disposes the used resources (geometries and content).
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        ///     Releases the gizmo geometries, effect and content manager.
+        /// </summary>
+        /// <param name="disposing">True when called from <see cref="Dispose()"/>.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _lineSegment.Dispose();
+                _sphere.Dispose();
+                _cube.Dispose();
+                _disk.Dispose();
+                _cylinder.Dispose();
+                _effect.Dispose();
+                _content.Dispose();
+            }
+        }
+
+        /// <summary>
+        ///     Adds a draw instance specifying the geometry, its color and the world matrix to use when drawing.
+        /// </summary>
+        /// <param name="type">The GizmoGeometry to be drawn.</param>
+        /// <param name="color">The color of the geometry.</param>
+        /// <param name="world">The world matrix to be used when drawing.</param>
+        private void AddDrawInstance(GizmoGeometry type, Color color, Matrix world)
+        {
+            var instancesByType = _drawInstances[type];
+            instancesByType.TryAdd(color, new List<Matrix>());
+            instancesByType[color].Add(world * _viewProjection);
         }
 
         /// <summary>
@@ -406,20 +441,6 @@ namespace TGC.MonoGame.Samples.Viewer.Gizmos
             _drawInstances[_cube].Clear();
             _drawInstances[_disk].Clear();
             _drawInstances[_cylinder].Clear();
-        }
-
-        /// <summary>
-        ///     Disposes the used resources (geometries and content).
-        /// </summary>
-        public void Dispose()
-        {
-            _lineSegment.Dispose();
-            _sphere.Dispose();
-            _cube.Dispose();
-            _disk.Dispose();
-            _cylinder.Dispose();
-            _effect.Dispose();
-            _content.Dispose();
         }
     }
 }

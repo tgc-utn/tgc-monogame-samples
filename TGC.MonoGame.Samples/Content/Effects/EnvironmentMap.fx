@@ -58,7 +58,7 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 	output.WorldPosition = mul(input.Position, World);
     output.Normal = mul(float4(normalize(input.Normal.xyz), 1.0), InverseTransposeWorld);
     output.TextureCoordinates = input.TextureCoordinates;
-	
+
     return output;
 }
 
@@ -66,13 +66,13 @@ float4 EnvironmentMapPS(VertexShaderOutput input) : COLOR
 {
 	//Normalizar vectores
 	float3 normal = normalize(input.Normal.xyz);
-    
+
 	// Get the texel from the texture
 	float3 baseColor = tex2D(textureSampler, input.TextureCoordinates).rgb;
-	
+
     // Not part of the mapping, just adjusting color
     baseColor = lerp(baseColor, float3(1, 1, 1), step(length(baseColor), 0.01));
-    
+
 	//Obtener texel de CubeMap
 	float3 view = normalize(eyePosition.xyz - input.WorldPosition.xyz);
 	float3 reflection = reflect(view, normal);
@@ -93,7 +93,7 @@ VertexShaderOutput SphereVS(in VertexShaderInput input)
     output.WorldPosition = mul(input.Position, World);
     output.Normal = mul(float4(normalize(input.Position.xyz), 1.0), InverseTransposeWorld);
     output.TextureCoordinates = input.TextureCoordinates;
-	
+
     return output;
 }
 
