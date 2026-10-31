@@ -16,7 +16,7 @@ The official
 ```bash
 winget install Microsoft.VCRedist.2013.x64
 winget install Microsoft.VCRedist.2015+.x64
-winget install Microsoft.DotNet.SDK.8
+winget install Microsoft.DotNet.SDK.10
 
 # To check the version installed.
 dotnet --info

@@ -8,7 +8,7 @@ The samples where tested in:
 
 We need the following tools:
 
-- [.NET Core SDK 8 (LTS)](https://learn.microsoft.com/dotnet/core/install/windows)
+- [.NET SDK 10 (LTS)](https://learn.microsoft.com/dotnet/core/install/windows)
 - [Git](https://git-scm.com/)
 - [Git Large File Storage (LFS)](https://git-lfs.com/)
 - IDE alternatives:

@@ -15,7 +15,7 @@ Outside of Windows you need [Wine's](https://www.winehq.org) help for Effects
 ## Set up MonoGame
 
 ```bash
-brew install --cask dotnet-sdk@8
+brew install --cask dotnet-sdk@10
 
 # To check the version installed.
 dotnet --info
@@ -44,7 +44,7 @@ You will need to open Wine manually first. Otherwise, you will get an error
 that Apple couldn't verify it.
 
 ```bash
-wget -qO- https://monogame.net/downloads/net8_mgfxc_wine_setup.sh | bash
+wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
 ```
 
 This will create new directory called .winemonogame in your home directory. If
