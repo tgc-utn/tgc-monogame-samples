@@ -13,12 +13,12 @@ at least for [now](https://github.com/MonoGame/MonoGame/issues/2167).
 ```bash
 sudo apt update && sudo apt full-upgrade
 
-# On Ubuntu 26.04, .NET 10 is the default version. To install .NET 8.0,
+# On Ubuntu 26.04, .NET 10 is the default version. On Ubuntu 24.04,
 # first register the Ubuntu .NET Backports package repository:
 # https://learn.microsoft.com/dotnet/core/install/linux-ubuntu-decision#register-the-ubuntu-net-backports-package-repository
 sudo add-apt-repository ppa:dotnet/backports && sudo apt update
 
-sudo apt install dotnet-sdk-8.0
+sudo apt install dotnet-sdk-10.0
 
 # To check the version installed.
 dotnet --info
@@ -40,7 +40,7 @@ dotnet run
 ```bash
 sudo apt install curl p7zip-full wget wine64
 wine --version
-wget -qO- https://monogame.net/downloads/net8_mgfxc_wine_setup.sh | bash
+wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
 ```
 
 This will create new directory called .winemonogame in your home directory.

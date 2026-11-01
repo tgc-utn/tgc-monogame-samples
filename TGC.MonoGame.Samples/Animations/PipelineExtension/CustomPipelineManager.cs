@@ -70,14 +70,19 @@ public class CustomPipelineManager : PipelineManager
             { "TextureFormat", "Compressed" },
         };
 
+        var importerName = _configuration["FbxImporterName"]
+            ?? throw new InvalidOperationException("FbxImporterName is missing from the configuration.");
+        var processorName = _configuration["ProcessorName"]
+            ?? throw new InvalidOperationException("ProcessorName is missing from the configuration.");
+
         // Record what we're building and how.
         var pipelineEvent = new PipelineBuildEvent
         {
             SourceFile = modelFilename,
             DestFile = OutputDirectory + modelFilename + _configuration["ContentExtension"],
-            Importer = _configuration["FbxImporterName"],
-            Processor = _configuration["ProcessorName"],
-            Parameters = ValidateProcessorParameters(_configuration["ProcessorName"], parameters),
+            Importer = importerName,
+            Processor = processorName,
+            Parameters = ValidateProcessorParameters(processorName, parameters),
         };
 
         var importContext = new PipelineImporterContext(this, pipelineEvent);

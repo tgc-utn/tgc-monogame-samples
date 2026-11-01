@@ -2,8 +2,8 @@
 
 ## Technology stack
 
-- Language: C# 12.
-- SDK: .NET 8 (LTS); target LTS releases only.
+- Language: C# 14.
+- SDK: .NET 10 (LTS); target LTS releases only.
 - Build tool: dotnet CLI.
 
 ## Dependencies
